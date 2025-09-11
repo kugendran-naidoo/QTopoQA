@@ -8,7 +8,7 @@ __pycache__/
 
 # Mac
 .DS_Store
-topoqa_work*/
+scripts/inference/topoqa/output/work/
 
 # Distribution / packaging
 .Python
