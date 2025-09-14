@@ -11,9 +11,9 @@ export DATASET_DIR="../../../../datasets/examples/BM55-AF2/decoy"
 # relative path to script
 export TARGET_DIR="3SE8"
 # relative path to script
-export TOPO_WORK_DIR="output/work"
+export TOPO_WORK_DIR="logs/output/work"
 # relative path to script
-export TOPO_RESULTS_DIR="output/results"
+export TOPO_RESULTS_DIR="logs/output/results"
 # relative path to script
 export TOPO_INF_MODEL="../../../../topoqa/model/topoqa.ckpt"
 # relative path to script
