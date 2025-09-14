@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+
+# Envs & caches
+.env
+.venv
+venv/
+pip-wheel-metadata/
+.cache/
+
+# VCS & OS cruft
+.git
+.gitignore
+.DS_Store
+
+# Build artifacts
+dist/
+build/
+

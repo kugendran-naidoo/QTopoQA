@@ -1,0 +1,21 @@
+# ---- Core PyTorch stack (CPU) ----
+# Torch 2.1.x expects NumPy 1.x headers -> pin to 1.26.x
+numpy==1.26.4
+
+torch==2.1.2
+torchvision==0.16.2
+torchaudio==2.1.2
+
+# ---- PyG core (pure Python; available on both arches) ----
+torch-geometric==2.5.3
+
+# ---- Training framework ----
+pytorch-lightning==2.5.3
+
+# (Any other project deps below…)
+pandas
+scikit-learn
+joblib
+gudhi==3.10.1
+biopython==1.84
+mdtraj

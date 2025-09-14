@@ -1,0 +1,259 @@
+[info] device = cpu
+[info] found 30 models in /workspace/BM55-AF2/decoy/3SE8
+[stage] extracting interfaces -> /workspace/delete_temp_output/work/interface_ca (jobs=8)
+[debug] interface files found: 30
+[info] 30 models with interfaces.
+[stage] computing topology features -> /workspace/delete_temp_output/work/node_topo (jobs=8)
+[stage] computing node features -> /workspace/delete_temp_output/work/node_fea (jobs=8)
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_1_multimer_20220423_569004_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_1_multimer_20220423_555805_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_2_multimer_20220423_555805_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_1_multimer_20220423_751456_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_1_multimer_20220423_727554_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_1_multimer_20220423_574203_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_2_multimer_20220423_574203_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_2_multimer_20220423_569004_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_3_multimer_20220423_569004_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_3_multimer_20220423_574203_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_4_multimer_20220423_555805_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_2_multimer_20220423_727554_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_3_multimer_20220423_727554_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_2_multimer_20220423_751456_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_3_multimer_20220423_555805_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_3_multimer_20220423_751456_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_4_multimer_20220423_569004_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_4_multimer_20220423_574203_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_4_multimer_20220423_727554_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_4_multimer_20220423_751456_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_5_multimer_20220423_555805_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_5_multimer_20220423_569004_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_5_multimer_20220423_574203_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_5_multimer_20220423_727554_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in ranked_3_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in ranked_4_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in model_5_multimer_20220423_751456_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in ranked_1_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in ranked_2_tidy: DSSP failed to produce an output
+/usr/local/lib/python3.10/site-packages/Bio/PDB/DSSP.py:199: UserWarning: Since the file did not start with a valid PDB HEADER line mmCIF was assumed, but that failed.
+ >> parse error at line 1: This file does not seem to be an mmCIF file
+
+  warnings.warn(err)
+[node_fea] error in ranked_0_tidy: DSSP failed to produce an output
+[stage] constructing graphs -> /workspace/delete_temp_output/work/graph (jobs=8, cutoff=0-10 Å)
+error in protein model_1_multimer_20220423_751456_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_1_multimer_20220423_751456_tidy.csv'
+error in protein model_1_multimer_20220423_569004_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_1_multimer_20220423_569004_tidy.csv'
+error in protein model_1_multimer_20220423_555805_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_1_multimer_20220423_555805_tidy.csv'
+error in protein model_2_multimer_20220423_569004_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_2_multimer_20220423_569004_tidy.csv'
+error in protein model_2_multimer_20220423_555805_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_2_multimer_20220423_555805_tidy.csv'
+error in protein model_2_multimer_20220423_574203_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_2_multimer_20220423_574203_tidy.csv'
+[validate] model_1_multimer_20220423_751456_tidy: no graph file produced.
+[create_graph] model_1_multimer_20220423_751456_tidy: validation failed; graph removed.
+[validate] model_1_multimer_20220423_569004_tidy: no graph file produced.
+[create_graph] model_1_multimer_20220423_569004_tidy: validation failed; graph removed.
+[validate] model_1_multimer_20220423_555805_tidy: no graph file produced.
+[create_graph] model_1_multimer_20220423_555805_tidy: validation failed; graph removed.
+[validate] model_2_multimer_20220423_574203_tidy: no graph file produced.
+[create_graph] model_2_multimer_20220423_574203_tidy: validation failed; graph removed.
+[validate] model_2_multimer_20220423_555805_tidy: no graph file produced.
+[create_graph] model_2_multimer_20220423_555805_tidy: validation failed; graph removed.
+[validate] model_2_multimer_20220423_569004_tidy: no graph file produced.
+[create_graph] model_2_multimer_20220423_569004_tidy: validation failed; graph removed.
+error in protein model_1_multimer_20220423_574203_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_1_multimer_20220423_574203_tidy.csv'
+[validate] model_1_multimer_20220423_574203_tidy: no graph file produced.
+[create_graph] model_1_multimer_20220423_574203_tidy: validation failed; graph removed.
+error in protein model_1_multimer_20220423_727554_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_1_multimer_20220423_727554_tidy.csv'
+[validate] model_1_multimer_20220423_727554_tidy: no graph file produced.
+[create_graph] model_1_multimer_20220423_727554_tidy: validation failed; graph removed.
+/usr/local/lib/python3.10/site-packages/joblib/externals/loky/process_executor.py:782: UserWarning: A worker stopped while some jobs were given to the executor. This can be caused by a too short worker timeout or by a memory leak.
+  warnings.warn(
+error in protein model_2_multimer_20220423_751456_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_2_multimer_20220423_751456_tidy.csv'
+error in protein model_2_multimer_20220423_727554_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_2_multimer_20220423_727554_tidy.csv'
+[validate] model_2_multimer_20220423_727554_tidy: no graph file produced.
+[create_graph] model_2_multimer_20220423_727554_tidy: validation failed; graph removed.
+[validate] model_2_multimer_20220423_751456_tidy: no graph file produced.
+[create_graph] model_2_multimer_20220423_751456_tidy: validation failed; graph removed.
+error in protein model_4_multimer_20220423_569004_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_4_multimer_20220423_569004_tidy.csv'
+error in protein model_4_multimer_20220423_574203_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_4_multimer_20220423_574203_tidy.csv'
+[validate] model_4_multimer_20220423_569004_tidy: no graph file produced.
+[create_graph] model_4_multimer_20220423_569004_tidy: validation failed; graph removed.
+[validate] model_4_multimer_20220423_574203_tidy: no graph file produced.
+[create_graph] model_4_multimer_20220423_574203_tidy: validation failed; graph removed.
+error in protein model_4_multimer_20220423_727554_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_4_multimer_20220423_727554_tidy.csv'
+error in protein model_4_multimer_20220423_751456_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_4_multimer_20220423_751456_tidy.csv'
+[validate] model_4_multimer_20220423_727554_tidy: no graph file produced.
+[create_graph] model_4_multimer_20220423_727554_tidy: validation failed; graph removed.
+error in protein model_5_multimer_20220423_555805_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_5_multimer_20220423_555805_tidy.csv'
+[validate] model_4_multimer_20220423_751456_tidy: no graph file produced.
+[create_graph] model_4_multimer_20220423_751456_tidy: validation failed; graph removed.
+[validate] model_5_multimer_20220423_555805_tidy: no graph file produced.
+error in protein model_5_multimer_20220423_569004_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_5_multimer_20220423_569004_tidy.csv'
+[create_graph] model_5_multimer_20220423_555805_tidy: validation failed; graph removed.
+error in protein model_5_multimer_20220423_574203_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_5_multimer_20220423_574203_tidy.csv'
+[validate] model_5_multimer_20220423_569004_tidy: no graph file produced.
+[create_graph] model_5_multimer_20220423_569004_tidy: validation failed; graph removed.
+error in protein model_5_multimer_20220423_727554_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_5_multimer_20220423_727554_tidy.csv'
+[validate] model_5_multimer_20220423_574203_tidy: no graph file produced.
+[create_graph] model_5_multimer_20220423_574203_tidy: validation failed; graph removed.
+[validate] model_5_multimer_20220423_727554_tidy: no graph file produced.
+[create_graph] model_5_multimer_20220423_727554_tidy: validation failed; graph removed.
+error in protein model_5_multimer_20220423_751456_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_5_multimer_20220423_751456_tidy.csv'
+error in protein ranked_0_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/ranked_0_tidy.csv'
+[validate] model_5_multimer_20220423_751456_tidy: no graph file produced.
+[create_graph] model_5_multimer_20220423_751456_tidy: validation failed; graph removed.
+error in protein ranked_1_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/ranked_1_tidy.csv'
+[validate] ranked_1_tidy: no graph file produced.
+[create_graph] ranked_1_tidy: validation failed; graph removed.
+error in protein ranked_2_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/ranked_2_tidy.csv'
+[validate] ranked_0_tidy: no graph file produced.
+[create_graph] ranked_0_tidy: validation failed; graph removed.
+error in protein ranked_3_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/ranked_3_tidy.csv'
+[validate] ranked_2_tidy: no graph file produced.
+[create_graph] ranked_2_tidy: validation failed; graph removed.
+error in protein ranked_4_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/ranked_4_tidy.csv'
+[validate] ranked_3_tidy: no graph file produced.
+[create_graph] ranked_3_tidy: validation failed; graph removed.
+[validate] ranked_4_tidy: no graph file produced.
+[create_graph] ranked_4_tidy: validation failed; graph removed.
+error in protein model_3_multimer_20220423_555805_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_3_multimer_20220423_555805_tidy.csv'
+[validate] model_3_multimer_20220423_555805_tidy: no graph file produced.
+[create_graph] model_3_multimer_20220423_555805_tidy: validation failed; graph removed.
+error in protein model_3_multimer_20220423_569004_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_3_multimer_20220423_569004_tidy.csv'
+[validate] model_3_multimer_20220423_569004_tidy: no graph file produced.
+[create_graph] model_3_multimer_20220423_569004_tidy: validation failed; graph removed.
+error in protein model_3_multimer_20220423_574203_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_3_multimer_20220423_574203_tidy.csv'
+[validate] model_3_multimer_20220423_574203_tidy: no graph file produced.
+[create_graph] model_3_multimer_20220423_574203_tidy: validation failed; graph removed.
+error in protein model_3_multimer_20220423_727554_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_3_multimer_20220423_727554_tidy.csv'
+[validate] model_3_multimer_20220423_727554_tidy: no graph file produced.
+[create_graph] model_3_multimer_20220423_727554_tidy: validation failed; graph removed.
+error in protein model_3_multimer_20220423_751456_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_3_multimer_20220423_751456_tidy.csv'
+[validate] model_3_multimer_20220423_751456_tidy: no graph file produced.
+[create_graph] model_3_multimer_20220423_751456_tidy: validation failed; graph removed.
+error in protein model_4_multimer_20220423_555805_tidy: [Errno 2] No such file or directory: '/workspace/delete_temp_output/work/node_fea/model_4_multimer_20220423_555805_tidy.csv'
+[validate] model_4_multimer_20220423_555805_tidy: no graph file produced.
+[create_graph] model_4_multimer_20220423_555805_tidy: validation failed; graph removed.
+[stage] graphs available for dataset: 0
+Traceback (most recent call last):
+  File "/app/k_mac_inference_pca_tsne4.py", line 914, in <module>
+    sys.exit(main())
+  File "/app/k_mac_inference_pca_tsne4.py", line 866, in main
+    ds = GraphDataset(graph_dir, model_names)
+  File "/app/k_mac_inference_pca_tsne4.py", line 530, in __init__
+    raise FileNotFoundError(f"No graph files found in {graph_dir}")
+FileNotFoundError: No graph files found in /workspace/delete_temp_output/work/graph
