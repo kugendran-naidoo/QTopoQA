@@ -7,7 +7,7 @@
 
 export DATASET_NAME="BM55-AF2"
 # relative path to script
-export DATASET_DIR="../../../datasets/examples/BM55-AF2/decoy"
+export DATASET_DIR="../../../../datasets/examples/BM55-AF2/decoy"
 # relative path to script
 export TARGET_DIR="3SE8"
 # relative path to script
@@ -15,9 +15,9 @@ export TOPO_WORK_DIR="output/work"
 # relative path to script
 export TOPO_RESULTS_DIR="output/results"
 # relative path to script
-export TOPO_INF_MODEL="../../../topoqa/model/topoqa.ckpt"
+export TOPO_INF_MODEL="../../../../topoqa/model/topoqa.ckpt"
 # relative path to script
-export TOPO_INF_SCRIPT="../../../topoqa/k_mac_inference_pca_tsne4.py"
+export TOPO_INF_SCRIPT="../../../../topoqa/k_mac_inference_pca_tsne4.py"
 
 # inference configuration
 export TOPO_JOBS=8

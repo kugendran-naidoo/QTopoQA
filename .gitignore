@@ -8,7 +8,9 @@ __pycache__/
 
 # Mac
 .DS_Store
-scripts/inference/topoqa/output/work/
+# ignore generated work artifacts
+**/output/work/
+**/logs/output/
 
 # Distribution / packaging
 .Python
@@ -222,3 +224,4 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+

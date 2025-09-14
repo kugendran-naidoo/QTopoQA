@@ -2,42 +2,38 @@
 ARG PYTHON_VERSION=3.10.14
 FROM python:${PYTHON_VERSION}-slim-bookworm
 
-ARG TORCH_VERSION=2.1.2
-ARG TORCHVISION_VERSION=0.16.2
-ARG TORCHAUDIO_VERSION=2.1.2
-ARG TORCH_CPU_INDEX=https://download.pytorch.org/whl/cpu
-# PyG index keyed to torch-2.1.x CPU
-ARG PYG_EXTRA_INDEX=https://data.pyg.org/whl/torch-2.1.0+cpu.html
-
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
     PYTHONDONTWRITEBYTECODE=1
 
-# -------- OS deps --------
+# ---- build deps for DSSP ----
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        ca-certificates curl git tini \
-        build-essential pkg-config \
-        libglib2.0-0 libsm6 libxext6 libxrender1 \
-        dssp \
-        vim-tiny \
-        && ln -sf /usr/bin/vim.tiny /usr/bin/vi \
-        && vi --version | head -n1 \
-        && rm -rf /var/lib/apt/lists/* \
-    # verify mkdssp is available (fail the build if not)
-        && mkdssp --version \
-        && command -v mkdssp
+      cmake make g++ \
+      libboost-dev zlib1g-dev libbz2-dev libeigen3-dev libpcre2-dev \
+      libcifpp-dev libmcfp-dev \
+      ca-certificates curl git tini \
+      build-essential pkg-config \
+      libglib2.0-0 libsm6 libxext6 libxrender1 \
+      vim-tiny \
+      && ln -sf /usr/bin/vim.tiny /usr/bin/vi \
+      && vi --version | head -n1 \
+      && rm -rf /var/lib/apt/lists/*
+
+# ---- build & install mkdssp v4.5.3 ----
+ARG DSSP_VER=v4.5.3
+RUN git clone --depth=1 --branch ${DSSP_VER} https://github.com/PDB-REDO/dssp.git /tmp/dssp \
+ && cmake -S /tmp/dssp -B /tmp/dssp/build -DCMAKE_BUILD_TYPE=Release \
+ && cmake --build /tmp/dssp/build -j"$(nproc)" \
+ && cmake --install /tmp/dssp/build \
+ && rm -rf /tmp/dssp
+
+# sanity check (leave or remove)
+RUN mkdssp --version && command -v mkdssp
 
 # -------- Python deps (CPU-only) --------
 COPY requirements.txt /tmp/requirements.txt
-
-# ---- Python deps (Torch/PyG/PL + project) ----
-ARG TORCH_CPU_INDEX=https://download.pytorch.org/whl/cpu
-ARG PYG_EXTRA_INDEX=https://data.pyg.org/whl/torch-2.1.0+cpu.html
-ARG TORCH_VERSION=2.1.2
-ARG TORCHVISION_VERSION=0.16.2
-ARG TORCHAUDIO_VERSION=2.1.2
 
 RUN <<'SH'
 set -eu
@@ -60,15 +56,14 @@ fi
 SH
 # === [END ADDED] ===
 
-
-
 # -------- User & permissions --------
 RUN groupadd -g 1000 app && \
     useradd -m -u 1000 -g app -s /bin/bash app && \
-    mkdir -p /app /workspace && \
-    chown -R app:app /workspace /home/app && \
+    mkdir -p /app /workspace /logs && \
+    chown -R app:app /workspace /home/app /logs && \
     chmod 0555 /app && \
-    chmod 0775 /workspace
+    chmod 0775 /workspace && \
+    chmod 0775 /logs
 
 VOLUME ["/workspace"]
 WORKDIR /workspace
