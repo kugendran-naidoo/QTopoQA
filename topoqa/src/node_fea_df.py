@@ -76,11 +76,19 @@ class node_fea:
 
         # AFTER (robust across versions)
         try:
-            dssp = DSSP(model, pdb_file, file_type="PDB")
+            # original
+            # dssp = DSSP(model, pdb_file, file_type="PDB")
+
+            # changed for x86 docker execution
+            dssp = DSSP(model, pdb_file, file_type="PDB", dssp='mkdssp')
 
         except TypeError:
             # Older/newer biopython variants can infer from filename if file_type omitted
-            dssp = DSSP(model, pdb_file)
+            # original
+            # dssp = DSSP(model, pdb_file)
+
+            # changed for x86 docker execution
+            dssp = DSSP(model, pdb_file, file_type="PDB", dssp='mkdssp')
 
         key_list = list(dssp.keys())
         
