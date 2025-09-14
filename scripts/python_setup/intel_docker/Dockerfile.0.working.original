@@ -1,0 +1,115 @@
+# -------- Base Python (multi-arch friendly) --------
+ARG PYTHON_VERSION=3.10.14
+FROM python:${PYTHON_VERSION}-slim-bookworm
+
+ARG TORCH_VERSION=2.1.2
+ARG TORCHVISION_VERSION=0.16.2
+ARG TORCHAUDIO_VERSION=2.1.2
+ARG TORCH_CPU_INDEX=https://download.pytorch.org/whl/cpu
+# PyG index keyed to torch-2.1.x CPU
+ARG PYG_EXTRA_INDEX=https://data.pyg.org/whl/torch-2.1.0+cpu.html
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# -------- OS deps --------
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates curl git tini \
+        build-essential pkg-config \
+        libglib2.0-0 libsm6 libxext6 libxrender1 \
+        dssp \
+        vim-tiny \
+        && ln -sf /usr/bin/vim.tiny /usr/bin/vi \
+        && vi --version | head -n1 \
+        && rm -rf /var/lib/apt/lists/* \
+    # verify mkdssp is available (fail the build if not)
+        && mkdssp --version \
+        && command -v mkdssp
+
+# -------- Python deps (CPU-only) --------
+COPY requirements.txt /tmp/requirements.txt
+
+# ---- Python deps (Torch/PyG/PL + project) ----
+ARG TORCH_CPU_INDEX=https://download.pytorch.org/whl/cpu
+ARG PYG_EXTRA_INDEX=https://data.pyg.org/whl/torch-2.1.0+cpu.html
+ARG TORCH_VERSION=2.1.2
+ARG TORCHVISION_VERSION=0.16.2
+ARG TORCHAUDIO_VERSION=2.1.2
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    set -eu; \
+    # 0) Tooling + PRE-PIN NumPy 1.26 (from PyPI)
+    python -m pip install --upgrade pip setuptools wheel && \
+    python -m pip install --no-cache-dir -i https://pypi.org/simple numpy==1.26.4 && \
+    python -c "import numpy; print('Pre-pinned NumPy:', numpy.__version__); assert numpy.__version__.startswith('1.26')" && \
+    # 1) Torch CPU stack from official index
+    python -m pip install --no-cache-dir --index-url ${TORCH_CPU_INDEX} \
+        torch==${TORCH_VERSION} \
+        torchvision==${TORCHVISION_VERSION} \
+        torchaudio==${TORCHAUDIO_VERSION} && \
+    # 2) PyG: arch-aware install
+    arch="$(uname -m)"; \
+    if [ "${arch}" = "x86_64" ] || [ "${arch}" = "amd64" ]; then \
+        echo "Installing PyG + extensions on ${arch}"; \
+        python -m pip install --no-cache-dir --extra-index-url ${PYG_EXTRA_INDEX} \
+            torch-geometric==2.5.3 \
+            torch-scatter \
+            torch-sparse \
+            torch-cluster \
+            torch-spline-conv ; \
+    else \
+        echo "Installing torch-geometric==2.5.3 on ${arch} from PyPI (no C++ extensions)"; \
+        python -m pip install --no-cache-dir -i https://pypi.org/simple \
+            torch-geometric==2.5.3 ; \
+    fi && \
+    # 3) Lightning (from PyPI)
+    python -m pip install --no-cache-dir -i https://pypi.org/simple pytorch-lightning==2.5.3 && \
+    # 4) Project deps from PyPI; on arm64 filter PyG C++ extensions
+    unset PIP_INDEX_URL PIP_EXTRA_INDEX_URL PIP_TRUSTED_HOST || true; \
+    if [ -s /tmp/requirements.txt ]; then \
+      # Strip any index directives from requirements to prevent overriding our CLI indexes
+      sed -E '/^\s*--(index-url|extra-index-url)\b/d' /tmp/requirements.txt > /tmp/requirements.nourls.txt && \
+      if [ "${arch}" = "x86_64" ] || [ "${arch}" = "amd64" ]; then \
+        # amd64: use cleaned file as-is
+        python -m pip install --no-cache-dir \
+          --index-url https://pypi.org/simple \
+          --extra-index-url ${TORCH_CPU_INDEX} \
+          --extra-index-url ${PYG_EXTRA_INDEX} \
+          -r /tmp/requirements.nourls.txt; \
+      else \
+        # arm64: also drop PyG C++ extension packages
+        echo "Filtering PyG extension packages from requirements.txt for ${arch}"; \
+        grep -viE '^(pyg-lib|torch-scatter|torch-sparse|torch-cluster|torch-spline-conv)\b' \
+          /tmp/requirements.txt > /tmp/requirements.filtered.txt || true; \
+        python -m pip install --no-cache-dir \
+          --index-url https://pypi.org/simple \
+          --extra-index-url ${TORCH_CPU_INDEX} \
+          --extra-index-url ${PYG_EXTRA_INDEX} \
+          -r /tmp/requirements.filtered.txt; \
+      fi; \
+    fi && \
+    python -c "import numpy, torch; print('Final NumPy:', numpy.__version__); print('Torch:', torch.__version__); assert numpy.__version__.startswith('1.26')"
+
+
+# -------- User & permissions --------
+RUN groupadd -g 1000 app && \
+    useradd -m -u 1000 -g app -s /bin/bash app && \
+    mkdir -p /app /workspace && \
+    chown -R app:app /workspace /home/app && \
+    chmod 0555 /app && \
+    chmod 0775 /workspace
+
+VOLUME ["/workspace"]
+WORKDIR /workspace
+USER app
+
+ENV OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    CUDA_VISIBLE_DEVICES=""
+
+ENTRYPOINT ["/usr/bin/tini","-g","--"]
+CMD ["python","--version"]
+
