@@ -22,7 +22,7 @@ USAGE
 # Allow env overrides but do NOT set defaults - EXCEPT for run below
 DATASET_NAME="${DATASET_NAME:-ABAG-AF3}"
 DATASET_DIR="${DATASET_DIR:-../../../../datasets/evaluation/ABAG-AF3/ABAG-AF3_structures}"
-GROUND_TRUTH_FILE="${GROUND_TRUTH_FILE:-../../../../datasets/evaluation/ABAG-AF3/label.txt}"
+GROUND_TRUTH_FILE="${GROUND_TRUTH_FILE:-../../../../datasets/evaluation/ABAG-AF3/label_info.csv}"
 
 # Parse CLI flags
 while [[ $# -gt 0 ]]; do
@@ -125,6 +125,15 @@ while (( i <= total )); do
     LOG_FILE="logs/infer_${DATASET_NAME}_${target}_${ts}.log"      # INF's own per-target log
     TOPO_WORK_DIR="logs/output/work/${DATASET_NAME}/${target}"
     TOPO_RESULTS_DIR="logs/output/results/${DATASET_NAME}/${target}"
+
+    full_ground_truth_file_path=$(cd "$(dirname "$GROUND_TRUTH_FILE")" && pwd)/$(basename "$GROUND_TRUTH_FILE")
+    echo 
+    echo "DATASET_NAME=\"$DATASET_NAME\" TARGET=\"$target\" \\"
+    echo "GROUND_TRUTH_FILE=\"$full_ground_truth_file_path\" \\"
+    echo "TOPO_RESULTS_DIR="${script_dir}/logs/output/results" TOPO_RESULT_FILE="result.csv" \\"
+    echo "LOG_FILE=\"${script_dir}/logs/results_${DATASET_NAME}_${target}_${ts}.log\" \\"
+    echo "$RESULTS_SCRIPT"
+    echo
 
     # Call inference
     DATASET_NAME="$DATASET_NAME" DATASET_DIR="$DATASET_DIR" TARGET_DIR="$target" \
