@@ -8,6 +8,20 @@ __pycache__/
 
 # Mac
 .DS_Store
+# Ignore evaluation datasets
+QTopoQA/datasets/evaluation/
+
+# Ignore training datasets
+QTopoQA/datasets/training/
+
+# keep empty directories although ignored
+QTopoQA/datasets/evaluation/*
+!QTopoQA/datasets/evaluation/.gitkeep
+
+# keep empty directories although ignored
+QTopoQA/datasets/training/*
+!QTopoQA/datasets/training/.gitkeep
+
 # ignore generated work artifacts
 **/output/work/
 **/logs/output/
