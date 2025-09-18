@@ -4,7 +4,10 @@ from torch import optim
 from torch_geometric.nn import global_add_pool, global_mean_pool, global_max_pool
 import pandas as pd
 import torch.nn as nn
-from torch_geometric.data import DataLoader
+try:
+    from torch_geometric.loader import DataLoader  # PyG >= 2.0
+except Exception:
+    from torch_geometric.data import DataLoader  # fallback
 import numpy as np
 import wandb
 import random
@@ -220,11 +223,11 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         scores = torch.cat([x for x in self.test_step_outputs['scores']],dim=0)
         true_scores = torch.cat([x for x in self.test_step_outputs['true_scores']],dim=0)
         scores=scores.view(-1).cpu().data.numpy();true_scores=true_scores.view(-1).cpu().data.numpy()
-        # print(self.test_step_outputs['name'])
+        # filter NaNs
+        mask = np.isfinite(scores) & np.isfinite(true_scores)
+        scores = scores[mask]
+        true_scores = true_scores[mask]
         test_model_list = [item[0].split('&')[1] for output in self.test_step_outputs['name'] for item in output]
-        # print(self.test_step_outputs['name'])
-        # print(test_model_list)
-        # test_model_list = [item.split('&')[1] for output in self.test_step_outputs['name'] for item in output]
         data_name=self.test_step_outputs['name'][0][0][0].split('&')[0].upper()
         result_df=pd.DataFrame({'MODEL':test_model_list,'DockQ_wave':true_scores,\
                                 'pred_dockq_wave':scores})
@@ -246,18 +249,31 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             dockq_losses.append(dockq_loss)
             curr_pred=np.array(curr_df['pred_dockq_wave'])
             curr_true=np.array(curr_df['DockQ_wave'])
-            pearson_corr=np.corrcoef(curr_pred,curr_true)[0,1]
-            spearman_corr,_=stats.spearmanr(curr_pred, curr_true)
+            # filter NaNs and guard zero-variance
+            m = np.isfinite(curr_pred) & np.isfinite(curr_true)
+            cp = curr_pred[m]; ct = curr_true[m]
+            if cp.size < 2 or np.std(cp) == 0 or np.std(ct) == 0:
+                pearson_corr = 0.0
+                spearman_corr = 0.0
+            else:
+                pearson_corr=np.corrcoef(cp,ct)[0,1]
+                spearman_corr,_=stats.spearmanr(cp, ct)
             pearson_corrs.append(pearson_corr);spearman_corrs.append(spearman_corr)
         ####cal correlation coefficient        
         dockq_pred=np.array(result_df['pred_dockq_wave'])
         dockq_true=np.array(result_df['DockQ_wave'])
-        pearson_corr=np.corrcoef(dockq_pred,dockq_true)[0,1]
-        spearman_corr,_=stats.spearmanr(dockq_pred,dockq_true)
+        m2 = np.isfinite(dockq_pred) & np.isfinite(dockq_true)
+        dp = dockq_pred[m2]; dt = dockq_true[m2]
+        if dp.size < 2 or np.std(dp) == 0 or np.std(dt) == 0:
+            pearson_corr = 0.0
+            spearman_corr = 0.0
+        else:
+            pearson_corr=np.corrcoef(dp,dt)[0,1]
+            spearman_corr,_=stats.spearmanr(dp,dt)
 
-        ####cal mse mae 
-        mse = mean_squared_error(dockq_pred,dockq_true)
-        mae = mean_absolute_error(dockq_pred,dockq_true)
+        ####cal mse mae (on filtered arrays)
+        mse = mean_squared_error(dp, dt) if dp.size > 0 else 0.0
+        mae = mean_absolute_error(dp, dt) if dp.size > 0 else 0.0
 
         ####cal mean dockq loss
         mean_dockq_loss=np.mean(dockq_losses);std_dockq_loss=np.std(dockq_losses)
@@ -276,6 +292,4 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         self.test_step_outputs.clear()
         return pearson_corr
     
-
-
 
