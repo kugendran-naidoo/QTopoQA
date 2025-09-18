@@ -13,6 +13,7 @@ from datetime import datetime
 import random 
 from pytorch_lightning.callbacks import ModelCheckpoint
 import os
+import shutil
 from torch_geometric.data import Data, Batch
 import pandas as pd
 from pytorch_lightning.callbacks import Callback
@@ -158,15 +159,19 @@ def _build_loaders():
     g_path = args.graph_dir
     train_label = args.train_label_file
     train_df = pd.read_csv(train_label)
+    # keep only finite labels
+    train_df = train_df[np.isfinite(train_df['dockq'])]
     train_list = list(train_df['MODEL'])
     train_label_map = dict(zip(train_df['MODEL'], train_df['dockq']))
     g_list = [file.split('.')[0] for file in os.listdir(g_path)]
-    model_list_tr = sorted(set(train_list) & set(g_list))
+    model_list_tr = sorted(set(train_list) & set(g_list) & set(train_label_map.keys()))
     train_loader = get_loader(g_path, model_list_tr, train_label_map, num_workers=0)
 
     print('loading val data')
     val_label = args.val_label_file
     val_df = pd.read_csv(val_label)
+    # keep only finite labels
+    val_df = val_df[np.isfinite(val_df['dockq'])]
     val_list = list(val_df['MODEL'])
     val_label_map = dict(zip(val_df['MODEL'], val_df['dockq']))
     model_list_val = sorted(set(val_list) & set(g_list))
@@ -215,6 +220,23 @@ def run_experiment():
 
     model = GNN_edge1_edgepooling(init_lr,args.pooling_type,'zuhe',num_net=1,edge_dim=11,heads=args.attention_head)
     trainer.fit(model, train_loader, val_loader)
+
+    # Save an explicit copy of the best checkpoint as topo_best_val_loss=*.ckpt
+    try:
+        best_path = trainer.checkpoint_callback.best_model_path
+        best_score = trainer.checkpoint_callback.best_model_score
+        if best_path and os.path.isfile(best_path):
+            # best_model_score can be a tensor; convert to float
+            try:
+                score_val = float(best_score.cpu().item()) if hasattr(best_score, 'item') else float(best_score)
+            except Exception:
+                score_val = float('nan')
+            best_name = f"topo_best_val_loss={score_val:.5f}.ckpt" if score_val == score_val else "topo_best.ckpt"
+            dst_path = os.path.join(_ckpt_out_dir, best_name)
+            # copy (not rename) to keep Lightning-managed checkpoint filenames intact
+            shutil.copy2(best_path, dst_path)
+    except Exception:
+        pass
 
     torch.cuda.empty_cache()
 
