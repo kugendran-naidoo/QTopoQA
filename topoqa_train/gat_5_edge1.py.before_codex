@@ -67,26 +67,6 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             data11=data_data[i]
             x,edge_index,edge_attr,batch = data11.x,data11.edge_index,data11.edge_attr,data11.batch
 
-            # Ensure a valid batch vector exists (some saved graphs may carry a stale None)
-            if batch is None:
-                try:
-                    if x is not None:
-                        n_nodes = x.size(0)
-                    elif edge_index is not None and edge_index.numel() > 0:
-                        n_nodes = int(edge_index.max().item()) + 1
-                    else:
-                        n_nodes = 0
-                    dev = None
-                    if edge_index is not None:
-                        dev = edge_index.device
-                    elif x is not None:
-                        dev = x.device
-                    batch = torch.zeros(n_nodes, dtype=torch.long, device=dev)
-                except Exception:
-                    # final fallback on CPU
-                    n_nodes = int(x.size(0)) if x is not None else 0
-                    batch = torch.zeros(n_nodes, dtype=torch.long)
-
             
             protein_embed=module[0]
             protein_gat1=module[1]
@@ -188,17 +168,8 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         scores = torch.cat([x for x in self.validation_step_outputs['scores']],dim=0)
         true_scores = torch.cat([x for x in self.validation_step_outputs['true_scores']],dim=0)
         scores=scores.view(-1).cpu().data.numpy();true_scores=true_scores.view(-1).cpu().data.numpy()
-        # filter NaNs
-        mask = np.isfinite(scores) & np.isfinite(true_scores)
-        scores = scores[mask]
-        true_scores = true_scores[mask]
-        # guard zero-variance or too few samples
-        if scores.size < 2 or np.std(scores) == 0 or np.std(true_scores) == 0:
-            correlation = 0.0
-            spearman_corr = 0.0
-        else:
-            correlation = np.corrcoef(scores, true_scores)[0, 1]
-            spearman_corr,_=stats.spearmanr(scores, true_scores)
+        correlation = np.corrcoef(scores, true_scores)[0, 1]
+        spearman_corr,_=stats.spearmanr(scores, true_scores)
         self.log('val_pearson_corr',correlation)
         self.log('val_spearman_corr',spearman_corr)
         self.validation_step_outputs.clear()
@@ -276,6 +247,8 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         self.test_step_outputs.clear()
         return pearson_corr
     
+
+
 
 
 
