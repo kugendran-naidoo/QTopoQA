@@ -20,6 +20,14 @@ datasets/training/*
 topoqa_train/graph_data/*
 !topoqa_train/graph_data/.gitkeep
 
+# keep empty directories although ignored
+topoqa_train/graph_data_Dockground/*
+!topoqa_train/graph_data_Dockground/.gitkeep
+
+# keep empty directories although ignored
+topoqa_train/graph_data_MAF2/*
+!topoqa_train/graph_data_MAF2/.gitkeep
+
 # ignore generated work artifacts
 **/output/work/
 **/logs/output/
