@@ -1,0 +1,23 @@
+// Node feature configuration
+// Defaults here mirror the legacy configuration used by --use-legacy-config.
+// All families are enabled and normalized where applicable to produce the exact
+// 172-dim node feature vector used by the original.
+{
+  // Include relative ASA feature
+  "use_rasa": true,
+
+  // Include backbone dihedrals (phi, psi)
+  "use_phi_psi": true,
+
+  // Include DSSP 8-state one-hot (SS8_0..SS8_7)
+  "use_ss8": true,
+
+  // Include amino-acid 21-dim one-hot (AA_0..AA_20)
+  "use_aa_onehot": true,
+
+  // Include topological features (f0_*, f1_* columns)
+  "use_topological": true,
+
+  // Normalize topological columns via MinMaxScaler in node_fea_df
+  "normalize_topo": true
+}
