@@ -1,0 +1,31 @@
+// Edge feature configuration
+// Defaults mirror the legacy configuration used by --use-legacy-config.
+// This produces the exact same edge_index and edge_attr as the original code:
+// - Inter-chain Cα–Cα edges with strict (0, 10) Å window
+// - Edge features: [Cα distance] + 10-bin all-atom distance histogram
+// - Edge normalization: MinMaxScaler (sklearn)
+{
+  // Lower bound for Cα–Cα distance (Å)
+  "cutoff_min": 0.0,
+  // Upper bound for Cα–Cα distance (Å)
+  "cutoff_max": 10.0,
+
+  // Include Cα–Cα distance as the first edge-attr component
+  "include_distance": true,
+  // Include all-atom distance histogram bins (10 bins)
+  "include_histogram": true,
+  // Number of histogram bins (legacy uses 10)
+  "histogram_bins": 10,
+
+  // Edge feature mode:
+  //  - "all_atom": legacy-compatible all-atom histogram per edge
+  //  - "simple": fast radial bin on the Cα distance only
+  "mode": "all_atom",
+
+  // Cutoff inclusivity flags (legacy strict bounds: both false)
+  "cutoff_inclusive_min": false,
+  "cutoff_inclusive_max": false,
+
+  // Edge normalization mode: "minmax_sklearn" (legacy) or "none"
+  "scale": "minmax_sklearn"
+}

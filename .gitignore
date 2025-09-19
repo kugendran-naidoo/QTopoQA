@@ -17,6 +17,10 @@ datasets/training/*
 !datasets/training/.gitkeep
 
 # keep empty directories although ignored
+qtdaqa/graph_features/output/graph_features/*
+!qtdaqa/graph_features/output/graph_features/.gitkeep
+
+# keep empty directories although ignored
 topoqa_train/graph_data/*
 !topoqa_train/graph_data/.gitkeep
 
