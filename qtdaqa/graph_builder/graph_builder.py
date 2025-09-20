@@ -32,11 +32,13 @@ independently via configuration while still supporting exact compatibility.
 from __future__ import annotations
 
 import argparse
+import heapq
 import logging
 import os
 import sys
+from datetime import datetime
 from pathlib import Path
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import Iterable, Iterator, List, Optional, Sequence, Set, Tuple
 import concurrent.futures as _fut
 
 import numpy as np
@@ -141,6 +143,109 @@ def _graph_path(out_graphs: Path, name: str) -> Path:
     return out_graphs / f"{name}.pt"
 
 
+def _job_logger_name(run_logger_name: str, target: str, model_stem: str) -> str:
+    return f"{run_logger_name}.{target}.{model_stem}"
+
+
+def _parse_timestamp(line: str) -> Optional[datetime]:
+    fragment = line[:19]
+    try:
+        return datetime.strptime(fragment, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        return None
+
+
+def _read_log_blocks(path: Path) -> List[Tuple[datetime, List[str]]]:
+    """Return timestamped log blocks preserving multiline records."""
+    blocks: List[Tuple[datetime, List[str]]] = []
+    last_ts = datetime.min
+    with path.open("r", encoding="utf-8") as fh:
+        while True:
+            line = fh.readline()
+            if not line:
+                break
+            parsed = _parse_timestamp(line)
+            if parsed is None:
+                ts = last_ts
+            else:
+                ts = parsed
+                last_ts = parsed
+            block = [line]
+            while True:
+                pos = fh.tell()
+                next_line = fh.readline()
+                if not next_line:
+                    break
+                if _parse_timestamp(next_line) is None:
+                    block.append(next_line)
+                    continue
+                fh.seek(pos)
+                break
+            blocks.append((ts, block))
+    return blocks
+
+
+def _merge_log_files(sources: Sequence[Path], destination: Path) -> None:
+    """Merge multiple log files by timestamp into destination."""
+    unique_sources = []
+    seen: Set[Path] = set()
+    for src in sources:
+        if src in seen or not src.exists():
+            continue
+        seen.add(src)
+        unique_sources.append(src)
+
+    if not unique_sources:
+        return
+
+    counter = 0
+    heap: List[Tuple[datetime, int, List[str], Iterator[Tuple[datetime, List[str]]]]] = []
+    for src in unique_sources:
+        blocks = _read_log_blocks(src)
+        if not blocks:
+            continue
+        iterator = iter(blocks)
+        ts, block = next(iterator)
+        heapq.heappush(heap, (ts, counter, block, iterator))
+        counter += 1
+
+    if not heap:
+        return
+
+    tmp_path = destination.with_suffix(destination.suffix + ".tmp")
+    tmp_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with tmp_path.open("w", encoding="utf-8") as out:
+        while heap:
+            ts, _, block, iterator = heapq.heappop(heap)
+            for line in block:
+                out.write(line)
+            try:
+                next_ts, next_block = next(iterator)
+            except StopIteration:
+                continue
+            counter += 1
+            heapq.heappush(heap, (next_ts, counter, next_block, iterator))
+
+    tmp_path.replace(destination)
+
+
+def _teardown_logger(logger: logging.Logger) -> None:
+    handler_ids = {id(h) for h in logger.handlers}
+    for handler in list(logger.handlers):
+        logger.removeHandler(handler)
+        try:
+            handler.flush()
+        except Exception:
+            pass
+        try:
+            handler.close()
+        except Exception:
+            pass
+    base = logging.getLogger("qtdaqa")
+    base.handlers = [h for h in base.handlers if id(h) not in handler_ids]
+
+
 def _worker_entry(item: Tuple[
     Path,  # pdb_path
     Path,  # target_dir
@@ -152,11 +257,12 @@ def _worker_entry(item: Tuple[
     bool,   # overwrite
     bool,   # exact_compat
     bool,   # verify_with_original
-    str,    # logger_name
-    str,    # log_dir
+    str,    # job_logger_name
+    str,    # job_log_dir
 ]) -> Tuple[str, str, Optional[str]]:
     (m, tdir, twork, out_sub, node_cfg, edge_cfg, topo_cfg,
      overwrite, exact_compat, verify_with_original, logger_name, log_dir_str) = item
+    logger = setup_logger(log_dir_str, name=logger_name)
     try:
         process_one(
             pdb_path=m,
@@ -169,13 +275,13 @@ def _worker_entry(item: Tuple[
             overwrite=overwrite,
             exact_compat=exact_compat,
             verify_with_original=verify_with_original,
-            logger=None,
-            logger_name=logger_name,
-            log_dir=Path(log_dir_str),
+            logger=logger,
         )
         return (tdir.name, m.name, None)
     except Exception as e:
         return (tdir.name, m.name, str(e))
+    finally:
+        _teardown_logger(logger)
 
 
 def process_one(
@@ -373,7 +479,13 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
     ts = time.strftime("%Y-%m-%d_%H:%M")
-    logger = setup_logger(args.log_dir, name=f"graph_builder.{ts}")
+    run_logger_name = f"graph_builder.{ts}"
+    logger = setup_logger(args.log_dir, name=run_logger_name)
+    file_handler = next((h for h in logger.handlers if getattr(h, "baseFilename", None)), None)
+    main_log_path = Path(file_handler.baseFilename) if file_handler else None
+    worker_log_dir = Path(args.log_dir) / run_logger_name
+    _ensure_dir(worker_log_dir)
+    worker_log_paths: Set[Path] = set()
     dataset_dir = Path(args.dataset_dir).resolve()
     work_dir = Path(args.work_dir).resolve()
     out_graphs = Path(args.out_graphs).resolve()
@@ -403,18 +515,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         _ensure_dir(twork)
         for m in models:
             out_sub = out_graphs / tdir.name
+            model_stem = _model_name_from_path(m)
+            job_logger_name = _job_logger_name(run_logger_name, tdir.name, model_stem)
+            worker_log_paths.add(worker_log_dir / f"{job_logger_name}.log")
             work_items.append((
                 m, tdir, twork, out_sub,
                 node_cfg, edge_cfg, topo_cfg,
                 other_cfg.overwrite_graphs,
                 args.use_legacy_config,
                 args.verify_original,
-                f"graph_builder.{ts}",
-                str(args.log_dir),
+                job_logger_name,
+                str(worker_log_dir),
             ))
 
     # Determine parallel workers
-    workers = args.parallel if args.parallel is not None else int(load_other_config(args.other_config).jobs)
+    workers = args.parallel if args.parallel is not None else int(other_cfg.jobs)
     if not workers or workers <= 1:
         # sequential
         for (m, tdir, twork, out_sub, node_cfg, edge_cfg, topo_cfg,
@@ -443,6 +558,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     logger.error(f"failed {target_name}/{model_name}: {err}")
 
     logger.info("[done] graph generation completed")
+    existing_worker_logs = sorted([p for p in worker_log_paths if p.exists()])
+    if main_log_path and existing_worker_logs:
+        logger.info(f"[logs] merging {len(existing_worker_logs)} worker logs")
+    _teardown_logger(logger)
+    if main_log_path and existing_worker_logs:
+        _merge_log_files([main_log_path] + existing_worker_logs, main_log_path)
     return 0
 
 

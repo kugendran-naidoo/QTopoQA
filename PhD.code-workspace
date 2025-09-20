@@ -7,5 +7,7 @@
 			"path": "../../topoqa/TopoQA"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
 }
