@@ -35,29 +35,34 @@ import argparse
 import heapq
 import logging
 import os
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, Iterator, List, Optional, Sequence, Set, Tuple
 import concurrent.futures as _fut
 
 import numpy as np
 import pandas as pd
 
 # Ensure we can import project-local modules/packages
-REPO_ROOT = Path(__file__).resolve().parents[1]  # QTopoQA
+GRAPH_BUILDER_DIR = Path(__file__).resolve().parent
+if str(GRAPH_BUILDER_DIR) not in sys.path:
+    sys.path.insert(0, str(GRAPH_BUILDER_DIR))
+
+REPO_ROOT = GRAPH_BUILDER_DIR.parents[1]  # QTopoQA
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))  # so 'qtdaqa' and 'topoqa' packages resolve
 TOPOQA_DIR = REPO_ROOT / "topoqa"
 if str(TOPOQA_DIR) not in sys.path:
     sys.path.insert(0, str(TOPOQA_DIR))
 
-# Existing feature builders
-from src.get_interface import cal_interface  # type: ignore
-from src.topo_feature import topo_fea  # type: ignore
-from src.node_fea_df import node_fea  # type: ignore
+# Existing feature builders (local copies)
+from lib.get_interface import cal_interface  # type: ignore
+from lib.topo_feature import topo_fea  # type: ignore
+from lib.node_fea_df import node_fea  # type: ignore
 
-from qtdaqa.lib.config import (
+from lib.config import (
     EdgeConfig,
     NodeConfig,
     OtherConfig,
@@ -67,10 +72,10 @@ from qtdaqa.lib.config import (
     load_other_config,
     load_topo_config,
 )
-from qtdaqa.lib.graph_build import build_graph
-from qtdaqa.lib.logging_utils import setup_logger
+from lib.graph_build import build_graph
+from lib.logging_utils import setup_logger
 import time
-from qtdaqa.lib.original_compat import create_graph_compat
+from lib.original_compat import create_graph_compat
 import torch
 
 
@@ -246,6 +251,27 @@ def _teardown_logger(logger: logging.Logger) -> None:
     base.handlers = [h for h in base.handlers if id(h) not in handler_ids]
 
 
+def _archive_logs(log_dir: Path) -> None:
+    """Move existing logs into a history/ subdirectory."""
+    log_dir.mkdir(parents=True, exist_ok=True)
+    history_dir = log_dir / "history"
+    history_dir.mkdir(parents=True, exist_ok=True)
+
+    for entry in list(log_dir.iterdir()):
+        if entry == history_dir:
+            continue
+        target = history_dir / entry.name
+        if target.exists():
+            if target.is_dir():
+                shutil.rmtree(target)
+            else:
+                target.unlink()
+        try:
+            entry.replace(target)
+        except Exception:
+            shutil.move(str(entry), str(target))
+
+
 def _worker_entry(item: Tuple[
     Path,  # pdb_path
     Path,  # target_dir
@@ -259,12 +285,12 @@ def _worker_entry(item: Tuple[
     bool,   # verify_with_original
     str,    # job_logger_name
     str,    # job_log_dir
-]) -> Tuple[str, str, Optional[str]]:
+]) -> Tuple[str, str, Optional[str], Optional[str]]:
     (m, tdir, twork, out_sub, node_cfg, edge_cfg, topo_cfg,
      overwrite, exact_compat, verify_with_original, logger_name, log_dir_str) = item
     logger = setup_logger(log_dir_str, name=logger_name)
     try:
-        process_one(
+        status = process_one(
             pdb_path=m,
             target_dir=tdir,
             work_dir=twork,
@@ -277,9 +303,9 @@ def _worker_entry(item: Tuple[
             verify_with_original=verify_with_original,
             logger=logger,
         )
-        return (tdir.name, m.name, None)
+        return (tdir.name, m.name, None, status)
     except Exception as e:
-        return (tdir.name, m.name, str(e))
+        return (tdir.name, m.name, str(e), "failed")
     finally:
         _teardown_logger(logger)
 
@@ -298,7 +324,7 @@ def process_one(
     logger: Optional[logging.Logger] = None,
     logger_name: Optional[str] = None,
     log_dir: Optional[Path] = None,
-) -> None:
+) -> str:
     # Allow initialization inside worker processes
     if logger is None:
         if logger_name and log_dir:
@@ -316,7 +342,7 @@ def process_one(
     gpath = _graph_path(out_graphs, name)
     if gpath.exists() and not overwrite:
         logger.info(f"skip {name}: graph exists")
-        return
+        return "skip_exists"
 
     # 1) interface
     iface_txt = _iface_path(work_dir, name)
@@ -328,7 +354,7 @@ def process_one(
     try:
         if (not iface_txt.exists()) or (iface_txt.stat().st_size == 0):
             logger.info(f"[skip] target={target_dir.name} decoy={pdb_path.name} reason=no_interface")
-            return
+            return "skip_no_interface"
     except Exception:
         # if any filesystem issue, attempt a conservative read
         try:
@@ -337,7 +363,7 @@ def process_one(
             n_lines = 0
         if n_lines == 0:
             logger.info(f"[skip] target={target_dir.name} decoy={pdb_path.name} reason=no_interface")
-            return
+            return "skip_no_interface"
 
     # 2) topo (optional depends on node_cfg.use_topological but safe to compute)
     topo_csv = _topo_path(work_dir, name)
@@ -452,6 +478,7 @@ def process_one(
                 logger.info(f"[verify] first-difference details: {details}")
         except Exception as e:
             logger.exception(f"[verify] failed compare for {name}: {e}")
+    return "success"
 
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
@@ -478,12 +505,15 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
+    log_dir = Path(args.log_dir)
+    _archive_logs(log_dir)
+
     ts = time.strftime("%Y-%m-%d_%H:%M")
     run_logger_name = f"graph_builder.{ts}"
-    logger = setup_logger(args.log_dir, name=run_logger_name)
+    logger = setup_logger(str(log_dir), name=run_logger_name)
     file_handler = next((h for h in logger.handlers if getattr(h, "baseFilename", None)), None)
     main_log_path = Path(file_handler.baseFilename) if file_handler else None
-    worker_log_dir = Path(args.log_dir) / run_logger_name
+    worker_log_dir = log_dir / run_logger_name
     _ensure_dir(worker_log_dir)
     worker_log_paths: Set[Path] = set()
     dataset_dir = Path(args.dataset_dir).resolve()
@@ -530,12 +560,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     # Determine parallel workers
     workers = args.parallel if args.parallel is not None else int(other_cfg.jobs)
+
+    stats: Dict[str, int] = {
+        "processed": 0,
+        "success": 0,
+        "skip_no_interface": 0,
+        "skip_exists": 0,
+        "failed": 0,
+    }
+
     if not workers or workers <= 1:
         # sequential
         for (m, tdir, twork, out_sub, node_cfg, edge_cfg, topo_cfg,
              overwrite, exact_compat, verify_with_original, _lname, _ldir) in work_items:
             try:
-                process_one(
+                status = process_one(
                     pdb_path=m,
                     target_dir=tdir,
                     work_dir=twork,
@@ -548,22 +587,57 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     verify_with_original=verify_with_original,
                     logger=logger,
                 )
+                stats["processed"] += 1
+                if status == "success":
+                    stats["success"] += 1
+                elif status in ("skip_no_interface", "skip_exists"):
+                    stats[status] = stats.get(status, 0) + 1
+                else:
+                    stats["failed"] += 1
+                    logger.error(f"unknown status for {tdir.name}/{m.name}: {status}")
             except Exception as e:
+                stats["processed"] += 1
+                stats["failed"] += 1
                 logger.exception(f"failed {tdir.name}/{m.name}: {e}")
     else:
         # parallel using processes
         with _fut.ProcessPoolExecutor(max_workers=int(workers)) as ex:
-            for target_name, model_name, err in ex.map(_worker_entry, work_items):
+            for target_name, model_name, err, status in ex.map(_worker_entry, work_items):
+                stats["processed"] += 1
                 if err:
+                    stats["failed"] += 1
                     logger.error(f"failed {target_name}/{model_name}: {err}")
+                    continue
+                if status == "success":
+                    stats["success"] += 1
+                elif status in ("skip_no_interface", "skip_exists"):
+                    stats[status] = stats.get(status, 0) + 1
+                else:
+                    stats["failed"] += 1
+                    logger.error(f"unknown status for {target_name}/{model_name}: {status}")
 
     logger.info("[done] graph generation completed")
     existing_worker_logs = sorted([p for p in worker_log_paths if p.exists()])
+    summary_lines = [
+        "[summary] processed={processed}",
+        "[summary] success={success}",
+    ]
+    for key, value in stats.items():
+        if key not in {"processed", "success", "failed", "skip_no_interface", "skip_exists"}:
+            summary_lines.append(f"[summary] {key}={value}")
+    summary_lines.append(f"[summary] skip_no_interface={stats.get('skip_no_interface', 0)}")
+    summary_lines.append(f"[summary] skip_exists={stats.get('skip_exists', 0)}")
+    summary_lines.append(f"[summary] failed={stats.get('failed', 0)}")
+
+    for line in summary_lines:
+        logger.info(line.format(**stats))
+
     if main_log_path and existing_worker_logs:
         logger.info(f"[logs] merging {len(existing_worker_logs)} worker logs")
     _teardown_logger(logger)
     if main_log_path and existing_worker_logs:
         _merge_log_files([main_log_path] + existing_worker_logs, main_log_path)
+
     return 0
 
 

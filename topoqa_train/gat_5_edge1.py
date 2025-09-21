@@ -46,11 +46,11 @@ class GNN_edge1_edgepooling(pl.LightningModule):
 
         self.edge_embed=nn.ModuleList([torch.nn.Linear(edge_dim,hidden_dim) for _ in range(self.num_net)])
         self.embed=nn.ModuleList([torch.nn.Linear(num_feature_xd,hidden_dim) for _ in range(self.num_net)])
-        self.conv1=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False).jittable() \
+        self.conv1=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False) \
                                   for _ in range(self.num_net)])
-        self.conv2=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False).jittable() \
+        self.conv2=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False) \
                                   for _ in range(self.num_net)])       
-        self.conv3=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False).jittable() \
+        self.conv3=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False) \
                                   for _ in range(self.num_net)])
         
         self.fc_edge = nn.Linear(hidden_dim,hidden_dim//2)
