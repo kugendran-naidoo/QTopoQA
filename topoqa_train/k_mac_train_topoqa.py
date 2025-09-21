@@ -19,6 +19,10 @@ import pandas as pd
 from pytorch_lightning.callbacks import Callback
 import argparse
 
+torch.manual_seed(222)
+torch.use_deterministic_algorithms(True)
+np.random.seed(222)
+random.seed(222)
 
 def get_args():
     """
@@ -138,7 +142,7 @@ def collate_fn(batch):
         B.batch = torch.zeros(N, dtype=torch.long)
     return [B]
 
-def get_loader(graph_path, model_list, label_map, num_workers: int = 0):
+def get_loader(graph_path, model_list, label_map, num_workers: int = 9):
     graph_list = [os.path.join(graph_path, model + '.pt') for model in model_list]
     dataset = GraphDataset(graph_list, label_map)
     # macOS: avoid multiprocessing workers to prevent re-import side effects and FD exhaustion
@@ -147,8 +151,8 @@ def get_loader(graph_path, model_list, label_map, num_workers: int = 0):
         batch_size=BATCH_SIZE,
         collate_fn=collate_fn,
         shuffle=False,
-        num_workers=num_workers,
-        persistent_workers=False,
+        num_workers=9,
+        persistent_workers=9,
     )
     return data_loader
 

@@ -1,0 +1,20 @@
+# Canonical TopoQA hyper-parameters (GPU variant)
+
+graph_dir: ../../topoqa_train/graph_data
+train_label_file: ../../topoqa_train/train.csv
+val_label_file: ../../topoqa_train/val.csv
+save_dir: ../../topoqa_train/experiments_gpu
+
+attention_head: 8
+pooling_type: mean
+batch_size: 16
+learning_rate: 0.005
+num_epochs: 200
+accumulate_grad_batches: 32
+seed: 222
+
+# Trainer hints (informational)
+precision: 32
+accelerator: gpu
+devices: 1
+num_workers: 0

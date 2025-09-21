@@ -1,0 +1,23 @@
+--- a/topoqa_train/train_topoqa.py
++++ b/topoqa_train/train_topoqa.py
+@@
+-def get_loader(graph_path,model_list):
++def get_loader(graph_path,model_list):
+     graph_list = [os.path.join(graph_path,model+'.pt') for model in model_list]
+     dataset = GraphDataset(graph_list)
+-    data_loader = DataLoader(dataset, batch_size=BATCH_SIZE, collate_fn=collate_fn, shuffle=False,num_workers=4)
++    data_loader = DataLoader(
++        dataset,
++        batch_size=BATCH_SIZE,
++        collate_fn=collate_fn,
++        shuffle=False,
++        num_workers=0,
++        persistent_workers=False,
++    )
+     return data_loader
+@@
+-train_loader = get_loader(g_path,model_list)
++train_loader = get_loader(g_path,model_list)
+@@
+-val_loader=get_loader(g_path,model_list)
++val_loader=get_loader(g_path,model_list)

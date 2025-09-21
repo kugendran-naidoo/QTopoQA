@@ -1,0 +1,22 @@
+# Canonical TopoQA training configuration
+
+# Paths are relative to the repository root unless stated otherwise.
+graph_dir: ../../topoqa_train/graph_data
+train_label_file: ../../topoqa_train/train.csv
+val_label_file: ../../topoqa_train/val.csv
+save_dir: ../../topoqa_train/experiments_repro
+
+# Optimisation hyper-parameters
+attention_head: 8
+pooling_type: mean
+batch_size: 16
+learning_rate: 0.005
+num_epochs: 200
+accumulate_grad_batches: 32
+seed: 222
+
+# Trainer/runtime options
+precision: 32
+accelerator: cpu
+devices: 1
+num_workers: 0
