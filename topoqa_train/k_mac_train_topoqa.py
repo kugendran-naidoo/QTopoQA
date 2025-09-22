@@ -142,7 +142,7 @@ def collate_fn(batch):
         B.batch = torch.zeros(N, dtype=torch.long)
     return [B]
 
-def get_loader(graph_path, model_list, label_map, num_workers: int = 9):
+def get_loader(graph_path, model_list, label_map, num_workers: int = 0):
     graph_list = [os.path.join(graph_path, model + '.pt') for model in model_list]
     dataset = GraphDataset(graph_list, label_map)
     # macOS: avoid multiprocessing workers to prevent re-import side effects and FD exhaustion
@@ -151,8 +151,8 @@ def get_loader(graph_path, model_list, label_map, num_workers: int = 9):
         batch_size=BATCH_SIZE,
         collate_fn=collate_fn,
         shuffle=False,
-        num_workers=9,
-        persistent_workers=9,
+        num_workers=0,
+        persistent_workers=0,
     )
     return data_loader
 

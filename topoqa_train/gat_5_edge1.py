@@ -4,6 +4,8 @@ from torch import optim
 from torch_geometric.nn import global_add_pool, global_mean_pool, global_max_pool
 import pandas as pd
 import torch.nn as nn
+import warnings
+from typing import Tuple
 try:
     from torch_geometric.loader import DataLoader  # PyG >= 2.0
 except Exception:
@@ -12,9 +14,58 @@ import numpy as np
 import wandb
 import random
 from scipy import stats
+from scipy.stats import ConstantInputWarning
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pytorch_lightning as pl
 from gat_with_edge import GATv2ConvWithEdgeEmbedding1
+
+
+
+def _align_pair(a: np.ndarray, b: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    a = np.asarray(a, dtype=np.float64)
+    b = np.asarray(b, dtype=np.float64)
+    if a.size == 0 or b.size == 0:
+        return np.asarray([], dtype=np.float64), np.asarray([], dtype=np.float64)
+    if a.shape != b.shape:
+        min_len = min(a.size, b.size)
+        a = a.reshape(-1)[:min_len]
+        b = b.reshape(-1)[:min_len]
+    mask = np.isfinite(a) & np.isfinite(b)
+    return a[mask], b[mask]
+
+
+def _safe_std(arr: np.ndarray) -> float:
+    if arr.size == 0:
+        return float('nan')
+    return float(np.nanstd(arr, ddof=0))
+
+
+def _pearson_safe(a: np.ndarray, b: np.ndarray) -> float:
+    a, b = _align_pair(a, b)
+    if a.size < 2 or b.size < 2:
+        return 0.0
+    std_a = _safe_std(a)
+    std_b = _safe_std(b)
+    if not np.isfinite(std_a) or not np.isfinite(std_b) or std_a < 1e-12 or std_b < 1e-12:
+        return 0.0
+    with np.errstate(divide="ignore", invalid="ignore"):
+        corr = np.corrcoef(a, b)
+    if not np.isfinite(corr).all():
+        return 0.0
+    return float(corr[0, 1])
+
+
+def _spearman_safe(a: np.ndarray, b: np.ndarray) -> float:
+    a, b = _align_pair(a, b)
+    if a.size < 2 or b.size < 2:
+        return 0.0
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        warnings.simplefilter("ignore", category=ConstantInputWarning)
+        coef, _ = stats.spearmanr(a, b, nan_policy="omit")
+    if not np.isfinite(coef):
+        return 0.0
+    return float(coef)
 
 
 
@@ -190,20 +241,14 @@ class GNN_edge1_edgepooling(pl.LightningModule):
     def on_validation_epoch_end(self):
         scores = torch.cat([x for x in self.validation_step_outputs['scores']],dim=0)
         true_scores = torch.cat([x for x in self.validation_step_outputs['true_scores']],dim=0)
-        scores=scores.view(-1).cpu().data.numpy();true_scores=true_scores.view(-1).cpu().data.numpy()
-        # filter NaNs
-        mask = np.isfinite(scores) & np.isfinite(true_scores)
-        scores = scores[mask]
-        true_scores = true_scores[mask]
-        # guard zero-variance or too few samples
-        if scores.size < 2 or np.std(scores) == 0 or np.std(true_scores) == 0:
-            correlation = 0.0
-            spearman_corr = 0.0
-        else:
-            correlation = np.corrcoef(scores, true_scores)[0, 1]
-            spearman_corr,_=stats.spearmanr(scores, true_scores)
-        self.log('val_pearson_corr',correlation)
-        self.log('val_spearman_corr',spearman_corr)
+        scores = scores.view(-1).cpu().numpy()
+        true_scores = true_scores.view(-1).cpu().numpy()
+
+        correlation = _pearson_safe(scores, true_scores)
+        spearman_corr = _spearman_safe(scores, true_scores)
+
+        self.log('val_pearson_corr', correlation)
+        self.log('val_spearman_corr', spearman_corr)
         self.validation_step_outputs.clear()
     def test_step(self, test_batch):
         batch_targets = test_batch[0].y
@@ -222,11 +267,9 @@ class GNN_edge1_edgepooling(pl.LightningModule):
     def on_test_epoch_end(self):
         scores = torch.cat([x for x in self.test_step_outputs['scores']],dim=0)
         true_scores = torch.cat([x for x in self.test_step_outputs['true_scores']],dim=0)
-        scores=scores.view(-1).cpu().data.numpy();true_scores=true_scores.view(-1).cpu().data.numpy()
-        # filter NaNs
-        mask = np.isfinite(scores) & np.isfinite(true_scores)
-        scores = scores[mask]
-        true_scores = true_scores[mask]
+        scores = scores.view(-1).cpu().numpy()
+        true_scores = true_scores.view(-1).cpu().numpy()
+        scores, true_scores = _align_pair(scores, true_scores)
         test_model_list = [item[0].split('&')[1] for output in self.test_step_outputs['name'] for item in output]
         data_name=self.test_step_outputs['name'][0][0][0].split('&')[0].upper()
         result_df=pd.DataFrame({'MODEL':test_model_list,'DockQ_wave':true_scores,\
@@ -247,29 +290,17 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             model_dockq=curr_df.loc[max_index]['DockQ_wave']
             dockq_loss=max_dockq-model_dockq
             dockq_losses.append(dockq_loss)
-            curr_pred=np.array(curr_df['pred_dockq_wave'])
-            curr_true=np.array(curr_df['DockQ_wave'])
-            # filter NaNs and guard zero-variance
-            m = np.isfinite(curr_pred) & np.isfinite(curr_true)
-            cp = curr_pred[m]; ct = curr_true[m]
-            if cp.size < 2 or np.std(cp) == 0 or np.std(ct) == 0:
-                pearson_corr = 0.0
-                spearman_corr = 0.0
-            else:
-                pearson_corr=np.corrcoef(cp,ct)[0,1]
-                spearman_corr,_=stats.spearmanr(cp, ct)
+            curr_pred = curr_df['pred_dockq_wave'].to_numpy(dtype=float)
+            curr_true = curr_df['DockQ_wave'].to_numpy(dtype=float)
+            pearson_corr = _pearson_safe(curr_pred, curr_true)
+            spearman_corr = _spearman_safe(curr_pred, curr_true)
             pearson_corrs.append(pearson_corr);spearman_corrs.append(spearman_corr)
         ####cal correlation coefficient        
-        dockq_pred=np.array(result_df['pred_dockq_wave'])
-        dockq_true=np.array(result_df['DockQ_wave'])
-        m2 = np.isfinite(dockq_pred) & np.isfinite(dockq_true)
-        dp = dockq_pred[m2]; dt = dockq_true[m2]
-        if dp.size < 2 or np.std(dp) == 0 or np.std(dt) == 0:
-            pearson_corr = 0.0
-            spearman_corr = 0.0
-        else:
-            pearson_corr=np.corrcoef(dp,dt)[0,1]
-            spearman_corr,_=stats.spearmanr(dp,dt)
+        dockq_pred = result_df['pred_dockq_wave'].to_numpy(dtype=float)
+        dockq_true = result_df['DockQ_wave'].to_numpy(dtype=float)
+        dp, dt = _align_pair(dockq_pred, dockq_true)
+        pearson_corr = _pearson_safe(dp, dt)
+        spearman_corr = _spearman_safe(dp, dt)
 
         ####cal mse mae (on filtered arrays)
         mse = mean_squared_error(dp, dt) if dp.size > 0 else 0.0
@@ -292,4 +323,3 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         self.test_step_outputs.clear()
         return pearson_corr
     
-
