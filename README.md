@@ -7,7 +7,7 @@ The project aims to combine persistent homology & graph learning (GNN) with quan
 
 Github Repo structure (as of now): datasets/, qtdaqa/, scripts/, topoqa/, topoqa_train/ plus .gitignore and README.md. 
 
-Table of contents
+# Table of contents
 
 What is this?
 Features
