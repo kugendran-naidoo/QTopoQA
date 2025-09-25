@@ -2,10 +2,10 @@
 QTopoQA - Quantum Topological Protein Complex Interface QA. Quantum paper for PhD in progress.
 
 QTopoQA is an experimental research codebase that explores topological data analysis (TDA) and quantum-inspired operators to assess the quality of protein complex interfaces (Interface QA / EMA).
+
 The project aims to combine persistent homology & graph learning (GNN) with quantum-native constructions of the boundary operator to study when topological signals improve ranking and error detection in predicted complexes.
 
-Repo structure (as of now): datasets/, qtdaqa/, scripts/, topoqa/, topoqa_train/ plus .gitignore and README.md. 
-GitHub
+Github Repo structure (as of now): datasets/, qtdaqa/, scripts/, topoqa/, topoqa_train/ plus .gitignore and README.md. 
 
 Table of contents
 
@@ -23,12 +23,12 @@ Citing
 License
 Acknowledgments
 
-What is this?
+**What is this?**
 
 Protein complex structure predictors (e.g., AF-Multimer / AF3) still benefit from quality assessment (QA) models that can rank candidate complexes without native structures.
 Recent work (e.g., TopoQA) shows that persistent homology features coupled with GNNs can improve interface QA and ranking on standard benchmarks by capturing higher-order structure at interfaces.
 
-QTopoQA extends this direction and provides a sandbox to:
+**QTopoQA extends this direction and provides a sandbox to:**
 
 build topological descriptors at residue/atom/interface level,
 
@@ -38,7 +38,7 @@ and experiment with quantum/fermionic encodings of boundary operators (e.g., Pro
 
 This repo is under active development; interfaces and paths may change.
 
-Features
+**Features**
 
 Topological interface features. Hooks for PH-based summaries of local neighborhoods and interface graphs.
 
@@ -50,8 +50,17 @@ Scriptable training/eval. Reproducible CLI entry points and job scripts (local o
 
 Dataset stubs. Folder conventions for placing or linking interface QA datasets.
 
-Repository Layout
+**Installation**
 
+Python: 3.9–3.11 recommended.
+
+**Data**
+
+This project expects a datasets/ directory with subfolders for the benchmarks you use.
+Popular public sets in the literature include DBM55-AF2, HAF2, and new AF3-based sets. See the TopoQA paper for references and acquisition details.
+
+**Repository Layout**
+```text
 QTopoQA/
 ├─ datasets/         # Put or symlink datasets here (see “Data”)
 ├─ qtdaqa/           # Quantum/Topological operator utilities (PFTM, parity trees, etc.)
@@ -60,13 +69,3 @@ QTopoQA/
 ├─ topoqa_train/     # Train / eval entry points and experiment configs
 ├─ .gitignore
 └─ README.md
-
-
-Installation
-
-Python: 3.9–3.11 recommended.
-
-Data
-
-This project expects a datasets/ directory with subfolders for the benchmarks you use.
-Popular public sets in the literature include DBM55-AF2, HAF2, and new AF3-based sets. See the TopoQA paper for references and acquisition details.
