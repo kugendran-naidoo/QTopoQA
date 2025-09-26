@@ -1,6 +1,8 @@
 # QTopoQA
 QTopoQA - Quantum Topological Protein Complex Interface QA. Quantum paper for PhD in progress.
 
+Based on the original 2024 work of "TopoQA: a topological deep learning-based approach for protein complex structure interface quality assessment" - Han, Xia, et al.
+
 QTopoQA is an experimental research codebase that explores topological data analysis (TDA) and quantum-inspired operators to assess the quality of protein complex interfaces (Interface QA / EMA).
 
 The project aims to combine persistent homology & graph learning (GNN) with quantum-native constructions of the boundary operator to study when topological signals improve ranking and error detection in predicted complexes.
