@@ -5,6 +5,12 @@
 		},
 		{
 			"path": "../../topoqa/TopoQA"
+		},
+		{
+			"path": "../../cbne/quantinuum"
+		},
+		{
+			"path": "../../cbne/local"
 		}
 	],
 	"settings": {

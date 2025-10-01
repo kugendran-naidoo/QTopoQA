@@ -25,6 +25,14 @@ topoqa_train/graph_data/*
 !topoqa_train/graph_data/.gitkeep
 
 # keep empty directories although ignored
+topoqa_train/graph_data_original_copied/*
+!topoqa_train/graph_data_original_copied/.gitkeep
+
+# keep empty directories although ignored
+topoqa_train/graph_data_built/*
+!topoqa_train/graph_data_built/.gitkeep
+
+# keep empty directories although ignored
 topoqa_train/graph_data_Dockground/*
 !topoqa_train/graph_data_Dockground/.gitkeep
 
