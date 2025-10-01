@@ -1,4 +1,5 @@
 
+import sys
 import torch
 import numpy as np
 # Prefer modern DataLoader path for PyG ≥2.0
@@ -19,10 +20,10 @@ import pandas as pd
 from pytorch_lightning.callbacks import Callback
 import argparse
 
-torch.manual_seed(222)
+torch.manual_seed(seed)
 torch.use_deterministic_algorithms(True)
-np.random.seed(222)
-random.seed(222)
+np.random.seed(seed)
+random.seed(seed)
 
 def get_args():
     """
@@ -73,6 +74,28 @@ def get_args():
 
 
 args = get_args()
+
+
+def _log_environment():
+    print("### TRAINING ENVIRONMENT ###")
+    print(f"Python executable : {sys.executable}")
+    print(f"PyTorch version   : {torch.__version__}")
+    print(f"Lightning version : {pl.__version__}")
+    print(f"Graph directory   : {args.graph_dir}")
+    print(f"Train labels      : {args.train_label_file}")
+    print(f"Val labels        : {args.val_label_file}")
+    print(f"Batch size        : {args.batch_size}")
+    print(f"Learning rate     : {args.learning_rate}")
+    print(f"Epochs            : {args.num_epochs}")
+    print(f"Grad accumulate   : {args.accumulate_grad_batches}")
+    print(f"Attention heads   : {args.attention_head}")
+    print(f"Pooling type      : {args.pooling_type}")
+    print(f"Seed              : {args.seed}")
+    print(f"Save dir          : {args.save_dir}")
+    print("#############################")
+
+
+_log_environment()
 BATCH_SIZE=args.batch_size
 Epochs=args.num_epochs
 _accumulate_grad_batches=args.accumulate_grad_batches
