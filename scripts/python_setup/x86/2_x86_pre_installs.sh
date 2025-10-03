@@ -1,6 +1,8 @@
+source $HOME/venv_qtopo/bin/activate
+
 # Python dependencies to run TopoQA Inference
 
-# python 3.10.11
+# python 3.11.13
 
 python -m pip install --upgrade pip wheel setuptools
 
@@ -18,7 +20,4 @@ pip install pytorch-lightning
 pip install --upgrade 'numpy<2'  # e.g., 1.26.4
 
 # install rest of python libraries
-pip install -r py_requirements/requirements_macos_mps.txt
-
-# install mkdssp
-zsh mac_requirements/install_dssp.zsh
+pip install -r py_requirements/requirements_x86.txt
