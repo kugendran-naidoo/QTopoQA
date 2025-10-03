@@ -20,11 +20,6 @@ import pandas as pd
 from pytorch_lightning.callbacks import Callback
 import argparse
 
-torch.manual_seed(seed)
-torch.use_deterministic_algorithms(True)
-np.random.seed(seed)
-random.seed(seed)
-
 def get_args():
     """
     define and parse all training arguments with default values optimized for performance.
@@ -75,6 +70,10 @@ def get_args():
 
 args = get_args()
 
+torch.manual_seed(args.seed)
+torch.use_deterministic_algorithms(True)
+np.random.seed(args.seed)
+random.seed(args.seed)
 
 def _log_environment():
     print("### TRAINING ENVIRONMENT ###")
