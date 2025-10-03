@@ -94,6 +94,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # parse CLI arguments
     args = parse_args(argv)
 
+    # CLI parameter
+    train_val_file = args.train_validate_target_list
+    print(f"file: ",train_val_file)
+
+    # CLI parameters - generate fully resolved directories
     dataset_dir = Path(args.dataset_dir).resolve()
     work_dir = Path(args.work_dir).resolve()
     out_graphs = Path(args.out_graphs).resolve()
@@ -107,7 +112,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # code can simply check ``parallel_cfg.workers``.
     parallel_cfg = normalise_worker_count(args.parallel, default_workers=None)
     _ = parallel_cfg  # placeholder until processing is integrated
-
 
     return 0
 
