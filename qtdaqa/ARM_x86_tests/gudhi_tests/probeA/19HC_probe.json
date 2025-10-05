@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-10-05T12:30:34.797143",
+  "platform": "macOS-15.6.1-arm64-arm-64bit",
+  "python": "3.10.11 (main, Nov 19 2023, 08:45:56) [Clang 15.0.0 (clang-1500.0.40.1)]",
+  "numpy": "1.26.4",
+  "gudhi": "3.10.1",
+  "coeff": 2,
+  "grid": 1e-08,
+  "rmax": "auto",
+  "alpha_inexact": false,
+  "include_h": false,
+  "ca_only": true,
+  "hashes": {
+    "alpha_filtration": "d645b6c5e0de5bbbc824b80fc45d658bd04befb80ba656589f3b232f6d5c34d2",
+    "alpha_b1": "6be1cbb0bf7b2c322100fca4e26e1ac0b4b4f6c4566c370c191f194b1ec1d69e",
+    "vr0": "2747e71020e9ba8d2068b3114d3e9bcdc6e1387293725a3bb6ed162b3261899d",
+    "points": "ed746bcee15a31354075982da36eb7648243851e9265df0444fd52681f4a4b6e"
+  }
+}
