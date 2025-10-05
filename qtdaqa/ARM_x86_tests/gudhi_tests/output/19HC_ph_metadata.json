@@ -1,0 +1,72 @@
+{
+  "input_file": "19HC.pdb",
+  "file_type": "pdb",
+  "parameters": {
+    "inputs": [
+      "19HC.pdb"
+    ],
+    "include_h": false,
+    "ca_only": false,
+    "chain": null,
+    "interface_cutoff_A": 0.0,
+    "grid": 1e-08,
+    "rmax": "auto",
+    "coeff": 2,
+    "alpha_inexact": false,
+    "outdir": "output"
+  },
+  "environment": {
+    "python": "3.10.11",
+    "platform": "macOS-15.6.1-arm64-arm-64bit",
+    "machine": "arm64",
+    "numpy": "1.26.4",
+    "gudhi": "3.10.1",
+    "blas_lapack": {
+      "error": "cannot import name 'get_info' from 'numpy.__config__' (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/numpy/__config__.py)"
+    },
+    "threads": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1"
+    }
+  },
+  "input_stats": {
+    "point_count": 4341,
+    "points_hash": "4a2f03de76d8f84c2255ba3393ad916b12ea1c3ee59e162de490ce2310468397",
+    "raw_metadata": {
+      "type": "pdb",
+      "chain_stats": {
+        "A": {
+          "atom_count": 2170,
+          "unique_residues": 292
+        },
+        "B": {
+          "atom_count": 2172,
+          "unique_residues": 292
+        }
+      },
+      "element_counts": {
+        "C": 2664,
+        "N": 772,
+        "O": 850,
+        "S": 56
+      },
+      "filters": {
+        "include_h": false,
+        "ca_only": false,
+        "chain_sel": null
+      }
+    }
+  },
+  "post_filter_chain_stats": {
+    "A": {
+      "atom_count": 2170
+    },
+    "B": {
+      "atom_count": 2172
+    }
+  },
+  "interface_applied": false
+}
