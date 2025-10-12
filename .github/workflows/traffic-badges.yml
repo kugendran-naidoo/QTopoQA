@@ -30,6 +30,7 @@ jobs:
           echo "Using OWNER=$OWNER REPO=$REPO"
 
           mkdir -p traffic
+          # clones/views (GitHub keeps 14d only)
           curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
             "https://api.github.com/repos/$OWNER/$REPO/traffic/clones" > traffic/clones.json
           curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
@@ -38,27 +39,68 @@ jobs:
           TOTAL_CLONES=$(jq -r '[.clones[].count] | add // 0' traffic/clones.json)
           TOTAL_VIEWS=$(jq -r '[.views[].count]  | add // 0' traffic/views.json)
 
-          echo "TOTAL_CLONES=$TOTAL_CLONES" | tee -a $GITHUB_ENV
-          echo "TOTAL_VIEWS=$TOTAL_VIEWS"   | tee -a $GITHUB_ENV
-          echo "F_CLONES=${REPO}-clones.json" | tee -a $GITHUB_ENV
-          echo "F_VIEWS=${REPO}-views.json"   | tee -a $GITHUB_ENV
+          # stars (total)
+          STARS=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$OWNER/$REPO" | jq -r '.stargazers_count // 0')
+
+          # commits in the last 30 days (paginate up to 1000 safely)
+          SINCE="$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-30d +%Y-%m-%dT%H:%M:%SZ)"
+          COMMITS_30D=0
+          for PAGE in $(seq 1 10); do
+            N=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+              "https://api.github.com/repos/$OWNER/$REPO/commits?since=${SINCE}&per_page=100&page=${PAGE}" \
+              | jq 'length')
+            COMMITS_30D=$((COMMITS_30D + N))
+            [ "$N" -lt 100 ] && break
+          done
+
+          echo "TOTAL_CLONES=$TOTAL_CLONES"     | tee -a $GITHUB_ENV
+          echo "TOTAL_VIEWS=$TOTAL_VIEWS"       | tee -a $GITHUB_ENV
+          echo "TOTAL_STARS=$STARS"             | tee -a $GITHUB_ENV
+          echo "TOTAL_COMMITS_30D=$COMMITS_30D" | tee -a $GITHUB_ENV
+
+          # repo-specific filenames for gists
+          echo "F_CLONES=${REPO}-clones.json"   | tee -a $GITHUB_ENV
+          echo "F_VIEWS=${REPO}-views.json"     | tee -a $GITHUB_ENV
+          echo "F_STARS=${REPO}-stars.json"     | tee -a $GITHUB_ENV
+          echo "F_COMMITS=${REPO}-commits.json" | tee -a $GITHUB_ENV
 
       - name: Upload clones badge to Gist
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_TOKEN }}             # classic PAT with "gist"
-          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # your clones Gist
+          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # your "numbers" Gist
           filename: ${{ env.F_CLONES }}               # e.g. RepoName-clones.json
-          label: "clones"
+          label: "clones (14d)"
           message: ${{ env.TOTAL_CLONES }}
           color: "blue"
 
       - name: Upload views badge to Gist
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
-          auth: ${{ secrets.GIST_TOKEN }}             # classic PAT with "gist"
-          gistID: 9b749f24de62343dc995f8d524027c39    # your views Gist
-          filename: ${{ env.F_VIEWS }}                # e.g. RepoName-views.json
-          label: "views"
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 9b749f24de62343dc995f8d524027c39    # your second Gist (can be the same as above if you prefer)
+          filename: ${{ env.F_VIEWS }}
+          label: "views (14d)"
           message: ${{ env.TOTAL_VIEWS }}
           color: "green"
+
+      - name: Upload stars badge to Gist
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # store in same Gist as clones (or change if you want)
+          filename: ${{ env.F_STARS }}
+          label: "stars"
+          message: ${{ env.TOTAL_STARS }}
+          color: "yellow"
+
+      - name: Upload commits badge to Gist
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # same Gist as stars/clones
+          filename: ${{ env.F_COMMITS }}
+          label: "commits (30d)"
+          message: ${{ env.TOTAL_COMMITS_30D }}
+          color: "orange"
