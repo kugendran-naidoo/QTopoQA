@@ -46,54 +46,22 @@ jobs:
           echo "F_CLONES=${REPO}-clones.json" | tee -a $GITHUB_ENV
           echo "F_VIEWS=${REPO}-views.json"   | tee -a $GITHUB_ENV
 
-      - name: Update clones badge file in Gist (PATCH)
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [ -z "${F_CLONES:-}" ]; then
-            echo "F_CLONES is empty; aborting"; exit 1
-          fi
-          CONTENT_JSON=$(jq -nc \
-            --arg label "clones " \
-            --arg msg   "${TOTAL_CLONES}" \
-            '{schemaVersion:1, label:$label, message:$msg, color:"blue"}')
-          echo "Will write ${F_CLONES}: ${CONTENT_JSON}"
-          BODY=$(jq -nc --arg fname "${F_CLONES}" --arg content "${CONTENT_JSON}" \
-            '{files: {($fname): {content: $content}}}')
-          curl --fail-with-body -sS -o /tmp/resp.json -w "%{http_code}" -X PATCH \
-            -H "Authorization: Bearer ${GIST_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            https://api.github.com/gists/2b0de4f9f92a605b780e986e6d48ffcc \
-            -d "${BODY}" | tee /tmp/http_code.txt
-          code=$(cat /tmp/http_code.txt)
-          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
-            echo "Response:"; cat /tmp/resp.json; exit 1
-          fi
+      - name: Upload clones badge to Gist
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}             # classic PAT with "gist"
+          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # your clones gist
+          filename: ${{ env.F_CLONES }}               # e.g. QTopoQA-clones.json
+          label: "clones"
+          message: ${{ env.TOTAL_CLONES }}
+          color: "blue"
 
-      - name: Update views badge file in Gist (PATCH)
-        env:
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: |
-          set -euo pipefail
-          if [ -z "${F_VIEWS:-}" ]; then
-            echo "F_VIEWS is empty; aborting"; exit 1
-          fi
-          CONTENT_JSON=$(jq -nc \
-            --arg label "views " \
-            --arg msg   "${TOTAL_VIEWS}" \
-            '{schemaVersion:1, label:$label, message:$msg, color:"green"}')
-          echo "Will write ${F_VIEWS}: ${CONTENT_JSON}"
-          BODY=$(jq -nc --arg fname "${F_VIEWS}" --arg content "${CONTENT_JSON}" \
-            '{files: {($fname): {content: $content}}}')
-          curl --fail-with-body -sS -o /tmp/resp.json -w "%{http_code}" -X PATCH \
-            -H "Authorization: Bearer ${GIST_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "Content-Type: application/json" \
-            https://api.github.com/gists/9b749f24de62343dc995f8d524027c39 \
-            -d "${BODY}" | tee /tmp/http_code.txt
-          code=$(cat /tmp/http_code.txt)
-          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
-            echo "Response:"; cat /tmp/resp.json; exit 1
-          fi
+      - name: Upload views badge to Gist
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_TOKEN }}             # classic PAT with "gist"
+          gistID: 9b749f24de62343dc995f8d524027c39    # your views gist
+          filename: ${{ env.F_VIEWS }}                # e.g. QTopoQA-views.json
+          label: "views"
+          message: ${{ env.TOTAL_VIEWS }}
+          color: "green"
