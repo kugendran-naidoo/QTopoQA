@@ -1,0 +1,45 @@
+name: Generate Repo Metrics Charts
+on:
+  schedule:
+    - cron: "0 14 * * *"
+  workflow_dispatch:
+
+jobs:
+  build-metrics:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib requests
+
+      - name: Generate 4-week dashboard
+        env:
+          GH_TOKEN: ${{ secrets.STATS_TOKEN }}                # PAT for API reads
+          OWNER:  ${{ github.repository_owner }}              # e.g. kugendran-naidoo
+          REPO:   ${{ github.event.repository.name || github.repository }}
+          # github.repository is "owner/repo" on some events; trim it in-line:
+        run: |
+          if [[ "$REPO" == */* ]]; then REPO="${REPO#*/}"; export REPO; fi
+          echo "Using OWNER=$OWNER REPO=$REPO"
+          python scripts/generate_metrics.py
+
+      - name: Commit updated chart + history
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add metrics/activity_4w.png metrics_data/traffic_history.json || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(metrics): update 4-week dashboard"
+          git push
