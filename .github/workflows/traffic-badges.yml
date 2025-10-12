@@ -7,16 +7,16 @@ on:
 jobs:
   update-traffic:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Sanity check secrets (won't print them)
+      - name: Sanity check secrets
         run: |
-          if [ -z "${{ secrets.GIST_TOKEN }}" ]; then
-            echo "❌ GIST_TOKEN is missing."; exit 1; fi
-          if [ -z "${{ secrets.TRAFFIC_TOKEN }}" ]; then
-            echo "❌ TRAFFIC_TOKEN is missing."; exit 1; fi
+          [ -n "${{ secrets.GIST_TOKEN }}" ] || { echo "❌ GIST_TOKEN missing"; exit 1; }
+          [ -n "${{ secrets.TRAFFIC_TOKEN }}" ] || { echo "❌ TRAFFIC_TOKEN missing"; exit 1; }
 
       - name: Fetch repository traffic data
         env:
@@ -25,8 +25,8 @@ jobs:
           REPO:   ${{ github.event.repository.name || github.repository }}
         run: |
           set -euo pipefail
-          # Trim owner if REPO came in as "owner/repo"
-          if [[ "$REPO" == */* ]]; then REPO="${REPO#*/}"; fi
+          # Trim owner if REPO is "owner/repo"
+          [[ "$REPO" == */* ]] && REPO="${REPO#*/}"
           echo "Using OWNER=$OWNER REPO=$REPO"
 
           mkdir -p traffic
@@ -34,9 +34,6 @@ jobs:
             "https://api.github.com/repos/$OWNER/$REPO/traffic/clones" > traffic/clones.json
           curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
             "https://api.github.com/repos/$OWNER/$REPO/traffic/views"  > traffic/views.json
-
-          echo "Raw clones.json:"; cat traffic/clones.json || true; echo
-          echo "Raw views.json:";  cat traffic/views.json  || true; echo
 
           TOTAL_CLONES=$(jq -r '[.clones[].count] | add // 0' traffic/clones.json)
           TOTAL_VIEWS=$(jq -r '[.views[].count]  | add // 0' traffic/views.json)
@@ -50,8 +47,8 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_TOKEN }}             # classic PAT with "gist"
-          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # your clones gist
-          filename: ${{ env.F_CLONES }}               # e.g. QTopoQA-clones.json
+          gistID: 2b0de4f9f92a605b780e986e6d48ffcc    # your clones Gist
+          filename: ${{ env.F_CLONES }}               # e.g. RepoName-clones.json
           label: "clones"
           message: ${{ env.TOTAL_CLONES }}
           color: "blue"
@@ -60,8 +57,8 @@ jobs:
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GIST_TOKEN }}             # classic PAT with "gist"
-          gistID: 9b749f24de62343dc995f8d524027c39    # your views gist
-          filename: ${{ env.F_VIEWS }}                # e.g. QTopoQA-views.json
+          gistID: 9b749f24de62343dc995f8d524027c39    # your views Gist
+          filename: ${{ env.F_VIEWS }}                # e.g. RepoName-views.json
           label: "views"
           message: ${{ env.TOTAL_VIEWS }}
           color: "green"
