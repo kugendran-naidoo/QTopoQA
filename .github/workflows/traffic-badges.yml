@@ -1,0 +1,77 @@
+name: Update Traffic Badges
+on:
+  schedule:
+    - cron: "0 14 * * *"   # Daily 14:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-traffic:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Sanity check secrets (won't print them)
+        run: |
+          if [ -z "${{ secrets.GIST_TOKEN }}" ]; then
+            echo "❌ GIST_TOKEN is missing."; exit 1; fi
+          if [ -z "${{ secrets.TRAFFIC_TOKEN }}" ]; then
+            echo "❌ TRAFFIC_TOKEN is missing."; exit 1; fi
+
+      - name: Fetch repository traffic data
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          OWNER:  ${{ github.repository_owner }}
+          REPO:   ${{ github.event.repository.name || github.repository }}
+        run: |
+          set -euo pipefail
+          # Trim owner if REPO came in as "owner/repo"
+          if [[ "$REPO" == */* ]]; then REPO="${REPO#*/}"; fi
+          echo "Using OWNER=$OWNER REPO=$REPO"
+
+          mkdir -p traffic
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$OWNER/$REPO/traffic/clones" > traffic/clones.json
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$OWNER/$REPO/traffic/views"  > traffic/views.json
+
+          echo "Raw clones.json:"; cat traffic/clones.json || true; echo
+          echo "Raw views.json:";  cat traffic/views.json  || true; echo
+
+          TOTAL_CLONES=$(jq -r '[.clones[].count] | add // 0' traffic/clones.json)
+          TOTAL_VIEWS=$(jq -r '[.views[].count]  | add // 0' traffic/views.json)
+
+          echo "TOTAL_CLONES=$TOTAL_CLONES" | tee -a $GITHUB_ENV
+          echo "TOTAL_VIEWS=$TOTAL_VIEWS"   | tee -a $GITHUB_ENV
+          echo "F_CLONES=${REPO}-clones.json" | tee -a $GITHUB_ENV
+          echo "F_VIEWS=${REPO}-views.json"   | tee -a $GITHUB_ENV
+
+      - name: Update clones badge file in Gist (PATCH)
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          set -euo pipefail
+          BODY=$(jq -nc --arg fname "${F_CLONES}" \
+                        --arg content "{\"schemaVersion\":1,\"label\":\"clones \",\"message\":\"${TOTAL_CLONES}\",\"color\":\"blue\"}" \
+                        '{files: {($fname): {content: $content}}}')
+          curl -sS -o /tmp/resp.json -w "%{http_code}" -X PATCH \
+            -H "Authorization: Bearer ${GIST_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/gists/2b0de4f9f92a605b780e986e6d48ffcc \
+            -d "$BODY" | tee /tmp/http_code.txt
+          test "$(cat /tmp/http_code.txt)" -ge 200 -a "$(cat /tmp/http_code.txt)" -lt 300 || (echo "Response:" && cat /tmp/resp.json && exit 1)
+
+      - name: Update views badge file in Gist (PATCH)
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          set -euo pipefail
+          BODY=$(jq -nc --arg fname "${F_VIEWS}" \
+                        --arg content "{\"schemaVersion\":1,\"label\":\"views \",\"message\":\"${TOTAL_VIEWS}\",\"color\":\"green\"}" \
+                        '{files: {($fname): {content: $content}}}')
+          curl -sS -o /tmp/resp.json -w "%{http_code}" -X PATCH \
+            -H "Authorization: Bearer ${GIST_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/gists/9b749f24de62343dc995f8d524027c39 \
+            -d "$BODY" | tee /tmp/http_code.txt
+          test "$(cat /tmp/http_code.txt)" -ge 200 -a "$(cat /tmp/http_code.txt)" -lt 300 || (echo "Response:" && cat /tmp/resp.json && exit 1)
