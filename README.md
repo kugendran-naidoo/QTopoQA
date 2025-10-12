@@ -7,7 +7,18 @@ QTopoQA is an experimental research codebase that explores topological data anal
 
 The project aims to combine persistent homology & graph learning (GNN) with quantum-native constructions of the boundary operator to study when topological signals improve ranking and error detection in predicted complexes.
 
-Github Repo structure (as of now): datasets/, qtdaqa/, scripts/, topoqa/, topoqa_train/ plus .gitignore and README.md. 
+Github Repo structure (as of now): datasets/, qtdaqa/, scripts/, topoqa/, topoqa_train/ plus .gitignore and README.md.
+
+## 📊 Traffic & Popularity
+![Clones](https://img.shields.io/endpoint?cacheSeconds=300&url=https%3A%2F%2Fgist.githubusercontent.com%2Fkugendran-naidoo%2F2b0de4f9f92a605b780e986e6d48ffcc%2Fraw%2FQTopoQA-clones.json%3Fv%3D1)
+![Views](https://img.shields.io/endpoint?cacheSeconds=300&url=https%3A%2F%2Fgist.githubusercontent.com%2Fkugendran-naidoo%2F9b749f24de62343dc995f8d524027c39%2Fraw%2FQTopoQA-views.json%3Fv%3D1)
+
+> Auto-updated daily at 14:00 UTC via GitHub Actions.
+
+## 📈 Metrics
+![Activity (last 4 weeks)](https://raw.githubusercontent.com/kugendran-naidoo/QTopoQA/main/metrics/activity_4w.png)
+
+> Auto-updated daily at 14:00 UTC via GitHub Actions.
 
 # Table of contents
 
