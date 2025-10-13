@@ -2,6 +2,8 @@ name: Update Traffic Badges
 on:
   schedule:
     - cron: "0 14 * * *"   # Daily 14:00 UTC
+  watch:
+    types: [started]                # run when the repo is starred
   workflow_dispatch:
 
 jobs:
