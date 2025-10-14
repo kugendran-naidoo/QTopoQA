@@ -33,7 +33,7 @@ if str(LIB_DIR) not in sys.path:
 
 from directory_permissions import ensure_tree_readable, ensure_tree_readwrite
 from log_dirs import LogDirectoryInfo, prepare_log_directory
-from parallel_executor import ParallelConfig, normalise_worker_count
+from parallel_executor import normalise_worker_count
 from new_calculate_interface import process_pdb_file
 
 
@@ -193,7 +193,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
                    default=None,
                    help="Folder for logs")
 
-    p.add_argument("--parallel",
+    p.add_argument("-p", "--parallel",
                    metavar="4",
                    type=int,
                    default=None,
@@ -228,6 +228,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     run_log_dir = log_info.run_dir
     logger = _configure_main_logger(run_log_dir)
     logger.info("=== Starting graph_builder2 run ===")
+
+    raw_args = list(argv) if argv is not None else sys.argv[1:]
+    logger.info("CLI raw arguments: %s", raw_args)
+    logger.info(
+        "CLI parameters: dataset_dir=%s, work_dir=%s, out_graphs=%s, log_dir=%s, parallel=%s",
+        args.dataset_dir,
+        args.work_dir,
+        args.out_graphs,
+        args.log_dir,
+        args.parallel,
+    )
+
+    parallel_cfg = normalise_worker_count(args.parallel, default_workers=8)
+    worker_count = parallel_cfg.workers if parallel_cfg.workers is not None else 1
+    logger.info("Parallel worker configuration: requested=%s, effective=%d", args.parallel, worker_count)
 
     try:
         _check_dataset_readable(dataset_dir)
@@ -270,8 +285,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     tasks: List[tuple[Path, Path, Path]] = []
     for pdb_path in sorted(pdb_files):
-        relative = pdb_path.relative_to(dataset_dir)
-        relative_path = Path(relative)
+        try:
+            relative = pdb_path.relative_to(dataset_dir)
+            relative_path = Path(relative)
+        except ValueError:
+            relative_path = Path(pdb_path.name)
         output_parent = interface_dir / relative_path.parent
         log_parent = interface_log_dir / relative_path.parent
         output_parent.mkdir(parents=True, exist_ok=True)
@@ -284,19 +302,15 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if tasks:
         logger.info(
-            "Beginning interface residue extraction for %d PDB files using 8 workers",
+            "Beginning interface residue extraction for %d PDB files using %d worker(s)",
             len(tasks),
+            worker_count,
         )
         try:
-            with ProcessPoolExecutor(max_workers=8) as executor:
-                future_to_task = {
-                    executor.submit(process_pdb_file, pdb_path, output_path): (pdb_path, output_path, log_path)
-                    for pdb_path, output_path, log_path in tasks
-                }
-                for future in as_completed(future_to_task):
-                    pdb_path, output_path, log_path = future_to_task[future]
+            if worker_count <= 1:
+                for pdb_path, output_path, log_path in tasks:
                     try:
-                        residue_count = future.result()
+                        residue_count = process_pdb_file(pdb_path, output_path)
                         generated_interface_files += 1
                         with log_path.open("w", encoding="utf-8") as handle:
                             handle.write(f"Interface residues: {residue_count}\n")
@@ -304,16 +318,28 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                         interface_failure_entries.append((pdb_path, log_path, str(exc)))
                         with log_path.open("w", encoding="utf-8") as handle:
                             handle.write(f"Failure: {exc}\n")
+            else:
+                with ProcessPoolExecutor(max_workers=worker_count) as executor:
+                    future_to_task = {
+                        executor.submit(process_pdb_file, pdb_path, output_path): (pdb_path, output_path, log_path)
+                        for pdb_path, output_path, log_path in tasks
+                    }
+                    for future in as_completed(future_to_task):
+                        pdb_path, output_path, log_path = future_to_task[future]
+                        try:
+                            residue_count = future.result()
+                            generated_interface_files += 1
+                            with log_path.open("w", encoding="utf-8") as handle:
+                                handle.write(f"Interface residues: {residue_count}\n")
+                        except Exception as exc:
+                            interface_failure_entries.append((pdb_path, log_path, str(exc)))
+                            with log_path.open("w", encoding="utf-8") as handle:
+                                handle.write(f"Failure: {exc}\n")
         except Exception as exc:
             logger.exception("Unexpected error during interface extraction: %s", exc)
             return 2
     else:
         logger.warning("No PDB files found for interface extraction.")
-
-    # Placeholder for upcoming parallel work; normalise the CLI input so later
-    # code can simply check ``parallel_cfg.workers``.
-    parallel_cfg = normalise_worker_count(args.parallel, default_workers=None)
-    logger.info("Parallel worker configuration: %s", parallel_cfg.workers)
 
     logger.info("Dataset directory: %s", dataset_dir)
     logger.info("Work directory: %s", work_dir)
