@@ -8,6 +8,6 @@ def read_best(path):
             return float(cb_state["best_model_score"])
     raise KeyError(f"best_model_score not found in {path}")
 
-print("deterministic ckpt:", read_best("model/topo_best_val_loss=0.14407.ckpt.DETERM"))
-print("reference ckpt:", read_best("model/topoqa.ckpt"))
+print("K trained model ckpt:", read_best("model/topo_best_val_loss=0.14407.ckpt.DETERM"))
+print("TopoQA reference model ckpt:", read_best("model/topoqa.ckpt"))
 
