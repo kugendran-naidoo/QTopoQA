@@ -9,8 +9,8 @@
 # export PL_SEED_WORKERS=1
 # export TORCH_USE_DETERMINISTIC_ALGORITHMS=1
 
-#export OMP_NUM_THREADS=8
-#export MKL_NUM_THREADS=8
+export OMP_NUM_THREADS=8
+export MKL_NUM_THREADS=8
 
 for LR in 0.0001 0.0003 ; do
    for SD in 111 222 333; do
@@ -20,8 +20,8 @@ for LR in 0.0001 0.0003 ; do
     --val_label_file val.csv \
     --attention_head 8 \
     --pooling_type "mean" \
-    --batch_size 16 \
-    --accumulate_grad_batches 32 \
+    --batch_size 32 \
+    --accumulate_grad_batches 16 \
     --learning_rate $LR \
     --num_epochs 300 \
     --seed $SD \
