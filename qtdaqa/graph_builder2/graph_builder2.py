@@ -18,7 +18,9 @@ Parallelism (CLI):
 from __future__ import annotations
 
 import argparse
+import logging
 import sys
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional, Sequence
 
@@ -32,7 +34,45 @@ if str(LIB_DIR) not in sys.path:
 from directory_permissions import ensure_tree_readable, ensure_tree_readwrite
 from log_dirs import LogDirectoryInfo, prepare_log_directory
 from parallel_executor import ParallelConfig, normalise_worker_count
-from new_calculate_interface import process_directory as process_interfaces
+from new_calculate_interface import process_pdb_file
+
+
+LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
+
+
+def _configure_main_logger(run_log_dir: Path) -> logging.Logger:
+    """Initialise the main logger that writes to both file and stdout."""
+    logger = logging.getLogger("graph_builder2")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    formatter = logging.Formatter(LOG_FORMAT)
+
+    file_handler = logging.FileHandler(run_log_dir / "graph_builder2.log", encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    file_handler.setLevel(logging.INFO)
+    logger.addHandler(file_handler)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(logging.INFO)
+    logger.addHandler(console_handler)
+
+    logger.propagate = False
+    return logger
+
+
+def _create_per_pdb_logger(log_path: Path) -> logging.Logger:
+    """Create a dedicated logger for a single PDB processing run."""
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    logger = logging.Logger(name=str(log_path))
+    logger.setLevel(logging.INFO)
+    formatter = logging.Formatter(LOG_FORMAT)
+    handler = logging.FileHandler(log_path, encoding="utf-8")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.propagate = False
+    return logger
 
 
 def _is_text_file(path: Path, *, chunk_size: int = 4096) -> bool:
@@ -180,6 +220,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     log_root = Path(args.log_dir).resolve()
 
     try:
+        log_info: LogDirectoryInfo = prepare_log_directory(log_root, run_prefix="graph_builder2")
+    except Exception as exc:
+        print(f"Error: unable to prepare log directory '{log_root}': {exc}", file=sys.stderr)
+        return 2
+
+    run_log_dir = log_info.run_dir
+    logger = _configure_main_logger(run_log_dir)
+    logger.info("=== Starting graph_builder2 run ===")
+
+    try:
         _check_dataset_readable(dataset_dir)
         pdb_files, cif_files = _collect_structure_files(dataset_dir)
         _check_rw_directories(
@@ -196,51 +246,97 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             ]
         )
     except (PermissionError, RuntimeError) as exc:
-        print(f"Error: {exc}", file=sys.stderr)
+        logger.error("Fatal validation error: %s", exc)
         return 2
-
-    interface_dir = work_dir / "interface"
-    try:
-        interface_dir.mkdir(parents=True, exist_ok=True)
-    except OSError as exc:
-        print(f"Error: unable to prepare interface directory '{interface_dir}': {exc}", file=sys.stderr)
-        return 2
-
-    try:
-        interface_results = process_interfaces(
-            dataset_dir,
-            interface_dir,
-            output_suffix="interface",
-            output_extension="txt",
-        )
-    except Exception as exc:
-        print(f"Error: failed to generate interface files: {exc}", file=sys.stderr)
-        return 2
-
-    generated_interface_files = len(interface_results)
 
     pdb_count = len(pdb_files)
     cif_count = len(cif_files)
 
-    # add log directory and logs with <run_prefix>.<timestamp>
-    log_info: LogDirectoryInfo = prepare_log_directory(log_root, run_prefix="graph_builder2")
-    log_dir = log_info.root_dir
-    run_log_dir = log_info.run_dir
+    interface_dir = work_dir / "interface"
+    logger.info(
+        "Dataset verification complete: %d PDB files, %d CIF files. Preparing interface outputs.",
+        pdb_count,
+        cif_count,
+    )
+    try:
+        interface_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        logger.error("Unable to prepare interface directory '%s': %s", interface_dir, exc)
+        return 2
+
+    interface_log_dir = run_log_dir / "interface_logs"
+    interface_log_dir.mkdir(parents=True, exist_ok=True)
+    interface_failure_entries: List[tuple[Path, Path, str]] = []
+
+    tasks: List[tuple[Path, Path, Path]] = []
+    for pdb_path in sorted(pdb_files):
+        relative = pdb_path.relative_to(dataset_dir)
+        relative_path = Path(relative)
+        output_parent = interface_dir / relative_path.parent
+        log_parent = interface_log_dir / relative_path.parent
+        output_parent.mkdir(parents=True, exist_ok=True)
+        log_parent.mkdir(parents=True, exist_ok=True)
+        output_path = output_parent / f"{pdb_path.stem}.interface.txt"
+        log_path = log_parent / f"{pdb_path.stem}.log"
+        tasks.append((pdb_path, output_path, log_path))
+
+    generated_interface_files = 0
+
+    if tasks:
+        logger.info(
+            "Beginning interface residue extraction for %d PDB files using 8 workers",
+            len(tasks),
+        )
+        try:
+            with ProcessPoolExecutor(max_workers=8) as executor:
+                future_to_task = {
+                    executor.submit(process_pdb_file, pdb_path, output_path): (pdb_path, output_path, log_path)
+                    for pdb_path, output_path, log_path in tasks
+                }
+                for future in as_completed(future_to_task):
+                    pdb_path, output_path, log_path = future_to_task[future]
+                    try:
+                        residue_count = future.result()
+                        generated_interface_files += 1
+                        with log_path.open("w", encoding="utf-8") as handle:
+                            handle.write(f"Interface residues: {residue_count}\n")
+                    except Exception as exc:
+                        interface_failure_entries.append((pdb_path, log_path, str(exc)))
+                        with log_path.open("w", encoding="utf-8") as handle:
+                            handle.write(f"Failure: {exc}\n")
+        except Exception as exc:
+            logger.exception("Unexpected error during interface extraction: %s", exc)
+            return 2
+    else:
+        logger.warning("No PDB files found for interface extraction.")
 
     # Placeholder for upcoming parallel work; normalise the CLI input so later
     # code can simply check ``parallel_cfg.workers``.
     parallel_cfg = normalise_worker_count(args.parallel, default_workers=None)
-    _ = parallel_cfg  # placeholder until processing is integrated
+    logger.info("Parallel worker configuration: %s", parallel_cfg.workers)
 
-    # CLI parameter
-    print(f"dataset_dir: ", dataset_dir)
-    print(f"work_dir: ", work_dir)
-    print(f"out_graphs: ", out_graphs)
-    print(f"run_log_dir: ", run_log_dir)
-    print(f"pdb_file_count: ", pdb_count)
-    print(f"cif_file_count: ", cif_count)
-    print(f"interface_dir: ", interface_dir)
-    print(f"interface_file_count: ", generated_interface_files)
+    logger.info("Dataset directory: %s", dataset_dir)
+    logger.info("Work directory: %s", work_dir)
+    logger.info("Output graph directory: %s", out_graphs)
+    logger.info("Run log directory: %s", run_log_dir)
+    logger.info("PDB file count: %d", pdb_count)
+    logger.info("CIF file count: %d", cif_count)
+    logger.info("Interface output directory: %s", interface_dir)
+    logger.info("Per-PDB interface logs directory: %s", interface_log_dir)
+    logger.info("Interface success count: %d", generated_interface_files)
+
+    if interface_failure_entries:
+        logger.warning("Interface failure count: %d", len(interface_failure_entries))
+        for failed_path, log_path, error in interface_failure_entries:
+            try:
+                label = failed_path.relative_to(dataset_dir)
+            except ValueError:
+                label = failed_path
+            logger.warning(" - %s failed with %s (see log: %s)", label, error, log_path)
+    else:
+        logger.info("All interface extractions completed successfully.")
+
+    logger.info("=== graph_builder2 run completed ===")
 
     return 0
 
