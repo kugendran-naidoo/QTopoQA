@@ -32,6 +32,7 @@ if str(LIB_DIR) not in sys.path:
 from directory_permissions import ensure_tree_readable, ensure_tree_readwrite
 from log_dirs import LogDirectoryInfo, prepare_log_directory
 from parallel_executor import ParallelConfig, normalise_worker_count
+from new_calculate_interface import process_directory as process_interfaces
 
 
 def _is_text_file(path: Path, *, chunk_size: int = 4096) -> bool:
@@ -198,6 +199,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
+    interface_dir = work_dir / "interface"
+    try:
+        interface_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        print(f"Error: unable to prepare interface directory '{interface_dir}': {exc}", file=sys.stderr)
+        return 2
+
+    try:
+        interface_results = process_interfaces(
+            dataset_dir,
+            interface_dir,
+            output_suffix="interface",
+            output_extension="txt",
+        )
+    except Exception as exc:
+        print(f"Error: failed to generate interface files: {exc}", file=sys.stderr)
+        return 2
+
+    generated_interface_files = len(interface_results)
+
     pdb_count = len(pdb_files)
     cif_count = len(cif_files)
 
@@ -218,6 +239,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print(f"run_log_dir: ", run_log_dir)
     print(f"pdb_file_count: ", pdb_count)
     print(f"cif_file_count: ", cif_count)
+    print(f"interface_dir: ", interface_dir)
+    print(f"interface_file_count: ", generated_interface_files)
 
     return 0
 
