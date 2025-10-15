@@ -24,8 +24,6 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional, Sequence
 
-from Bio.PDB import PDBParser
-
 GRAPH_BUILDER2_DIR = Path(__file__).resolve().parent
 LIB_DIR = GRAPH_BUILDER2_DIR / "lib"
 # Ensure the local helpers (e.g., log_dirs.py) are importable even when this module
@@ -37,18 +35,9 @@ from directory_permissions import ensure_tree_readable, ensure_tree_readwrite
 from log_dirs import LogDirectoryInfo, prepare_log_directory
 from parallel_executor import normalise_worker_count
 from new_calculate_interface import process_pdb_file
-from new_topological_features import (
-    ResidueDescriptor,
-    TopologicalConfig,
-    compute_features_for_residues,
-)
 
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
-TOPOLOGY_NEIGHBOR_DISTANCE = 6.0
-TOPOLOGY_FILTRATION_CUTOFF = 8.0
-TOPOLOGY_MIN_PERSISTENCE = 0.01
-TOPOLOGY_ELEMENT_FILTERS = ["all"]
 
 
 def _configure_main_logger(run_log_dir: Path) -> logging.Logger:
@@ -169,53 +158,6 @@ def _ensure_empty_directories(paths: list[tuple[Path, str]]) -> None:
             raise RuntimeError(
                 f"{label} '{path}' must be empty before running (found '{first_entry.name}')"
             )
-
-
-def _collect_residue_descriptors(pdb_path: Path) -> List[ResidueDescriptor]:
-    parser = PDBParser(QUIET=True)
-    try:
-        structure = parser.get_structure("topology", str(pdb_path))
-    except Exception as exc:
-        raise RuntimeError(f"Failed to parse PDB file '{pdb_path}': {exc}") from exc
-
-    descriptors: List[ResidueDescriptor] = []
-    for model in structure:
-        for chain in model:
-            for residue in chain:
-                hetero_flag, seq_number, insertion_code = residue.id
-                if hetero_flag != " ":
-                    continue
-                insertion = insertion_code if insertion_code.strip() else " "
-                resname = residue.get_resname()
-                descriptor_str = f"c<{chain.id}>r<{seq_number}>"
-                if insertion.strip():
-                    descriptor_str += f"i<{insertion}>"
-                descriptor_str += f"R<{resname}>"
-                descriptors.append(ResidueDescriptor.from_string(descriptor_str))
-    return descriptors
-
-
-def _write_topology_log(log_path: Path, lines: List[str]) -> None:
-    with log_path.open("w", encoding="utf-8") as handle:
-        for line in lines:
-            handle.write(f"{line}\n")
-
-
-def _generate_topology_features(
-    pdb_path: Path,
-    output_path: Path,
-    config: TopologicalConfig,
-) -> tuple[int, Optional[str]]:
-    descriptors = _collect_residue_descriptors(pdb_path)
-    if not descriptors:
-        return 0, "No standard residues found"
-    frame = compute_features_for_residues(
-        pdb_path,
-        descriptors,
-        config,
-    )
-    frame.to_csv(output_path, index=False)
-    return len(descriptors), None
 
 
 
@@ -399,125 +341,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     else:
         logger.warning("No PDB files found for interface extraction.")
 
-    topology_dir = work_dir / "topology"
-    try:
-        topology_dir.mkdir(parents=True, exist_ok=True)
-    except OSError as exc:
-        logger.error("Unable to prepare topology directory '%s': %s", topology_dir, exc)
-        return 2
-
-    topology_log_dir = run_log_dir / "topology_logs"
-    topology_log_dir.mkdir(parents=True, exist_ok=True)
-
-    topology_failure_entries: List[tuple[Path, Path, str]] = []
-    topology_config = TopologicalConfig(
-        neighbor_distance=TOPOLOGY_NEIGHBOR_DISTANCE,
-        filtration_cutoff=TOPOLOGY_FILTRATION_CUTOFF,
-        min_persistence=TOPOLOGY_MIN_PERSISTENCE,
-        element_filters=TOPOLOGY_ELEMENT_FILTERS,
-        workers=None,
-        log_progress=False,
-    )
-
-    topology_tasks: List[tuple[Path, Path, Path]] = []
-    for pdb_path in sorted(pdb_files):
-        try:
-            relative = pdb_path.relative_to(dataset_dir)
-            relative_path = Path(relative)
-        except ValueError:
-            relative_path = Path(pdb_path.name)
-        topology_output_parent = topology_dir / relative_path.parent
-        topology_log_parent = topology_log_dir / relative_path.parent
-        topology_output_parent.mkdir(parents=True, exist_ok=True)
-        topology_log_parent.mkdir(parents=True, exist_ok=True)
-        topology_output_path = topology_output_parent / f"{pdb_path.stem}.topology.csv"
-        topology_log_path = topology_log_parent / f"{pdb_path.stem}.log"
-        topology_tasks.append((pdb_path, topology_output_path, topology_log_path))
-
-    generated_topology_files = 0
-
-    if topology_tasks:
-        logger.info(
-            "Beginning topological feature extraction for %d PDB files using %d worker(s)",
-            len(topology_tasks),
-            worker_count,
-        )
-        try:
-            if worker_count <= 1:
-                for pdb_path, output_path, log_path in topology_tasks:
-                    try:
-                        residue_count, error_msg = _generate_topology_features(
-                            pdb_path,
-                            output_path,
-                            topology_config,
-                        )
-                    except Exception as exc:
-                        residue_count, error_msg = 0, str(exc)
-                    if error_msg:
-                        topology_failure_entries.append((pdb_path, log_path, error_msg))
-                        _write_topology_log(
-                            log_path,
-                            [
-                                f"PDB: {pdb_path}",
-                                f"Status: FAILURE",
-                                f"Error: {error_msg}",
-                            ],
-                        )
-                    else:
-                        generated_topology_files += 1
-                        _write_topology_log(
-                            log_path,
-                            [
-                                f"PDB: {pdb_path}",
-                                "Status: SUCCESS",
-                                f"Residues processed: {residue_count}",
-                                f"Output file: {output_path}",
-                            ],
-                        )
-            else:
-                with ProcessPoolExecutor(max_workers=worker_count) as executor:
-                    future_to_task = {
-                        executor.submit(
-                            _generate_topology_features,
-                            pdb_path,
-                            output_path,
-                            topology_config,
-                        ): (pdb_path, output_path, log_path)
-                        for pdb_path, output_path, log_path in topology_tasks
-                    }
-                    for future in as_completed(future_to_task):
-                        pdb_path, output_path, log_path = future_to_task[future]
-                        try:
-                            residue_count, error_msg = future.result()
-                        except Exception as exc:
-                            residue_count, error_msg = 0, str(exc)
-                        if error_msg:
-                            topology_failure_entries.append((pdb_path, log_path, error_msg))
-                            _write_topology_log(
-                                log_path,
-                                [
-                                    f"PDB: {pdb_path}",
-                                    f"Status: FAILURE",
-                                    f"Error: {error_msg}",
-                                ],
-                            )
-                        else:
-                            generated_topology_files += 1
-                            _write_topology_log(
-                                log_path,
-                                [
-                                    f"PDB: {pdb_path}",
-                                    "Status: SUCCESS",
-                                    f"Residues processed: {residue_count}",
-                                    f"Output file: {output_path}",
-                                ],
-                            )
-        except Exception as exc:
-            logger.exception("Unexpected error during topology feature extraction: %s", exc)
-            return 2
-    else:
-        logger.warning("No PDB files found for topological feature extraction.")
-
     logger.info("Dataset directory: %s", dataset_dir)
     logger.info("Work directory: %s", work_dir)
     logger.info("Output graph directory: %s", out_graphs)
@@ -527,9 +350,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     logger.info("Interface output directory: %s", interface_dir)
     logger.info("Per-PDB interface logs directory: %s", interface_log_dir)
     logger.info("Interface success count: %d", generated_interface_files)
-    logger.info("Topology output directory: %s", topology_dir)
-    logger.info("Per-PDB topology logs directory: %s", topology_log_dir)
-    logger.info("Topology success count: %d", generated_topology_files)
 
     if interface_failure_entries:
         logger.warning("Interface failure count: %d", len(interface_failure_entries))
@@ -541,17 +361,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             logger.warning(" - %s failed with %s (see log: %s)", label, error, log_path)
     else:
         logger.info("All interface extractions completed successfully.")
-
-    if topology_failure_entries:
-        logger.warning("Topology failure count: %d", len(topology_failure_entries))
-        for failed_path, log_path, error in topology_failure_entries:
-            try:
-                label = failed_path.relative_to(dataset_dir)
-            except ValueError:
-                label = failed_path
-            logger.warning(" - %s failed with %s (see log: %s)", label, error, log_path)
-    else:
-        logger.info("All topological feature extractions completed successfully.")
 
     logger.info("=== graph_builder2 run completed ===")
 
