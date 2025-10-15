@@ -17,8 +17,8 @@ datasets/training/*
 !datasets/training/.gitkeep
 
 # keep empty directories although ignored
-qtdaqa/graph_builder/output/*
-!qtdaqa/graph_builder/output/.gitkeep
+qtdaqa/graph_builder/output*
+qtdaqa/graph_builder2/output*
 
 # keep empty directories although ignored
 topoqa_train/graph_data/*
