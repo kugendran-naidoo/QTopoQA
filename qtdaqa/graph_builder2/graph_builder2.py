@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional, Sequence
@@ -57,7 +58,7 @@ def _configure_main_logger(run_log_dir: Path) -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
-    formatter = logging.Formatter(LOG_FORMAT)
+    formatter = logging.Formatter(LOG_FORMAT, "%Y-%m-%d %H:%M:%S")
 
     file_handler = logging.FileHandler(run_log_dir / "graph_builder2.log", encoding="utf-8")
     file_handler.setFormatter(formatter)
@@ -357,6 +358,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         tasks.append((pdb_path, output_path, log_path))
 
     generated_interface_files = 0
+    interface_elapsed = 0.0
 
     if tasks:
         logger.info(
@@ -364,6 +366,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             len(tasks),
             worker_count,
         )
+        interface_start = time.perf_counter()
         try:
             if worker_count <= 1:
                 for pdb_path, output_path, log_path in tasks:
@@ -396,8 +399,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         except Exception as exc:
             logger.exception("Unexpected error during interface extraction: %s", exc)
             return 2
+        interface_elapsed = time.perf_counter() - interface_start
     else:
         logger.warning("No PDB files found for interface extraction.")
+    logger.info("Interface extraction elapsed time: %.2f s", interface_elapsed)
 
     topology_dir = work_dir / "topology"
     try:
@@ -435,6 +440,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         topology_tasks.append((pdb_path, topology_output_path, topology_log_path))
 
     generated_topology_files = 0
+    topology_elapsed = 0.0
 
     if topology_tasks:
         logger.info(
@@ -442,6 +448,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             len(topology_tasks),
             worker_count,
         )
+        topology_start = time.perf_counter()
         try:
             if worker_count <= 1:
                 for pdb_path, output_path, log_path in topology_tasks:
@@ -515,8 +522,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         except Exception as exc:
             logger.exception("Unexpected error during topology feature extraction: %s", exc)
             return 2
+        topology_elapsed = time.perf_counter() - topology_start
     else:
         logger.warning("No PDB files found for topological feature extraction.")
+    logger.info("Topological feature extraction elapsed time: %.2f s", topology_elapsed)
 
     logger.info("Dataset directory: %s", dataset_dir)
     logger.info("Work directory: %s", work_dir)
