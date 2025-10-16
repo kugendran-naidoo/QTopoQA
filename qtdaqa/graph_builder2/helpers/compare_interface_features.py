@@ -5,8 +5,29 @@ from __future__ import annotations
 
 import argparse
 import math
+import sys
 from pathlib import Path
 from typing import Dict, List
+
+
+class _TeeStdout:
+    """Mirror writes to both stdout and a log file."""
+
+    def __init__(self, primary, mirror):
+        self._primary = primary
+        self._mirror = mirror
+
+    def write(self, data: str) -> int:
+        self._primary.write(data)
+        self._mirror.write(data)
+        return len(data)
+
+    def flush(self) -> None:
+        self._primary.flush()
+        self._mirror.flush()
+
+    def __getattr__(self, attr):
+        return getattr(self._primary, attr)
 
 
 def parse_args() -> argparse.Namespace:
@@ -119,7 +140,7 @@ def compare_files(
     return is_same, diffs
 
 
-def main() -> int:
+def _run() -> int:
     args = parse_args()
     baseline_dir = args.interface_1.resolve()
     candidate_dir = args.interface_2.resolve()
@@ -206,6 +227,18 @@ def main() -> int:
     if different or missing_in_candidate or missing_in_baseline:
         return 1
     return 0
+
+
+def main() -> int:
+    log_path = Path("interface_run.log").resolve()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    original_stdout = sys.stdout
+    with log_path.open("w", encoding="utf-8") as log_handle:
+        sys.stdout = _TeeStdout(original_stdout, log_handle)
+        try:
+            return _run()
+        finally:
+            sys.stdout = original_stdout
 
 
 if __name__ == "__main__":
