@@ -23,7 +23,7 @@ import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 from Bio.PDB import PDBParser
 
@@ -46,10 +46,27 @@ from new_topological_features import (
 
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
-TOPOLOGY_NEIGHBOR_DISTANCE = 6.0
+INTERFACE_CUTOFF = 10.0
+TOPOLOGY_NEIGHBOR_DISTANCE = 8.0
 TOPOLOGY_FILTRATION_CUTOFF = 8.0
 TOPOLOGY_MIN_PERSISTENCE = 0.01
-TOPOLOGY_ELEMENT_FILTERS = ["all"]
+# Mirror the legacy extractor's element groups so we emit 7 × (5 + 15) = 140 values.
+TOPOLOGY_ELEMENT_FILTERS: Sequence[Sequence[str]] = (
+    ("C",),
+    ("N",),
+    ("O",),
+    ("C", "N"),
+    ("C", "O"),
+    ("N", "O"),
+    ("C", "N", "O"),
+)
+
+
+def _format_element_filters(filters: Sequence[Sequence[str]]) -> str:
+    parts: List[str] = []
+    for group in filters:
+        parts.append("{" + ",".join(group) + "}")
+    return ", ".join(parts)
 
 
 def _configure_main_logger(run_log_dir: Path) -> logging.Logger:
@@ -196,6 +213,37 @@ def _collect_residue_descriptors(pdb_path: Path) -> List[ResidueDescriptor]:
     return descriptors
 
 
+def _load_interface_descriptors(
+    interface_path: Path,
+    interface_cutoff: float,
+) -> Tuple[List[ResidueDescriptor], Optional[str]]:
+    descriptors: List[ResidueDescriptor] = []
+    try:
+        with interface_path.open("r", encoding="utf-8") as handle:
+            for raw_line in handle:
+                stripped = raw_line.strip()
+                if not stripped:
+                    continue
+                residue_token = stripped.split(None, 1)[0]
+                try:
+                    descriptors.append(ResidueDescriptor.from_string(residue_token))
+                except ValueError:
+                    return [], (
+                        f"Interface file '{interface_path}' contains an unrecognised descriptor: "
+                        f"'{residue_token}'"
+                    )
+    except FileNotFoundError:
+        return [], f"Interface file not found: {interface_path}"
+    except OSError as exc:
+        return [], f"Failed to read interface file '{interface_path}': {exc}"
+
+    if not descriptors:
+        cutoff_str = f"{interface_cutoff:g}A"
+        return [], f"No interface residues with cutoff of {cutoff_str} recorded in '{interface_path}'"
+
+    return descriptors, None
+
+
 def _write_topology_log(log_path: Path, lines: List[str]) -> None:
     with log_path.open("w", encoding="utf-8") as handle:
         for line in lines:
@@ -206,10 +254,18 @@ def _generate_topology_features(
     pdb_path: Path,
     output_path: Path,
     config: TopologicalConfig,
+    interface_path: Optional[Path] = None,
+    interface_cutoff: float = INTERFACE_CUTOFF,
 ) -> tuple[int, Optional[str]]:
-    descriptors = _collect_residue_descriptors(pdb_path)
-    if not descriptors:
-        return 0, "No standard residues found"
+    if interface_path is not None:
+        descriptors, error = _load_interface_descriptors(interface_path, interface_cutoff)
+        if error:
+            return 0, error
+    else:
+        descriptors = _collect_residue_descriptors(pdb_path)
+        if not descriptors:
+            return 0, "No standard residues found"
+
     frame = compute_features_for_residues(
         pdb_path,
         descriptors,
@@ -287,6 +343,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     run_log_dir = log_info.run_dir
     logger = _configure_main_logger(run_log_dir)
     logger.info("=== Starting graph_builder2 run ===")
+    logger.info(
+        "Defaults: interface_cutoff=%.1f Å, topology_neighbor_distance=%.1f Å, "
+        "topology_filtration_cutoff=%.1f Å, topology_min_persistence=%.4f, "
+        "topology_element_filters=%s",
+        INTERFACE_CUTOFF,
+        TOPOLOGY_NEIGHBOR_DISTANCE,
+        TOPOLOGY_FILTRATION_CUTOFF,
+        TOPOLOGY_MIN_PERSISTENCE,
+        _format_element_filters(TOPOLOGY_ELEMENT_FILTERS),
+    )
 
     raw_args = list(argv) if argv is not None else sys.argv[1:]
     logger.info("CLI raw arguments: %s", raw_args)
@@ -371,7 +437,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             if worker_count <= 1:
                 for pdb_path, output_path, log_path in tasks:
                     try:
-                        residue_count = process_pdb_file(pdb_path, output_path)
+                        residue_count = process_pdb_file(pdb_path, output_path, cutoff=INTERFACE_CUTOFF)
                         generated_interface_files += 1
                         with log_path.open("w", encoding="utf-8") as handle:
                             handle.write(f"Interface residues: {residue_count}\n")
@@ -382,7 +448,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             else:
                 with ProcessPoolExecutor(max_workers=worker_count) as executor:
                     future_to_task = {
-                        executor.submit(process_pdb_file, pdb_path, output_path): (pdb_path, output_path, log_path)
+                        executor.submit(process_pdb_file, pdb_path, output_path, INTERFACE_CUTOFF): (pdb_path, output_path, log_path)
                         for pdb_path, output_path, log_path in tasks
                     }
                     for future in as_completed(future_to_task):
@@ -424,7 +490,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         log_progress=False,
     )
 
-    topology_tasks: List[tuple[Path, Path, Path]] = []
+    topology_tasks: List[tuple[Path, Path, Path, Path]] = []
     for pdb_path in sorted(pdb_files):
         try:
             relative = pdb_path.relative_to(dataset_dir)
@@ -435,9 +501,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         topology_log_parent = topology_log_dir / relative_path.parent
         topology_output_parent.mkdir(parents=True, exist_ok=True)
         topology_log_parent.mkdir(parents=True, exist_ok=True)
+        interface_path = interface_dir / relative_path.parent / f"{pdb_path.stem}.interface.txt"
         topology_output_path = topology_output_parent / f"{pdb_path.stem}.topology.csv"
         topology_log_path = topology_log_parent / f"{pdb_path.stem}.log"
-        topology_tasks.append((pdb_path, topology_output_path, topology_log_path))
+        topology_tasks.append((pdb_path, interface_path, topology_output_path, topology_log_path))
 
     generated_topology_files = 0
     topology_elapsed = 0.0
@@ -451,12 +518,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         topology_start = time.perf_counter()
         try:
             if worker_count <= 1:
-                for pdb_path, output_path, log_path in topology_tasks:
+                for pdb_path, interface_path, output_path, log_path in topology_tasks:
                     try:
                         residue_count, error_msg = _generate_topology_features(
                             pdb_path,
                             output_path,
                             topology_config,
+                            interface_path=interface_path,
+                            interface_cutoff=INTERFACE_CUTOFF,
                         )
                     except Exception as exc:
                         residue_count, error_msg = 0, str(exc)
@@ -489,8 +558,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                             pdb_path,
                             output_path,
                             topology_config,
+                            interface_path,
+                            INTERFACE_CUTOFF,
                         ): (pdb_path, output_path, log_path)
-                        for pdb_path, output_path, log_path in topology_tasks
+                        for pdb_path, interface_path, output_path, log_path in topology_tasks
                     }
                     for future in as_completed(future_to_task):
                         pdb_path, output_path, log_path = future_to_task[future]
