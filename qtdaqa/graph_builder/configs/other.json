@@ -1,7 +1,0 @@
-// General builder configuration
-// - overwrite_graphs: overwrite existing .pt files if true
-// - jobs: default job count when --parallel is not supplied on CLI
-{
-  "overwrite_graphs": true,
-  "jobs": 4
-}
