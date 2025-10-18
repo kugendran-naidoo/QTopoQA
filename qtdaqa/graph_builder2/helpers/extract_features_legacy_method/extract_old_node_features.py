@@ -18,7 +18,15 @@ except ImportError as exc:  # pragma: no cover - runtime dependency check
     raise SystemExit("Error: pandas is required to run this script.") from exc
 
 # Make topoqa/src importable
-REPO_ROOT = Path(__file__).resolve().parents[2]
+def _locate_repo_root(start: Path) -> Path:
+    for parent in [start] + list(start.parents):
+        candidate = parent / "topoqa" / "src"
+        if candidate.exists():
+            return parent
+    raise RuntimeError("Unable to locate repo root containing 'topoqa/src'.")
+
+
+REPO_ROOT = _locate_repo_root(Path(__file__).resolve())
 TOPOQA_SRC = REPO_ROOT / "topoqa" / "src"
 if str(TOPOQA_SRC) not in sys.path:
     sys.path.insert(0, str(TOPOQA_SRC))
