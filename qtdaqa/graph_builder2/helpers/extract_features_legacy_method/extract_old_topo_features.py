@@ -3,15 +3,39 @@
 from __future__ import annotations
 
 import argparse
+import sys
+import tempfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Tuple, Union
 
-from Bio.PDB import PDBParser
-import pandas as pd
+try:
+    import pandas as pd
+except ImportError as exc:  # pragma: no cover
+    raise SystemExit("Error: pandas is required to run this script.") from exc
 
-import sys
-sys.path.insert(0, "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/topoqa/src")
-from topo_feature import topo_fea
+try:
+    from Bio.PDB import PDBParser
+except ImportError as exc:  # pragma: no cover
+    raise SystemExit("Error: biopython is required to run this script.") from exc
+
+
+def _locate_repo_root(start: Path) -> Path:
+    current = start
+    for parent in [current] + list(current.parents):
+        candidate = parent / "topoqa" / "src"
+        if candidate.exists():
+            return parent
+    raise RuntimeError("Unable to locate repo root containing 'topoqa/src'.")
+
+
+REPO_ROOT = _locate_repo_root(Path(__file__).resolve())
+TOPOQA_SRC = REPO_ROOT / "topoqa" / "src"
+if str(TOPOQA_SRC) not in sys.path:
+    sys.path.insert(0, str(TOPOQA_SRC))
+
+from topo_feature import topo_fea  # type: ignore  # noqa: E402
+from get_interface import cal_interface  # type: ignore  # noqa: E402
 
 ElementFilter = Union[List[str], str]
 DEFAULT_ELEMENT_TOKENS: List[str] = ["C", "N", "O", "CN", "CO", "NO", "CNO"]
@@ -29,17 +53,14 @@ DEFAULT_ELEMENT_FILTERS: List[List[str]] = [
 class HelpOnErrorArgumentParser(argparse.ArgumentParser):
     """ArgumentParser that prints full help text before exiting on errors."""
 
-    def error(self, message: str) -> None:
-        help_text = self.format_help()
-        self._print_message(help_text, sys.stdout)
+    def error(self, message: str) -> None:  # pragma: no cover
+        self.print_help(sys.stderr)
         self.exit(2, f"{self.prog}: error: {message}\n")
 
 
-def normalise_element_filters(values: Optional[Iterable[str]]) -> List[ElementFilter]:
-    """Convert CLI element tokens into the format expected by topo_fea."""
+def _normalise_element_filters(values: Optional[Iterable[str]]) -> List[ElementFilter]:
     if not values:
         return [group.copy() for group in DEFAULT_ELEMENT_FILTERS]
-
     cleaned: List[ElementFilter] = []
     for token in values:
         trimmed = token.strip()
@@ -50,168 +71,243 @@ def normalise_element_filters(values: Optional[Iterable[str]]) -> List[ElementFi
         letters = [char.upper() for char in trimmed if char.isalpha()]
         if not letters:
             continue
-        unique_letters = list(dict.fromkeys(letters))
-        cleaned.append(unique_letters)
-
+        cleaned.append(list(dict.fromkeys(letters)))
     return cleaned or ["all"]
 
 
-def parse_args(argv: Iterable[str]) -> Tuple[argparse.Namespace, argparse.ArgumentParser]:
+def parse_args(argv: Iterable[str]) -> argparse.Namespace:
     parser = HelpOnErrorArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
         "--dataset-dir",
         type=Path,
         required=True,
-        help="Directory containing the Dockground_MAF2 PDBs",
-    )
-    parser.add_argument(
-        "--neighbor-distance",
-        type=float,
-        default=6.0,
-        help="Neighborhood radius in Å (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--cutoff",
-        type=float,
-        default=8.0,
-        help="Persistence cutoff for H0 bars (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--min-persistence",
-        type=float,
-        default=0.01,
-        help="Minimum persistence to keep bars (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--elements",
-        nargs="*",
-        default=list(DEFAULT_ELEMENT_TOKENS),
-        help="Element filters (default: C, N, O, CN, CO, NO, CNO)",
-    )
-    parser.add_argument(
-        "--residues-per-file",
-        type=int,
-        default=0,
-        help="If >0, limit to this many residues per file (0 = all).",
+        help="Directory containing input structures (.pdb). (required)",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
         required=True,
-        help="Directory to write CSV outputs",
+        help="Directory to write topology CSV files ('.topology.csv'). (required)",
     )
-    args = parser.parse_args(list(argv))
+    parser.add_argument(
+        "--neighbor-distance",
+        type=float,
+        default=8.0,
+        help="Neighborhood radius in Å for point cloud extraction.",
+    )
+    parser.add_argument(
+        "--cutoff",
+        type=float,
+        default=8.0,
+        help="Persistence cutoff for H0 bars.",
+    )
+    parser.add_argument(
+        "--interface-cutoff",
+        type=float,
+        default=10.0,
+        help="Interface detection cutoff in Å (used when selecting residues).",
+    )
+    parser.add_argument(
+        "--min-persistence",
+        type=float,
+        default=0.01,
+        help="Minimum persistence threshold to keep bars.",
+    )
+    parser.add_argument(
+        "--elements",
+        nargs="*",
+        default=list(DEFAULT_ELEMENT_TOKENS),
+        help="Element filters (use tokens like C, N, O, CN, ... or 'all').",
+    )
+    parser.add_argument(
+        "--residues-per-file",
+        type=int,
+        default=0,
+        help="If >0, limit to this many residues per structure (0 = all).",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=1,
+        help="Number of worker processes (1 = sequential).",
+    )
+    parser.add_argument(
+        "--max-models",
+        type=int,
+        default=0,
+        help="Optional limit on number of models to process (0 = all).",
+    )
+    return parser.parse_args(list(argv))
 
-    if not args.dataset_dir.is_dir():
-        parser.error(f"Dataset directory not found or not a directory: {args.dataset_dir}")
-    if args.output_dir.exists() and not args.output_dir.is_dir():
-        parser.error(f"Output path exists and is not a directory: {args.output_dir}")
 
-    return args, parser
-
-
-def collect_defaults(parser: argparse.ArgumentParser) -> dict[str, object]:
-    defaults: dict[str, object] = {}
-    for action in parser._actions:
-        if not action.option_strings:
-            continue
-        default = action.default
-        if default is argparse.SUPPRESS:
-            continue
-        defaults[action.dest] = default
-    return defaults
+@dataclass
+class ExtractionTask:
+    model: str
+    pdb_path: Path
+    interface_output: Path
+    output_path: Path
 
 
-def select_residues(pdb_path: Path, limit: int) -> list[str]:
-    parser = PDBParser(QUIET=True)
-    structure = parser.get_structure("struct", str(pdb_path))
-    descriptors: list[str] = []
-    for model in structure:
-        for chain in model:
-            for residue in chain:
-                if residue.id[0] != " ":
-                    continue
-                seq, icode = residue.id[1], residue.id[2] if residue.id[2].strip() else " "
-                desc = f"c<{chain.id}>r<{seq}>"
-                if icode.strip():
-                    desc += f"i<{icode}>"
-                desc += f"R<{residue.get_resname()}>"
-                descriptors.append(desc)
-                if limit > 0 and len(descriptors) >= limit:
-                    return descriptors
-    return descriptors
+def _collect_tasks(dataset_dir: Path, output_dir: Path, max_models: int) -> List[ExtractionTask]:
+    pdb_files = sorted(dataset_dir.rglob("*.pdb"))
+    tasks: List[ExtractionTask] = []
+    for pdb_path in pdb_files:
+        model = pdb_path.stem
+        interface_placeholder = output_dir / "interface_tmp" / f"{model}.interface.txt"
+        topology_output = output_dir / f"{model}.topology.csv"
+        topology_output.parent.mkdir(parents=True, exist_ok=True)
+        interface_placeholder.parent.mkdir(parents=True, exist_ok=True)
+        tasks.append(
+            ExtractionTask(
+                model=model,
+                pdb_path=pdb_path,
+                interface_output=interface_placeholder,
+                output_path=topology_output,
+            )
+        )
+        if max_models and len(tasks) >= max_models:
+            break
+    return tasks
+
+
+def _generate_interface(task: ExtractionTask, cutoff: float) -> List[str]:
+    extractor = cal_interface(str(task.pdb_path), cut=cutoff)
+    extractor.find_and_write(str(task.interface_output))
+    residues: List[str] = []
+    with task.interface_output.open() as handle:
+        for line in handle:
+            token = line.strip().split()[0]
+            residues.append(token)
+    return residues
+
+
+def _process_task(
+    task: ExtractionTask,
+    element_filters: List[ElementFilter],
+    neighbor_distance: float,
+    cutoff: float,
+    min_persistence: float,
+    residues_per_file: int,
+    interface_cutoff: float,
+) -> Tuple[str, Optional[str]]:
+    temp_interface = None
+    try:
+        residues = _generate_interface(task, interface_cutoff)
+        if residues_per_file > 0:
+            residues = residues[:residues_per_file]
+        if not residues:
+            return task.model, "no interface residues found"
+        extractor = topo_fea(
+            str(task.pdb_path),
+            neighbor_dis=neighbor_distance,
+            e_set=element_filters,
+            res_list=residues,
+            Cut=cutoff,
+        )
+        df = extractor.cal_fea()
+        pd.set_option("future.no_silent_downcasting", True)
+        df.replace("NA", pd.NA, inplace=True)
+        df.to_csv(task.output_path, index=False)
+        task.interface_output.unlink(missing_ok=True)
+        return task.model, None
+    except Exception as exc:  # pragma: no cover
+        return task.model, str(exc)
+
+
+def run_extraction(args: argparse.Namespace) -> int:
+    dataset_dir = args.dataset_dir.resolve()
+    output_dir = args.output_dir.resolve()
+
+    print("Configuration:")
+    print(f"  dataset_dir: {dataset_dir}")
+    print(f"  output_dir: {output_dir}")
+    print(f"  neighbor_distance: {args.neighbor_distance}")
+    print(f"  cutoff: {args.cutoff}")
+    print(f"  min_persistence: {args.min_persistence}")
+    print(f"  elements: {args.elements}")
+    print(f"  residues_per_file: {args.residues_per_file}")
+    print(f"  interface_cutoff: {args.interface_cutoff}")
+    print(f"  jobs: {args.jobs}  # number of worker processes (1 = sequential)")
+    print(f"  max_models: {args.max_models}  # optional limit on models to process (0 = all)")
+
+    if not dataset_dir.is_dir():
+        print(f"[error] dataset directory not found: {dataset_dir}")
+        return 2
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    element_filters = _normalise_element_filters(args.elements)
+    tasks = _collect_tasks(dataset_dir, output_dir, args.max_models)
+    if not tasks:
+        print("[warn] No '.pdb' files found; nothing to do.")
+        return 0
+
+    success = 0
+    failures: List[Tuple[str, str]] = []
+
+    if args.jobs and args.jobs > 1:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+
+        with ProcessPoolExecutor(max_workers=args.jobs) as executor:
+            future_map = {
+                executor.submit(
+                    _process_task,
+                    task,
+                    element_filters,
+                    args.neighbor_distance,
+                    args.cutoff,
+                    args.min_persistence,
+                    args.residues_per_file,
+                    args.interface_cutoff,
+                ): task.model
+                for task in tasks
+            }
+            for future in as_completed(future_map):
+                model, error = future.result()
+                if error:
+                    failures.append((model, error))
+                    print(f"[warn] {model}: {error}")
+                else:
+                    success += 1
+    else:
+        for task in tasks:
+            model, error = _process_task(
+                task,
+                element_filters,
+                args.neighbor_distance,
+                args.cutoff,
+                args.min_persistence,
+                args.residues_per_file,
+                args.interface_cutoff,
+            )
+            if error:
+                failures.append((model, error))
+                print(f"[warn] {model}: {error}")
+            else:
+                success += 1
+
+    print("Summary:")
+    print(f"  processed: {len(tasks)}")
+    print(f"  succeeded: {success}")
+    print(f"  failed:    {len(failures)}")
+    if failures:
+        print("Failures:")
+        for model, error in failures:
+            print(f"  {model}: {error}")
+        return 1
+    return 0
+
+
+def describe_source() -> None:
+    print("This script reuses code from topoqa/src/topo_feature.py (topo_fea class).")
 
 
 def main(argv: Iterable[str]) -> int:
-    args, parser = parse_args(argv)
-    defaults = collect_defaults(parser)
-    element_filters = normalise_element_filters(args.elements)
-    element_filters_display = [
-        "all" if filt == "all" else "".join(filt) for filt in element_filters
-    ]
-
-    log_path = Path("topo_features_run.log").resolve()
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with log_path.open("a", encoding="utf-8") as log_file:
-        def log_print(*objects, **kwargs):
-            print(*objects, **kwargs)
-            print(*objects, **kwargs, file=log_file)
-
-        usage_text = parser.format_help().rstrip("\n")
-        for line in usage_text.splitlines():
-            log_print(line)
-
-        log_print("=== topo feature extraction run ===")
-        log_print(f"log_path: {log_path}")
-        log_print("Defaults:")
-        for key in sorted(defaults):
-            log_print(f"  {key}: {defaults[key]!r}")
-
-        runtime_params = vars(args).copy()
-        runtime_params["element_filters"] = element_filters_display
-        log_print("Runtime parameters:")
-        for key in sorted(runtime_params):
-            log_print(f"  {key}: {runtime_params[key]!r}")
-
-        log_print("Configuration:")
-        log_print(f"  neighbor_distance: {args.neighbor_distance}")
-        log_print(f"  cutoff: {args.cutoff}")
-        log_print(f"  min_persistence: {args.min_persistence}")
-        log_print(f"  element_filters: {element_filters_display}")
-        log_print(f"  residues_per_file: {args.residues_per_file}")
-
-        output_dir = args.output_dir.resolve()
-        output_dir.mkdir(parents=True, exist_ok=True)
-
-        pdb_files = sorted(args.dataset_dir.rglob("*.pdb"))
-
-        for pdb_path in pdb_files:
-            residues = select_residues(pdb_path, args.residues_per_file)
-            if not residues:
-                log_print(f"Skipping {pdb_path}: no residues")
-                continue
-
-            fea = topo_fea(
-                str(pdb_path),
-                neighbor_dis=args.neighbor_distance,
-                e_set=element_filters,
-                res_list=residues,
-                Cut=args.cutoff,
-            )
-            df = fea.cal_fea()
-            output_path = output_dir / f"{pdb_path.stem}.topology.csv"
-            output_path.parent.mkdir(parents=True, exist_ok=True)
-            df.to_csv(output_path, index=False)
-            log_print(f"Wrote {output_path}")
-
-        return 0
+    args = parse_args(argv)
+    return run_extraction(args)
 
 
 if __name__ == "__main__":
-    import sys
-
+    describe_source()
     raise SystemExit(main(sys.argv[1:]))
