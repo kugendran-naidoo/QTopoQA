@@ -18,12 +18,16 @@ Parallelism (CLI):
 from __future__ import annotations
 
 import argparse
+import inspect
 import logging
+import shutil
 import sys
+import tempfile
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from Bio.PDB import PDBParser
 
@@ -44,6 +48,27 @@ from new_topological_features import (
     compute_features_for_residues,
 )
 
+try:
+    import pandas as pd
+except ImportError as exc:  # pragma: no cover
+    raise SystemExit("Error: pandas is required for node feature extraction.") from exc
+
+
+def _locate_repo_root(start: Path) -> Path:
+    for parent in [start] + list(start.parents):
+        candidate = parent / "topoqa" / "src"
+        if candidate.exists():
+            return parent
+    raise RuntimeError("Unable to locate repo root containing 'topoqa/src'.")
+
+
+REPO_ROOT = _locate_repo_root(Path(__file__).resolve())
+TOPOQA_SRC = REPO_ROOT / "topoqa" / "src"
+if str(TOPOQA_SRC) not in sys.path:
+    sys.path.insert(0, str(TOPOQA_SRC))
+
+from node_fea_df import node_fea  # type: ignore  # noqa: E402
+
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 INTERFACE_CUTOFF = 10.0
@@ -61,12 +86,86 @@ TOPOLOGY_ELEMENT_FILTERS: Sequence[Sequence[str]] = (
     ("C", "N", "O"),
 )
 
+NODE_FEATURE_DROP_NA = False
+
 
 def _format_element_filters(filters: Sequence[Sequence[str]]) -> str:
     parts: List[str] = []
     for group in filters:
         parts.append("{" + ",".join(group) + "}")
     return ", ".join(parts)
+
+
+def _trim_suffix(stem: str, suffixes: tuple[str, ...]) -> str:
+    lower = stem.lower()
+    for suffix in suffixes:
+        if lower.endswith(suffix):
+            stem = stem[: -len(suffix)]
+            stem = stem.rstrip("_- .")
+            lower = stem.lower()
+    return stem
+
+
+def _normalise_interface_name(name: str) -> str:
+    return _trim_suffix(Path(name).stem, (".interface", "interface", "iface"))
+
+
+def _normalise_topology_name(name: str) -> str:
+    return _trim_suffix(Path(name).stem, (".topology", "topology", "node_topo"))
+
+
+def _gather_interface_files(root: Path) -> Dict[str, List[Path]]:
+    mapping: Dict[str, List[Path]] = {}
+    for pattern in ("*.interface.txt", "*.txt"):
+        for path in root.rglob(pattern):
+            if path.is_file():
+                mapping.setdefault(_normalise_interface_name(path.name), []).append(path)
+        if mapping:
+            break
+    return mapping
+
+
+def _gather_topology_files(root: Path) -> Dict[str, List[Path]]:
+    mapping: Dict[str, List[Path]] = {}
+    for pattern in ("*.topology.csv", "*.csv"):
+        for path in root.rglob(pattern):
+            if path.is_file():
+                mapping.setdefault(_normalise_topology_name(path.name), []).append(path)
+        if mapping:
+            break
+    return mapping
+
+
+def _select_single_path(paths: List[Path]) -> Optional[Path]:
+    if not paths:
+        return None
+    if len(paths) == 1:
+        return paths[0]
+    return sorted(paths, key=lambda p: (len(p.parts), str(p)))[0]
+
+
+def _relative_node_output_path(base_dir: Path, interface_file: Path, model: str) -> Path:
+    try:
+        relative = interface_file.relative_to(base_dir)
+        return relative.parent / f"{model}.csv"
+    except ValueError:
+        return Path(f"{model}.csv")
+
+
+def _detect_node_fea_signature() -> int:
+    try:
+        return len(inspect.signature(node_fea).parameters)
+    except (TypeError, ValueError):
+        return -1
+
+
+@dataclass
+class NodeFeatureTask:
+    model: str
+    structure_path: Path
+    interface_path: Path
+    topology_path: Path
+    output_path: Path
 
 
 def _configure_main_logger(run_log_dir: Path) -> logging.Logger:
@@ -275,6 +374,90 @@ def _generate_topology_features(
     return len(descriptors), None
 
 
+def _stage_node_feature_inputs(model: str, interface_path: Path, topology_path: Path) -> tuple[tempfile.TemporaryDirectory, Path, Path]:
+    temp_dir = tempfile.TemporaryDirectory(prefix=f"node_features_{model}_")
+    root = Path(temp_dir.name)
+    iface_dir = root / "interface"
+    topo_dir = root / "topology"
+    iface_dir.mkdir(parents=True, exist_ok=True)
+    topo_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(interface_path, iface_dir / f"{model}.txt")
+    shutil.copyfile(topology_path, topo_dir / f"{model}.csv")
+    return temp_dir, iface_dir, topo_dir
+
+
+def _initialise_node_fea(model: str, structure_path: Path, interface_dir: Path, topo_dir: Path, signature_size: int):
+    iface = str(interface_dir)
+    topo = str(topo_dir)
+    if signature_size == 3:
+        return node_fea(str(structure_path), iface, topo)
+    if signature_size == 4:
+        return node_fea(model, str(structure_path.parent), iface, topo)
+    try:
+        return node_fea(str(structure_path), iface, topo)
+    except TypeError:
+        return node_fea(model, str(structure_path.parent), iface, topo)
+
+
+def _process_node_feature_task(
+    task: NodeFeatureTask,
+    signature_size: int,
+    drop_na: bool,
+) -> tuple[str, Optional[str]]:
+    temp_dir: Optional[tempfile.TemporaryDirectory] = None
+    try:
+        temp_dir, iface_dir, topo_dir = _stage_node_feature_inputs(task.model, task.interface_path, task.topology_path)
+        extractor = _initialise_node_fea(task.model, task.structure_path, iface_dir, topo_dir, signature_size)
+        result = extractor.calculate_fea()
+        if isinstance(result, tuple):
+            fea_df = result[0]
+        else:
+            fea_df = result
+        if drop_na:
+            pd.set_option("future.no_silent_downcasting", True)
+            fea_df.replace("NA", pd.NA, inplace=True)
+            fea_df = fea_df.dropna()
+        fea_df.to_csv(task.output_path, index=False)
+        return task.model, None
+    except Exception as exc:  # pragma: no cover
+        return task.model, str(exc)
+    finally:
+        if temp_dir is not None:
+            temp_dir.cleanup()
+
+
+def _build_node_feature_tasks(
+    structure_map: Dict[str, Path],
+    interface_dir: Path,
+    topology_dir: Path,
+    output_dir: Path,
+) -> List[NodeFeatureTask]:
+    interface_map = _gather_interface_files(interface_dir)
+    topology_map = _gather_topology_files(topology_dir)
+    shared_models = sorted(set(interface_map) & set(topology_map))
+
+    tasks: List[NodeFeatureTask] = []
+    for model in shared_models:
+        interface_path = _select_single_path(interface_map.get(model, []))
+        topology_path = _select_single_path(topology_map.get(model, []))
+        structure_path = structure_map.get(model)
+        if not interface_path or not topology_path or not structure_path:
+            continue
+        output_rel = _relative_node_output_path(interface_dir, interface_path, model)
+        output_path = (output_dir / output_rel).resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        tasks.append(
+            NodeFeatureTask(
+                model=model,
+                structure_path=structure_path,
+                interface_path=interface_path,
+                topology_path=topology_path,
+                output_path=output_path,
+            )
+        )
+    return tasks
+
+
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 
@@ -372,6 +555,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     try:
         _check_dataset_readable(dataset_dir)
         pdb_files, cif_files = _collect_structure_files(dataset_dir)
+        structure_map: Dict[str, Path] = {}
+        for path in list(pdb_files) + list(cif_files):
+            structure_map.setdefault(path.stem, path)
         _check_rw_directories(
             [
                 (work_dir, "work directory"),
@@ -475,6 +661,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         topology_dir.mkdir(parents=True, exist_ok=True)
     except OSError as exc:
         logger.error("Unable to prepare topology directory '%s': %s", topology_dir, exc)
+        return 2
+
+    node_feature_dir = work_dir / "node_features"
+    try:
+        node_feature_dir.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        logger.error("Unable to prepare node feature directory '%s': %s", node_feature_dir, exc)
         return 2
 
     topology_log_dir = run_log_dir / "topology_logs"
@@ -607,9 +800,61 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     logger.info("Interface output directory: %s", interface_dir)
     logger.info("Per-PDB interface logs directory: %s", interface_log_dir)
     logger.info("Interface success count: %d", generated_interface_files)
+    node_feature_tasks = _build_node_feature_tasks(structure_map, interface_dir, topology_dir, node_feature_dir)
+    node_feature_success = 0
+    node_feature_failures: List[Tuple[str, str]] = []
+    node_elapsed = 0.0
+
+    if node_feature_tasks:
+        logger.info(
+            "Beginning node feature extraction for %d model(s) using %d worker(s)",
+            len(node_feature_tasks),
+            worker_count,
+        )
+        node_start = time.perf_counter()
+        signature_size = _detect_node_fea_signature()
+        if worker_count <= 1:
+            for task in node_feature_tasks:
+                model, error = _process_node_feature_task(task, signature_size, NODE_FEATURE_DROP_NA)
+                if error:
+                    node_feature_failures.append((task.model, error))
+                    logger.warning("Node feature extraction failed for %s: %s", task.model, error)
+                else:
+                    node_feature_success += 1
+        else:
+            with ThreadPoolExecutor(max_workers=worker_count) as executor:
+                future_map = {
+                    executor.submit(
+                        _process_node_feature_task,
+                        task,
+                        signature_size,
+                        NODE_FEATURE_DROP_NA,
+                    ): task
+                    for task in node_feature_tasks
+                }
+                for future in as_completed(future_map):
+                    task = future_map[future]
+                    try:
+                        model, error = future.result()
+                    except Exception as exc:  # pragma: no cover
+                        node_feature_failures.append((task.model, str(exc)))
+                        logger.warning("Node feature extraction failed for %s: %s", task.model, exc)
+                    else:
+                        if error:
+                            node_feature_failures.append((model, error))
+                            logger.warning("Node feature extraction failed for %s: %s", model, error)
+                        else:
+                            node_feature_success += 1
+        node_elapsed = time.perf_counter() - node_start
+    else:
+        logger.info("No node feature tasks to process (missing interface/topology pairs)")
+
     logger.info("Topology output directory: %s", topology_dir)
     logger.info("Per-PDB topology logs directory: %s", topology_log_dir)
     logger.info("Topology success count: %d", generated_topology_files)
+    logger.info("Node feature output directory: %s", node_feature_dir)
+    logger.info("Node feature success count: %d", node_feature_success)
+    logger.info("Node feature extraction elapsed time: %.2f s", node_elapsed)
 
     if interface_failure_entries:
         logger.warning("Interface failure count: %d", len(interface_failure_entries))
@@ -632,6 +877,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             logger.warning(" - %s failed with %s (see log: %s)", label, error, log_path)
     else:
         logger.info("All topological feature extractions completed successfully.")
+
+    if node_feature_failures:
+        logger.warning("Node feature failure count: %d", len(node_feature_failures))
+        for model, error in node_feature_failures:
+            logger.warning(" - %s failed with %s", model, error)
+    else:
+        logger.info("All node feature extractions completed successfully.")
 
     logger.info("=== graph_builder2 run completed ===")
 
