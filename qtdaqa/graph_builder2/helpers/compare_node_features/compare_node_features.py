@@ -79,14 +79,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--flatten-baseline",
         action="store_true",
-        default=False,
-        help="Recursively search baseline directory for node feature files.",
+        dest="flatten_baseline",
+        default=True,
+        help="Recursively search baseline directory for node feature files (default: flatten).",
+    )
+    parser.add_argument(
+        "--no-flatten-baseline",
+        action="store_false",
+        dest="flatten_baseline",
+        help="Disable recursive search for baseline directory.",
     )
     parser.add_argument(
         "--flatten-candidate",
         action="store_true",
-        default=False,
-        help="Recursively search candidate directory for node feature files.",
+        dest="flatten_candidate",
+        default=True,
+        help="Recursively search candidate directory for node feature files (default: flatten).",
+    )
+    parser.add_argument(
+        "--no-flatten-candidate",
+        action="store_false",
+        dest="flatten_candidate",
+        help="Disable recursive search for candidate directory.",
     )
     return parser.parse_args()
 
