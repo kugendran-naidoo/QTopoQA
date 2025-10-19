@@ -48,6 +48,7 @@ DEFAULT_ELEMENT_FILTERS: List[List[str]] = [
     ["N", "O"],
     ["C", "N", "O"],
 ]
+INTERFACE_COORD_DECIMALS = 3
 
 
 class HelpOnErrorArgumentParser(argparse.ArgumentParser):
@@ -175,6 +176,7 @@ def _collect_tasks(dataset_dir: Path, output_dir: Path, max_models: int) -> List
 def _generate_interface(task: ExtractionTask, cutoff: float) -> List[str]:
     extractor = cal_interface(str(task.pdb_path), cut=cutoff)
     extractor.find_and_write(str(task.interface_output))
+    _round_interface_file(task.interface_output, INTERFACE_COORD_DECIMALS)
     residues: List[str] = []
     with task.interface_output.open() as handle:
         for line in handle:
@@ -311,3 +313,42 @@ def main(argv: Iterable[str]) -> int:
 if __name__ == "__main__":
     describe_source()
     raise SystemExit(main(sys.argv[1:]))
+
+
+def _round_interface_file(path: Path, decimals: int) -> None:
+    """Normalise interface coordinate precision to match legacy inference outputs."""
+    if decimals < 0:
+        return
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return
+
+    format_str = f"{{:.{decimals}f}}"
+    updated: List[str] = []
+    changed = False
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            updated.append("")
+            continue
+        parts = stripped.split()
+        if len(parts) < 4:
+            updated.append(stripped)
+            continue
+        descriptor, coords = parts[0], parts[1:]
+        try:
+            rounded = [format_str.format(float(value)) for value in coords]
+        except ValueError:
+            updated.append(stripped)
+            continue
+        combined = " ".join([descriptor, *rounded])
+        if combined != stripped:
+            changed = True
+        updated.append(combined)
+
+    if changed:
+        with path.open("w", encoding="utf-8") as handle:
+            handle.write("\n".join(updated))
+            handle.write("\n")
