@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Iterable, List, Optional
 
@@ -181,7 +182,6 @@ def _round_interface_file(path: Path, decimals: int) -> None:
     except FileNotFoundError:
         return
 
-    format_str = f"{{:.{decimals}f}}"
     updated_lines: List[str] = []
     changed = False
 
@@ -196,7 +196,7 @@ def _round_interface_file(path: Path, decimals: int) -> None:
             continue
         descriptor, coords = parts[0], parts[1:]
         try:
-            rounded = [format_str.format(float(value)) for value in coords]
+            rounded = [_format_coordinate(float(value), decimals) for value in coords]
         except ValueError:
             updated_lines.append(stripped)
             continue
@@ -209,6 +209,15 @@ def _round_interface_file(path: Path, decimals: int) -> None:
         with path.open("w", encoding="utf-8") as handle:
             handle.write("\n".join(updated_lines))
             handle.write("\n")
+
+
+def _format_coordinate(value: float, decimals: int) -> str:
+    quant = Decimal(1).scaleb(-decimals)
+    decimal_value = Decimal(str(value)).quantize(quant, rounding=ROUND_HALF_UP)
+    text = format(decimal_value.normalize(), 'f')
+    if '.' in text:
+        text = text.rstrip('0').rstrip('.')
+    return text or '0'
 
 
 if __name__ == "__main__":
