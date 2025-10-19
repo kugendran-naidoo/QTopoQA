@@ -16,8 +16,8 @@ except ImportError as exc:  # pragma: no cover
 
 RUN_LOG = Path("pt_file_compare_run.log").resolve()
 FAIL_LOG = Path("pt_file_compare_failures.log").resolve()
-DEFAULT_ABS_TOL = 1e-8
-DEFAULT_REL_TOL = 1e-6
+DEFAULT_ABS_TOL = 0.0
+DEFAULT_REL_TOL = 0.0
 
 
 class _TeeStdout:
@@ -76,9 +76,9 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> tuple[argparse.Namespace
     parser = HelpOnErrorArgumentParser(
         description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument("--pt_file_dir1", type=Path, required=True,
+    parser.add_argument("--pt-file-dir1", type=Path, required=True,
                         help="Directory containing baseline .pt files. (required)")
-    parser.add_argument("--pt_file_dir2", type=Path, required=True,
+    parser.add_argument("--pt-file-dir2", type=Path, required=True,
                         help="Directory containing candidate .pt files. (required)")
     parser.add_argument("--abs-tolerance", type=float, default=DEFAULT_ABS_TOL,
                         help="Absolute tolerance for numeric comparison (default: %(default)s)")
