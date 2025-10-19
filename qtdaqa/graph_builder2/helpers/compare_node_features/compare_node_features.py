@@ -67,13 +67,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tolerance",
         type=float,
-        default=1e-8,
+        default=0.0,
         help="Floating point absolute tolerance for numeric comparison (default: %(default)s)",
     )
     parser.add_argument(
         "--rel-tolerance",
         type=float,
-        default=1e-6,
+        default=0.0,
         help="Floating point relative tolerance for numeric comparison (default: %(default)s)",
     )
     parser.add_argument(
