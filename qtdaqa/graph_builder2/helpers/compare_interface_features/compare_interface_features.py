@@ -67,14 +67,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tolerance",
         type=float,
-        default=1e-8,
-        help="Floating point tolerance for coordinate comparison (default: %(default)s)",
+        default=0.0,
+        help=(
+            "Absolute tolerance for coordinate comparison; default 0.0 requires exact match "
+            "(default: %(default)s)"
+        ),
     )
     parser.add_argument(
         "--rel-tolerance",
         type=float,
-        default=1e-6,
-        help="Relative tolerance for coordinate comparison (default: %(default)s)",
+        default=0.0,
+        help=(
+            "Relative tolerance for coordinate comparison; default 0.0 requires exact match "
+            "(default: %(default)s)"
+        ),
     )
     parser.add_argument(
         "--flatten-baseline",
