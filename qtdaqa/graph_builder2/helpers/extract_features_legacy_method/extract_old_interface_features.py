@@ -6,7 +6,7 @@ import argparse
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, List, Optional
 
 # Ensure legacy topoqa code is importable
 def _locate_repo_root(start: Path) -> Path:
@@ -24,6 +24,8 @@ if str(TOPOQA_SRC) not in sys.path:
     sys.path.insert(0, str(TOPOQA_SRC))
 
 from get_interface import cal_interface  # type: ignore  # noqa: E402
+
+INTERFACE_COORD_DECIMALS = 3
 
 
 class HelpOnErrorArgumentParser(argparse.ArgumentParser):
@@ -95,6 +97,7 @@ def _process_task(task: ExtractionTask, cutoff: float) -> tuple[str, Optional[st
     try:
         interface_calc = cal_interface(str(task.pdb_path), cut=cutoff)
         interface_calc.find_and_write(str(task.output_path))
+        _round_interface_file(task.output_path, INTERFACE_COORD_DECIMALS)
         return task.model, None
     except Exception as exc:  # pragma: no cover - operational logging
         return task.model, str(exc)
@@ -167,6 +170,45 @@ def describe_source() -> None:
 def main(argv: Iterable[str]) -> int:
     args = parse_args(argv)
     return run_extraction(args)
+
+
+def _round_interface_file(path: Path, decimals: int) -> None:
+    """Normalise interface coordinate precision to match legacy inference outputs."""
+    if decimals < 0:
+        return
+    try:
+        raw_lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return
+
+    format_str = f"{{:.{decimals}f}}"
+    updated_lines: List[str] = []
+    changed = False
+
+    for line in raw_lines:
+        stripped = line.strip()
+        if not stripped:
+            updated_lines.append("")
+            continue
+        parts = stripped.split()
+        if len(parts) < 4:
+            updated_lines.append(stripped)
+            continue
+        descriptor, coords = parts[0], parts[1:]
+        try:
+            rounded = [format_str.format(float(value)) for value in coords]
+        except ValueError:
+            updated_lines.append(stripped)
+            continue
+        combined = " ".join([descriptor, *rounded])
+        if combined != stripped:
+            changed = True
+        updated_lines.append(combined)
+
+    if changed:
+        with path.open("w", encoding="utf-8") as handle:
+            handle.write("\n".join(updated_lines))
+            handle.write("\n")
 
 
 if __name__ == "__main__":
