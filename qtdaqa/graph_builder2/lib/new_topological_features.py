@@ -146,6 +146,7 @@ class TopologicalConfig:
     max_alpha_dimension: int = 2
     workers: Optional[int] = None  # None = sequential, otherwise max processes
     log_progress: bool = False
+    dedup_sort: bool = False
 
     def __post_init__(self) -> None:
         if self.neighbor_distance <= 0:
@@ -161,6 +162,7 @@ class TopologicalConfig:
         if self.workers is not None and self.workers <= 0:
             raise ValueError("workers must be positive or None")
         object.__setattr__(self, "element_filters", _normalise_element_filters(self.element_filters))
+        object.__setattr__(self, "dedup_sort", bool(self.dedup_sort))
 
 
 # --------------------------------------------------------------------------- #
@@ -293,11 +295,12 @@ def _compute_features_for_atoms(
         return np.zeros(5), np.zeros(15)
 
     # Remove duplicate coordinates (if any)
-    if coords.shape[0] > 1:
-        unique_coords = np.unique(coords, axis=0)
+    if config.dedup_sort and coords.shape[0] > 1:
+        unique_coords, indices = np.unique(coords, axis=0, return_index=True)
         if unique_coords.shape[0] != coords.shape[0]:
             log.debug("Removed %d duplicate coordinate(s)", coords.shape[0] - unique_coords.shape[0])
-        coords = unique_coords
+        order = np.argsort(indices)
+        coords = unique_coords[order]
 
     if coords.shape[0] < 2:
         log.debug("Insufficient unique points (%d) for topological features", coords.shape[0])

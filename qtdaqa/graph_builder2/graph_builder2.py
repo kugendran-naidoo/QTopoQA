@@ -7,7 +7,7 @@ Generates PyG graph files (.pt) ONLY, with configurable feature construction.
 Inputs
 - --dataset-dir: folder containing per-target subfolders with .pdb decoys
 - --work-dir:    folder for intermediates (interface, topo, node feature CSVs)
-- --out-graphs:  destination for graph .pt files (one per decoy)
+- --graph-dir:   destination for graph .pt files (one per decoy)
 - --log-dir:     folder for logs (a per-run timestamped file is created)
 
 Parallelism (CLI):
@@ -26,6 +26,7 @@ import tempfile
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
@@ -97,6 +98,15 @@ def _format_element_filters(filters: Sequence[Sequence[str]]) -> str:
     return ", ".join(parts)
 
 
+def _format_coordinate(value: float, decimals: int) -> str:
+    quant = Decimal(1).scaleb(-decimals)
+    decimal_value = Decimal(str(value)).quantize(quant, rounding=ROUND_HALF_UP)
+    text = format(decimal_value.normalize(), 'f')
+    if '.' in text:
+        text = text.rstrip('0').rstrip('.')
+    return text or '0'
+
+
 def _round_interface_file(path: Path, decimals: int) -> None:
     """Normalise coordinate precision so downstream scaling matches legacy output."""
     if decimals < 0:
@@ -106,7 +116,6 @@ def _round_interface_file(path: Path, decimals: int) -> None:
     except FileNotFoundError:
         return
 
-    format_str = f"{{:.{decimals}f}}"
     updated_lines: List[str] = []
     changed = False
 
@@ -121,7 +130,7 @@ def _round_interface_file(path: Path, decimals: int) -> None:
             continue
         descriptor, coord_tokens = parts[0], parts[1:]
         try:
-            rounded_coords = [format_str.format(float(value)) for value in coord_tokens]
+            rounded_coords = [_format_coordinate(float(value), decimals) for value in coord_tokens]
         except ValueError:
             updated_lines.append(stripped)
             continue
@@ -499,51 +508,60 @@ def _build_node_feature_tasks(
 
 
 
+class HelpOnErrorArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser that prints full help text on errors."""
+
+    def error(self, message: str) -> None:  # pragma: no cover
+        self.print_help(sys.stderr)
+        self.exit(2, f"{self.prog}: error: {message}\n")
+
+
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 
-    p = argparse.ArgumentParser(description="Configurable graph-only builder for QTopoQA")
+    parser = HelpOnErrorArgumentParser(
+        description="Configurable graph-only builder for QTopoQA",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 
-    p.add_argument("-d", "--dataset-dir",
-                   metavar="/datasets/Dockground_MAF2",
-                   type=str, 
-                   required=True, 
-                   default=None,
-                   help="Folder containing targets with .pdb decoys")
+    parser.add_argument(
+        "--dataset-dir",
+        type=Path,
+        required=True,
+        help="Directory containing input structures (.pdb or .cif). (required)",
+    )
+    parser.add_argument(
+        "--work-dir",
+        type=Path,
+        required=True,
+        help="Working directory for intermediate files. (required)",
+    )
+    parser.add_argument(
+        "--graph-dir",
+        type=Path,
+        required=True,
+        help="Directory where output graph files (.pt) will be written. (required)",
+    )
+    parser.add_argument(
+        "--log-dir",
+        type=Path,
+        default=Path("logs"),
+        help="Directory used for log files.",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=4,
+        help="Optional number of worker processes for parallel jobs.",
+    )
+    parser.add_argument(
+        "--topology-dedup-sort",
+        "--topology-dedup--sort",
+        action="store_true",
+        default=False,
+        help="Remove duplicate neighbour coordinates and sort them before topological feature extraction.",
+    )
 
-    p.add_argument("-w", "--work-dir", 
-                   metavar="./work",
-                   type=str, 
-                   required=True, 
-                   default=None,
-                   help="Folder for intermediate files")
-
-    p.add_argument("-o", "--out-graphs", 
-                   metavar="./graph_data",
-                   type=str, 
-                   required=True, 
-                   default=None,
-                   help="Folder for graph .pt files (one per decoy)")
-
-    p.add_argument("-l", "--log-dir", 
-                   metavar="./logs",
-                   type=str, 
-                   required=True, 
-                   default=None,
-                   help="Folder for logs")
-
-    p.add_argument("-p", "--parallel",
-                   metavar="4",
-                   type=int,
-                   default=None,
-                   help="Optional number of worker processes for parallel jobs",
-                  )
-
-    # If no arguments at all → print usage and exit
-    if len(sys.argv) < 4:
-        p.print_usage()
-        sys.exit(1)
-
-    return p.parse_args(argv)
+    return parser.parse_args(list(argv) if argv is not None else None)
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -554,7 +572,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     # CLI parameters - generate fully resolved directories
     dataset_dir = Path(args.dataset_dir).resolve()
     work_dir = Path(args.work_dir).resolve()
-    out_graphs = Path(args.out_graphs).resolve()
+    graph_dir = Path(args.graph_dir).resolve()
     log_root = Path(args.log_dir).resolve()
 
     try:
@@ -580,17 +598,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     raw_args = list(argv) if argv is not None else sys.argv[1:]
     logger.info("CLI raw arguments: %s", raw_args)
     logger.info(
-        "CLI parameters: dataset_dir=%s, work_dir=%s, out_graphs=%s, log_dir=%s, parallel=%s",
+        "CLI parameters: dataset_dir=%s, work_dir=%s, graph_dir=%s, log_dir=%s, jobs=%s, topology_dedup_sort=%s",
         args.dataset_dir,
         args.work_dir,
-        args.out_graphs,
+        args.graph_dir,
         args.log_dir,
-        args.parallel,
+        args.jobs,
+        args.topology_dedup_sort,
     )
 
-    parallel_cfg = normalise_worker_count(args.parallel, default_workers=8)
+    parallel_cfg = normalise_worker_count(args.jobs, default_workers=4)
     worker_count = parallel_cfg.workers if parallel_cfg.workers is not None else 1
-    logger.info("Parallel worker configuration: requested=%s, effective=%d", args.parallel, worker_count)
+    logger.info("Parallel worker configuration: requested=%s, effective=%d", args.jobs, worker_count)
 
     try:
         _check_dataset_readable(dataset_dir)
@@ -601,14 +620,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         _check_rw_directories(
             [
                 (work_dir, "work directory"),
-                (out_graphs, "output graph directory"),
+                (graph_dir, "output graph directory"),
                 (log_root, "log directory"),
             ]
         )
         _ensure_empty_directories(
             [
                 (work_dir, "work directory"),
-                (out_graphs, "output graph directory"),
+                (graph_dir, "output graph directory"),
             ]
         )
     except (PermissionError, RuntimeError) as exc:
@@ -723,6 +742,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         element_filters=TOPOLOGY_ELEMENT_FILTERS,
         workers=None,
         log_progress=False,
+        dedup_sort=args.topology_dedup_sort,
     )
 
     topology_tasks: List[tuple[Path, Path, Path, Path]] = []
@@ -835,7 +855,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     logger.info("Dataset directory: %s", dataset_dir)
     logger.info("Work directory: %s", work_dir)
-    logger.info("Output graph directory: %s", out_graphs)
+    logger.info("Output graph directory: %s", graph_dir)
     logger.info("Run log directory: %s", run_log_dir)
     logger.info("PDB file count: %d", pdb_count)
     logger.info("CIF file count: %d", cif_count)
