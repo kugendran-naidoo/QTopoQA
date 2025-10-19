@@ -1,1 +1,0 @@
-python compare_graphs.py --original-list original_graphs.list --new-list new_graphs.list
