@@ -30,6 +30,16 @@ from typing import Dict, Iterable, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
+class HelpOnErrorArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser that prints full help (with defaults) on error."""
+
+    def error(self, message: str) -> None:  # pragma: no cover
+        self.print_help(sys.stderr)
+        self.exit(2, f"{self.prog}: error: {message}\n")
+
+
+
+
 
 @dataclass
 class ComparisonResult:
@@ -42,7 +52,7 @@ class ComparisonResult:
 
 
 def parse_args(argv: Iterable[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = HelpOnErrorArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(
         "reference",
         type=Path,
@@ -56,7 +66,7 @@ def parse_args(argv: Iterable[str]) -> argparse.Namespace:
     parser.add_argument(
         "--tolerance",
         type=float,
-        default=1e-8,
+        default=0.0,
         help="Maximum absolute difference tolerated (default: %(default)s)",
     )
     parser.add_argument(
