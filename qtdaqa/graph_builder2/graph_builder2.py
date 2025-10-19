@@ -87,6 +87,7 @@ TOPOLOGY_ELEMENT_FILTERS: Sequence[Sequence[str]] = (
 )
 
 NODE_FEATURE_DROP_NA = False
+INTERFACE_COORD_DECIMALS = 3
 
 
 def _format_element_filters(filters: Sequence[Sequence[str]]) -> str:
@@ -94,6 +95,45 @@ def _format_element_filters(filters: Sequence[Sequence[str]]) -> str:
     for group in filters:
         parts.append("{" + ",".join(group) + "}")
     return ", ".join(parts)
+
+
+def _round_interface_file(path: Path, decimals: int) -> None:
+    """Normalise coordinate precision so downstream scaling matches legacy output."""
+    if decimals < 0:
+        return
+    try:
+        raw_lines = path.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return
+
+    format_str = f"{{:.{decimals}f}}"
+    updated_lines: List[str] = []
+    changed = False
+
+    for line in raw_lines:
+        stripped = line.strip()
+        if not stripped:
+            updated_lines.append("")
+            continue
+        parts = stripped.split()
+        if len(parts) < 4:
+            updated_lines.append(stripped)
+            continue
+        descriptor, coord_tokens = parts[0], parts[1:]
+        try:
+            rounded_coords = [format_str.format(float(value)) for value in coord_tokens]
+        except ValueError:
+            updated_lines.append(stripped)
+            continue
+        normalised_line = " ".join([descriptor, *rounded_coords])
+        if normalised_line != stripped:
+            changed = True
+        updated_lines.append(normalised_line)
+
+    if changed:
+        with path.open("w", encoding="utf-8") as handle:
+            handle.write("\n".join(updated_lines))
+            handle.write("\n")
 
 
 def _trim_suffix(stem: str, suffixes: tuple[str, ...]) -> str:
@@ -624,6 +664,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 for pdb_path, output_path, log_path in tasks:
                     try:
                         residue_count = process_pdb_file(pdb_path, output_path, cutoff=INTERFACE_CUTOFF)
+                        _round_interface_file(output_path, INTERFACE_COORD_DECIMALS)
                         generated_interface_files += 1
                         with log_path.open("w", encoding="utf-8") as handle:
                             handle.write(f"Interface residues: {residue_count}\n")
@@ -641,6 +682,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                         pdb_path, output_path, log_path = future_to_task[future]
                         try:
                             residue_count = future.result()
+                            _round_interface_file(output_path, INTERFACE_COORD_DECIMALS)
                             generated_interface_files += 1
                             with log_path.open("w", encoding="utf-8") as handle:
                                 handle.write(f"Interface residues: {residue_count}\n")
