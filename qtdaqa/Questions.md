@@ -16,3 +16,14 @@ Parameter roles:
 
 neighbor_distance: the radius around each reference residue within which atoms are collected before building the point cloud for persistent-homology calculations. A larger radius includes more atoms/geometry in the analysis.
 cutoff: the persistence-death threshold applied to H0 bars. Bars longer than this are discarded, so the cutoff controls how long-lived connected components must be to contribute to the 0‑dimensional summary statistics.
+
+- **Why does the Interface vector not have a header like Topology and Node vectors?**
+- **Does this help or hinder model training or is it irrelevant?**
+- **Answer:**
+	- Interface outputs are intentionally headerless because every downstream consumer treats them as a simple, line‑based list of interface residues plus coordinates:
+	- **Inference path:** k_mac_inference_pca_tsne4.py writes files via cal_interface/process_pdb_file. Later, _generate_topology_features and _stage_node_feature_inputs read each line, split on whitespace, and pull the first token as a residue ID. A header row would be mistaken for real data and either raise an error or leak an invalid ID.
+	- **Training path:** the legacy node/graph builders (node_fea_df.py, graph.py) also call pd.read_csv(..., names=[...]) or string parsing with the assumption of no header.
+	    
+	  Topo and node features are true CSV datasets with named numeric columns; headers are necessary so pandas (and ultimately PyTorch) know which statistic each value represents. Those files are fed directly into model training/inference and having column names ensures consistent ordering.  
+	    
+	  Because interface files are only intermediates and never passed directly to the model, adding a header provides no benefit—and would actually break the existing parsers. The current, headerless format is therefore both intentional and required for the rest of the pipeline to function correctly.
