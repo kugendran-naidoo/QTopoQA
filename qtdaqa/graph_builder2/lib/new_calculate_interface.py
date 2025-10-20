@@ -1,151 +1,47 @@
-"""Improved interface residue extraction utilities.
+"""Compatibility wrapper around the legacy interface extractor.
 
-This module rewrites the legacy ``calculate_interface`` helpers with clearer
-logic, stronger validation, and a friendlier parallel workflow.  The core idea
-is unchanged: identify residues whose alpha-carbons lie within a cutoff
-distance of residues on other chains and write the results to disk.  However,
-the implementation now favours readability and debuggability over terse,
-opaque constructs.
+graph_builder2 originally shipped a rewritten interface pipeline that
+stabilised ordering and deduplication.  However, the original inference
+code (``topoqa/src/get_interface.py``) determines the node ordering used
+throughout the historic training runs.  To reproduce the exact `.pt`
+files emitted by that pipeline we proxy back to the legacy ``cal_interface``.
 """
 
 from __future__ import annotations
 
 import concurrent.futures
-from dataclasses import dataclass
+import sys
 from pathlib import Path
-from typing import (
-    Iterable,
-    List,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Protocol,
-    Sequence,
-    Tuple,
-)
-
-import numpy as np
-from Bio.PDB import PDBParser
+from typing import Mapping, MutableMapping, Optional, Protocol
 
 
-@dataclass(frozen=True)
-class ResidueInfo:
-    """Information about a residue's alpha carbon."""
-
-    chain_id: str
-    residue_id: int
-    residue_name: str
-    insertion_code: str
-    coord: np.ndarray
-
-    def serialise(self) -> str:
-        """Serialise the residue for human-readable text output."""
-        coord_str = " ".join(f"{value:.6f}" for value in self.coord)
-        if self.insertion_code:
-            return (
-                f"c<{self.chain_id}>r<{self.residue_id}>i<{self.insertion_code}>"
-                f"R<{self.residue_name}> {coord_str}"
-            )
-        return f"c<{self.chain_id}>r<{self.residue_id}>R<{self.residue_name}> {coord_str}"
+def _locate_repo_root(start: Path) -> Path:
+    for parent in [start] + list(start.parents):
+        candidate = parent / "topoqa" / "src"
+        if candidate.exists():
+            return parent
+    raise RuntimeError("Unable to locate repo root containing 'topoqa/src'.")
 
 
-def _load_structure_alpha_carbons(pdb_path: Path) -> List[ResidueInfo]:
-    """Parse *pdb_path* and return the alpha-carbon coordinates for each residue."""
-    if not pdb_path.is_file():
-        raise FileNotFoundError(f"PDB file does not exist: {pdb_path}")
-    if pdb_path.suffix.lower() != ".pdb":
-        raise ValueError(f"Expected a .pdb file, received: {pdb_path}")
+REPO_ROOT = _locate_repo_root(Path(__file__).resolve())
+TOPOQA_SRC = REPO_ROOT / "topoqa" / "src"
+if str(TOPOQA_SRC) not in sys.path:
+    sys.path.insert(0, str(TOPOQA_SRC))
 
-    parser = PDBParser(QUIET=True)
-    structure = parser.get_structure(pdb_path.stem, str(pdb_path))
-
-    residues: List[ResidueInfo] = []
-    for model in structure:
-        for chain in model:
-            for residue in chain:
-                hetatm_flag, seq_id, insertion_code = residue.get_id()
-                if hetatm_flag.strip() or not residue.has_id("CA"):
-                    continue
-
-                atom = residue["CA"]
-                residues.append(
-                    ResidueInfo(
-                        chain_id=chain.id,
-                        residue_id=int(seq_id),
-                        residue_name=residue.get_resname(),
-                        insertion_code=insertion_code.strip(),
-                        coord=np.asarray(atom.get_coord(), dtype=float),
-                    )
-                )
-    return residues
+from get_interface import cal_interface  # type: ignore  # noqa: E402
 
 
-def _group_by_chain(residues: Iterable[ResidueInfo]) -> dict[str, List[ResidueInfo]]:
-    by_chain: dict[str, List[ResidueInfo]] = {}
-    for residue in residues:
-        by_chain.setdefault(residue.chain_id, []).append(residue)
-    return by_chain
+class LoggingLike(Protocol):
+    """Minimal protocol for objects that mirror ``logging.Logger``."""
+
+    def debug(self, message: str, *args, **kwargs) -> None: ...
 
 
-def _find_interactions_for_pair(
-    residues_a: Sequence[ResidueInfo],
-    residues_b: Sequence[ResidueInfo],
-    cutoff_sq: float,
-) -> Tuple[set[int], set[int]]:
-    """Return indices of residues within the cutoff for a pair of chains."""
-    coords_a = np.stack([r.coord for r in residues_a], axis=0)
-    coords_b = np.stack([r.coord for r in residues_b], axis=0)
+class NullLogger:
+    """Fallback logger that ignores all messages."""
 
-    # Broadcasting vectors keeps the code short and the implementation fast.
-    deltas = coords_a[:, None, :] - coords_b[None, :, :]
-    distances_sq = np.einsum("ijk,ijk->ij", deltas, deltas, optimize=True)
-    close_pairs = np.argwhere(distances_sq <= cutoff_sq)
-
-    indices_a = {int(i) for i, _ in close_pairs}
-    indices_b = {int(j) for _, j in close_pairs}
-    return indices_a, indices_b
-
-
-def find_interface_residues(residues: Sequence[ResidueInfo], cutoff: float) -> List[ResidueInfo]:
-    """Return residues whose alpha-carbons are within *cutoff* Å of another chain."""
-    if not residues:
-        return []
-
-    per_chain = _group_by_chain(residues)
-    cutoff_sq = float(cutoff) * float(cutoff)
-
-    interface_indices: dict[str, set[int]] = {chain: set() for chain in per_chain}
-    chains = sorted(per_chain.keys())
-
-    for idx_a in range(len(chains)):
-        residues_a = per_chain[chains[idx_a]]
-        for idx_b in range(idx_a + 1, len(chains)):
-            residues_b = per_chain[chains[idx_b]]
-            if not residues_a or not residues_b:
-                continue
-
-            indices_a, indices_b = _find_interactions_for_pair(residues_a, residues_b, cutoff_sq)
-            interface_indices[chains[idx_a]].update(indices_a)
-            interface_indices[chains[idx_b]].update(indices_b)
-
-    interface_residues: List[ResidueInfo] = []
-    for chain_id in chains:
-        for index in sorted(interface_indices[chain_id]):
-            interface_residues.append(per_chain[chain_id][index])
-
-    return sorted(
-        interface_residues,
-        key=lambda res: (res.chain_id, res.residue_id, res.insertion_code, res.residue_name),
-    )
-
-
-def write_interface_file(residues: Sequence[ResidueInfo], output_path: Path) -> None:
-    """Write interface residues to *output_path* in a simple text format."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8") as handle:
-        for residue in residues:
-            handle.write(residue.serialise())
-            handle.write("\n")
+    def debug(self, message: str, *args, **kwargs) -> None:  # pragma: no cover - trivial
+        pass
 
 
 def process_pdb_file(
@@ -160,15 +56,18 @@ def process_pdb_file(
     log = logger or NullLogger()
     log.debug(f"Processing PDB file: {pdb_path}")
 
-    residues = _load_structure_alpha_carbons(pdb_path)
-    log.debug(f"Parsed {len(residues)} residues from {pdb_path.name}")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    interface_calc = cal_interface(str(pdb_path), cut=cutoff)
+    interface_calc.find_and_write(str(output_path))
 
-    interface_residues = find_interface_residues(residues, cutoff)
-    log.debug(f"Identified {len(interface_residues)} interface residues in {pdb_path.name}")
+    try:
+        with output_path.open("r", encoding="utf-8") as handle:
+            count = sum(1 for line in handle if line.strip())
+    except FileNotFoundError:
+        count = 0
 
-    write_interface_file(interface_residues, output_path)
-    log.debug(f"Wrote interface data to {output_path}")
-    return len(interface_residues)
+    log.debug(f"Wrote interface data to {output_path} ({count} residue(s))")
+    return count
 
 
 def process_directory(
@@ -180,15 +79,7 @@ def process_directory(
     output_suffix: str = "",
     output_extension: str = "txt",
 ) -> Mapping[Path, int]:
-    """Process every ``*.pdb`` in *pdb_dir* and write output files under *output_dir*.
-
-    The work is parallelised with :class:`concurrent.futures.ProcessPoolExecutor`.
-    ``workers`` defaults to ``None``, which lets Python choose an appropriate
-    number of processes.
-
-    Returns a mapping of ``pdb_path`` → ``interface_count`` so callers can inspect
-    the results or surface statistics.
-    """
+    """Process every ``*.pdb`` in *pdb_dir* and write output files under *output_dir*."""
 
     pdb_dir = Path(pdb_dir).resolve()
     output_dir = Path(output_dir).resolve()
@@ -222,7 +113,7 @@ def process_directory(
             pdb_path = future_to_path[future]
             try:
                 results[pdb_path] = future.result()
-            except Exception as exc:  # pragma: no cover - surfaced to caller
+            except Exception as exc:
                 failures[pdb_path] = exc
 
     if failures:
@@ -233,22 +124,8 @@ def process_directory(
 
 
 __all__ = [
-    "ResidueInfo",
-    "find_interface_residues",
-    "write_interface_file",
     "process_pdb_file",
     "process_directory",
     "LoggingLike",
     "NullLogger",
 ]
-class LoggingLike(Protocol):
-    """Minimal protocol for objects that mirror ``logging.Logger``."""
-
-    def debug(self, message: str, *args, **kwargs) -> None: ...
-
-
-class NullLogger:
-    """Fallback logger that ignores all messages."""
-
-    def debug(self, message: str, *args, **kwargs) -> None:  # pragma: no cover - trivial
-        pass
