@@ -9,6 +9,8 @@ import time
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 
+import numpy as np
+
 try:
     import torch
 except ImportError as exc:  # pragma: no cover
@@ -84,14 +86,16 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> tuple[argparse.Namespace
                         help="Absolute tolerance for numeric comparison (default: %(default)s)")
     parser.add_argument("--rel-tolerance", type=float, default=DEFAULT_REL_TOL,
                         help="Relative tolerance for numeric comparison (default: %(default)s)")
-    parser.add_argument("--report", type=Path, default=Path("pt_diff_report.txt"),
+    parser.add_argument("--report", type=Path, default=Path("pt_file_compare_diff_report.txt"),
                         help="Path to write a detailed difference report (default: %(default)s)")
-    parser.add_argument("--same-report", type=Path, default=Path("pt_same_report.txt"),
+    parser.add_argument("--same-report", type=Path, default=Path("pt_file_compare_same_report.txt"),
                         help="Path to write identical pair report (default: %(default)s)")
     parser.add_argument("--no-flatten-dir1", action="store_true",
                         help="Do not search recursively in pt_file_dir1.")
     parser.add_argument("--no-flatten-dir2", action="store_true",
                         help="Do not search recursively in pt_file_dir2.")
+    parser.add_argument("--order-agnostic", action="store_true",
+                        help="Treat tensors as order-independent (ignores row/edge ordering).")
     args = parser.parse_args(list(argv) if argv is not None else None)
     return args, parser
 
@@ -113,6 +117,92 @@ def _log_configuration(log, args: argparse.Namespace, defaults: Dict[str, object
     log("Defaults:")
     for key in sorted(defaults):
         log(f"  {key}: {defaults[key]}")
+
+
+def _to_field_dict(data) -> Dict[str, object]:
+    if isinstance(data, dict):
+        return {k: data[k] for k in data}
+    if hasattr(data, "keys"):
+        return {k: data[k] for k in data.keys()}
+    raise TypeError(f"Unsupported data type for comparison: {type(data)}")
+
+
+def _node_permutation(x: torch.Tensor) -> torch.Tensor:
+    x_cpu = x.detach().cpu()
+    n = x_cpu.size(0)
+    if n == 0:
+        return torch.arange(0, device=x.device, dtype=torch.long)
+
+    keys = [np.arange(n)]
+    x_np = x_cpu.numpy()
+    if x_np.ndim == 1:
+        keys.append(x_np)
+    else:
+        for col in x_np.T[::-1]:
+            keys.append(col)
+    order = np.lexsort(tuple(keys))
+    return torch.from_numpy(order).to(x.device, dtype=torch.long)
+
+
+def _edge_permutation(edge_index: torch.Tensor,
+                      edge_attr: Optional[torch.Tensor] = None) -> torch.Tensor:
+    if edge_index.numel() == 0:
+        return torch.arange(0, device=edge_index.device, dtype=torch.long)
+
+    edge_cpu = edge_index.detach().cpu()
+    src = edge_cpu[0].numpy()
+    dst = edge_cpu[1].numpy()
+    e = src.shape[0]
+
+    keys = [np.arange(e)]
+    if edge_attr is not None and torch.is_tensor(edge_attr) and edge_attr.numel() > 0:
+        attr_np = edge_attr.detach().cpu().numpy()
+        if attr_np.ndim == 1:
+            keys.append(attr_np)
+        else:
+            for col in attr_np.T[::-1]:
+                keys.append(col)
+    keys.append(dst)
+    keys.append(src)
+    order = np.lexsort(tuple(keys))
+    return torch.from_numpy(order).to(edge_index.device, dtype=torch.long)
+
+
+def _canonicalise_fields(fields: Dict[str, object]) -> Dict[str, object]:
+    canon: Dict[str, object] = {}
+    for key, value in fields.items():
+        if torch.is_tensor(value):
+            canon[key] = value.clone()
+        else:
+            canon[key] = value
+
+    x = canon.get("x")
+    if isinstance(x, torch.Tensor) and x.numel() > 0:
+        perm = _node_permutation(x)
+        canon["x"] = x[perm]
+
+        batch = canon.get("batch")
+        if isinstance(batch, torch.Tensor) and batch.numel() == perm.numel():
+            canon["batch"] = batch[perm]
+
+        perm_inv = torch.empty_like(perm)
+        perm_inv[perm] = torch.arange(perm.numel(), device=perm.device, dtype=perm.dtype)
+
+        edge_index = canon.get("edge_index")
+        if isinstance(edge_index, torch.Tensor) and edge_index.numel() > 0:
+            remapped = perm_inv[edge_index]
+            edge_attr = canon.get("edge_attr") if "edge_attr" in canon else None
+            if edge_attr is not None and not torch.is_tensor(edge_attr):
+                edge_attr = None
+            order = _edge_permutation(remapped, edge_attr)
+            canon["edge_index"] = remapped[:, order]
+
+            for edge_field in ("edge_attr", "edge_weight"):
+                value = canon.get(edge_field)
+                if isinstance(value, torch.Tensor) and value.size(0) == order.numel():
+                    canon[edge_field] = value[order]
+
+    return canon
 
 
 def _compare_scalars(a, b, abs_tol: float, rel_tol: float) -> bool:
@@ -164,6 +254,13 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     pt_dir1 = args.pt_file_dir1.resolve()
     pt_dir2 = args.pt_file_dir2.resolve()
 
+    report_path = args.report.resolve()
+    same_path = args.same_report.resolve()
+    if report_path.exists():
+        report_path.write_text("", encoding="utf-8")
+    if same_path.exists():
+        same_path.write_text("", encoding="utf-8")
+
     start = time.perf_counter()
 
     with RUN_LOG.open("w", encoding="utf-8") as run_handle, FAIL_LOG.open("w", encoding="utf-8") as fail_handle:
@@ -211,7 +308,18 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
                 different += 1
                 continue
 
-            diffs = _compare_data_objects(data_a, data_b, args.abs_tolerance, args.rel_tolerance)
+            fields_a = _to_field_dict(data_a)
+            fields_b = _to_field_dict(data_b)
+            if args.order_agnostic:
+                fields_a = _canonicalise_fields(fields_a)
+                fields_b = _canonicalise_fields(fields_b)
+
+            diffs = _compare_data_objects(
+                fields_a,
+                fields_b,
+                args.abs_tolerance,
+                args.rel_tolerance,
+            )
             if diffs:
                 header = (
                     f"DIFFERENT: {key}\n  baseline: {baseline_path}\n  candidate: {candidate_path}"
@@ -252,7 +360,6 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         log(f"Elapsed time: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}")
 
         if diff_report:
-            report_path = args.report.resolve()
             report_path.parent.mkdir(parents=True, exist_ok=True)
             report_path.write_text("\n\n".join(diff_report) + "\n", encoding="utf-8")
             log(f"Detailed differences written to {report_path}")
@@ -260,7 +367,6 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
             log("No differences detected; no report written.")
 
         if same_report:
-            same_path = args.same_report.resolve()
             same_path.parent.mkdir(parents=True, exist_ok=True)
             same_path.write_text("\n".join(same_report) + "\n", encoding="utf-8")
             log(f"Identical file pairs written to {same_path}")
