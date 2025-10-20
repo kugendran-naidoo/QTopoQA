@@ -1,5 +1,76 @@
 General Questions
 - PhD defence
+what is the full workflow of the code?
+
+Workflow Overview (Plain Language)
+
+Start with a folder of protein structures (.pdb or .cif files).
+For each protein, the script extracts three sets of features, storing them in a workspace:
+Interface features capture which residues are close across different chains.
+Topological features describe the 3D “shape” of the interface residues via persistent homology.
+Node features assemble per-residue descriptors (DSSP, one-hot encodings, etc.).
+Everything is written to disk so that downstream tools (like write_pt_file.py) can assemble a PyTorch Geometric graph object for machine learning.
+
+Workflow (Detailed Mapping to Code)
+
+Argument parsing & setup (graph_builder2.py:520-577).
+Mandatory folders: input structures (--dataset-dir), scratch space (--work-dir), output graph folder (--graph-dir), log area (--log-dir).
+The script sets deterministic options (e.g., PYTHONHASHSEED=0) so runs are reproducible (graph_builder2.py:94).
+Environment validation (graph_builder2.py:549-620).
+Checks permissions and empties work_dir/graph_dir.
+Builds a map from residue names to PDB files (graph_builder2.py:560-618).
+
+Interface extraction (called where the log says “Beginning interface residue extraction”; actual worker is process_pdb_file in lib/new_calculate_interface.py:39-94).
+Uses the legacy topoqa/src/get_interface.py to find residues whose C-alpha atoms are within the default 10Å threshold of another chain.
+Results are rounded and sorted deterministically (graph_builder2.py:116-158) and saved as <model>.interface.txt.
+
+Topological features (graph_builder2.py:713-814).
+For each interface file, persistent homology is computed via new_topological_features.py, producing <model>.topology.csv.
+Logs record successes/failures per model.
+Node features (graph_builder2.py:822-912).
+node_fea_df.py (the same module used by inference) combines DSSP secondary-structure info, solvent accessibility, amino-acid one-hot encodings, and the persistent-homology columns from the previous step.
+Output is <model>.csv under node_features/.
+
+Packaging
+graph_builder2.py stops after producing the CSVs; graph_dir remains empty (“graph-only builder”).
+Graph assembly happens later via write_pt_file.py, which stages the three files and calls topoqa/src/graph.py:create_graph to make <model>.pt.
+
+Simple Trace with a Concrete PDB
+Imagine a toy structure with two chains, A and B, each with three residues.
+
+Input: toy_complex.pdb with residues A1, A2, A3 and B1, B2, B3.
+Interface step:
+Finds that A2, A3 are within 8–10Å of B1, B2.
+toy_complex.interface.txt might contain:
+c<A>r<2>R<LYS>  10.53  14.22   9.47
+c<A>r<3>R<ASP>   8.11  12.08  11.60
+c<B>r<1>R<SER>   8.77  17.15  12.00
+c<B>r<2>R<GLU>  10.55  16.93  14.40
+Topological step:
+Uses these four residues as anchor points to build persistence diagrams for different atom sets and neighbour distances.
+Outputs columns like f0_C_sum, f1_CN_mean, etc. in toy_complex.topology.csv.
+
+Node step (staged copy of interface/topology inside temporary folders):
+Runs DSSP to compute secondary structure and solvent accessibility for each residue.
+Aligns with the interface IDs and combines features into toy_complex.csv (127 rows became 4 rows in this toy example).
+Columns include ID, rasa, phi, psi, SS8_*, AA_*, followed by persistent-homology features.
+
+Graph assembly (when write_pt_file.py is invoked later):
+Copies the three files into a temporary directory, calls create_graph, which:
+Loads the node CSV (PyTorch tensor x of shape [num_nodes, num_features]).
+Calculates pairwise edges: for every interface residue pair within cutoff, adds an entry to edge_index (shape [2, num_edges]).
+Stores per-edge descriptors in edge_attr (num_edges × 11 in the default config).
+Saves a torch_geometric.data.Data object (Data(x, edge_index, edge_attr)) to <model>.pt.
+Later scripts load the graph with torch.load('...pt') to feed GNN models.
+
+Prompt for Visualizing the Resulting Graph
+When asking ChatGPT (or another visual tool) to sketch the graph, provide coordinates/order:
+
+“Please draw a simple bipartite graph showing residue nodes from chain A and chain B in `toy_complex`. Place A2 (LYS) and A3 (ASP) on the left, B1 (SER) and B2 (GLU) on the right. Connect nodes that are within 10 Å: A2–B1, A2–B2, A3–B1, A3–B2. Label each node with its residue name and chain.”  
+
+For larger real datasets, include (1) list of residues with chain labels; (2) edges defined by interface proximity; (3) optional feature annotations (e.g., solvent accessibility). This lets the assistant generate an accurate GNN-style visualization.
+
+
 
 Why train/predict with DockQ over CAPRI scores?
 What is the weaknesses associated with CPU vs GPU resource training ?
@@ -27,3 +98,79 @@ cutoff: the persistence-death threshold applied to H0 bars. Bars longer than thi
 	  Topo and node features are true CSV datasets with named numeric columns; headers are necessary so pandas (and ultimately PyTorch) know which statistic each value represents. Those files are fed directly into model training/inference and having column names ensures consistent ordering.  
 	    
 	  Because interface files are only intermediates and never passed directly to the model, adding a header provides no benefit—and would actually break the existing parsers. The current, headerless format is therefore both intentional and required for the rest of the pipeline to function correctly.
+
+
+	  PDB Insertion Codes and Impact on .pt files
+
+	  Big Picture
+
+Protein structures label each residue with a chain ID (A/B/…) and a residue number. When extra residues are inserted between numbered positions, PDB files reuse the number but add an insertion code such as 30A, 30B, etc. (node_fea_df.py:113-149). Those letters keep the biological order without renumbering the whole chain.
+The inference script topoqa/src/get_interface.py:12-64 collects interface residues into a Python set and then sorts them by (chain, residue number, residue name), silently ignoring the insertion code. Sets preserve no order, so any residue pair like 30, 30A, 30B comes out in the order decided by CPython’s hash table at run time.
+Graph construction (topoqa/src/graph.py:10-34) simply reads the interface file, merges it with node/topology features, and preserves whatever order it received. When the same structure is processed twice with different insertion-code tie-breakers, you get the same data but listed in a different row sequence. A GNN can still use it, but the .pt bytes don’t match and downstream diffs light up.
+Why Behaviour Differs Now
+
+The refreshed graph_builder2.py rewrites each interface file by rounding coordinates and then sorting deterministically on (chain, residue number, residue name, insertion code) (qtdaqa/graph_builder2/graph_builder2.py:99-157).
+Whenever a chain really has multiple residues with the same number—e.g. c<L>r<14>R<ASP> and c<L>r<14>i<L>R<ASP>—the new file orders them alphabetically by insertion code, while the legacy inference run preserved the hash-based order it happened to generate. The node and edge tensors follow suit, so hash-order vs. deterministic-order files compare “different” even though the underlying graph is the same.
+Concrete Example
+
+legacy interface extract (order from Python set)
+c<L>r<14>i<D>R<ARG>
+c<L>r<14>R<ASP>
+c<L>r<14>i<L>R<ASP>
+c<L>r<14>i<H>R<GLU>
+
+deterministic rewrite
+c<L>r<14>R<ASP>
+c<L>r<14>i<D>R<ARG>
+c<L>r<14>i<H>R<GLU>
+c<L>r<14>i<L>R<ASP>
+Both mention the same four residues; they’re just listed in a different order.
+
+What to Do
+
+For faithful training/inference going forward
+Use the deterministic ordering already in graph_builder2.py. Every rerun now yields identical .pt files, making regression testing and debugging much easier. A GNN treats permuted nodes the same, so model quality is unaffected as long as you keep one ordering per dataset.
+For byte-for-byte legacy reproduction
+You must restore the original tie-breaking: skip the deterministic sort and run the pipeline with the identical Python interpreter and PYTHONHASHSEED that produced the archived files. Otherwise, reusing the old interface text files verbatim is the only way to recreate those exact tensors.
+Key Takeaway for Non-Experts
+Insertion codes are the letters PDB files add when several residues share the same number. The historical inference script didn’t fully sort by those letters, so their order changed unpredictably between runs. The new pipeline fixes the ordering, which is good for reproducibility but means the tensors no longer match the legacy artifacts byte-for-byte. The data itself hasn’t changed—only the row order—and modern GNN training will work the same with the new files.
+
+Comparing .pt files
+
+compare_pt_files.py does not rely on a raw byte diff. It loads each pair with torch.load, walks the resulting objects, and performs field-by-field comparisons (tensors, lists, dicts, scalars). Tensors must have identical shapes and their values must match exactly, because the default tolerances (abs_tolerance=0, rel_tolerance=0) require every element to be equal. If you prefer a looser check you can rerun the script with non-zero tolerances, but even then it is comparing numerical content—not just file bytes.
+
+What actually changes?
+Only the order of entries in each tensor. The shapes stay identical, and the underlying numbers are the same once you line them up properly. The mismatch you see is a permutation of node rows and the corresponding edge indices.
+
+Why does it happen?
+For residues with insertion codes (e.g. PDB entry 1BTH has chain L residue 14 with variants 14, 14A, 14L, etc.), the historical inference run preserved whichever order the Python set returned. The refreshed graph_builder2.py sorts those residues deterministically (graph_builder2.py:99-158). That reorder is what propagates through to x, edge_index, and edge_attr.
+
+Concrete illustration (1bth_1)
+In output/ARM/old_method_inference/work/interface/1bth_1.txt the tied residues appear as:
+
+c<L>r<14>i<D>R<ARG>
+c<L>r<14>R<ASP>
+c<L>r<14>i<L>R<ASP>
+c<L>r<14>i<H>R<GLU>
+With the deterministic rewrite (output/ARM/283_failed/work/interface/1bth_1.interface.txt) the same block becomes:
+
+c<L>r<14>R<ASP>
+c<L>r<14>i<D>R<ARG>
+c<L>r<14>i<H>R<GLU>
+c<L>r<14>i<L>R<ASP>
+When you load the .pt files:
+
+base = torch.load('.../283_failed/work/pt_files/1bth_1.pt')
+old  = torch.load('.../old_method_inference/work/pt_file_data/1bth_1.pt')
+
+base.x.shape == old.x.shape  # both (127, 172)
+but the rows don’t match:
+
+# After permuting the new tensor to the old order:
+perm = [index of each old ID in the new ID list]
+torch.allclose(base.x[perm], old.x)  # → True
+edge_index and edge_attr exhibit the same behaviour: once you apply the same permutation to node indices (and adjust the edge endpoints accordingly) they line up exactly.
+
+Takeaway
+Insertion-code ordering shuffles the row ordering, not the data itself. The GNN sees the same graph, and retraining on the new artifacts is fine—as long as you stick with one ordering per dataset.
+
