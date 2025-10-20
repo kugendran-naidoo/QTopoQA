@@ -63,6 +63,62 @@ Stores per-edge descriptors in edge_attr (num_edges × 11 in the default config)
 Saves a torch_geometric.data.Data object (Data(x, edge_index, edge_attr)) to <model>.pt.
 Later scripts load the graph with torch.load('...pt') to feed GNN models.
 
+Why is the topology features dependent on the interface features and the node features dependent on the topology features? Explain the relationship and in general is this a common aspect of a graph used for GNN's? Create a summary and detail level explanation as if its been shown to a layman. Take a simple but useful example of a small pdb file as input and explain how to do this process using the 10A interface cutoff and 8A and 8A topology cutoffs etc.
+
+Summary (Plain Language)
+
+Think of a protein complex like a crowd of people.
+Interface features act as a guest list: we only remember people who stand within 10 Å of someone from another group (another chain).
+Topology features describe how those guests are arranged—who’s nearer, who forms triangles—so they must know exactly which guests were invited.
+Node features add personal details (hair colour, height), and they also attach the topology stats to each guest.
+Because each stage depends on who made the list first, the outputs match one-to-one. This layered dependency is typical when constructing graph inputs for GNNs: you first decide which nodes belong in the graph, then compute higher-level relationships, then package everything into x, edge_index, and edge_attr.
+Detailed Explanation
+
+Stage	What it Needs	Why It Depends on the Previous Stage	Output
+Interface extraction (new_calculate_interface.py)	Raw 3D structure (.pdb/.cif), default cutoff 10 Å	It is the first step; identifies residues exposed to other chains	<model>.interface.txt: one residue per line, ordered and rounded (graph_builder2.py lines 110–158)
+Topology features (graph_builder2.py lines 704–818)	Structure + interface file	Only interface residues matter; persistent homology (new_topological_features.py) needs exactly that list to stay in sync	<model>.topology.csv: persistent homology features aligned to the interface IDs
+Node features (graph_builder2.py lines 822–912)	Structure + interface + topology directories	Builds on both: DSSP/one-hot data (structure) + interface order (IDs) + topological columns. Everything is merged on the interface IDs	<model>.csv: final per-residue feature table
+When you later call write_pt_file.py, the three files are copied into a temp directory, topoqa/src/graph.py:create_graph reads them in that same order, and writes a PyTorch Geometric Data object (x, edge_index, edge_attr).
+
+Simple Example (Toy PDB)
+
+Assume a toy complex with chain A (residues 1–3) and chain B (residues 1–3).
+
+Interface (10 Å cut-off)
+
+Distances show A2 and A3 are within 10 Å of B1 and B2.
+Output:
+c<A>r<2>R<LYS> 10.53 14.22 9.47
+c<A>r<3>R<ASP> 8.11 12.08 11.60
+c<B>r<1>R<SER> 8.77 17.15 12.00
+c<B>r<2>R<GLU> 10.55 16.93 14.40
+Topology (default neighbour distance 8 Å, filtration 8 Å)
+
+new_topological_features.py uses these four coordinates, slices them into element subsets (C, N, O, etc.), and computes persistence diagrams (birth/death of 0D/1D features under distance ≤ 8 Å).
+Result: a CSV with columns like f0_C_sum, f1_CN_mean, etc., one row per residue.
+Node features
+
+node_fea_df.node_fea runs DSSP on the structure, aligns residue IDs from interface.txt, and merges the topological columns.
+
+Example row (simplified):
+
+ID	rasa	phi	psi	SS8_*	AA_*	f0_C_sum	...
+c<A>r<2>R<LYS>	0.32	-60°	-45°	…	…	1.25	…
+Graph packaging (write_pt_file.py)
+
+create_graph loads toy_complex.csv, builds a tensor x of shape [4, feature_dim], a distance-based edge_index connecting A2/A3 to B1/B2, and edge_attr with smoothed distance/element statistics.
+torch.save(Data(...), 'toy_complex.pt'). A later script calls torch.load to feed this graph to a GNN.
+Is This Common in GNN Pipelines?
+Yes. Many pipelines first define which residues/atoms/nodes belong to the graph (interface selection), derive relational or structural features (topology), and finally decorate each node with a rich feature vector (node_features). Graph neural networks expect consistent ordering across these stages—a change in node order without recomputing edges/nodes leads to mismatched tensors, so each step protecting the order is standard practice.
+
+Is This Common in GNN Pipelines?
+Yes. Many pipelines first define which residues/atoms/nodes belong to the graph (interface selection), derive relational or structural features (topology), and finally decorate each node with a rich feature vector (node_features). Graph neural networks expect consistent ordering across these stages—a change in node order without recomputing edges/nodes leads to mismatched tensors, so each step protecting the order is standard practice.
+
+Suggested Prompt for a Visualisation
+
+“Create a diagram of the interaction graph for toy_complex: place chain A residues (A2 LYS, A3 ASP) on the left and chain B residues (B1 SER, B2 GLU) on the right. Draw edges for pairs within 10 Å (A2–B1, A2–B2, A3–B1, A3–B2) and label each edge with its distance. Include a legend showing which features (DSSP, persistent homology) are attached to each node.”
+
+
 Prompt for Visualizing the Resulting Graph
 When asking ChatGPT (or another visual tool) to sketch the graph, provide coordinates/order:
 
