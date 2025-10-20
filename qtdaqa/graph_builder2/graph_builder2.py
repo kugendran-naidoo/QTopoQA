@@ -20,15 +20,18 @@ from __future__ import annotations
 import argparse
 import inspect
 import logging
+import os
+import re
 import shutil
 import sys
 import tempfile
 import time
+import warnings
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 from Bio.PDB import PDBParser
 
@@ -90,6 +93,24 @@ TOPOLOGY_ELEMENT_FILTERS: Sequence[Sequence[str]] = (
 NODE_FEATURE_DROP_NA = False
 INTERFACE_COORD_DECIMALS = 3
 
+os.environ.setdefault("PYTHONHASHSEED", "0")
+
+_INTERFACE_DESCRIPTOR_RE = re.compile(
+    r"^c<(?P<chain>[^>]+)>r<(?P<res>-?\d+)>(?:i<(?P<ins>[^>]+)>)?R<(?P<resname>[^>]+)>$"
+)
+
+
+def _interface_sort_key(descriptor: str) -> Tuple[str, int, str, str]:
+    match = _INTERFACE_DESCRIPTOR_RE.match(descriptor)
+    if match is None:
+        raise ValueError(f"Unrecognised interface descriptor: {descriptor}")
+
+    chain = match.group("chain")
+    residue = int(match.group("res"))
+    insertion = match.group("ins") or ""
+    residue_name = match.group("resname")
+    return chain, residue, residue_name, insertion
+
 
 def _format_element_filters(filters: Sequence[Sequence[str]]) -> str:
     parts: List[str] = []
@@ -116,32 +137,57 @@ def _round_interface_file(path: Path, decimals: int) -> None:
     except FileNotFoundError:
         return
 
-    updated_lines: List[str] = []
+    records: List[dict[str, object]] = []
     changed = False
 
     for line in raw_lines:
         stripped = line.strip()
         if not stripped:
-            updated_lines.append("")
+            records.append({"sortable": False, "line": ""})
             continue
         parts = stripped.split()
         if len(parts) < 4:
-            updated_lines.append(stripped)
+            records.append({"sortable": False, "line": stripped})
             continue
         descriptor, coord_tokens = parts[0], parts[1:]
         try:
             rounded_coords = [_format_coordinate(float(value), decimals) for value in coord_tokens]
         except ValueError:
-            updated_lines.append(stripped)
+            records.append({"sortable": False, "line": stripped})
             continue
         normalised_line = " ".join([descriptor, *rounded_coords])
         if normalised_line != stripped:
             changed = True
-        updated_lines.append(normalised_line)
+        try:
+            sort_key = _interface_sort_key(descriptor)
+            records.append({"sortable": True, "line": normalised_line, "key": sort_key})
+        except ValueError:
+            records.append({"sortable": False, "line": normalised_line})
+
+    if not records:
+        return
+
+    sortable_records = [rec for rec in records if rec.get("sortable")]
+    sorted_lines = [
+        cast(str, rec["line"])
+        for rec in sorted(sortable_records, key=lambda r: cast(Tuple[str, int, str, str], r["key"]))
+    ]
+
+    final_lines: List[str] = []
+    sorted_iter = iter(sorted_lines)
+    for rec in records:
+        if rec.get("sortable"):
+            final_lines.append(next(sorted_iter))
+        else:
+            final_lines.append(cast(str, rec["line"]))
+
+    original_lines = [cast(str, rec["line"]) for rec in records]
+    if final_lines != original_lines:
+        changed = True
 
     if changed:
         with path.open("w", encoding="utf-8") as handle:
-            handle.write("\n".join(updated_lines))
+            handle.write("\n".join(final_lines))
             handle.write("\n")
 
 
@@ -215,6 +261,7 @@ class NodeFeatureTask:
     interface_path: Path
     topology_path: Path
     output_path: Path
+    log_path: Path
 
 
 def _configure_main_logger(run_log_dir: Path) -> logging.Logger:
@@ -454,10 +501,19 @@ def _process_node_feature_task(
     drop_na: bool,
 ) -> tuple[str, Optional[str]]:
     temp_dir: Optional[tempfile.TemporaryDirectory] = None
+    log_lines: List[str] = []
+    task.log_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         temp_dir, iface_dir, topo_dir = _stage_node_feature_inputs(task.model, task.interface_path, task.topology_path)
         extractor = _initialise_node_fea(task.model, task.structure_path, iface_dir, topo_dir, signature_size)
-        result = extractor.calculate_fea()
+        log_lines.append(f"PDB: {task.structure_path}")
+        log_lines.append(f"Interface source: {task.interface_path}")
+        log_lines.append(f"Topology source: {task.topology_path}")
+        log_lines.append(f"Output CSV: {task.output_path}")
+
+        with warnings.catch_warnings(record=True) as captured:
+            warnings.simplefilter("always")
+            result = extractor.calculate_fea()
         if isinstance(result, tuple):
             fea_df = result[0]
         else:
@@ -467,12 +523,23 @@ def _process_node_feature_task(
             fea_df.replace("NA", pd.NA, inplace=True)
             fea_df = fea_df.dropna()
         fea_df.to_csv(task.output_path, index=False)
+        if captured:
+            log_lines.append("Warnings:")
+            for warn in captured:
+                log_lines.append(f"  {warn.category.__name__}: {warn.message}")
+        log_lines.append("Status: SUCCESS")
         return task.model, None
     except Exception as exc:  # pragma: no cover
+        log_lines.append("Status: FAILURE")
+        log_lines.append(f"Error: {exc}")
         return task.model, str(exc)
     finally:
         if temp_dir is not None:
             temp_dir.cleanup()
+        if log_lines:
+            with task.log_path.open("w", encoding="utf-8") as handle:
+                for line in log_lines:
+                    handle.write(f"{line}\n")
 
 
 def _build_node_feature_tasks(
@@ -480,6 +547,7 @@ def _build_node_feature_tasks(
     interface_dir: Path,
     topology_dir: Path,
     output_dir: Path,
+    log_dir: Path,
 ) -> List[NodeFeatureTask]:
     interface_map = _gather_interface_files(interface_dir)
     topology_map = _gather_topology_files(topology_dir)
@@ -495,6 +563,7 @@ def _build_node_feature_tasks(
         output_rel = _relative_node_output_path(interface_dir, interface_path, model)
         output_path = (output_dir / output_rel).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path = (log_dir / output_rel.parent / f"{model}.log").resolve()
         tasks.append(
             NodeFeatureTask(
                 model=model,
@@ -502,6 +571,7 @@ def _build_node_feature_tasks(
                 interface_path=interface_path,
                 topology_path=topology_path,
                 output_path=output_path,
+                log_path=log_path,
             )
         )
     return tasks
@@ -582,6 +652,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 2
 
     run_log_dir = log_info.run_dir
+    summary_log_path = run_log_dir / "graph_builder2_summary.log"
     logger = _configure_main_logger(run_log_dir)
     logger.info("=== Starting graph_builder2 run ===")
     logger.info(
@@ -731,6 +802,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         logger.error("Unable to prepare node feature directory '%s': %s", node_feature_dir, exc)
         return 2
 
+    node_feature_log_dir = run_log_dir / "node_feature_logs"
+    node_feature_log_dir.mkdir(parents=True, exist_ok=True)
+
     topology_log_dir = run_log_dir / "topology_logs"
     topology_log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -862,7 +936,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     logger.info("Interface output directory: %s", interface_dir)
     logger.info("Per-PDB interface logs directory: %s", interface_log_dir)
     logger.info("Interface success count: %d", generated_interface_files)
-    node_feature_tasks = _build_node_feature_tasks(structure_map, interface_dir, topology_dir, node_feature_dir)
+    node_feature_tasks = _build_node_feature_tasks(structure_map, interface_dir, topology_dir, node_feature_dir, node_feature_log_dir)
+    node_feature_log_paths = {task.model: task.log_path for task in node_feature_tasks}
     node_feature_success = 0
     node_feature_failures: List[Tuple[str, str]] = []
     node_elapsed = 0.0
@@ -915,6 +990,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     logger.info("Per-PDB topology logs directory: %s", topology_log_dir)
     logger.info("Topology success count: %d", generated_topology_files)
     logger.info("Node feature output directory: %s", node_feature_dir)
+    logger.info("Per-PDB node feature logs directory: %s", node_feature_log_dir)
     logger.info("Node feature success count: %d", node_feature_success)
     logger.info("Node feature extraction elapsed time: %.2f s", node_elapsed)
 
@@ -946,6 +1022,54 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             logger.warning(" - %s failed with %s", model, error)
     else:
         logger.info("All node feature extractions completed successfully.")
+
+    summary_lines: List[str] = []
+    summary_lines.append("=== Graph Builder 2 Summary ===")
+    summary_lines.append(f"Dataset directory: {dataset_dir}")
+    summary_lines.append(f"Work directory: {work_dir}")
+    summary_lines.append(f"Graph directory: {graph_dir}")
+    summary_lines.append("")
+
+    summary_lines.append("[Interface Features]")
+    summary_lines.append(f"  Successes : {generated_interface_files}")
+    summary_lines.append(f"  Failures  : {len(interface_failure_entries)}")
+    summary_lines.append(f"  Logs dir  : {interface_log_dir}")
+    if interface_failure_entries:
+        summary_lines.append("  Failure details:")
+        for failed_path, log_path, error in interface_failure_entries:
+            try:
+                label = failed_path.relative_to(dataset_dir)
+            except ValueError:
+                label = failed_path
+            summary_lines.append(f"    - {label}: {error} (log: {log_path})")
+    summary_lines.append("")
+
+    summary_lines.append("[Topology Features]")
+    summary_lines.append(f"  Successes : {generated_topology_files}")
+    summary_lines.append(f"  Failures  : {len(topology_failure_entries)}")
+    summary_lines.append(f"  Logs dir  : {topology_log_dir}")
+    if topology_failure_entries:
+        summary_lines.append("  Failure details:")
+        for failed_path, log_path, error in topology_failure_entries:
+            try:
+                label = failed_path.relative_to(dataset_dir)
+            except ValueError:
+                label = failed_path
+            summary_lines.append(f"    - {label}: {error} (log: {log_path})")
+    summary_lines.append("")
+
+    summary_lines.append("[Node Features]")
+    summary_lines.append(f"  Successes : {node_feature_success}")
+    summary_lines.append(f"  Failures  : {len(node_feature_failures)}")
+    summary_lines.append(f"  Logs dir  : {node_feature_log_dir}")
+    if node_feature_failures:
+        summary_lines.append("  Failure details:")
+        for model, error in node_feature_failures:
+            log_path = node_feature_log_paths.get(model)
+            summary_lines.append(f"    - {model}: {error} (log: {log_path})")
+
+    summary_log_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
+    logger.info("Summary written to %s", summary_log_path)
 
     logger.info("=== graph_builder2 run completed ===")
 
