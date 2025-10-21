@@ -85,17 +85,17 @@ def get_pointcloud_type(descriptor1,descriptor2,model,e1,e2):
     ####atom coord
     if e1=='all':
         atom_coords1 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[1])] for atom in res1.get_atoms()]
+                                   float(atom.get_coord()[2])] for atom in res1.get_atoms()]
     else:
         atom_coords1 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[1])] for atom in res1.get_atoms() if atom.get_name()[0]==e1]
+                                   float(atom.get_coord()[2])] for atom in res1.get_atoms() if atom.get_name()[0]==e1]
     atom_coords1 = np.array(atom_coords1)
     if e2=='all':
         atom_coords2 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[1])] for atom in res2.get_atoms()]
+                                   float(atom.get_coord()[2])] for atom in res2.get_atoms()]
     else:    
         atom_coords2 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[1])] for atom in res2.get_atoms() if atom.get_name()[0]==e2]
+                                   float(atom.get_coord()[2])] for atom in res2.get_atoms() if atom.get_name()[0]==e2]
     atom_coords2 = np.array(atom_coords2)
     # print(atom_coords1)
     # print(atom_coords2)
