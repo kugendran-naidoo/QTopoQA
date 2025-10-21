@@ -230,3 +230,27 @@ edge_index and edge_attr exhibit the same behaviour: once you apply the same per
 Takeaway
 Insertion-code ordering shuffles the row ordering, not the data itself. The GNN sees the same graph, and retraining on the new artifacts is fine—as long as you stick with one ordering per dataset.
 
+Figure out how to interpret the model training Table:
+
+
+   | Name         | Type             | Params | Mode 
+-----------------------------------------------------------
+0  | criterion    | MeanSquaredError | 0      | train
+1  | relu         | ReLU             | 0      | train
+2  | sigmoid      | Sigmoid          | 0      | train
+3  | edge_embed   | ModuleList       | 384    | train
+4  | embed        | ModuleList       | 5.5 K  | train
+5  | conv1        | ModuleList       | 50.2 K | train
+6  | conv2        | ModuleList       | 50.2 K | train
+7  | conv3        | ModuleList       | 50.2 K | train
+8  | fc_edge      | Linear           | 528    | train
+9  | protein_fc_1 | ModuleList       | 3.1 K  | train
+10 | fc1          | Linear           | 4.2 K  | train
+11 | out          | Linear           | 65     | train
+-----------------------------------------------------------
+164 K     Trainable params
+0         Non-trainable params
+164 K     Total params
+0.658     Total estimated model params size (MB)
+33        Modules in train mode
+0         Modules in eval mode
