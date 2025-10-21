@@ -93,6 +93,7 @@ Added a new CPU-first launcher at qtdaqa/proposed_model_training/ARM_cpu/train_t
 Introduced early stopping plus a ReduceLROnPlateau scheduler via the CpuTopoQAModule subclass (train_topoqa_cpu.py:174-204), addressing the stagnation risk noted in gat_5_edge1.py. Both callbacks are wired into the Lightning trainer with deterministic settings (train_topoqa_cpu.py:309-343).
 Updated the configuration to point at the ARM .pt directory, lowered gradient accumulation to 16 for steadier updates, and exposed tuning knobs for the new callbacks (qtdaqa/proposed_model_training/ARM_cpu/config.yaml:3-23). The run wrapper now simply invokes the new Python entry point and lets extra CLI flags (e.g., --fast-dev-run) flow through (run_training.sh:1-24).
 The pipeline logs coverage for train/val splits, warning about the 39/31 missing graphs still present in the current dataset (train_topoqa_cpu.py:238-287), so you can regenerate once the new edge geometry is available.
+
 Differences vs Original GPU Script
 
 Replaces the hard-coded CUDA invocation with accelerator='cpu' while keeping the model architecture intact, ensuring ARM Macs can retrain without edits.
@@ -106,3 +107,7 @@ Next Steps
 
 Regenerate the .pt graphs with the fixed edge geometry, then rerun ./run_training.sh (optionally remove runs/ if you want a clean slate) for a full training cycle.
 Once a complete graph set exists, monitor the saved CSV logs in qtdaqa/proposed_model_training/ARM_cpu/runs/ to compare validation MSE against the 0.0498 baseline.
+
+Shuffling means the training loader presents samples in a different random order each epoch instead of the fixed order they’re stored in. It’s useful because it breaks correlations between consecutive samples, gives each batch a more representative mix of the data distribution, and helps gradient-based training converge more smoothly.
+The newer pipeline enables this for training: build_dataloaders constructs DataLoader(..., shuffle=True, ...) for the train split so batches are reshuffled every epoch, while the validation loader stays deterministic (shuffle=False). See qtdaqa/proposed_model_training/ARM_cpu/model_train_topoqa_cpu.py:214-244.
+The legacy GPU script never shuffled—its get_loader helper created both train and validation loaders with shuffle=False, so every epoch saw the graphs in the same order (topoqa_train/train_topoqa.py:95-110).
