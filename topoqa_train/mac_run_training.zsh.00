@@ -1,0 +1,30 @@
+# export OMP_NUM_THREADS=1
+# export OPENBLAS_NUM_THREADS=1
+# export MKL_NUM_THREADS=1
+# export VECLIB_MAXIMUM_THREADS=1
+# export NUMEXPR_NUM_THREADS=1
+
+# export PYTORCH_ENABLE_MPS_FALLBACK=1
+# export PYTHONHASHSEED=222
+# export PL_SEED_WORKERS=1
+# export TORCH_USE_DETERMINISTIC_ALGORITHMS=1
+
+#export OMP_NUM_THREADS=8
+#export MKL_NUM_THREADS=8
+
+for LR in 0.0001 0.0003 ; do
+   for SD in 111 222 333; do
+  python k_mac_train_topoqa.py \
+    --graph_dir graph_data \
+    --train_label_file train.csv \
+    --val_label_file val.csv \
+    --attention_head 8 \
+    --pooling_type "mean" \
+    --batch_size 16 \
+    --accumulate_grad_batches 32 \
+    --learning_rate $LR \
+    --num_epochs 300 \
+    --seed $SD \
+    --save_dir ./experiments/lr_${LR//./}_${SD}
+   done
+done
