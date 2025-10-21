@@ -1,58 +1,115 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Resolve repository root regardless of invocation point.
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-CONFIG_FILE="${SCRIPT_DIR}/config.yaml"
+usage() {
+  cat <<'USAGE'
+Usage: run_training.sh -c CONFIG [-- python_args...]
 
-if [[ ! -f "${CONFIG_FILE}" ]]; then
-  echo "Config file not found: ${CONFIG_FILE}" >&2
-  exit 1
-fi
+Mandatory options:
+  -c, --config PATH     Path to the YAML configuration describing training inputs,
+                        hyper-parameters, and runtime settings.
 
-# Export determinism-related environment variables.  They are harmless on CPU.
-export PYTHONHASHSEED=222
-export PL_SEED_WORKERS=1
-export TORCH_USE_DETERMINISTIC_ALGORITHMS=1
-export CUBLAS_WORKSPACE_CONFIG=:16:8
+Optional passthrough:
+  Any arguments after the configuration flag are forwarded to train_topoqa_cpu.py.
+  For example:
+    ./run_training.sh -c config.yaml -- --fast-dev-run
+    ./run_training.sh -c config.yaml -- --limit-train-batches 0.25 --limit-val-batches 0.5
 
-ARGS=$(python - <<'PY'
-import sys, yaml
-cfg_path = sys.argv[1]
-with open(cfg_path, 'r') as fh:
-    cfg = yaml.safe_load(fh)
+Forwarded Python options of note:
+  --fast-dev-run               Lightning dry run (1 batch train/val).
+  --limit-train-batches VALUE  Limit training batches (float fraction or int count).
+  --limit-val-batches VALUE    Limit validation batches (float fraction or int count).
 
-flag_map = {
-    'graph_dir': '--graph_dir',
-    'train_label_file': '--train_label_file',
-    'val_label_file': '--val_label_file',
-    'attention_head': '--attention_head',
-    'pooling_type': '--pooling_type',
-    'batch_size': '--batch_size',
-    'learning_rate': '--learning_rate',
-    'num_epochs': '--num_epochs',
-    'accumulate_grad_batches': '--accumulate_grad_batches',
-    'seed': '--seed',
-    'save_dir': '--save_dir',
+Environment defaults (override via shell exports if required):
+  PYTHONHASHSEED=222
+  PL_SEED_WORKERS=1
+  TORCH_USE_DETERMINISTIC_ALGORITHMS=1
+  CUBLAS_WORKSPACE_CONFIG=:16:8
+USAGE
 }
 
-tokens = []
-for key, flag in flag_map.items():
-    val = cfg.get(key)
-    if val is None:
-        continue
-    tokens.extend([flag, str(val)])
-
-print(' '.join(tokens))
-PY
-"${CONFIG_FILE}")
-
-if [[ -z "${ARGS}" ]]; then
-  echo "Failed to build argument list from ${CONFIG_FILE}" >&2
+if [[ $# -lt 2 ]]; then
+  usage
   exit 1
 fi
+
+CONFIG_FILE=""
+PASSTHRU=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -c|--config)
+      CONFIG_FILE="$2"
+      shift 2
+      ;;
+    --)
+      shift
+      PASSTHRU=("$@")
+      break
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z "${CONFIG_FILE}" ]]; then
+  echo "Error: configuration file must be specified with -c/--config." >&2
+  usage
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+if [[ "${CONFIG_FILE}" != /* ]]; then
+  CONFIG_PATH="${SCRIPT_DIR}/${CONFIG_FILE}"
+else
+  CONFIG_PATH="${CONFIG_FILE}"
+fi
+CONFIG_PATH="$(cd "$(dirname "${CONFIG_PATH}")" && pwd)/$(basename "${CONFIG_PATH}")"
+
+if [[ ! -f "${CONFIG_PATH}" ]]; then
+  echo "Configuration file not found: ${CONFIG_PATH}" >&2
+  exit 1
+fi
+
+timestamp="$(date +%Y-%m-%d_%H-%M-%S)"
+RUN_ROOT="${SCRIPT_DIR}/training_runs"
+mkdir -p "${RUN_ROOT}"
+
+history_root="${RUN_ROOT}/history"
+mkdir -p "${history_root}"
+shopt -s nullglob
+for prev_run in "${RUN_ROOT}"/training_run_*; do
+  if [[ -d "${prev_run}" ]]; then
+    mv "${prev_run}" "${history_root}/$(basename "${prev_run}")"
+  fi
+done
+shopt -u nullglob
+
+RUN_DIR="${RUN_ROOT}/training_run_${timestamp}"
+mkdir -p "${RUN_DIR}/config"
+
+cp "${CONFIG_PATH}" "${RUN_DIR}/config/config.yaml"
+ENVIRONMENT_SRC="${SCRIPT_DIR}/environment.yml"
+if [[ -f "${ENVIRONMENT_SRC}" ]]; then
+  cp "${ENVIRONMENT_SRC}" "${RUN_DIR}/config/environment.yml"
+else
+  echo "Warning: environment.yml not found at ${ENVIRONMENT_SRC}; skipping copy." >&2
+fi
+
+export PYTHONHASHSEED=${PYTHONHASHSEED:-222}
+export PL_SEED_WORKERS=${PL_SEED_WORKERS:-1}
+export TORCH_USE_DETERMINISTIC_ALGORITHMS=${TORCH_USE_DETERMINISTIC_ALGORITHMS:-1}
+export CUBLAS_WORKSPACE_CONFIG=${CUBLAS_WORKSPACE_CONFIG:-:16:8}
 
 cd "${REPO_ROOT}"
 
-python topoqa_train/k_mac_train_topoqa.py ${ARGS}
+python "${SCRIPT_DIR}/model_train_topoqa_cpu.py" --config "${RUN_DIR}/config/config.yaml" --run-dir "${RUN_DIR}" "${PASSTHRU[@]}"
