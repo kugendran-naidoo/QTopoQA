@@ -98,11 +98,11 @@ RUN_DIR="${RUN_ROOT}/training_run_${timestamp}"
 mkdir -p "${RUN_DIR}/config"
 
 cp "${CONFIG_PATH}" "${RUN_DIR}/config/config.yaml"
-ENVIRONMENT_SRC="${SCRIPT_DIR}/environment.yml"
-if [[ -f "${ENVIRONMENT_SRC}" ]]; then
-  cp "${ENVIRONMENT_SRC}" "${RUN_DIR}/config/environment.yml"
+REQUIREMENTS_SRC="${SCRIPT_DIR}/requirements.txt"
+if [[ -f "${REQUIREMENTS_SRC}" ]]; then
+  cp "${REQUIREMENTS_SRC}" "${RUN_DIR}/config/requirements.txt"
 else
-  echo "Warning: environment.yml not found at ${ENVIRONMENT_SRC}; skipping copy." >&2
+  echo "Warning: requirements.txt not found at ${REQUIREMENTS_SRC}; skipping copy." >&2
 fi
 
 export PYTHONHASHSEED=${PYTHONHASHSEED:-222}
