@@ -1,7 +1,7 @@
 # Canonical TopoQA training configuration
 
 # Paths are relative to the repository root unless stated otherwise.
-graph_dir: ../../graph_builder2/output/ARM/broken_z_standard_inference/work/pt_file_data
+graph_dir: ../../graph_builder2/output/ARM/apparent_fixed_z_graph_builder2/graph_data
 train_label_file: ../../../topoqa_train/train.csv
 val_label_file: ../../../topoqa_train/val.csv
 save_dir: ./training_runs
