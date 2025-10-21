@@ -45,6 +45,8 @@ if str(LIB_DIR) not in sys.path:
 from directory_permissions import ensure_tree_readable, ensure_tree_readwrite
 from log_dirs import LogDirectoryInfo, prepare_log_directory
 from parallel_executor import normalise_worker_count
+from pt_writer import DEFAULT_ARR_CUTOFF as PT_DEFAULT_CUTOFF
+from pt_writer import PtGenerationResult, generate_pt_files
 from new_calculate_interface import process_pdb_file
 from new_topological_features import (
     ResidueDescriptor,
@@ -1019,9 +1021,45 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if node_feature_failures:
         logger.warning("Node feature failure count: %d", len(node_feature_failures))
         for model, error in node_feature_failures:
-            logger.warning(" - %s failed with %s", model, error)
+            logger.warning(
+                " - %s failed with %s (see log: %s)",
+                model,
+                error,
+                node_feature_log_paths.get(model),
+            )
     else:
         logger.info("All node feature extractions completed successfully.")
+
+    pt_log_dir = run_log_dir / "pt_logs"
+    pt_log_dir.mkdir(parents=True, exist_ok=True)
+
+    logger.info("Graph (.pt) logs directory: %s", pt_log_dir)
+
+    pt_result: PtGenerationResult = generate_pt_files(
+        interface_dir=interface_dir,
+        topology_dir=topology_dir,
+        node_dir=node_feature_dir,
+        dataset_dir=dataset_dir,
+        output_pt_dir=graph_dir,
+        jobs=worker_count,
+        arr_cutoff=PT_DEFAULT_CUTOFF,
+        log_dir=pt_log_dir,
+        logger=logger,
+    )
+
+    pt_success_count = pt_result.success_count
+    pt_failures = pt_result.failures
+    pt_processed = pt_result.processed
+
+    logger.info("Graph (.pt) processed count: %d", pt_processed)
+    logger.info("Graph (.pt) success count: %d", pt_success_count)
+    logger.info("Graph (.pt) run log: %s", pt_result.run_log)
+    if pt_failures:
+        logger.warning("Graph (.pt) failure count: %d", len(pt_failures))
+        for model, error, log_path in pt_failures:
+            logger.warning(" - %s failed with %s (see log: %s)", model, error, log_path)
+    else:
+        logger.info("All graph (.pt) generations completed successfully.")
 
     summary_lines: List[str] = []
     summary_lines.append("=== Graph Builder 2 Summary ===")
@@ -1066,6 +1104,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         summary_lines.append("  Failure details:")
         for model, error in node_feature_failures:
             log_path = node_feature_log_paths.get(model)
+            summary_lines.append(f"    - {model}: {error} (log: {log_path})")
+    summary_lines.append("")
+
+    summary_lines.append("[Graph (.pt) Files]")
+    summary_lines.append(f"  Processed : {pt_processed}")
+    summary_lines.append(f"  Successes : {pt_success_count}")
+    summary_lines.append(f"  Failures  : {len(pt_failures)}")
+    summary_lines.append(f"  Logs dir  : {pt_log_dir}")
+    summary_lines.append(f"  Run log   : {pt_result.run_log}")
+    if pt_failures:
+        summary_lines.append("  Failure details:")
+        for model, error, log_path in pt_failures:
             summary_lines.append(f"    - {model}: {error} (log: {log_path})")
 
     summary_log_path.write_text("\n".join(summary_lines) + "\n", encoding="utf-8")
