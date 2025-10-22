@@ -13,7 +13,7 @@ batch_size: 16
 learning_rate: 0.005
 num_epochs: 200
 accumulate_grad_batches: 16
-seed: 1337
+seed: 222
 
 # Trainer/runtime options
 precision: 32
