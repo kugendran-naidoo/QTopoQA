@@ -10,10 +10,10 @@ save_dir: ./training_runs
 attention_head: 8
 pooling_type: mean
 batch_size: 16
-learning_rate: 0.005
+learning_rate: 0.003
 num_epochs: 200
 accumulate_grad_batches: 16
-seed: 1337
+seed: 222
 
 # Trainer/runtime options
 precision: 32

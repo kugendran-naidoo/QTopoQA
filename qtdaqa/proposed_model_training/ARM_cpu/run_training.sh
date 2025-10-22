@@ -112,4 +112,8 @@ export CUBLAS_WORKSPACE_CONFIG=${CUBLAS_WORKSPACE_CONFIG:-:16:8}
 
 cd "${REPO_ROOT}"
 
-python "${SCRIPT_DIR}/model_train_topoqa_cpu.py" --config "${RUN_DIR}/config/config.yaml" --run-dir "${RUN_DIR}" "${PASSTHRU[@]}"
+if [[ ${#PASSTHRU[@]} -gt 0 ]]; then
+  python "${SCRIPT_DIR}/model_train_topoqa_cpu.py" --config "${RUN_DIR}/config/config.yaml" --run-dir "${RUN_DIR}" "${PASSTHRU[@]}"
+else
+  python "${SCRIPT_DIR}/model_train_topoqa_cpu.py" --config "${RUN_DIR}/config/config.yaml" --run-dir "${RUN_DIR}"
+fi
