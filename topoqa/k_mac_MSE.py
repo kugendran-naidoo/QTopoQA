@@ -10,4 +10,5 @@ def read_best(path):
 
 print("K trained model ckpt:", read_best("model/topo_best_val_loss=0.14407.ckpt.DETERM"))
 print("TopoQA reference model ckpt:", read_best("model/topoqa.ckpt"))
+print("K new model ckpt:", read_best("../qtdaqa/proposed_model_training/ARM_cpu/training_runs/history/training_run_2025-10-21_20-31-57/model_checkpoints/model.0.05354.chkpt"))
 
