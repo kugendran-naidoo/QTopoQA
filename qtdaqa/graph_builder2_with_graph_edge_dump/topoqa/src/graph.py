@@ -57,6 +57,11 @@ def create_graph(
 
             fea = fea_df[fea_col].values
             edge_tensor = torch.tensor(edge_attr,dtype=torch.float32)
+            edge_index_tensor = torch.LongTensor(edge_index)
+            if edge_index_tensor.numel() == 0:
+                edge_index_tensor = torch.empty((2, 0), dtype=torch.long)
+            else:
+                edge_index_tensor = edge_index_tensor.transpose(1, 0)
 
             if dump_edges and edge_dir_path is not None and edge_file_path is not None:
                 src_idx = [int(pair[0]) for pair in edge_index]
@@ -83,7 +88,7 @@ def create_graph(
                 edge_df.to_csv(edge_file_path, index=False, mode=mode, header=header_needed)
 
             GCNData =DATA.Data(x=torch.tensor(fea,dtype=torch.float32),
-                                        edge_index=torch.LongTensor(edge_index).transpose(1, 0),
+                                        edge_index=edge_index_tensor,
                                         edge_attr=edge_tensor)
             # GCNData.__setitem__('model_name', [dataname+'&'+model_name])
             graph_path = os.path.join(graph_dir,model_name+'.pt')
