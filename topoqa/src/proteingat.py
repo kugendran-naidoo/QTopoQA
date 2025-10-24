@@ -87,6 +87,14 @@ class GNN_edge1_edgepooling(pl.LightningModule):
                 # x = torch.sigmoid(self.lin1(x))
                 return x,edge_attr
             
+            if edge_attr.numel() == 0:
+                edge_attr = torch.zeros(
+                    x.size(0),
+                    self.fc_edge.in_features,
+                    dtype=x.dtype,
+                    device=x.device,
+                )
+
             # x = x.to(protein_fc1.weight.device)
             edge_attr = self.fc_edge(edge_attr)
             x_edge = torch.cat((x,edge_attr),dim=1)
@@ -106,4 +114,3 @@ class GNN_edge1_edgepooling(pl.LightningModule):
 
         return out            
       
-
