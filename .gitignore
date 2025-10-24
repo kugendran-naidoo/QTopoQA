@@ -19,6 +19,8 @@ datasets/training/*
 # keep empty directories although ignored
 qtdaqa/graph_builder/output*
 qtdaqa/graph_builder2/output*
+qtdaqa/graph_builder2_before_edge_dumping/qtdaqa/graph_builder2/output/
+qtdaqa/graph_builder2_with_graph_edge_dump/qtdaqa/graph_builder2/output/
 
 # keep empty directories although ignored
 topoqa_train/graph_data/*
@@ -35,6 +37,7 @@ topoqa_train/graph_data_x86/*
 # ignore generated work artifacts
 **/output/work/
 **/logs/output/
+**/logs_*/output/
 
 # Distribution / packaging
 .Python
