@@ -141,7 +141,12 @@ def get_element_index_dis_atom(mat_re,mat,num,vertice_df_filter,model):
                 arr_index.append([j,i])
     
     # 将 edge_atrr 转换为 numpy 数组
-    edge_atrr = np.array(edge_atrr)
+    edge_atrr = np.array(edge_atrr, dtype=float)
+
+    if edge_atrr.size == 0:
+        # no qualifying edges; return empty feature matrix with the expected width
+        return arr_index, np.empty((0, 11), dtype=float)
+
     # 标准化 edge_atrr
     scaler = MinMaxScaler()
     edge_atrr = scaler.fit_transform(edge_atrr)
