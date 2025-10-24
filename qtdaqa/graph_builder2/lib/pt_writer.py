@@ -113,7 +113,13 @@ def _prepare_staging(task: GraphTask) -> tuple[tempfile.TemporaryDirectory, Path
     return temp_dir, node_dir, interface_dir, topology_dir, pdb_dir
 
 
-def _process_task(task: GraphTask, output_dir: Path, arr_cutoff: Sequence[str]) -> tuple[str, Optional[str]]:
+def _process_task(
+    task: GraphTask,
+    output_dir: Path,
+    arr_cutoff: Sequence[str],
+    dump_edges: bool,
+    edge_dump_dir: Optional[Path],
+) -> tuple[str, Optional[str]]:
     temp_handle: Optional[tempfile.TemporaryDirectory] = None
     try:
         temp_handle, node_dir, interface_dir, topology_dir, pdb_dir = _prepare_staging(task)
@@ -124,6 +130,8 @@ def _process_task(task: GraphTask, output_dir: Path, arr_cutoff: Sequence[str]) 
             list(arr_cutoff),
             str(output_dir),
             str(pdb_dir),
+            dump_edges=dump_edges,
+            edge_dir=str(edge_dump_dir) if (dump_edges and edge_dump_dir is not None) else None,
         )
         return task.model, None
     except Exception as exc:  # pragma: no cover
@@ -143,6 +151,8 @@ def generate_pt_files(
     arr_cutoff: Optional[Sequence[str]] = None,
     log_dir: Optional[Path] = None,
     logger: Optional["logging.Logger"] = None,
+    dump_edges: bool = True,
+    edge_dump_dir: Optional[Path] = None,
 ) -> PtGenerationResult:
     import logging
 
@@ -154,6 +164,9 @@ def generate_pt_files(
     dataset_dir = dataset_dir.resolve()
     output_pt_dir = output_pt_dir.resolve()
     output_pt_dir.mkdir(parents=True, exist_ok=True)
+    if edge_dump_dir is not None:
+        edge_dump_dir = edge_dump_dir.resolve()
+        edge_dump_dir.mkdir(parents=True, exist_ok=True)
 
     if log_dir is None:
         log_dir = Path("pt_logs")
@@ -215,7 +228,7 @@ def generate_pt_files(
     if tasks:
         if jobs <= 1:
             for task in tasks:
-                model, error = _process_task(task, output_pt_dir, arr_cutoff)
+                model, error = _process_task(task, output_pt_dir, arr_cutoff, dump_edges, edge_dump_dir)
                 if error:
                     failures.append((model, error, task.log_path))
                     _write_model_log(task, "FAILURE", error)
@@ -225,7 +238,7 @@ def generate_pt_files(
         else:
             with ThreadPoolExecutor(max_workers=jobs) as executor:
                 future_map = {
-                    executor.submit(_process_task, task, output_pt_dir, arr_cutoff): task
+                    executor.submit(_process_task, task, output_pt_dir, arr_cutoff, dump_edges, edge_dump_dir): task
                     for task in tasks
                 }
                 for future in as_completed(future_map):

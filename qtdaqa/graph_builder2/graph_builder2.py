@@ -34,7 +34,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 from Bio.PDB import PDBParser
-import numpy as np
 
 GRAPH_BUILDER2_DIR = Path(__file__).resolve().parent
 LIB_DIR = GRAPH_BUILDER2_DIR / "lib"
@@ -75,70 +74,6 @@ if str(TOPOQA_SRC) not in sys.path:
     sys.path.insert(0, str(TOPOQA_SRC))
 
 from node_fea_df import node_fea  # type: ignore  # noqa: E402
-
-try:  # type: ignore  # noqa: E402
-    import utils as topoqa_utils
-except ImportError:  # pragma: no cover - should not occur when repo is intact
-    topoqa_utils = None
-else:
-    _ORIGINAL_GET_POINTCLOUD = getattr(topoqa_utils, "get_pointcloud_type", None)
-
-    if callable(_ORIGINAL_GET_POINTCLOUD):
-
-        def _fixed_get_pointcloud_type(
-            descriptor1: str,
-            descriptor2: str,
-            model,
-            e1: str = "all",
-            e2: str = "all",
-        ):
-            """
-            Drop-in replacement for topoqa.src.utils.get_pointcloud_type with
-            corrected z-coordinate handling (original duplicated y-axis).
-            """
-            c_pattern = r"c<([^>]+)>"
-            r_pattern = r"r<([^>]+)>"
-            i_pattern = r"i<([^>]+)>"
-
-            c_match1 = re.search(c_pattern, descriptor1)
-            r_match1 = re.search(r_pattern, descriptor1)
-            i_match1 = re.search(i_pattern, descriptor1)
-            c_match2 = re.search(c_pattern, descriptor2)
-            r_match2 = re.search(r_pattern, descriptor2)
-            i_match2 = re.search(i_pattern, descriptor2)
-
-            c_content1 = c_match1.group(1) if c_match1 else None
-            r_content1 = int(r_match1.group(1)) if r_match1 else None
-            i_content1 = i_match1.group(1) if i_match1 else " "
-            c_content2 = c_match2.group(1) if c_match2 else None
-            r_content2 = int(r_match2.group(1)) if r_match2 else None
-            i_content2 = i_match2.group(1) if i_match2 else " "
-
-            res_id1 = (" ", r_content1, i_content1)
-            res_id2 = (" ", r_content2, i_content2)
-            res1 = model[c_content1][res_id1]
-            res2 = model[c_content2][res_id2]
-
-            def _select_atoms(residue, selector: str):
-                if selector == "all":
-                    atoms = residue.get_atoms()
-                else:
-                    atoms = (atom for atom in residue.get_atoms() if atom.get_name()[0] == selector)
-                return [
-                    [
-                        float(coord[0]),
-                        float(coord[1]),
-                        float(coord[2]),
-                    ]
-                    for atom in atoms
-                    for coord in [atom.get_coord()]
-                ]
-
-            atom_coords1 = np.array(_select_atoms(res1, e1))
-            atom_coords2 = np.array(_select_atoms(res2, e2))
-            return atom_coords1, atom_coords2
-
-        topoqa_utils.get_pointcloud_type = _fixed_get_pointcloud_type
 
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
@@ -697,6 +632,12 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         default=False,
         help="Remove duplicate neighbour coordinates and sort them before topological feature extraction.",
     )
+    parser.add_argument(
+        "--no-dump-graph-edges",
+        action="store_true",
+        default=False,
+        help="Disable writing graph edge feature CSVs (default: edge features are written).",
+    )
 
     return parser.parse_args(list(argv) if argv is not None else None)
 
@@ -735,14 +676,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     raw_args = list(argv) if argv is not None else sys.argv[1:]
     logger.info("CLI raw arguments: %s", raw_args)
+    dump_edges_enabled = not args.no_dump_graph_edges
     logger.info(
-        "CLI parameters: dataset_dir=%s, work_dir=%s, graph_dir=%s, log_dir=%s, jobs=%s, topology_dedup_sort=%s",
+        "CLI parameters: dataset_dir=%s, work_dir=%s, graph_dir=%s, log_dir=%s, jobs=%s, topology_dedup_sort=%s, dump_edges=%s",
         args.dataset_dir,
         args.work_dir,
         args.graph_dir,
         args.log_dir,
         args.jobs,
         args.topology_dedup_sort,
+        dump_edges_enabled,
     )
 
     parallel_cfg = normalise_worker_count(args.jobs, default_workers=4)
@@ -1100,6 +1043,14 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     logger.info("Graph (.pt) logs directory: %s", pt_log_dir)
 
+    edge_feature_dir: Optional[Path] = None
+    if dump_edges_enabled:
+        edge_feature_dir = work_dir / "edge_features"
+        edge_feature_dir.mkdir(parents=True, exist_ok=True)
+        logger.info("Edge feature directory: %s", edge_feature_dir)
+    else:
+        logger.info("Edge feature directory: (disabled)")
+
     pt_result: PtGenerationResult = generate_pt_files(
         interface_dir=interface_dir,
         topology_dir=topology_dir,
@@ -1110,6 +1061,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         arr_cutoff=PT_DEFAULT_CUTOFF,
         log_dir=pt_log_dir,
         logger=logger,
+        dump_edges=dump_edges_enabled,
+        edge_dump_dir=edge_feature_dir,
     )
 
     pt_success_count = pt_result.success_count
@@ -1131,6 +1084,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     summary_lines.append(f"Dataset directory: {dataset_dir}")
     summary_lines.append(f"Work directory: {work_dir}")
     summary_lines.append(f"Graph directory: {graph_dir}")
+    if dump_edges_enabled and edge_feature_dir is not None:
+        summary_lines.append(f"Edge feature directory: {edge_feature_dir}")
+    else:
+        summary_lines.append("Edge feature directory: (not written)")
     summary_lines.append("")
 
     summary_lines.append("[Interface Features]")
