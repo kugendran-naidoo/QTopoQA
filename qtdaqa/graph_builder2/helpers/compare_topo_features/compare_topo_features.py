@@ -81,6 +81,18 @@ def parse_args(argv: Iterable[str]) -> argparse.Namespace:
         default=Path("topo_same_report.txt"),
         help="Write identical file pairs to this file (default: %(default)s)",
     )
+    parser.add_argument(
+        "--missing-report",
+        type=Path,
+        default=Path("topo_missing_report.txt"),
+        help="Write missing file listings to this file (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--run-report",
+        type=Path,
+        default=Path("topo_run.log"),
+        help="Write console output to this log file (default: %(default)s)",
+    )
     return parser.parse_args(list(argv))
 
 
@@ -236,12 +248,24 @@ def main(argv: Iterable[str]) -> int:
     reference_dir = args.reference.resolve()
     candidate_dir = args.candidate.resolve()
 
-    log_path = Path("topo_run.log").resolve()
+    log_path = args.run_report.resolve()
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("a", encoding="utf-8") as log_file:
         def log_print(*objects, **kwargs):
             print(*objects, **kwargs)
             print(*objects, **kwargs, file=log_file)
+
+        log_print("=== compare_topology_features run ===")
+        log_print("CLI parameters:")
+        log_print(f"  baseline_dir: {args.reference}")
+        log_print(f"  candidate_dir: {args.candidate}")
+        log_print(f"  tolerance: {args.tolerance}")
+        log_print(f"  diff_report: {args.diff_report}")
+        log_print(f"  same_report: {args.same_report}")
+        log_print(f"  missing_report: {args.missing_report}")
+        log_print(f"  run_report: {args.run_report}")
+        log_print(f"  Reference root: {reference_dir}")
+        log_print(f"  Candidate root: {candidate_dir}")
 
         if not reference_dir.is_dir():
             log_print(f"Reference directory not found: {reference_dir}", file=sys.stderr)
@@ -256,14 +280,9 @@ def main(argv: Iterable[str]) -> int:
             tolerance=args.tolerance,
         )
 
-        log_print(f"Reference root: {reference_dir}")
-        log_print(f"Candidate root: {candidate_dir}")
-        log_print(f"Tolerance: {args.tolerance}")
-        log_print(f"Shared CSV files: {len(results)}")
-        log_print(f"Missing in candidate: {len(missing_candidate)}")
-        log_print(f"Missing in reference: {len(missing_reference)}")
-
         mismatches = 0
+        different_files = 0
+        identical_files = 0
         diff_lines: List[str] = []
         same_lines: List[str] = []
         for rel_path in missing_candidate:
@@ -273,6 +292,7 @@ def main(argv: Iterable[str]) -> int:
         for result in results:
             if result.error:
                 mismatches += 1
+                different_files += 1
                 diff_lines.append(
                     f"ERROR: {result.relative_path}\n"
                     f"  reference: {result.reference_path}\n"
@@ -281,6 +301,7 @@ def main(argv: Iterable[str]) -> int:
                 )
             elif result.exceeded:
                 mismatches += 1
+                different_files += 1
                 header = (
                     f"DIFFERENT: {result.relative_path}\n"
                     f"  reference: {result.reference_path}\n"
@@ -292,22 +313,24 @@ def main(argv: Iterable[str]) -> int:
                         f"    row={row_id}, column='{column}', diff={diff:.3e}"
                     )
             else:
+                identical_files += 1
                 same_lines.append(
                     f"SAME: {result.relative_path}\n"
                     f"  reference: {result.reference_path}\n"
                     f"  candidate: {result.candidate_path}"
                 )
 
-        log_print(
-            f"Summary: {len(results) - mismatches} files within tolerance, "
-            f"{mismatches} files exceeding tolerance."
-        )
+        log_print(f"Shared files compared: {len(results)}")
+        log_print(f"  Identical files:     {identical_files}")
+        log_print(f"  Different files:     {different_files}")
+        log_print(f"Missing in candidate:  {len(missing_candidate)}")
+        log_print(f"Missing in baseline:   {len(missing_reference)}")
 
         if diff_lines:
             diff_path = args.diff_report.resolve()
             diff_path.parent.mkdir(parents=True, exist_ok=True)
             diff_path.write_text("\n".join(diff_lines) + "\n", encoding="utf-8")
-            log_print(f"Detailed difference report written to {diff_path}")
+            log_print(f"Detailed differences written to {args.diff_report}")
         else:
             log_print("No differences detected; no diff report written.")
 
@@ -315,9 +338,26 @@ def main(argv: Iterable[str]) -> int:
             same_path = args.same_report.resolve()
             same_path.parent.mkdir(parents=True, exist_ok=True)
             same_path.write_text("\n".join(same_lines) + "\n", encoding="utf-8")
-            log_print(f"Identical file pairs written to {same_path}")
+            log_print(f"Identical file pairs written to {args.same_report}")
         else:
             log_print("No identical file pairs recorded; no same report written.")
+
+        missing_lines: List[str] = []
+        if missing_candidate:
+            missing_lines.append("Missing in candidate:")
+            missing_lines.extend([f"  {reference_dir / rel_path}" for rel_path in missing_candidate])
+        if missing_reference:
+            missing_lines.append("Missing in baseline:")
+            missing_lines.extend([f"  {candidate_dir / rel_path}" for rel_path in missing_reference])
+        if missing_lines:
+            missing_path = args.missing_report.resolve()
+            missing_path.parent.mkdir(parents=True, exist_ok=True)
+            missing_path.write_text("\n".join(missing_lines) + "\n", encoding="utf-8")
+            log_print(f"Missing files written to {args.missing_report}")
+        else:
+            log_print("No missing files detected; no missing report written.")
+
+        log_print(f"Run log written to {args.run_report}")
 
         return 0 if mismatches == 0 and not missing_candidate and not missing_reference else 1
 
