@@ -39,7 +39,8 @@ def create_graph(
         structure = parser.get_structure("protein",pdb_file)
         model=structure[0]
 
-        edge_dir_path: Path | None = None
+        edge_dir_path: Optional[Path] = None
+        edge_file_path: Optional[Path] = None
         if dump_edges and edge_dir is not None:
             edge_dir_path = Path(edge_dir)
             edge_dir_path.mkdir(parents=True, exist_ok=True)
@@ -54,18 +55,27 @@ def create_graph(
             dis,dis_real=inter_chain_dis.Calculate_distance(vertice_df_filter,curr_cutoff)
             edge_index,edge_attr=get_element_index_dis_atom(dis_real,dis,1.0,vertice_df_filter,model)
 
-            if dump_edges and edge_dir_path is not None:
-                src_idx = [pair[0] for pair in edge_index]
-                dst_idx = [pair[1] for pair in edge_index]
-                src_id = [vertex_ids[idx] if idx < len(vertex_ids) else "" for idx in src_idx]
-                dst_id = [vertex_ids[idx] if idx < len(vertex_ids) else "" for idx in dst_idx]
-                raw_distance = [float(dis_real[src][dst]) for src, dst in edge_index] if len(edge_index) else []
-                num_features = edge_attr.shape[1] if edge_attr.size else 0
-                feature_cols = [f"edge_attr_{k:02d}" for k in range(num_features)]
-                if num_features > 0:
-                    edge_df = pd.DataFrame(edge_attr, columns=feature_cols)
+            fea = fea_df[fea_col].values
+            edge_tensor = torch.tensor(edge_attr,dtype=torch.float32)
+            edge_index_tensor = torch.LongTensor(edge_index)
+            if edge_index_tensor.numel() == 0:
+                edge_index_tensor = torch.empty((2, 0), dtype=torch.long)
+            else:
+                edge_index_tensor = edge_index_tensor.transpose(1, 0)
+
+            if dump_edges and edge_dir_path is not None and edge_file_path is not None:
+                src_idx = [int(pair[0]) for pair in edge_index]
+                dst_idx = [int(pair[1]) for pair in edge_index]
+                src_id = [vertex_ids[idx] if 0 <= idx < len(vertex_ids) else "" for idx in src_idx]
+                dst_id = [vertex_ids[idx] if 0 <= idx < len(vertex_ids) else "" for idx in dst_idx]
+                row_count = len(src_idx)
+                if row_count and edge_tensor.dim() == 2 and edge_tensor.size(0) == row_count and edge_tensor.size(1) > 0:
+                    feature_cols = [f"edge_attr_{k:02d}" for k in range(edge_tensor.size(1))]
+                    feature_array = edge_tensor.detach().cpu().numpy().copy()
+                    edge_df = pd.DataFrame(feature_array, columns=feature_cols)
                 else:
-                    edge_df = pd.DataFrame(columns=feature_cols)
+                    edge_df = pd.DataFrame(index=range(row_count))
+                raw_distance = [float(dis_real[src][dst]) for src, dst in zip(src_idx, dst_idx)]
                 edge_df.insert(0, "distance_raw", raw_distance)
                 edge_df.insert(0, "dst_id", dst_id)
                 edge_df.insert(0, "dst_idx", dst_idx)
@@ -73,16 +83,13 @@ def create_graph(
                 edge_df.insert(0, "src_idx", src_idx)
                 edge_df.insert(0, "cutoff", List_cutoff[i])
                 edge_df.insert(0, "model", model_name)
-                edge_file_path = edge_dir_path / f"{model_name}.edges.csv"
-                header = not edge_file_path.exists()
-                mode = "w" if header else "a"
-                edge_df.to_csv(edge_file_path, index=False, mode=mode, header=header)
-
-            fea = fea_df[fea_col].values
+                header_needed = not edge_file_path.exists()
+                mode = "w" if header_needed else "a"
+                edge_df.to_csv(edge_file_path, index=False, mode=mode, header=header_needed)
 
             GCNData =DATA.Data(x=torch.tensor(fea,dtype=torch.float32),
-                                        edge_index=torch.LongTensor(edge_index).transpose(1, 0),
-                                        edge_attr=torch.tensor(edge_attr,dtype=torch.float32))
+                                        edge_index=edge_index_tensor,
+                                        edge_attr=edge_tensor)
             # GCNData.__setitem__('model_name', [dataname+'&'+model_name])
             graph_path = os.path.join(graph_dir,model_name+'.pt')
             torch.save(GCNData,graph_path)
