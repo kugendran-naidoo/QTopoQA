@@ -78,9 +78,9 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> tuple[argparse.Namespace
     parser = HelpOnErrorArgumentParser(
         description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
-    parser.add_argument("--pt-file-dir1", type=Path, required=True,
+    parser.add_argument("baseline_dir", type=Path, metavar="baseline_dir",
                         help="Directory containing baseline .pt files. (required)")
-    parser.add_argument("--pt-file-dir2", type=Path, required=True,
+    parser.add_argument("candidate_dir", type=Path, metavar="candidate_dir",
                         help="Directory containing candidate .pt files. (required)")
     parser.add_argument("--abs-tolerance", type=float, default=DEFAULT_ABS_TOL,
                         help="Absolute tolerance for numeric comparison (default: %(default)s)")
@@ -91,9 +91,9 @@ def parse_args(argv: Optional[Iterable[str]] = None) -> tuple[argparse.Namespace
     parser.add_argument("--same-report", type=Path, default=Path("pt_file_compare_same_report.txt"),
                         help="Path to write identical pair report (default: %(default)s)")
     parser.add_argument("--no-flatten-dir1", action="store_true",
-                        help="Do not search recursively in pt_file_dir1.")
+                        help="Do not search recursively in baseline_dir.")
     parser.add_argument("--no-flatten-dir2", action="store_true",
-                        help="Do not search recursively in pt_file_dir2.")
+                        help="Do not search recursively in candidate_dir.")
     parser.add_argument("--order-agnostic", action="store_true",
                         help="Treat tensors as order-independent (ignores row/edge ordering).")
     args = parser.parse_args(list(argv) if argv is not None else None)
@@ -251,8 +251,8 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     RUN_LOG.parent.mkdir(parents=True, exist_ok=True)
     FAIL_LOG.parent.mkdir(parents=True, exist_ok=True)
 
-    pt_dir1 = args.pt_file_dir1.resolve()
-    pt_dir2 = args.pt_file_dir2.resolve()
+    pt_dir1 = args.baseline_dir.resolve()
+    pt_dir2 = args.candidate_dir.resolve()
 
     report_path = args.report.resolve()
     same_path = args.same_report.resolve()
@@ -274,11 +274,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         flatten2 = not args.no_flatten_dir2
 
         if not pt_dir1.is_dir():
-            log(f"Error: pt_file_dir1 does not exist: {pt_dir1}")
+            log(f"Error: baseline_dir does not exist: {pt_dir1}")
             fail_handle.write(f"Missing directory: {pt_dir1}\n")
             return 2
         if not pt_dir2.is_dir():
-            log(f"Error: pt_file_dir2 does not exist: {pt_dir2}")
+            log(f"Error: candidate_dir does not exist: {pt_dir2}")
             fail_handle.write(f"Missing directory: {pt_dir2}\n")
             return 2
 
@@ -362,14 +362,14 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
         if diff_report:
             report_path.parent.mkdir(parents=True, exist_ok=True)
             report_path.write_text("\n\n".join(diff_report) + "\n", encoding="utf-8")
-            log(f"Detailed differences written to {report_path}")
+            log(f"Detailed differences written to {report_path.name}")
         else:
             log("No differences detected; no report written.")
 
         if same_report:
             same_path.parent.mkdir(parents=True, exist_ok=True)
             same_path.write_text("\n".join(same_report) + "\n", encoding="utf-8")
-            log(f"Identical file pairs written to {same_path}")
+            log(f"Identical file pairs written to {same_path.name}")
         else:
             log("No identical file pairs recorded; no same-report written.")
 
