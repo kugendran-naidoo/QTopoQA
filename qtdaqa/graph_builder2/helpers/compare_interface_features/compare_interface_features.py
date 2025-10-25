@@ -43,14 +43,14 @@ def parse_args() -> argparse.Namespace:
         description="Compare interface output files between two directories."
     )
     parser.add_argument(
-        "interface_1",
+        "baseline_dir",
         type=Path,
-        help="Directory containing the first set of interface outputs",
+        help="Directory containing the baseline interface outputs",
     )
     parser.add_argument(
-        "interface_2",
+        "candidate_dir",
         type=Path,
-        help="Directory containing the second set of interface outputs",
+        help="Directory containing the candidate interface outputs",
     )
     parser.add_argument(
         "--report",
@@ -169,10 +169,30 @@ def compare_files(
     tolerance: float,
     rel_tolerance: float,
 ) -> tuple[bool, List[str]]:
-    baseline_entries = load_interface_file(baseline_path)
-    candidate_entries = load_interface_file(candidate_path)
+    baseline_entries: Dict[str, List[float]] | None = None
+    candidate_entries: Dict[str, List[float]] | None = None
+    baseline_error: ValueError | None = None
+    candidate_error: ValueError | None = None
+
+    try:
+        baseline_entries = load_interface_file(baseline_path)
+    except ValueError as exc:
+        baseline_error = exc
+
+    try:
+        candidate_entries = load_interface_file(candidate_path)
+    except ValueError as exc:
+        candidate_error = exc
 
     diffs: List[str] = []
+
+    if baseline_error or candidate_error:
+        if baseline_error:
+            diffs.append(f"  Malformed baseline file ({baseline_path}): {baseline_error}")
+        if candidate_error:
+            diffs.append(f"  Malformed candidate file ({candidate_path}): {candidate_error}")
+        return False, diffs
+
     is_same = True
     all_keys = set(baseline_entries) | set(candidate_entries)
 
@@ -208,8 +228,8 @@ def _run() -> int:
     print("CLI parameters:")
     for key, value in sorted(vars(args).items()):
         print(f"  {key}: {value}")
-    baseline_dir = args.interface_1.resolve()
-    candidate_dir = args.interface_2.resolve()
+    baseline_dir = args.baseline_dir.resolve()
+    candidate_dir = args.candidate_dir.resolve()
 
     if not baseline_dir.is_dir():
         print(f"Error: baseline directory does not exist: {baseline_dir}")
@@ -292,7 +312,7 @@ def _run() -> int:
         report_path = args.report.resolve()
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text("\n\n".join(differences_report) + "\n", encoding="utf-8")
-        print(f"Detailed differences written to {report_path}")
+        print(f"Detailed differences written to {report_path.name}")
     else:
         print("No differences detected; no report written.")
 
@@ -300,7 +320,7 @@ def _run() -> int:
         same_path = args.same_report.resolve()
         same_path.parent.mkdir(parents=True, exist_ok=True)
         same_path.write_text("\n".join(same_report) + "\n", encoding="utf-8")
-        print(f"Identical file pairs written to {same_path}")
+        print(f"Identical file pairs written to {same_path.name}")
     else:
         print("No identical file pairs recorded; no same-report written.")
 
