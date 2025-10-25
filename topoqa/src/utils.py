@@ -83,20 +83,18 @@ def get_pointcloud_type(descriptor1,descriptor2,model,e1,e2):
     res2=model[c_content2][res_id2]
 
     ####atom coord
-    if e1=='all':
-        atom_coords1 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[2])] for atom in res1.get_atoms()]
-    else:
-        atom_coords1 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[2])] for atom in res1.get_atoms() if atom.get_name()[0]==e1]
-    atom_coords1 = np.array(atom_coords1)
-    if e2=='all':
-        atom_coords2 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[2])] for atom in res2.get_atoms()]
-    else:    
-        atom_coords2 = [[float(atom.get_coord()[0]),float(atom.get_coord()[1]),
-                                   float(atom.get_coord()[2])] for atom in res2.get_atoms() if atom.get_name()[0]==e2]
-    atom_coords2 = np.array(atom_coords2)
+    def _iter_atoms(residue, selector):
+        atoms = residue.get_atoms()
+        if selector != 'all':
+            atoms = (atom for atom in atoms if atom.get_name()[0] == selector)
+        return [
+            [float(coord[0]), float(coord[1]), float(coord[2])]
+            for atom in atoms
+            for coord in [atom.get_coord()]
+        ]
+
+    atom_coords1 = np.array(_iter_atoms(res1, e1))
+    atom_coords2 = np.array(_iter_atoms(res2, e2))
     # print(atom_coords1)
     # print(atom_coords2)
     return atom_coords1,atom_coords2
@@ -143,7 +141,12 @@ def get_element_index_dis_atom(mat_re,mat,num,vertice_df_filter,model):
                 arr_index.append([j,i])
     
     # 将 edge_atrr 转换为 numpy 数组
-    edge_atrr = np.array(edge_atrr)
+    edge_atrr = np.array(edge_atrr, dtype=float)
+
+    if edge_atrr.size == 0:
+        # no qualifying edges; return empty feature matrix with the expected width
+        return arr_index, np.empty((0, 11), dtype=float)
+
     # 标准化 edge_atrr
     scaler = MinMaxScaler()
     edge_atrr = scaler.fit_transform(edge_atrr)
