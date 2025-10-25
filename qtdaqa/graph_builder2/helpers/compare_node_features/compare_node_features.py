@@ -105,6 +105,15 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def _format_path_for_display(path: Path) -> str:
+    """Return a shorter, human-friendly representation of a path."""
+    try:
+        return str(path.relative_to(Path.cwd()))
+    except ValueError:
+        # Fall back to filename for off-tree locations to keep output concise.
+        return path.name or str(path)
+
+
 def _normalise_name(name: str) -> str:
     stem = Path(name).stem
     lower = stem.lower()
@@ -284,7 +293,7 @@ def _run() -> int:
         report_path = args.report.resolve()
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text("\n\n".join(differences_report) + "\n", encoding="utf-8")
-        print(f"Detailed differences written to {report_path}")
+        print(f"Detailed differences written to {_format_path_for_display(report_path)}")
     else:
         print("No differences detected; no report written.")
 
@@ -292,7 +301,7 @@ def _run() -> int:
         same_path = args.same_report.resolve()
         same_path.parent.mkdir(parents=True, exist_ok=True)
         same_path.write_text("\n".join(same_report) + "\n", encoding="utf-8")
-        print(f"Identical file pairs written to {same_path}")
+        print(f"Identical file pairs written to {_format_path_for_display(same_path)}")
     else:
         print("No identical file pairs recorded; no same-report written.")
 
