@@ -13,7 +13,7 @@ export OMP_NUM_THREADS=8
 export MKL_NUM_THREADS=1
 
 python k_mac_train_topoqa.py \
-    --graph_dir graph_data \
+    --graph_dir  ../qtdaqa/graph_builder2/output/ARM/edges_dumped_fixed_z_edge_bug/graph_data \
     --train_label_file train.csv \
     --val_label_file val.csv \
     --attention_head 8 \
@@ -21,6 +21,6 @@ python k_mac_train_topoqa.py \
     --batch_size 16 \
     --learning_rate 0.005 \
     --num_epochs 200 \
-    --accumulate_grad_batches 32 \
+    --accumulate_grad_batches 16 \
     --seed 222 \
     --save_dir "./experiments"
