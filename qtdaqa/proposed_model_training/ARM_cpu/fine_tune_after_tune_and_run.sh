@@ -1,1 +1,0 @@
-./run_training.sh -c configs/sched_boost_finetune.yaml -- --resume-from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/proposed_model_training/ARM_cpu/training_runs/history/training_run_2025-10-21_23-52-10/model_checkpoints/model.0.05257.chkpt
