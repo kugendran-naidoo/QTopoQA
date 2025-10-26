@@ -4,7 +4,7 @@ attention_head: 8
 batch_size: 16
 devices: 1
 early_stopping_patience: 45
-graph_dir: ../../graph_builder2_with_graph_edge_dump/qtdaqa/graph_builder2/output/edge_dumping_fixed_z_bug_edge_bug/graph_data
+graph_dir: ../../graph_builder2/output/ARM/edges_dumped_fixed_z_edge_bug/graph_data
 learning_rate: 0.0035
 lr_scheduler_factor: 0.2
 lr_scheduler_patience: 6

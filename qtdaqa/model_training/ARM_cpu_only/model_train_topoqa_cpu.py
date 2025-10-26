@@ -345,6 +345,23 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Log learning rate each epoch via callbacks.",
     )
+    parser.add_argument(
+        "--trial-label",
+        type=str,
+        default=None,
+        help="Optional identifier provided by run_training.sh for logging.",
+    )
+    parser.add_argument(
+        "--git-commit",
+        type=str,
+        default=None,
+        help="Git commit hash recorded by the launcher.",
+    )
+    parser.add_argument(
+        "--git-dirty",
+        action="store_true",
+        help="Flag indicating the repository had uncommitted changes.",
+    )
     return parser.parse_args()
 
 
@@ -366,6 +383,13 @@ def main() -> int:
     cfg.log_lr = bool(args.log_lr)
 
     logger = _setup_logging(cfg.save_dir)
+
+    if args.trial_label:
+        logger.info("trial = %s", args.trial_label)
+    if args.git_commit or args.git_dirty:
+        commit = args.git_commit or "unknown"
+        status = "dirty" if args.git_dirty else "clean"
+        logger.info("git_commit = %s (%s)", commit, status)
 
     logger.info("Repository root: %s", REPO_ROOT)
     logger.info("Configuration loaded from %s", config_path)

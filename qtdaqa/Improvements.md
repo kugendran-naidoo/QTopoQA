@@ -111,3 +111,20 @@ Once a complete graph set exists, monitor the saved CSV logs in qtdaqa/proposed_
 Shuffling means the training loader presents samples in a different random order each epoch instead of the fixed order they’re stored in. It’s useful because it breaks correlations between consecutive samples, gives each batch a more representative mix of the data distribution, and helps gradient-based training converge more smoothly.
 The newer pipeline enables this for training: build_dataloaders constructs DataLoader(..., shuffle=True, ...) for the train split so batches are reshuffled every epoch, while the validation loader stays deterministic (shuffle=False). See qtdaqa/proposed_model_training/ARM_cpu/model_train_topoqa_cpu.py:214-244.
 The legacy GPU script never shuffled—its get_loader helper created both train and validation loaders with shuffle=False, so every epoch saw the graphs in the same order (topoqa_train/train_topoqa.py:95-110).
+
+Give a high level summary of why code base 2 beats code base 1 in a table. What are the lessons to take away from this that are critical to apply for training GNN's or NN's and rank them from highest to lowest in terms of impact as to why code base 2 beats 1. Give an estimate percentage contribution to the overall results for each lesson or reason
+
+
+Rank	Lever / Lesson	Code Base 1 (topoqa_train)	Code Base 2 (ARM_cpu_only)	Estimated Contribution to MSE Gap
+1	Evidence-driven learning-rate scheduling	Fixed LR from optimizer; no scheduler or LR logging.	Adds ReduceLROnPlateau tied to val_loss, plus staged configs that lower LR for fine-tuning.	~45%
+2	Early stopping + checkpoint-driven fine-tunes	Runs full 200 epochs regardless of validation; single pass from scratch.	Uses patience-based early stopping and repeatedly resumes the best checkpoint for low-LR refinement (Phase 1/2 scripts).	~30%
+3	Data-loader discipline & coverage checks	Deterministic ordering, no shuffle, silent on missing graphs.	Shuffles train batches every epoch, validates graph coverage, seeds workers via Lightning utilities.	~15%
+4	Experiment orchestration & logging	One ad-hoc shell command, minimal logging/checkpoint hygiene.	run_training.sh snapshots configs/git state, keeps console logs, manages history, enabling controlled multi-trial sweeps.	~10%
+Percentages are heuristic but reflect the observed jump from MSE ≈ 0.14 to ≈ 0.048 when the scheduler/early-stop/fine-tune stack came online.
+
+Takeaways for GNN/NN Training
+
+Prioritise adaptive LR schedules and LR-aware fine-tuning—most of the dramatic improvement came from letting LR respond to validation feedback.
+Protect the best checkpoint with early stopping and resume-based fine-tuning rather than running fixed-length epochs.
+Keep data loaders stochastic and auditable; shuffled batches and coverage checks guard against hidden bias.
+Treat experiment management as infrastructure: reproducible configs, logs, and checkpoints make it possible to iterate until the model converges.
