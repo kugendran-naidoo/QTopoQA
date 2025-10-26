@@ -100,7 +100,7 @@ EOF
   if [[ "$trial" == "sched_boost_finetune" ]]; then
     echo "=== ${trial}: configure manually (resume-from required) ==="
     echo "Config written to ${cfg}. Run fine-tune via:"
-    echo "  ./run_training.sh -c ${cfg} -- --resume-from <best-checkpoint>"
+    echo "  ./run_training.sh --trial \"${trial}\" -c \"${cfg}\" -- --resume-from <best-checkpoint>"
     continue
   fi
 
@@ -111,7 +111,8 @@ EOF
 seed: ${seed}
 EOF
 )"
+    trial_label="${trial}_seed${seed}"
     echo "=== Running ${trial} with seed ${seed} ==="
-    ./run_training.sh -c "$cfg_seed"
+    ./run_training.sh --trial "${trial_label}" -c "$cfg_seed"
   done
 done
