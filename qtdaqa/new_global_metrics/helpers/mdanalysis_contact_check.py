@@ -46,7 +46,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         description="Recompute inter-chain heavy-atom contacts using MDAnalysis.",
     )
     parser.add_argument("--dataset-dir", type=Path, required=True, help="Directory containing PDB decoys")
-    parser.add_argument("--output-csv", type=Path, default=Path("mdanalysis_contact_counts.csv"))
+    parser.add_argument("--output-csv", type=Path, default=Path("contact_counts.csv"))
     parser.add_argument("--contact-cutoff", type=float, default=DEFAULT_CONTACT_CUTOFF, help="Heavy-atom cutoff distance (Å)")
     parser.add_argument(
         "--limit",

@@ -250,7 +250,20 @@ class InterfaceContactCountFeature(MetricFeature):
         return {"interface_contact_count": float(summary.atom_contact_count)}
 
 
-FEATURES: Tuple[MetricFeature, ...] = (InterfaceContactCountFeature(),)
+class InterfaceResidueCountFeature(MetricFeature):
+    name = "interface_residue_count"
+    cli_name = "interface-residue-count"
+    columns = ("interface_residue_count",)
+
+    def compute(self, context: ModelContext) -> Mapping[str, float]:
+        summary = context.get_contact_summary()
+        return {"interface_residue_count": float(len(summary.residues))}
+
+
+FEATURES: Tuple[MetricFeature, ...] = (
+    InterfaceContactCountFeature(),
+    InterfaceResidueCountFeature(),
+)
 
 
 class GlobalMetricsRunner:
@@ -268,6 +281,12 @@ class GlobalMetricsRunner:
 
         if self.config.jobs > 1:
             self.logger.info("Parallel execution not yet implemented; running sequentially with 1 worker")
+
+        feature_names = {feature.name for feature in self.features}
+        if "interface_contact_count" in feature_names:
+            self.logger.info("Starting interface_contact_count feature computation")
+        if "interface_residue_count" in feature_names:
+            self.logger.info("Starting interface_residue_count feature computation")
 
         _ensure_dir(self.config.work_dir)
         rows: List[Dict[str, float]] = []
