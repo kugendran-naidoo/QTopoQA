@@ -18,6 +18,7 @@ datasets/training/*
 
 # keep empty directories although ignored
 qtdaqa/graph_builder/output*
+qtdaqa/new_graph_builder/output*
 qtdaqa/graph_builder2/output*
 qtdaqa/graph_builder2_before_edge_dumping/qtdaqa/graph_builder2/output/
 qtdaqa/graph_builder2_with_graph_edge_dump/qtdaqa/graph_builder2/output/
