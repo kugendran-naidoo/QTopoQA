@@ -115,6 +115,24 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
         assert seq_short >= 0.0
         assert seq_count >= 0.0
         assert seq_total >= 0.0
+        prov_token_count = float(row["model_provenance_token_count"])
+        prov_digit_frac = float(row["model_provenance_digit_token_fraction"])
+        prov_alpha_frac = float(row["model_provenance_alpha_token_fraction"])
+        prov_numeric_suffix = float(row["model_provenance_numeric_suffix"])
+        prov_contains_af2 = float(row["model_provenance_contains_af2"])
+        prov_parent_match = float(row["model_provenance_parent_match_flag"])
+        prov_variant = float(row["model_provenance_variant_flag"])
+        prov_entropy = float(row["model_provenance_token_entropy"])
+        prov_hash = float(row["model_provenance_hash"])
+        assert prov_token_count >= 1.0
+        assert 0.0 <= prov_digit_frac <= 1.0
+        assert 0.0 <= prov_alpha_frac <= 1.0
+        assert prov_numeric_suffix >= 0.0
+        assert prov_contains_af2 in (0.0, 1.0)
+        assert prov_parent_match in (0.0, 1.0)
+        assert prov_variant in (0.0, 1.0)
+        assert prov_entropy >= -1e-6
+        assert 0.0 <= prov_hash <= 1.0
         if HAS_MDANALYSIS:
             sasa_value = float(row["interface_buried_sasa"])
             assert sasa_value >= 0.0
@@ -170,6 +188,15 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
     assert "sequence_n_short_le_0p5med" in reader.fieldnames
     assert "sequence_chain_count" in reader.fieldnames
     assert "sequence_total_length" in reader.fieldnames
+    assert "model_provenance_token_count" in reader.fieldnames
+    assert "model_provenance_digit_token_fraction" in reader.fieldnames
+    assert "model_provenance_alpha_token_fraction" in reader.fieldnames
+    assert "model_provenance_numeric_suffix" in reader.fieldnames
+    assert "model_provenance_contains_af2" in reader.fieldnames
+    assert "model_provenance_parent_match_flag" in reader.fieldnames
+    assert "model_provenance_variant_flag" in reader.fieldnames
+    assert "model_provenance_token_entropy" in reader.fieldnames
+    assert "model_provenance_hash" in reader.fieldnames
 
     if HAS_MDANALYSIS:
         # Re-run skipping buried SASA to ensure CLI toggle works.
@@ -305,5 +332,46 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
         "sequence_n_short_le_0p5med",
         "sequence_chain_count",
         "sequence_total_length",
+    ]:
+        assert column not in reader.fieldnames
+
+    # Re-run skipping provenance to ensure CLI toggle works.
+    prov_skip_args = [
+        "--dataset-dir",
+        str(dataset_dir),
+        "--work-dir",
+        str(work_dir),
+        "--graph-dir",
+        str(graph_dir),
+        "--log-dir",
+        str(log_dir),
+        "--output-csv",
+        "metrics_no_provenance.csv",
+        "--no-model-provenance",
+    ]
+    if not HAS_MDANALYSIS:
+        prov_skip_args.append("--no-buried-sasa")
+
+    exit_code = global_metrics.main(prov_skip_args)
+    assert exit_code == 0
+
+    no_prov_csv = work_dir / "metrics_no_provenance.csv"
+    assert no_prov_csv.is_file()
+
+    with no_prov_csv.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+
+    assert rows, "Expected metrics rows when provenance disabled"
+    for column in [
+        "model_provenance_token_count",
+        "model_provenance_digit_token_fraction",
+        "model_provenance_alpha_token_fraction",
+        "model_provenance_numeric_suffix",
+        "model_provenance_contains_af2",
+        "model_provenance_parent_match_flag",
+        "model_provenance_variant_flag",
+        "model_provenance_token_entropy",
+        "model_provenance_hash",
     ]:
         assert column not in reader.fieldnames

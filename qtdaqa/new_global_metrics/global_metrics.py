@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import logging
 import statistics
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 import tempfile
+import re
 from typing import Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Set, Tuple
 
 import math
@@ -626,6 +628,50 @@ def _compute_chain_length_features(structure: Structure) -> Dict[str, float]:
     return feats
 
 
+def _tokenize_stem(stem: str) -> List[str]:
+    tokens = [tok for tok in re.split(r"[_\\-]+", stem.lower()) if tok]
+    if not tokens:
+        tokens = [stem.lower()]
+    return tokens
+
+
+def _compute_provenance_features(pdb_path: Path) -> Dict[str, float]:
+    stem = pdb_path.stem
+    tokens = _tokenize_stem(stem)
+    token_count = max(1, len(tokens))
+
+    digit_tokens = sum(tok.isdigit() for tok in tokens)
+    alpha_tokens = sum(tok.isalpha() for tok in tokens)
+    digit_fraction = digit_tokens / token_count
+    alpha_fraction = alpha_tokens / token_count
+
+    numeric_suffix_match = re.search(r"(\d+)$", stem)
+    numeric_suffix = float(numeric_suffix_match.group(1)) if numeric_suffix_match else 0.0
+
+    contains_af2 = float(any("af2" in tok for tok in tokens))
+    parent_name = pdb_path.parent.name.lower()
+    parent_match_flag = float(tokens[0] == parent_name if tokens else 0.0)
+    variant_flag = float(any(re.match(r"[pu]\d+$", tok) for tok in tokens))
+
+    _, _, freq = np.unique(tokens, return_inverse=True, return_counts=True)
+    probabilities = freq / token_count
+    entropy = float(max(0.0, -np.sum(probabilities * np.log(probabilities + EPSILON))))
+
+    hash_value = int(hashlib.sha1(stem.encode("utf-8")).hexdigest()[:8], 16) / 0xFFFFFFFF
+
+    return {
+        "model_provenance_token_count": float(token_count),
+        "model_provenance_digit_token_fraction": float(digit_fraction),
+        "model_provenance_alpha_token_fraction": float(alpha_fraction),
+        "model_provenance_numeric_suffix": numeric_suffix,
+        "model_provenance_contains_af2": contains_af2,
+        "model_provenance_parent_match_flag": parent_match_flag,
+        "model_provenance_variant_flag": variant_flag,
+        "model_provenance_token_entropy": entropy,
+        "model_provenance_hash": float(hash_value),
+    }
+
+
 @dataclass
 class ModelContext:
     pdb_path: Path
@@ -636,6 +682,7 @@ class ModelContext:
     _centroid_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
     _chain_rg_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
     _chain_length_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
+    _provenance_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
 
     def get_contact_summary(self) -> ContactSummary:
         if self._contact_summary is None:
@@ -661,6 +708,11 @@ class ModelContext:
         if self._chain_length_stats is None:
             self._chain_length_stats = _compute_chain_length_features(self.structure)
         return self._chain_length_stats
+
+    def get_provenance_stats(self) -> Dict[str, float]:
+        if self._provenance_stats is None:
+            self._provenance_stats = _compute_provenance_features(self.pdb_path)
+        return self._provenance_stats
 
 
 @dataclass(frozen=True)
@@ -762,6 +814,25 @@ class SequenceLengthRatioFeature(MetricFeature):
         return context.get_chain_length_stats()
 
 
+class ModelProvenanceFeature(MetricFeature):
+    name = "model_provenance"
+    cli_name = "model-provenance"
+    columns = (
+        "model_provenance_token_count",
+        "model_provenance_digit_token_fraction",
+        "model_provenance_alpha_token_fraction",
+        "model_provenance_numeric_suffix",
+        "model_provenance_contains_af2",
+        "model_provenance_parent_match_flag",
+        "model_provenance_variant_flag",
+        "model_provenance_token_entropy",
+        "model_provenance_hash",
+    )
+
+    def compute(self, context: ModelContext) -> Mapping[str, float]:
+        return context.get_provenance_stats()
+
+
 FEATURES: Tuple[MetricFeature, ...] = (
     InterfaceContactCountFeature(),
     InterfaceResidueCountFeature(),
@@ -769,6 +840,7 @@ FEATURES: Tuple[MetricFeature, ...] = (
     InterfaceCentroidDistanceFeature(),
     ChainRadiusOfGyrationFeature(),
     SequenceLengthRatioFeature(),
+    ModelProvenanceFeature(),
 )
 
 
@@ -801,6 +873,8 @@ class GlobalMetricsRunner:
             self.logger.info("Starting chain_radius_of_gyration feature computation")
         if "sequence_length_ratio" in feature_names:
             self.logger.info("Starting sequence_length_ratio feature computation")
+        if "model_provenance" in feature_names:
+            self.logger.info("Starting model_provenance feature computation")
 
         _ensure_dir(self.config.work_dir)
         rows: List[Dict[str, float]] = []
