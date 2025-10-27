@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import json
 import logging
 import os
 import random
@@ -189,11 +190,14 @@ class CpuTopoQAModule(GNN_edge1_edgepooling):
         pooling_type: str,
         lr_scheduler_factor: float,
         lr_scheduler_patience: int,
+        edge_schema: Optional[Dict[str, object]] = None,
+        feature_metadata: Optional[Dict[str, object]] = None,
         **kwargs,
     ):
-        super().__init__(init_lr=lr, pooling_type=pooling_type, mode="zuhe", **kwargs)
+        super().__init__(init_lr=lr, pooling_type=pooling_type, mode="zuhe", edge_schema=edge_schema, **kwargs)
         self.lr_scheduler_factor = lr_scheduler_factor
         self.lr_scheduler_patience = lr_scheduler_patience
+        self.feature_metadata = feature_metadata or {}
 
     def configure_optimizers(self):
         optimizer = super().configure_optimizers()
@@ -210,6 +214,12 @@ class CpuTopoQAModule(GNN_edge1_edgepooling):
                 "monitor": "val_loss",
             },
         }
+
+    def on_save_checkpoint(self, checkpoint: Dict[str, object]) -> None:
+        checkpoint["feature_metadata"] = self.feature_metadata
+
+    def on_load_checkpoint(self, checkpoint: Dict[str, object]) -> None:
+        self.feature_metadata = checkpoint.get("feature_metadata", {})
 
 
 
@@ -409,6 +419,12 @@ def main() -> int:
         if not path.exists():
             raise FileNotFoundError(f"Required path does not exist: {path}")
 
+    feature_metadata = {
+        "edge_schema": cfg.edge_schema,
+        "topology_schema": cfg.topology_schema,
+    }
+    logger.info("Feature metadata: %s", json.dumps(feature_metadata, indent=2))
+
     seed_everything(cfg.seed, workers=True)
 
     warnings.filterwarnings(
@@ -454,6 +470,7 @@ def main() -> int:
         edge_dim=int(cfg.edge_schema.get("dim", 24)),
         heads=cfg.attention_head,
         edge_schema=cfg.edge_schema,
+        feature_metadata=feature_metadata,
     )
 
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
@@ -535,6 +552,7 @@ def main() -> int:
 
     if cfg.fast_dev_run:
         logger.info("Fast dev run enabled; skipping full validation sweep.")
+        best_ckpt_path = checkpoint_cb.best_model_path or None
     else:
         logger.info("Running final validation/evaluation pass on full validation set.")
         best_ckpt_path = checkpoint_cb.best_model_path or None
@@ -550,6 +568,25 @@ def main() -> int:
             "Training proceeded with missing graphs. Consider regenerating .pt files "
             "to close the gap and potentially improve MSE."
         )
+
+    metadata_path = cfg.save_dir / "feature_metadata.json"
+    try:
+        with metadata_path.open("w", encoding="utf-8") as handle:
+            json.dump(feature_metadata, handle, indent=2)
+        logger.info("Feature metadata written to %s", metadata_path)
+    except OSError as exc:
+        logger.warning("Unable to write feature metadata file: %s", exc)
+
+    if best_ckpt_path:
+        best_ckpt = Path(best_ckpt_path)
+        symlink = checkpoint_dir / "best.ckpt"
+        try:
+            if symlink.exists() or symlink.is_symlink():
+                symlink.unlink()
+            symlink.symlink_to(best_ckpt)
+            logger.info("Symlinked best checkpoint to %s", symlink)
+        except OSError as exc:
+            logger.warning("Unable to create best checkpoint symlink: %s", exc)
 
     return 0
 
