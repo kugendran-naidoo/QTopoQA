@@ -35,6 +35,7 @@ DEFAULT_CONTACT_CUTOFF = 5.0  # Ångström
 DEFAULT_SASA_PROBE_RADIUS = 1.4
 DEFAULT_SASA_SPHERE_POINTS = 100
 DEFAULT_SOFTMIN_ALPHA = 2.0
+DEFAULT_GYRATION_NORMALISER = 1.0
 _SASA_FALLBACK_WARNED = False
 EPSILON = 1e-6
 
@@ -512,6 +513,47 @@ def _compute_centroid_statistics(context: ModelContext) -> Dict[str, float]:
     }
 
 
+def _chain_atom_coords(chain: Chain) -> Optional[np.ndarray]:
+    coords: List[np.ndarray] = []
+    for residue in chain:
+        for atom in residue.get_atoms():
+            element = (atom.element or "").strip().upper()
+            if element == "H":
+                continue
+            coords.append(np.asarray(atom.coord, dtype=float))
+    if not coords:
+        for residue in chain:
+            for atom in residue.get_atoms():
+                coords.append(np.asarray(atom.coord, dtype=float))
+    if not coords:
+        return None
+    return np.vstack(coords)
+
+
+def _compute_chain_radius_of_gyration(structure: Structure) -> Dict[str, float]:
+    model = _select_primary_model(structure)
+    if model is None:
+        return {"mean": 0.0, "median": 0.0, "std": 0.0}
+
+    rg_values: List[float] = []
+    for chain in model:
+        coords = _chain_atom_coords(chain)
+        if coords is None:
+            continue
+        rg = _radius_of_gyration(coords)
+        if rg > 0.0:
+            rg_values.append(rg)
+
+    if not rg_values:
+        return {"mean": 0.0, "median": 0.0, "std": 0.0}
+
+    mean_value = float(statistics.mean(rg_values))
+    median_value = float(statistics.median(rg_values))
+    std_value = float(np.std(np.asarray(rg_values, dtype=float))) if len(rg_values) > 1 else 0.0
+
+    return {"mean": mean_value, "median": median_value, "std": std_value}
+
+
 @dataclass
 class ModelContext:
     pdb_path: Path
@@ -520,6 +562,7 @@ class ModelContext:
     _contact_summary: Optional[ContactSummary] = field(default=None, init=False, repr=False)
     _buried_sasa: Optional[float] = field(default=None, init=False, repr=False)
     _centroid_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
+    _chain_rg_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
 
     def get_contact_summary(self) -> ContactSummary:
         if self._contact_summary is None:
@@ -535,6 +578,11 @@ class ModelContext:
         if self._centroid_stats is None:
             self._centroid_stats = _compute_centroid_statistics(self)
         return self._centroid_stats
+
+    def get_chain_rg_stats(self) -> Dict[str, float]:
+        if self._chain_rg_stats is None:
+            self._chain_rg_stats = _compute_chain_radius_of_gyration(self.structure)
+        return self._chain_rg_stats
 
 
 @dataclass(frozen=True)
@@ -596,11 +644,30 @@ class InterfaceCentroidDistanceFeature(MetricFeature):
         }
 
 
+class ChainRadiusOfGyrationFeature(MetricFeature):
+    name = "chain_radius_of_gyration"
+    cli_name = "radius-gyration"
+    columns = (
+        "chain_radius_of_gyration_mean",
+        "chain_radius_of_gyration_median",
+        "chain_radius_of_gyration_std",
+    )
+
+    def compute(self, context: ModelContext) -> Mapping[str, float]:
+        stats = context.get_chain_rg_stats()
+        return {
+            "chain_radius_of_gyration_mean": stats["mean"],
+            "chain_radius_of_gyration_median": stats["median"],
+            "chain_radius_of_gyration_std": stats["std"],
+        }
+
+
 FEATURES: Tuple[MetricFeature, ...] = (
     InterfaceContactCountFeature(),
     InterfaceResidueCountFeature(),
     BuriedSasaFeature(),
     InterfaceCentroidDistanceFeature(),
+    ChainRadiusOfGyrationFeature(),
 )
 
 
@@ -629,6 +696,8 @@ class GlobalMetricsRunner:
             self.logger.info("Starting interface_buried_sasa feature computation")
         if "interface_centroid_distance" in feature_names:
             self.logger.info("Starting interface_centroid_distance feature computation")
+        if "chain_radius_of_gyration" in feature_names:
+            self.logger.info("Starting chain_radius_of_gyration feature computation")
 
         _ensure_dir(self.config.work_dir)
         rows: List[Dict[str, float]] = []
