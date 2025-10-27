@@ -68,3 +68,33 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
         assert "MODEL" in row
         value = float(row["interface_contact_count"])
         assert value >= 0.0
+        residue_value = float(row["interface_residue_count"])
+        assert residue_value >= 0.0
+
+    # Re-run skipping residue count to ensure CLI toggle works.
+    exit_code = global_metrics.main(
+        [
+            "--dataset-dir",
+            str(dataset_dir),
+            "--work-dir",
+            str(work_dir),
+            "--graph-dir",
+            str(graph_dir),
+            "--log-dir",
+            str(log_dir),
+            "--output-csv",
+            "metrics_contacts_only.csv",
+            "--no-interface-residue-count",
+        ]
+    )
+    assert exit_code == 0
+
+    contacts_only_csv = work_dir / "metrics_contacts_only.csv"
+    assert contacts_only_csv.is_file()
+
+    with contacts_only_csv.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+
+    assert rows, "Expected contact-only metrics"
+    assert "interface_residue_count" not in reader.fieldnames

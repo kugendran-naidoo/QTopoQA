@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recalculate interface contact counts using MDAnalysis for independent validation."""
+"""Recalculate unique interface residue counts using MDAnalysis for validation."""
 
 from __future__ import annotations
 
@@ -7,16 +7,15 @@ import argparse
 import csv
 import logging
 import sys
-from dataclasses import dataclass
-from pathlib import Path
 from itertools import combinations
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 DEFAULT_CONTACT_CUTOFF = 5.0
 DEFAULT_COMPARISON_TOLERANCE = 1.0
 
-try:  # guard optional dependency
+try:  # pragma: no cover - import guard
     import MDAnalysis as mda
     from MDAnalysis.lib.distances import capped_distance
 except Exception as exc:  # pragma: no cover - import guard
@@ -28,7 +27,7 @@ else:  # pragma: no cover - requires MDAnalysis runtime
 
 
 def _configure_logger(verbose: bool) -> logging.Logger:
-    logger = logging.getLogger("mdanalysis_contact_check")
+    logger = logging.getLogger("mdanalysis_residue_check")
     logger.setLevel(logging.DEBUG if verbose else logging.INFO)
     logger.handlers.clear()
 
@@ -43,11 +42,16 @@ def _configure_logger(verbose: bool) -> logging.Logger:
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Recompute inter-chain heavy-atom contacts using MDAnalysis.",
+        description="Recompute inter-chain interface residue counts using MDAnalysis.",
     )
     parser.add_argument("--dataset-dir", type=Path, required=True, help="Directory containing PDB decoys")
-    parser.add_argument("--output-csv", type=Path, default=Path("contact_counts.csv"))
-    parser.add_argument("--contact-cutoff", type=float, default=DEFAULT_CONTACT_CUTOFF, help="Heavy-atom cutoff distance (Å)")
+    parser.add_argument("--output-csv", type=Path, default=Path("residue_counts.csv"))
+    parser.add_argument(
+        "--contact-cutoff",
+        type=float,
+        default=DEFAULT_CONTACT_CUTOFF,
+        help="Heavy-atom cutoff distance for defining contacts (Å)",
+    )
     parser.add_argument(
         "--limit",
         type=int,
@@ -58,13 +62,13 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         "--compare-against",
         type=Path,
         default=None,
-        help="Existing CSV (MODEL, interface_contact_count) to compare against",
+        help="Existing CSV (MODEL, interface_residue_count) to compare against",
     )
     parser.add_argument(
         "--comparison-tolerance",
         type=float,
         default=DEFAULT_COMPARISON_TOLERANCE,
-        help=f"Allowed absolute difference in contact counts when comparing (default: {DEFAULT_COMPARISON_TOLERANCE:g})",
+        help=f"Allowed absolute difference in residue counts when comparing (default: {DEFAULT_COMPARISON_TOLERANCE:g})",
     )
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
     return parser.parse_args(argv)
@@ -79,10 +83,43 @@ def _model_identifier(dataset_dir: Path, pdb_path: Path) -> str:
         relative = pdb_path.relative_to(dataset_dir)
     except ValueError:
         relative = pdb_path.name
-    stem = relative.as_posix()
-    if stem.lower().endswith(".pdb"):
-        stem = stem[: -len(".pdb")]
-    return stem
+    name = relative.as_posix()
+    if name.lower().endswith(".pdb"):
+        name = name[: -len(".pdb")]
+    return name
+
+
+def _iter_chain_pairs(universe: "mda.Universe") -> Iterable[Tuple["mda.AtomGroup", "mda.AtomGroup"]]:
+    groups: List["mda.AtomGroup"] = []
+    for _, atom_group in universe.atoms.groupby("chainIDs").items():
+        heavy = atom_group.select_atoms("not name H*")
+        if len(heavy):
+            groups.append(heavy)
+    return combinations(groups, 2)
+
+
+def _residue_descriptor(atom) -> Tuple[str, int, str]:
+    chain = atom.chainID.strip() or atom.segid.strip()
+    return chain, int(atom.resid), atom.resname.strip()
+
+
+def compute_residue_count(pdb_path: Path, cutoff: float) -> int:
+    universe = mda.Universe(str(pdb_path))
+    residues: set[Tuple[str, int, str]] = set()
+    for atoms_a, atoms_b in _iter_chain_pairs(universe):
+        if not len(atoms_a) or not len(atoms_b):
+            continue
+        descriptors_a = [_residue_descriptor(atom) for atom in atoms_a]
+        descriptors_b = [_residue_descriptor(atom) for atom in atoms_b]
+        pairs = capped_distance(atoms_a.positions, atoms_b.positions, cutoff, return_distances=False)
+        if isinstance(pairs, tuple):
+            idx_a, idx_b = pairs
+        else:
+            idx_a, idx_b = pairs[:, 0], pairs[:, 1]
+        for ia, ib in zip(idx_a, idx_b):
+            residues.add(descriptors_a[int(ia)])
+            residues.add(descriptors_b[int(ib)])
+    return len(residues)
 
 
 def _load_reference(csv_path: Path) -> Dict[str, float]:
@@ -94,67 +131,39 @@ def _load_reference(csv_path: Path) -> Dict[str, float]:
             if not model:
                 continue
             try:
-                value = float(row.get("interface_contact_count", "nan"))
+                mapping[model] = float(row.get("interface_residue_count", "nan"))
             except ValueError:
                 continue
-            mapping[model] = value
     return mapping
 
 
-def _iter_chain_pairs(universe: "mda.Universe") -> Iterable[Tuple["mda.AtomGroup", "mda.AtomGroup"]]:
-    groups: List["mda.AtomGroup"] = []
-    for chain_id, atom_group in universe.atoms.groupby("chainIDs").items():
-        heavy_atoms = atom_group.select_atoms("not name H*")
-        if len(heavy_atoms):
-            groups.append(heavy_atoms)
-    return combinations(groups, 2)
-
-
-def compute_contact_count(pdb_path: Path, cutoff: float) -> int:
-    universe = mda.Universe(str(pdb_path))
-    total = 0
-    for atoms_a, atoms_b in _iter_chain_pairs(universe):
-        pairs = capped_distance(atoms_a.positions, atoms_b.positions, cutoff, return_distances=False)
-        if isinstance(pairs, tuple):
-            total += len(pairs[0])
-        else:
-            total += len(pairs)
-    return total
-
-
-@dataclass
-class ResultRow:
-    model: str
-    contact_count: float
-
-
-def _write_results(path: Path, rows: Sequence[ResultRow]) -> None:
+def _write_results(path: Path, rows: Sequence[Tuple[str, float]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["MODEL", "interface_contact_count"])
-        for row in rows:
-            writer.writerow([row.model, f"{row.contact_count:.0f}"])
+        writer.writerow(["MODEL", "interface_residue_count"])
+        for model, value in rows:
+            writer.writerow([model, f"{value:.0f}"])
 
 
 def _compare_results(
     logger: logging.Logger,
-    computed: Sequence[ResultRow],
+    computed: Sequence[Tuple[str, float]],
     reference: Dict[str, float],
     tolerance: float,
 ) -> None:
     missing: List[str] = []
     mismatches: List[Tuple[str, float, float]] = []
 
-    for row in computed:
-        ref_value = reference.get(row.model)
+    for model, value in computed:
+        ref_value = reference.get(model)
         if ref_value is None:
-            missing.append(row.model)
+            missing.append(model)
             continue
-        if abs(ref_value - row.contact_count) > tolerance:
-            mismatches.append((row.model, row.contact_count, ref_value))
+        if abs(ref_value - value) > tolerance:
+            mismatches.append((model, value, ref_value))
 
-    logger.info("Comparison tolerance in effect: ±%.4f contact(s)", tolerance)
+    logger.info("Comparison tolerance in effect: ±%.4f residue(s)", tolerance)
     if missing:
         logger.warning("Reference comparison missing %d model(s)", len(missing))
     if mismatches:
@@ -184,7 +193,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
         return 1
 
     logger.info(
-        "Comparison tolerance configured (via --comparison-tolerance, default %.4f): ±%.4f contact(s)",
+        "Comparison tolerance configured (via --comparison-tolerance, default %.4f): ±%.4f residue(s)",
         DEFAULT_COMPARISON_TOLERANCE,
         args.comparison_tolerance,
     )
@@ -196,20 +205,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
         logger.warning("No PDB files found under %s", args.dataset_dir)
         return 0
 
-    rows: List[ResultRow] = []
+    rows: List[Tuple[str, float]] = []
     for index, pdb_path in enumerate(pdb_files, start=1):
         model = _model_identifier(args.dataset_dir, pdb_path)
         try:
-            count = compute_contact_count(pdb_path, args.contact_cutoff)
+            count = compute_residue_count(pdb_path, args.contact_cutoff)
         except Exception as exc:
             logger.error("Failed to process %s: %s", pdb_path, exc)
             continue
-        rows.append(ResultRow(model=model, contact_count=float(count)))
+        rows.append((model, float(count)))
         if index % 20 == 0 or index == len(pdb_files):
             logger.info("Processed %d/%d models", index, len(pdb_files))
 
     _write_results(args.output_csv, rows)
-    logger.info("Wrote MDAnalysis counts for %d models to %s", len(rows), args.output_csv)
+    logger.info("Wrote MDAnalysis residue counts for %d models to %s", len(rows), args.output_csv)
 
     if args.compare_against:
         reference = _load_reference(args.compare_against)
@@ -221,5 +230,5 @@ def main(argv: Optional[Sequence[str]] = None) -> int:  # pragma: no cover - CLI
     return 0
 
 
-if __name__ == "__main__":  # pragma: no cover - CLI entry
+if __name__ == "__main__":  # pragma: no cover - CLI entrypoint
     raise SystemExit(main())
