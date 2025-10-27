@@ -554,6 +554,78 @@ def _compute_chain_radius_of_gyration(structure: Structure) -> Dict[str, float]:
     return {"mean": mean_value, "median": median_value, "std": std_value}
 
 
+def _compute_chain_length_features(structure: Structure) -> Dict[str, float]:
+    model = _select_primary_model(structure)
+    if model is None:
+        return {
+            "sequence_largest_fraction": 0.0,
+            "sequence_top2_fraction": 0.0,
+            "sequence_log_L1_L2": 0.0,
+            "sequence_max_min_ratio_clipped": 0.0,
+            "sequence_cv": 0.0,
+            "sequence_median_length": 0.0,
+            "sequence_mean_length": 0.0,
+            "sequence_p75_length": 0.0,
+            "sequence_n_long_ge_1p5med": 0.0,
+            "sequence_n_short_le_0p5med": 0.0,
+            "sequence_chain_count": 0.0,
+            "sequence_total_length": 0.0,
+        }
+
+    lengths: Dict[str, int] = {}
+    for chain in model:
+        count = 0
+        for residue in chain.get_residues():
+            hetero = residue.id[0]
+            if hetero.strip() not in {"H", "W"}:  # include standard amino acids and most hetero peptide residues
+                count += 1
+        chain_id = getattr(chain, "id", "") or f"chain_{len(lengths)}"
+        if count > 0:
+            lengths[chain_id] = count
+
+    if not lengths:
+        return {
+            "sequence_largest_fraction": 0.0,
+            "sequence_top2_fraction": 0.0,
+            "sequence_log_L1_L2": 0.0,
+            "sequence_max_min_ratio_clipped": 0.0,
+            "sequence_cv": 0.0,
+            "sequence_median_length": 0.0,
+            "sequence_mean_length": 0.0,
+            "sequence_p75_length": 0.0,
+            "sequence_n_long_ge_1p5med": 0.0,
+            "sequence_n_short_le_0p5med": 0.0,
+            "sequence_chain_count": 0.0,
+            "sequence_total_length": 0.0,
+        }
+
+    L = np.array(sorted(lengths.values(), reverse=True), dtype=float)
+    k = len(L)
+    T = float(L.sum())
+    mu = float(L.mean())
+    med = float(np.median(L))
+    eps = 1e-8
+    L1 = float(L[0])
+    L2 = float(L[1]) if k > 1 else L1
+    Lk = float(L[-1])
+
+    feats = {
+        "sequence_largest_fraction": L1 / (T + eps),
+        "sequence_top2_fraction": (L1 + (L2 if k > 1 else 0.0)) / (T + eps),
+        "sequence_log_L1_L2": float(np.log((L1 + eps) / (L2 + eps))),
+        "sequence_max_min_ratio_clipped": float(min(L1 / (Lk + eps), 10.0)),
+        "sequence_cv": float(np.std(L) / (mu + eps)),
+        "sequence_median_length": med,
+        "sequence_mean_length": mu,
+        "sequence_p75_length": float(np.quantile(L, 0.75)),
+        "sequence_n_long_ge_1p5med": float((L >= 1.5 * med).sum()),
+        "sequence_n_short_le_0p5med": float((L <= 0.5 * med).sum()),
+        "sequence_chain_count": float(k),
+        "sequence_total_length": T,
+    }
+    return feats
+
+
 @dataclass
 class ModelContext:
     pdb_path: Path
@@ -563,6 +635,7 @@ class ModelContext:
     _buried_sasa: Optional[float] = field(default=None, init=False, repr=False)
     _centroid_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
     _chain_rg_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
+    _chain_length_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
 
     def get_contact_summary(self) -> ContactSummary:
         if self._contact_summary is None:
@@ -583,6 +656,11 @@ class ModelContext:
         if self._chain_rg_stats is None:
             self._chain_rg_stats = _compute_chain_radius_of_gyration(self.structure)
         return self._chain_rg_stats
+
+    def get_chain_length_stats(self) -> Dict[str, float]:
+        if self._chain_length_stats is None:
+            self._chain_length_stats = _compute_chain_length_features(self.structure)
+        return self._chain_length_stats
 
 
 @dataclass(frozen=True)
@@ -662,12 +740,35 @@ class ChainRadiusOfGyrationFeature(MetricFeature):
         }
 
 
+class SequenceLengthRatioFeature(MetricFeature):
+    name = "sequence_length_ratio"
+    cli_name = "sequence-ratio"
+    columns = (
+        "sequence_largest_fraction",
+        "sequence_top2_fraction",
+        "sequence_log_L1_L2",
+        "sequence_max_min_ratio_clipped",
+        "sequence_cv",
+        "sequence_median_length",
+        "sequence_mean_length",
+        "sequence_p75_length",
+        "sequence_n_long_ge_1p5med",
+        "sequence_n_short_le_0p5med",
+        "sequence_chain_count",
+        "sequence_total_length",
+    )
+
+    def compute(self, context: ModelContext) -> Mapping[str, float]:
+        return context.get_chain_length_stats()
+
+
 FEATURES: Tuple[MetricFeature, ...] = (
     InterfaceContactCountFeature(),
     InterfaceResidueCountFeature(),
     BuriedSasaFeature(),
     InterfaceCentroidDistanceFeature(),
     ChainRadiusOfGyrationFeature(),
+    SequenceLengthRatioFeature(),
 )
 
 
@@ -698,6 +799,8 @@ class GlobalMetricsRunner:
             self.logger.info("Starting interface_centroid_distance feature computation")
         if "chain_radius_of_gyration" in feature_names:
             self.logger.info("Starting chain_radius_of_gyration feature computation")
+        if "sequence_length_ratio" in feature_names:
+            self.logger.info("Starting sequence_length_ratio feature computation")
 
         _ensure_dir(self.config.work_dir)
         rows: List[Dict[str, float]] = []

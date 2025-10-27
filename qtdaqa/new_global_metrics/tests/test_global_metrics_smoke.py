@@ -92,6 +92,29 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
         assert rg_mean >= 0.0
         assert rg_median >= 0.0
         assert rg_std >= 0.0
+        seq_largest = float(row["sequence_largest_fraction"])
+        seq_top2 = float(row["sequence_top2_fraction"])
+        seq_log = float(row["sequence_log_L1_L2"])
+        seq_ratio = float(row["sequence_max_min_ratio_clipped"])
+        seq_cv = float(row["sequence_cv"])
+        seq_med = float(row["sequence_median_length"])
+        seq_mean = float(row["sequence_mean_length"])
+        seq_p75 = float(row["sequence_p75_length"])
+        seq_long = float(row["sequence_n_long_ge_1p5med"])
+        seq_short = float(row["sequence_n_short_le_0p5med"])
+        seq_count = float(row["sequence_chain_count"])
+        seq_total = float(row["sequence_total_length"])
+        assert 0.0 <= seq_largest <= 1.0
+        assert 0.0 <= seq_top2 <= 1.0
+        assert seq_ratio >= 0.0
+        assert seq_cv >= 0.0
+        assert seq_med >= 0.0
+        assert seq_mean >= 0.0
+        assert seq_p75 >= 0.0
+        assert seq_long >= 0.0
+        assert seq_short >= 0.0
+        assert seq_count >= 0.0
+        assert seq_total >= 0.0
         if HAS_MDANALYSIS:
             sasa_value = float(row["interface_buried_sasa"])
             assert sasa_value >= 0.0
@@ -135,6 +158,18 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
     assert "chain_radius_of_gyration_mean" in reader.fieldnames
     assert "chain_radius_of_gyration_median" in reader.fieldnames
     assert "chain_radius_of_gyration_std" in reader.fieldnames
+    assert "sequence_largest_fraction" in reader.fieldnames
+    assert "sequence_top2_fraction" in reader.fieldnames
+    assert "sequence_log_L1_L2" in reader.fieldnames
+    assert "sequence_max_min_ratio_clipped" in reader.fieldnames
+    assert "sequence_cv" in reader.fieldnames
+    assert "sequence_median_length" in reader.fieldnames
+    assert "sequence_mean_length" in reader.fieldnames
+    assert "sequence_p75_length" in reader.fieldnames
+    assert "sequence_n_long_ge_1p5med" in reader.fieldnames
+    assert "sequence_n_short_le_0p5med" in reader.fieldnames
+    assert "sequence_chain_count" in reader.fieldnames
+    assert "sequence_total_length" in reader.fieldnames
 
     if HAS_MDANALYSIS:
         # Re-run skipping buried SASA to ensure CLI toggle works.
@@ -228,3 +263,47 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
     assert "chain_radius_of_gyration_mean" not in reader.fieldnames
     assert "chain_radius_of_gyration_median" not in reader.fieldnames
     assert "chain_radius_of_gyration_std" not in reader.fieldnames
+
+    # Re-run skipping sequence ratio to ensure CLI toggle works.
+    seq_skip_args = [
+        "--dataset-dir",
+        str(dataset_dir),
+        "--work-dir",
+        str(work_dir),
+        "--graph-dir",
+        str(graph_dir),
+        "--log-dir",
+        str(log_dir),
+        "--output-csv",
+        "metrics_no_seq.csv",
+        "--no-sequence-ratio",
+    ]
+    if not HAS_MDANALYSIS:
+        seq_skip_args.append("--no-buried-sasa")
+
+    exit_code = global_metrics.main(seq_skip_args)
+    assert exit_code == 0
+
+    no_seq_csv = work_dir / "metrics_no_seq.csv"
+    assert no_seq_csv.is_file()
+
+    with no_seq_csv.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+
+    assert rows, "Expected metrics rows when sequence ratio disabled"
+    for column in [
+        "sequence_largest_fraction",
+        "sequence_top2_fraction",
+        "sequence_log_L1_L2",
+        "sequence_max_min_ratio_clipped",
+        "sequence_cv",
+        "sequence_median_length",
+        "sequence_mean_length",
+        "sequence_p75_length",
+        "sequence_n_long_ge_1p5med",
+        "sequence_n_short_le_0p5med",
+        "sequence_chain_count",
+        "sequence_total_length",
+    ]:
+        assert column not in reader.fieldnames
