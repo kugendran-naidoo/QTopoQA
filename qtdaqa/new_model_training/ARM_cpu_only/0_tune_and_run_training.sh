@@ -13,7 +13,7 @@ trials=(
 
 # seeds=(222 777 1337)
 # originally tried 3, but 222 tends to work the best
-seeds=(222)
+seeds=(222 777 1337)
 
 patch_yaml() {
   python - "$1" "$2" <<'PY'
