@@ -13,6 +13,8 @@ from pathlib import Path
 import tempfile
 from typing import Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Set, Tuple
 
+import math
+import numpy as np
 from Bio.PDB import NeighborSearch, PDBParser, PDBIO, ShrakeRupley
 from Bio.PDB.Atom import Atom
 from Bio.PDB.Chain import Chain
@@ -32,7 +34,9 @@ LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 DEFAULT_CONTACT_CUTOFF = 5.0  # Ångström
 DEFAULT_SASA_PROBE_RADIUS = 1.4
 DEFAULT_SASA_SPHERE_POINTS = 100
+DEFAULT_SOFTMIN_ALPHA = 2.0
 _SASA_FALLBACK_WARNED = False
+EPSILON = 1e-6
 
 
 def _ensure_dir(path: Path) -> None:
@@ -129,6 +133,15 @@ class ContactSummary:
     @property
     def atom_contact_count(self) -> int:
         return len(self.atom_pairs)
+
+
+@dataclass(frozen=True)
+class ChainPairCentroidData:
+    chain_a: str
+    chain_b: str
+    distance: float
+    normalized_distance: float
+    weight: float
 
 
 class ContactAccumulator:
@@ -361,6 +374,144 @@ def _biopython_sasa_area(entity) -> float:
     return total
 
 
+def _residue_atom_coords(structure: Structure, residue_key: ResidueKey) -> Optional[np.ndarray]:
+    model = _select_primary_model(structure)
+    if model is None:
+        return None
+    try:
+        chain = model[residue_key.chain_id]
+    except KeyError:
+        return None
+    insertion = residue_key.insertion_code or " "
+    try:
+        residue = chain[(" ", residue_key.residue_seq, insertion)]
+    except KeyError:
+        return None
+
+    coords: List[np.ndarray] = []
+    for atom in residue.get_atoms():
+        element = (atom.element or "").strip().upper()
+        if element == "H":
+            continue
+        coords.append(np.asarray(atom.coord, dtype=float))
+
+    if not coords:
+        for atom in residue.get_atoms():
+            coords.append(np.asarray(atom.coord, dtype=float))
+
+    if not coords:
+        return None
+    return np.vstack(coords)
+
+
+def _chain_interface_coords(structure: Structure, residue_keys: Set[ResidueKey]) -> Optional[np.ndarray]:
+    coord_blocks: List[np.ndarray] = []
+    for key in residue_keys:
+        coords = _residue_atom_coords(structure, key)
+        if coords is not None:
+            coord_blocks.append(coords)
+    if not coord_blocks:
+        return None
+    return np.vstack(coord_blocks)
+
+
+def _radius_of_gyration(coords: np.ndarray) -> float:
+    if coords.size == 0:
+        return 0.0
+    centroid = np.mean(coords, axis=0)
+    diffs = coords - centroid
+    squared = np.sum(diffs * diffs, axis=1)
+    return float(np.sqrt(max(EPSILON, np.mean(squared))))
+
+
+def _collect_chain_pair_centroids(context: ModelContext) -> List[ChainPairCentroidData]:
+    summary = context.get_contact_summary()
+    pair_map: Dict[Tuple[str, str], Dict[str, object]] = {}
+
+    for atom_a, atom_b in summary.atom_pairs:
+        chain_a = atom_a.residue.chain_id
+        chain_b = atom_b.residue.chain_id
+        if chain_a == chain_b:
+            continue
+        if chain_a <= chain_b:
+            key = (chain_a, chain_b)
+            res_a, res_b = atom_a.residue, atom_b.residue
+        else:
+            key = (chain_b, chain_a)
+            res_a, res_b = atom_b.residue, atom_a.residue
+        record = pair_map.setdefault(
+            key,
+            {
+                "contacts": 0,
+                "residues": {key[0]: set(), key[1]: set()},
+            },
+        )
+        record["contacts"] = int(record["contacts"]) + 1
+        residues: Dict[str, Set[ResidueKey]] = record["residues"]  # type: ignore[assignment]
+        residues.setdefault(chain_a, set()).add(res_a)
+        residues.setdefault(chain_b, set()).add(res_b)
+
+    structure = context.structure
+    pair_data: List[ChainPairCentroidData] = []
+
+    for (chain_a, chain_b), record in pair_map.items():
+        residues: Dict[str, Set[ResidueKey]] = record["residues"]  # type: ignore[assignment]
+        coords_a = _chain_interface_coords(structure, residues.get(chain_a, set()))
+        coords_b = _chain_interface_coords(structure, residues.get(chain_b, set()))
+        if coords_a is None or coords_b is None:
+            continue
+        centroid_a = np.mean(coords_a, axis=0)
+        centroid_b = np.mean(coords_b, axis=0)
+        distance = float(np.linalg.norm(centroid_a - centroid_b))
+        rg_a = _radius_of_gyration(coords_a)
+        rg_b = _radius_of_gyration(coords_b)
+        scale = max(EPSILON, (rg_a + rg_b) / 2.0)
+        normalized = distance / scale
+        weight = float(max(1, int(record["contacts"])))
+        pair_data.append(
+            ChainPairCentroidData(
+                chain_a=chain_a,
+                chain_b=chain_b,
+                distance=distance,
+                normalized_distance=normalized,
+                weight=weight,
+            )
+        )
+
+    return pair_data
+
+
+def _softmin(values: Sequence[float], alpha: float = DEFAULT_SOFTMIN_ALPHA) -> float:
+    if not values:
+        return 0.0
+    arr = np.asarray(values, dtype=float)
+    min_val = float(np.min(arr))
+    shifted = np.exp(-alpha * (arr - min_val))
+    mean_shifted = float(np.mean(shifted))
+    if mean_shifted <= 0.0:
+        return min_val
+    return min_val - (math.log(mean_shifted) / alpha)
+
+
+def _compute_centroid_statistics(context: ModelContext) -> Dict[str, float]:
+    pair_data = _collect_chain_pair_centroids(context)
+    if not pair_data:
+        return {"median": 0.0, "softmin": 0.0, "weighted_mean": 0.0}
+
+    values = [data.normalized_distance for data in pair_data]
+    median_value = float(statistics.median(values))
+    softmin_value = float(_softmin(values, DEFAULT_SOFTMIN_ALPHA))
+
+    weights = [max(data.weight, EPSILON) for data in pair_data]
+    weighted_mean = float(sum(v * w for v, w in zip(values, weights)) / sum(weights))
+
+    return {
+        "median": median_value,
+        "softmin": softmin_value,
+        "weighted_mean": weighted_mean,
+    }
+
+
 @dataclass
 class ModelContext:
     pdb_path: Path
@@ -368,6 +519,7 @@ class ModelContext:
     contact_cutoff: float
     _contact_summary: Optional[ContactSummary] = field(default=None, init=False, repr=False)
     _buried_sasa: Optional[float] = field(default=None, init=False, repr=False)
+    _centroid_stats: Optional[Dict[str, float]] = field(default=None, init=False, repr=False)
 
     def get_contact_summary(self) -> ContactSummary:
         if self._contact_summary is None:
@@ -378,6 +530,11 @@ class ModelContext:
         if self._buried_sasa is None:
             self._buried_sasa = _compute_buried_sasa(self)
         return self._buried_sasa
+
+    def get_centroid_stats(self) -> Dict[str, float]:
+        if self._centroid_stats is None:
+            self._centroid_stats = _compute_centroid_statistics(self)
+        return self._centroid_stats
 
 
 @dataclass(frozen=True)
@@ -421,10 +578,29 @@ class BuriedSasaFeature(MetricFeature):
         return {"interface_buried_sasa": float(buried)}
 
 
+class InterfaceCentroidDistanceFeature(MetricFeature):
+    name = "interface_centroid_distance"
+    cli_name = "interface-centroid-distance"
+    columns = (
+        "interface_centroid_distance_median",
+        "interface_centroid_distance_softmin",
+        "interface_centroid_distance_weighted_mean",
+    )
+
+    def compute(self, context: ModelContext) -> Mapping[str, float]:
+        stats = context.get_centroid_stats()
+        return {
+            "interface_centroid_distance_median": stats["median"],
+            "interface_centroid_distance_softmin": stats["softmin"],
+            "interface_centroid_distance_weighted_mean": stats["weighted_mean"],
+        }
+
+
 FEATURES: Tuple[MetricFeature, ...] = (
     InterfaceContactCountFeature(),
     InterfaceResidueCountFeature(),
     BuriedSasaFeature(),
+    InterfaceCentroidDistanceFeature(),
 )
 
 
@@ -451,6 +627,8 @@ class GlobalMetricsRunner:
             self.logger.info("Starting interface_residue_count feature computation")
         if "interface_buried_sasa" in feature_names:
             self.logger.info("Starting interface_buried_sasa feature computation")
+        if "interface_centroid_distance" in feature_names:
+            self.logger.info("Starting interface_centroid_distance feature computation")
 
         _ensure_dir(self.config.work_dir)
         rows: List[Dict[str, float]] = []

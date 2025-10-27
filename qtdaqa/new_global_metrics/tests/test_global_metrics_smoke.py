@@ -80,6 +80,12 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
         assert value >= 0.0
         residue_value = float(row["interface_residue_count"])
         assert residue_value >= 0.0
+        centroid_median = float(row["interface_centroid_distance_median"])
+        centroid_softmin = float(row["interface_centroid_distance_softmin"])
+        centroid_weighted = float(row["interface_centroid_distance_weighted_mean"])
+        assert centroid_median >= 0.0
+        assert centroid_softmin >= 0.0
+        assert centroid_weighted >= 0.0
         if HAS_MDANALYSIS:
             sasa_value = float(row["interface_buried_sasa"])
             assert sasa_value >= 0.0
@@ -117,6 +123,9 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
     assert "interface_residue_count" not in reader.fieldnames
     if HAS_MDANALYSIS:
         assert "interface_buried_sasa" in reader.fieldnames
+    assert "interface_centroid_distance_median" in reader.fieldnames
+    assert "interface_centroid_distance_softmin" in reader.fieldnames
+    assert "interface_centroid_distance_weighted_mean" in reader.fieldnames
 
     if HAS_MDANALYSIS:
         # Re-run skipping buried SASA to ensure CLI toggle works.
@@ -142,7 +151,39 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
 
         with no_sasa_csv.open(newline="", encoding="utf-8") as handle:
             reader = csv.DictReader(handle)
-            rows = list(reader)
+        rows = list(reader)
 
         assert rows, "Expected metrics rows when SASA disabled"
         assert "interface_buried_sasa" not in reader.fieldnames
+
+    # Re-run skipping centroid distance to ensure CLI toggle works.
+    centroid_skip_args = [
+        "--dataset-dir",
+        str(dataset_dir),
+        "--work-dir",
+        str(work_dir),
+        "--graph-dir",
+        str(graph_dir),
+        "--log-dir",
+        str(log_dir),
+        "--output-csv",
+        "metrics_no_centroid.csv",
+        "--no-interface-centroid-distance",
+    ]
+    if not HAS_MDANALYSIS:
+        centroid_skip_args.append("--no-buried-sasa")
+
+    exit_code = global_metrics.main(centroid_skip_args)
+    assert exit_code == 0
+
+    no_centroid_csv = work_dir / "metrics_no_centroid.csv"
+    assert no_centroid_csv.is_file()
+
+    with no_centroid_csv.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        rows = list(reader)
+
+    assert rows, "Expected metrics rows when centroid distance disabled"
+    assert "interface_centroid_distance_median" not in reader.fieldnames
+    assert "interface_centroid_distance_softmin" not in reader.fieldnames
+    assert "interface_centroid_distance_weighted_mean" not in reader.fieldnames
