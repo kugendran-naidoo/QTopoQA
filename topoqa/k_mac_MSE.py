@@ -8,7 +8,9 @@ def read_best(path):
             return float(cb_state["best_model_score"])
     raise KeyError(f"best_model_score not found in {path}")
 
-print("K trained model ckpt:", read_best("model/topo_best_val_loss=0.14407.ckpt.DETERM"))
-print("TopoQA reference model ckpt:", read_best("model/topoqa.ckpt"))
-print("K new model ckpt:", read_best("../qtdaqa/proposed_model_training/ARM_cpu/training_runs/history/training_run_2025-10-21_20-31-57/model_checkpoints/model.0.05354.chkpt"))
+k_model = "model/k_best_model.chkpt"
+topoqa_model = "model/topoqa.ckpt"
+
+print("\nK trained model ckpt:", read_best(k_model))
+print("\nTopoQA reference model ckpt:", read_best(topoqa_model))
 
