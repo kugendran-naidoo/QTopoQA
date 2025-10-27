@@ -8,6 +8,14 @@ import pytest
 
 from qtdaqa.new_global_metrics import global_metrics
 
+try:  # pragma: no cover - optional dependency checks
+    import MDAnalysis  # noqa: F401
+    from MDAnalysis.analysis import sasa  # noqa: F401
+except ImportError:  # pragma: no cover
+    HAS_MDANALYSIS = False
+else:  # pragma: no cover
+    HAS_MDANALYSIS = True
+
 
 DATASET_ROOT = Path(
     "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/pilot_batch_Dockground_MAF2"
@@ -40,20 +48,22 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
     graph_dir = tmp_path / "graph"
     log_dir = tmp_path / "logs"
 
-    exit_code = global_metrics.main(
-        [
-            "--dataset-dir",
-            str(dataset_dir),
-            "--work-dir",
-            str(work_dir),
-            "--graph-dir",
-            str(graph_dir),
-            "--log-dir",
-            str(log_dir),
-            "--output-csv",
-            "metrics.csv",
-        ]
-    )
+    base_args = [
+        "--dataset-dir",
+        str(dataset_dir),
+        "--work-dir",
+        str(work_dir),
+        "--graph-dir",
+        str(graph_dir),
+        "--log-dir",
+        str(log_dir),
+        "--output-csv",
+        "metrics.csv",
+    ]
+    if not HAS_MDANALYSIS:
+        base_args.append("--no-buried-sasa")
+
+    exit_code = global_metrics.main(base_args)
     assert exit_code == 0
 
     output_csv = work_dir / "metrics.csv"
@@ -70,23 +80,30 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
         assert value >= 0.0
         residue_value = float(row["interface_residue_count"])
         assert residue_value >= 0.0
+        if HAS_MDANALYSIS:
+            sasa_value = float(row["interface_buried_sasa"])
+            assert sasa_value >= 0.0
+        else:
+            assert "interface_buried_sasa" not in row
 
     # Re-run skipping residue count to ensure CLI toggle works.
-    exit_code = global_metrics.main(
-        [
-            "--dataset-dir",
-            str(dataset_dir),
-            "--work-dir",
-            str(work_dir),
-            "--graph-dir",
-            str(graph_dir),
-            "--log-dir",
-            str(log_dir),
-            "--output-csv",
-            "metrics_contacts_only.csv",
-            "--no-interface-residue-count",
-        ]
-    )
+    contacts_args = [
+        "--dataset-dir",
+        str(dataset_dir),
+        "--work-dir",
+        str(work_dir),
+        "--graph-dir",
+        str(graph_dir),
+        "--log-dir",
+        str(log_dir),
+        "--output-csv",
+        "metrics_contacts_only.csv",
+        "--no-interface-residue-count",
+    ]
+    if not HAS_MDANALYSIS:
+        contacts_args.append("--no-buried-sasa")
+
+    exit_code = global_metrics.main(contacts_args)
     assert exit_code == 0
 
     contacts_only_csv = work_dir / "metrics_contacts_only.csv"
@@ -98,3 +115,34 @@ def test_interface_contact_count_smoke(tmp_path: Path) -> None:
 
     assert rows, "Expected contact-only metrics"
     assert "interface_residue_count" not in reader.fieldnames
+    if HAS_MDANALYSIS:
+        assert "interface_buried_sasa" in reader.fieldnames
+
+    if HAS_MDANALYSIS:
+        # Re-run skipping buried SASA to ensure CLI toggle works.
+        exit_code = global_metrics.main(
+            [
+                "--dataset-dir",
+                str(dataset_dir),
+                "--work-dir",
+                str(work_dir),
+                "--graph-dir",
+                str(graph_dir),
+                "--log-dir",
+                str(log_dir),
+                "--output-csv",
+                "metrics_no_sasa.csv",
+                "--no-buried-sasa",
+            ]
+        )
+        assert exit_code == 0
+
+        no_sasa_csv = work_dir / "metrics_no_sasa.csv"
+        assert no_sasa_csv.is_file()
+
+        with no_sasa_csv.open(newline="", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            rows = list(reader)
+
+        assert rows, "Expected metrics rows when SASA disabled"
+        assert "interface_buried_sasa" not in reader.fieldnames

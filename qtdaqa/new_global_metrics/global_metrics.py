@@ -10,9 +10,10 @@ import statistics
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+import tempfile
 from typing import Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Set, Tuple
 
-from Bio.PDB import NeighborSearch, PDBParser
+from Bio.PDB import NeighborSearch, PDBParser, PDBIO, ShrakeRupley
 from Bio.PDB.Atom import Atom
 from Bio.PDB.Chain import Chain
 from Bio.PDB.Model import Model
@@ -29,6 +30,9 @@ from log_dirs import LogDirectoryInfo, prepare_log_directory
 
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 DEFAULT_CONTACT_CUTOFF = 5.0  # Ångström
+DEFAULT_SASA_PROBE_RADIUS = 1.4
+DEFAULT_SASA_SPHERE_POINTS = 100
+_SASA_FALLBACK_WARNED = False
 
 
 def _ensure_dir(path: Path) -> None:
@@ -216,17 +220,164 @@ def _build_contact_summary(structure: Structure, cutoff: float) -> ContactSummar
     return accumulator.build()
 
 
+def _compute_buried_sasa(context: ModelContext) -> float:
+    try:
+        import MDAnalysis as mda  # type: ignore
+        from MDAnalysis.analysis.sasa import ShrakeRupley as MDAShrakeRupley  # type: ignore
+    except ImportError:
+        return _compute_buried_sasa_fallback(context, warn=True)
+
+    universe = mda.Universe(str(context.pdb_path))
+    if not len(universe.atoms):
+        return 0.0
+
+    def _shrake_rupley_area(atom_group) -> float:
+        calculator = MDAShrakeRupley(
+            atom_group,
+            probe_radius=DEFAULT_SASA_PROBE_RADIUS,
+            n_sphere_points=DEFAULT_SASA_SPHERE_POINTS,
+        )
+        calculator.run()
+        return float(calculator.results.total_area)
+
+    complex_area = _shrake_rupley_area(universe.atoms)
+
+    chain_groups: List = []
+    chain_groups_map: Dict[str, object] = {}
+
+    for chain_id, atom_group in universe.atoms.groupby("chainIDs").items():
+        if not len(atom_group):
+            continue
+        key = chain_id.strip() or f"chain_{len(chain_groups_map)}"
+        chain_groups_map[key] = atom_group
+
+    if len(chain_groups_map) <= 1:
+        for segment in universe.segments:
+            if len(segment.atoms):
+                key = segment.segid.strip() or f"segment_{len(chain_groups_map)}"
+                chain_groups_map.setdefault(key, segment.atoms)
+
+    chain_groups = list(chain_groups_map.values()) or [universe.atoms]
+
+    monomer_area = 0.0
+    for atom_group in chain_groups:
+        monomer_area += _shrake_rupley_area(atom_group)
+
+    buried = monomer_area - complex_area
+    if buried < 0.0:
+        buried = 0.0
+    return buried
+
+
+def _compute_buried_sasa_fallback(context: ModelContext, *, warn: bool = False) -> float:
+    global _SASA_FALLBACK_WARNED
+    if warn and not _SASA_FALLBACK_WARNED:
+        logging.getLogger("global_metrics").warning(
+            "MDAnalysis Shrake–Rupley unavailable; falling back to FreeSASA/Biopython implementation."
+        )
+        _SASA_FALLBACK_WARNED = True
+
+    try:
+        return _compute_buried_sasa_freesasa(context)
+    except Exception as exc:  # pragma: no cover - fallback path
+        logging.getLogger("global_metrics").warning(
+            "FreeSASA fallback failed for %s: %s; retrying with Biopython Shrake–Rupley.",
+            context.pdb_path,
+            exc,
+        )
+        return _compute_buried_sasa_biopython(context)
+
+
+def _compute_buried_sasa_freesasa(context: ModelContext) -> float:
+    import freesasa  # type: ignore
+
+    parameters = freesasa.Parameters()
+    parameters.setProbeRadius(float(DEFAULT_SASA_PROBE_RADIUS))
+    parameters.setNPoints(int(DEFAULT_SASA_SPHERE_POINTS))
+
+    structure = freesasa.Structure(str(context.pdb_path))
+    complex_result = freesasa.calc(structure, parameters)
+    complex_area = float(complex_result.totalArea())
+
+    parser = PDBParser(QUIET=True)
+    structure = parser.get_structure("sasa", str(context.pdb_path))
+    try:
+        model = next(structure.get_models())
+    except StopIteration:
+        return 0.0
+
+    monomer_area = 0.0
+    for chain in model:
+        with tempfile.NamedTemporaryFile("w", suffix=".pdb", delete=False) as handle:
+            tmp_path = Path(handle.name)
+        try:
+            io = PDBIO()
+            io.set_structure(chain)
+            io.save(str(tmp_path))
+            chain_structure = freesasa.Structure(str(tmp_path))
+            chain_result = freesasa.calc(chain_structure, parameters)
+            monomer_area += float(chain_result.totalArea())
+        finally:
+            try:
+                tmp_path.unlink()
+            except OSError:
+                pass
+
+    buried = monomer_area - complex_area
+    return float(buried if buried > 0.0 else 0.0)
+
+
+def _compute_buried_sasa_biopython(context: ModelContext) -> float:
+    parser = PDBParser(QUIET=True)
+    structure = parser.get_structure("sasa", str(context.pdb_path))
+    try:
+        model = next(structure.get_models())
+    except StopIteration:
+        return 0.0
+
+    complex_area = _biopython_sasa_area(model)
+
+    complex_area = _biopython_sasa_area(model)
+    monomer_area = 0.0
+    for chain in model:
+        monomer_area += _biopython_sasa_area(chain)
+
+    buried = monomer_area - complex_area
+    return float(buried if buried > 0.0 else 0.0)
+
+
+def _biopython_sasa_area(entity) -> float:
+    calculator = ShrakeRupley(
+        probe_radius=DEFAULT_SASA_PROBE_RADIUS,
+        n_points=DEFAULT_SASA_SPHERE_POINTS,
+    )
+    calculator.compute(entity, level="A")
+    total = 0.0
+    for atom in entity.get_atoms():
+        value = getattr(atom, "sasa", None)
+        if value is None:
+            value = atom.xtra.get("EXP_SASA", 0.0)
+        total += float(value or 0.0)
+    return total
+
+
 @dataclass
 class ModelContext:
     pdb_path: Path
     structure: Structure
     contact_cutoff: float
     _contact_summary: Optional[ContactSummary] = field(default=None, init=False, repr=False)
+    _buried_sasa: Optional[float] = field(default=None, init=False, repr=False)
 
     def get_contact_summary(self) -> ContactSummary:
         if self._contact_summary is None:
             self._contact_summary = _build_contact_summary(self.structure, self.contact_cutoff)
         return self._contact_summary
+
+    def get_buried_sasa(self) -> float:
+        if self._buried_sasa is None:
+            self._buried_sasa = _compute_buried_sasa(self)
+        return self._buried_sasa
 
 
 @dataclass(frozen=True)
@@ -260,9 +411,20 @@ class InterfaceResidueCountFeature(MetricFeature):
         return {"interface_residue_count": float(len(summary.residues))}
 
 
+class BuriedSasaFeature(MetricFeature):
+    name = "interface_buried_sasa"
+    cli_name = "buried-sasa"
+    columns = ("interface_buried_sasa",)
+
+    def compute(self, context: ModelContext) -> Mapping[str, float]:
+        buried = context.get_buried_sasa()
+        return {"interface_buried_sasa": float(buried)}
+
+
 FEATURES: Tuple[MetricFeature, ...] = (
     InterfaceContactCountFeature(),
     InterfaceResidueCountFeature(),
+    BuriedSasaFeature(),
 )
 
 
@@ -287,6 +449,8 @@ class GlobalMetricsRunner:
             self.logger.info("Starting interface_contact_count feature computation")
         if "interface_residue_count" in feature_names:
             self.logger.info("Starting interface_residue_count feature computation")
+        if "interface_buried_sasa" in feature_names:
+            self.logger.info("Starting interface_buried_sasa feature computation")
 
         _ensure_dir(self.config.work_dir)
         rows: List[Dict[str, float]] = []
