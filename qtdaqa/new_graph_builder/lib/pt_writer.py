@@ -68,7 +68,8 @@ AA_INDEX = {name: idx for idx, name in enumerate(AMINO_ACIDS)}
 
 @dataclass
 class GraphTask:
-    model: str
+    model_key: str
+    model_name: str
     pdb_path: Path
     interface_path: Path
     topology_path: Path
@@ -172,7 +173,8 @@ def _index_structures(dataset_dir: Path) -> Dict[str, Path]:
 
 
 def _prepare_staging(task: GraphTask) -> tuple[tempfile.TemporaryDirectory, Path, Path, Path, Path]:
-    temp_dir = tempfile.TemporaryDirectory(prefix=f"pt_build_{task.model}_")
+    safe_token = re.sub(r"[^A-Za-z0-9_.-]", "_", task.model_name) or "model"
+    temp_dir = tempfile.TemporaryDirectory(prefix=f"pt_build_{safe_token}_")
     root = Path(temp_dir.name)
     node_dir = root / "node"
     interface_dir = root / "interface"
@@ -182,10 +184,10 @@ def _prepare_staging(task: GraphTask) -> tuple[tempfile.TemporaryDirectory, Path
     interface_dir.mkdir(parents=True, exist_ok=True)
     topology_dir.mkdir(parents=True, exist_ok=True)
     pdb_dir.mkdir(parents=True, exist_ok=True)
-    node_target = node_dir / Path(f"{task.model}.csv")
-    iface_target = interface_dir / Path(f"{task.model}.txt")
-    topo_target = topology_dir / Path(f"{task.model}.topology.csv")
-    pdb_target = pdb_dir / Path(f"{task.model}{task.pdb_path.suffix}")
+    node_target = node_dir / f"{task.model_name}.csv"
+    iface_target = interface_dir / f"{task.model_name}.txt"
+    topo_target = topology_dir / f"{task.model_name}.topology.csv"
+    pdb_target = pdb_dir / f"{task.model_name}{task.pdb_path.suffix}"
     node_target.parent.mkdir(parents=True, exist_ok=True)
     iface_target.parent.mkdir(parents=True, exist_ok=True)
     topo_target.parent.mkdir(parents=True, exist_ok=True)
@@ -432,14 +434,14 @@ def _process_task(
     temp_handle: Optional[tempfile.TemporaryDirectory] = None
     try:
         temp_handle, node_dir, interface_dir, topology_dir, pdb_dir = _prepare_staging(task)
-        node_csv = node_dir / f"{task.model}.csv"
-        interface_file = interface_dir / f"{task.model}.txt"
-        pdb_file = next(pdb_dir.glob(f"{task.model}.*"))
+        node_csv = node_dir / f"{task.model_name}.csv"
+        interface_file = interface_dir / f"{task.model_name}.txt"
+        pdb_file = next(pdb_dir.glob(f"{task.model_name}.*"))
 
         node_df, feature_cols = _load_node_features(node_csv)
         residues = _parse_interface_file(interface_file)
         if not residues:
-            raise RuntimeError(f"No interface residues parsed for {task.model}")
+            raise RuntimeError(f"No interface residues parsed for {task.model_key}")
 
         id_to_index = {identifier: idx for idx, identifier in enumerate(node_df["ID"].tolist())}
         structure_cache = StructureCache(pdb_file)
@@ -448,16 +450,16 @@ def _process_task(
         dump_path = None
         if edge_dump_dir is not None:
             edge_dump_dir.mkdir(parents=True, exist_ok=True)
-            dump_path = edge_dump_dir / Path(f"{task.model}.edges.csv")
+            dump_path = edge_dump_dir / Path(f"{task.model_key}.edges.csv")
             dump_path.parent.mkdir(parents=True, exist_ok=True)
 
         edge_index, edge_attr = feature_builder.build_edges(residues, id_to_index, structure_cache, dump_path)
         x = node_df[feature_cols].to_numpy(dtype=np.float32)
-        _save_graph(task.model, x, edge_index, edge_attr, output_dir)
+        _save_graph(task.model_key, x, edge_index, edge_attr, output_dir)
         feature_dim = edge_attr.shape[1] if edge_attr.size else 0
-        return task.model, None, feature_dim
+        return task.model_key, None, feature_dim
     except Exception as exc:  # pragma: no cover
-        return task.model, str(exc), None
+        return task.model_key, str(exc), None
     finally:
         if temp_handle is not None:
             temp_handle.cleanup()
@@ -504,15 +506,18 @@ def generate_pt_files(
 
     shared_models = sorted(set(interface_map) & set(topology_map) & set(node_map) & set(structure_map))
     tasks: List[GraphTask] = []
-    for model in shared_models:
-        log_path = model_log_dir / Path(f"{model}.log")
+    for model_key in shared_models:
+        model_name = Path(model_key).name
+        log_rel = Path(model_key).with_suffix(".log")
+        log_path = (model_log_dir / log_rel).resolve()
         tasks.append(
             GraphTask(
-                model=model,
-                pdb_path=structure_map[model],
-                interface_path=interface_map[model],
-                topology_path=topology_map[model],
-                node_path=node_map[model],
+                model_key=model_key,
+                model_name=model_name,
+                pdb_path=structure_map[model_key],
+                interface_path=interface_map[model_key],
+                topology_path=topology_map[model_key],
+                node_path=node_map[model_key],
                 log_path=log_path,
             )
         )
@@ -538,11 +543,13 @@ def generate_pt_files(
     def _write_model_log(task: GraphTask, status: str, message: str = "") -> None:
         task.log_path.parent.mkdir(parents=True, exist_ok=True)
         lines = [
+            f"Model key: {task.model_key}",
+            f"Model name: {task.model_name}",
             f"PDB: {task.pdb_path}",
             f"Interface: {task.interface_path}",
             f"Topology: {task.topology_path}",
             f"Node features: {task.node_path}",
-            f"Output: {output_pt_dir / Path(f'{task.model}.pt')}",
+            f"Output: {output_pt_dir / Path(f'{task.model_key}.pt')}",
             f"Status: {status}",
         ]
         if message:
@@ -572,7 +579,7 @@ def generate_pt_files(
                         model, error, dim = future.result()
                     except Exception as exc:  # pragma: no cover
                         error = str(exc)
-                        model = task.model
+                        model = task.model_key
                         dim = None
                     if error:
                         failures.append((model, error, task.log_path))

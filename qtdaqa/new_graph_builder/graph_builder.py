@@ -300,7 +300,8 @@ def _detect_node_fea_signature() -> int:
 
 @dataclass
 class NodeFeatureTask:
-    model: str
+    model_key: str
+    model_name: str
     structure_path: Path
     interface_path: Path
     topology_path: Path
@@ -514,15 +515,20 @@ def _generate_topology_features(
     return len(descriptors), None
 
 
-def _stage_node_feature_inputs(model: str, interface_path: Path, topology_path: Path) -> tuple[tempfile.TemporaryDirectory, Path, Path]:
-    temp_dir = tempfile.TemporaryDirectory(prefix=f"node_features_{model}_")
+def _stage_node_feature_inputs(
+    model_name: str,
+    interface_path: Path,
+    topology_path: Path,
+) -> tuple[tempfile.TemporaryDirectory, Path, Path]:
+    safe_token = re.sub(r"[^A-Za-z0-9_.-]", "_", model_name) or "model"
+    temp_dir = tempfile.TemporaryDirectory(prefix=f"node_features_{safe_token}_")
     root = Path(temp_dir.name)
     iface_dir = root / "interface"
     topo_dir = root / "topology"
     iface_dir.mkdir(parents=True, exist_ok=True)
     topo_dir.mkdir(parents=True, exist_ok=True)
-    iface_target = iface_dir / Path(f"{model}.txt")
-    topo_target = topo_dir / Path(f"{model}.csv")
+    iface_target = iface_dir / f"{model_name}.txt"
+    topo_target = topo_dir / f"{model_name}.csv"
     iface_target.parent.mkdir(parents=True, exist_ok=True)
     topo_target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(interface_path, iface_target)
@@ -530,17 +536,23 @@ def _stage_node_feature_inputs(model: str, interface_path: Path, topology_path: 
     return temp_dir, iface_dir, topo_dir
 
 
-def _initialise_node_fea(model: str, structure_path: Path, interface_dir: Path, topo_dir: Path, signature_size: int):
+def _initialise_node_fea(
+    model_name: str,
+    structure_path: Path,
+    interface_dir: Path,
+    topo_dir: Path,
+    signature_size: int,
+):
     iface = str(interface_dir)
     topo = str(topo_dir)
     if signature_size == 3:
         return node_fea(str(structure_path), iface, topo)
     if signature_size == 4:
-        return node_fea(model, str(structure_path.parent), iface, topo)
+        return node_fea(model_name, str(structure_path.parent), iface, topo)
     try:
         return node_fea(str(structure_path), iface, topo)
     except TypeError:
-        return node_fea(model, str(structure_path.parent), iface, topo)
+        return node_fea(model_name, str(structure_path.parent), iface, topo)
 
 
 def _process_node_feature_task(
@@ -552,8 +564,20 @@ def _process_node_feature_task(
     log_lines: List[str] = []
     task.log_path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        temp_dir, iface_dir, topo_dir = _stage_node_feature_inputs(task.model, task.interface_path, task.topology_path)
-        extractor = _initialise_node_fea(task.model, task.structure_path, iface_dir, topo_dir, signature_size)
+        temp_dir, iface_dir, topo_dir = _stage_node_feature_inputs(
+            task.model_name,
+            task.interface_path,
+            task.topology_path,
+        )
+        extractor = _initialise_node_fea(
+            task.model_name,
+            task.structure_path,
+            iface_dir,
+            topo_dir,
+            signature_size,
+        )
+        log_lines.append(f"Model key: {task.model_key}")
+        log_lines.append(f"Model name: {task.model_name}")
         log_lines.append(f"PDB: {task.structure_path}")
         log_lines.append(f"Interface source: {task.interface_path}")
         log_lines.append(f"Topology source: {task.topology_path}")
@@ -576,11 +600,11 @@ def _process_node_feature_task(
             for warn in captured:
                 log_lines.append(f"  {warn.category.__name__}: {warn.message}")
         log_lines.append("Status: SUCCESS")
-        return task.model, None
+        return task.model_key, None
     except Exception as exc:  # pragma: no cover
         log_lines.append("Status: FAILURE")
         log_lines.append(f"Error: {exc}")
-        return task.model, str(exc)
+        return task.model_key, str(exc)
     finally:
         if temp_dir is not None:
             temp_dir.cleanup()
@@ -602,20 +626,22 @@ def _build_node_feature_tasks(
     shared_models = sorted(set(interface_map) & set(topology_map))
 
     tasks: List[NodeFeatureTask] = []
-    for model in shared_models:
-        interface_path = _select_single_path(interface_map.get(model, []))
-        topology_path = _select_single_path(topology_map.get(model, []))
-        structure_path = structure_map.get(model)
+    for model_key in shared_models:
+        interface_path = _select_single_path(interface_map.get(model_key, []))
+        topology_path = _select_single_path(topology_map.get(model_key, []))
+        structure_path = structure_map.get(model_key)
         if not interface_path or not topology_path or not structure_path:
             continue
-        output_rel = _relative_node_output_path(interface_dir, interface_path, model)
+        model_name = Path(model_key).name
+        output_rel = _relative_node_output_path(interface_dir, interface_path, model_key)
         output_path = (output_dir / output_rel).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
         log_rel = output_rel.with_suffix(".log")
         log_path = (log_dir / log_rel).resolve()
         tasks.append(
             NodeFeatureTask(
-                model=model,
+                model_key=model_key,
+                model_name=model_name,
                 structure_path=structure_path,
                 interface_path=interface_path,
                 topology_path=topology_path,
@@ -983,7 +1009,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     logger.info("Per-PDB interface logs directory: %s", interface_log_dir)
     logger.info("Interface success count: %d", generated_interface_files)
     node_feature_tasks = _build_node_feature_tasks(structure_map, interface_dir, topology_dir, node_feature_dir, node_feature_log_dir)
-    node_feature_log_paths = {task.model: task.log_path for task in node_feature_tasks}
+    node_feature_log_paths = {task.model_key: task.log_path for task in node_feature_tasks}
     node_feature_success = 0
     node_feature_failures: List[Tuple[str, str]] = []
     node_elapsed = 0.0
@@ -1000,8 +1026,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             for task in node_feature_tasks:
                 model, error = _process_node_feature_task(task, signature_size, NODE_FEATURE_DROP_NA)
                 if error:
-                    node_feature_failures.append((task.model, error))
-                    logger.warning("Node feature extraction failed for %s: %s", task.model, error)
+                    node_feature_failures.append((task.model_key, error))
+                    logger.warning("Node feature extraction failed for %s: %s", task.model_key, error)
                 else:
                     node_feature_success += 1
         else:
@@ -1020,8 +1046,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     try:
                         model, error = future.result()
                     except Exception as exc:  # pragma: no cover
-                        node_feature_failures.append((task.model, str(exc)))
-                        logger.warning("Node feature extraction failed for %s: %s", task.model, exc)
+                        node_feature_failures.append((task.model_key, str(exc)))
+                        logger.warning("Node feature extraction failed for %s: %s", task.model_key, exc)
                     else:
                         if error:
                             node_feature_failures.append((model, error))
