@@ -17,6 +17,7 @@ datasets/training/*
 !datasets/training/.gitkeep
 
 # keep empty directories although ignored
+qtdaqa/new_inference/ARM_cpu_only/output*
 qtdaqa/graph_builder/output*
 qtdaqa/new_graph_builder/output*
 qtdaqa/new_global_metrics/output*
