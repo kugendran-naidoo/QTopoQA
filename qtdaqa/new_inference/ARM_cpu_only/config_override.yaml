@@ -1,0 +1,22 @@
+data_dir: ../../../datasets/training/adjusted/pilot_batch_Dockground_MAF2/1AVW
+work_dir: ./config_run
+checkpoint_path: ../../new_model_training/ARM_cpu_only/training_runs/model_checkpoints/best.ckpt
+output_file: ./config_run/preds.csv
+label_file: null
+batch_size: 256
+num_workers: 0
+builder:
+  jobs: 2
+  topology_dedup_sort: false
+  dump_edges: true
+reuse_existing_graphs: true
+use_checkpoint_schema: false
+edge_schema:
+  dim: 24
+  use_layer_norm: false
+  bands:
+    - {label: short, min_distance: 0.0, max_distance: 6.0}
+    - {label: medium, min_distance: 6.0, max_distance: 10.0}
+    - {label: long, min_distance: 10.0, max_distance: 14.0}
+topology_schema:
+  vector_dim: 140
