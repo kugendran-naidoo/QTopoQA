@@ -10,7 +10,7 @@ import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import numpy as np
@@ -131,12 +131,32 @@ def _normalise_node_name(name: str) -> str:
     return _trim_suffix(Path(name).stem, (".node_fea", "node_fea", "node"))
 
 
+def _relative_key(root: Path, path: Path, name: str) -> str:
+    try:
+        relative = path.relative_to(root)
+    except ValueError:
+        return name
+    parent_parts = [part for part in relative.parent.parts if part not in ("", ".")]
+    if parent_parts:
+        return str(PurePosixPath(*parent_parts, name))
+    return name
+
+
+def _structure_model_key(dataset_dir: Path, structure_path: Path) -> str:
+    relative = structure_path.relative_to(dataset_dir)
+    parent_parts = [part for part in relative.parent.parts if part not in ("", ".")]
+    if parent_parts:
+        return str(PurePosixPath(*parent_parts, structure_path.stem))
+    return structure_path.stem
+
+
 def _gather_files(root: Path, patterns: Iterable[str], normalise) -> Dict[str, Path]:
     mapping: Dict[str, Path] = {}
     for pattern in patterns:
         for path in root.rglob(pattern):
             if path.is_file():
-                key = normalise(path.name)
+                normalised = normalise(path.name)
+                key = _relative_key(root, path, normalised)
                 mapping.setdefault(key, path)
     return mapping
 
@@ -146,7 +166,8 @@ def _index_structures(dataset_dir: Path) -> Dict[str, Path]:
     for ext in (".pdb",):
         for path in dataset_dir.rglob(f"*{ext}"):
             if path.is_file():
-                mapping.setdefault(path.stem, path)
+                key = _structure_model_key(dataset_dir, path)
+                mapping.setdefault(key, path)
     return mapping
 
 
@@ -161,10 +182,18 @@ def _prepare_staging(task: GraphTask) -> tuple[tempfile.TemporaryDirectory, Path
     interface_dir.mkdir(parents=True, exist_ok=True)
     topology_dir.mkdir(parents=True, exist_ok=True)
     pdb_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(task.node_path, node_dir / f"{task.model}.csv")
-    shutil.copyfile(task.interface_path, interface_dir / f"{task.model}.txt")
-    shutil.copyfile(task.topology_path, topology_dir / f"{task.model}.topology.csv")
-    shutil.copyfile(task.pdb_path, pdb_dir / f"{task.model}{task.pdb_path.suffix}")
+    node_target = node_dir / Path(f"{task.model}.csv")
+    iface_target = interface_dir / Path(f"{task.model}.txt")
+    topo_target = topology_dir / Path(f"{task.model}.topology.csv")
+    pdb_target = pdb_dir / Path(f"{task.model}{task.pdb_path.suffix}")
+    node_target.parent.mkdir(parents=True, exist_ok=True)
+    iface_target.parent.mkdir(parents=True, exist_ok=True)
+    topo_target.parent.mkdir(parents=True, exist_ok=True)
+    pdb_target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(task.node_path, node_target)
+    shutil.copyfile(task.interface_path, iface_target)
+    shutil.copyfile(task.topology_path, topo_target)
+    shutil.copyfile(task.pdb_path, pdb_target)
     return temp_dir, node_dir, interface_dir, topology_dir, pdb_dir
 
 
@@ -389,7 +418,9 @@ def _save_graph(model: str, x: np.ndarray, edge_index: np.ndarray, edge_attr: np
         edge_index=torch.tensor(edge_index.T if edge_index.size else np.empty((2, 0), dtype=np.int64), dtype=torch.long),
         edge_attr=torch.tensor(edge_attr, dtype=torch.float32),
     )
-    torch.save(data, output_dir / f"{model}.pt")
+    output_path = output_dir / Path(f"{model}.pt")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(data, output_path)
 
 
 def _process_task(
@@ -417,7 +448,8 @@ def _process_task(
         dump_path = None
         if edge_dump_dir is not None:
             edge_dump_dir.mkdir(parents=True, exist_ok=True)
-            dump_path = edge_dump_dir / f"{task.model}.edges.csv"
+            dump_path = edge_dump_dir / Path(f"{task.model}.edges.csv")
+            dump_path.parent.mkdir(parents=True, exist_ok=True)
 
         edge_index, edge_attr = feature_builder.build_edges(residues, id_to_index, structure_cache, dump_path)
         x = node_df[feature_cols].to_numpy(dtype=np.float32)
@@ -473,7 +505,7 @@ def generate_pt_files(
     shared_models = sorted(set(interface_map) & set(topology_map) & set(node_map) & set(structure_map))
     tasks: List[GraphTask] = []
     for model in shared_models:
-        log_path = model_log_dir / f"{model}.log"
+        log_path = model_log_dir / Path(f"{model}.log")
         tasks.append(
             GraphTask(
                 model=model,
@@ -504,12 +536,13 @@ def generate_pt_files(
     feature_dim: Optional[int] = None
 
     def _write_model_log(task: GraphTask, status: str, message: str = "") -> None:
+        task.log_path.parent.mkdir(parents=True, exist_ok=True)
         lines = [
             f"PDB: {task.pdb_path}",
             f"Interface: {task.interface_path}",
             f"Topology: {task.topology_path}",
             f"Node features: {task.node_path}",
-            f"Output: {output_pt_dir / f'{task.model}.pt'}",
+            f"Output: {output_pt_dir / Path(f'{task.model}.pt')}",
             f"Status: {status}",
         ]
         if message:
