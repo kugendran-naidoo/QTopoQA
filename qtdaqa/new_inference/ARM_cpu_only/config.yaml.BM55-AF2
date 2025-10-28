@@ -12,7 +12,7 @@ num_workers: 0
 
 # Builder options
 builder:
-  jobs: 12
+  jobs: 6
   topology_dedup_sort: false
   dump_edges: true
 
