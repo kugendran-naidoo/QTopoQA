@@ -1,0 +1,335 @@
+{
+  "dataset_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2",
+  "edge": {
+    "edge_feature_dim": 24,
+    "elapsed": 86.8548431249801,
+    "failures": [],
+    "log_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/edge_logs",
+    "metadata_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/graph_data/graph_metadata.json",
+    "output_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/graph_data",
+    "processed": 106,
+    "run_log": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/edge_logs/edge_stage.log",
+    "structure_map": {
+      "1A9X/1A9X": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1A9X/1A9X.pdb",
+      "1A9X/1A9X_af2m": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1A9X/1A9X_af2m.pdb",
+      "1a2k/1a2k_1": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_1.pdb",
+      "1a2k/1a2k_10": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_10.pdb",
+      "1a2k/1a2k_100": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_100.pdb",
+      "1a2k/1a2k_11": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_11.pdb",
+      "1a2k/1a2k_12": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_12.pdb",
+      "1a2k/1a2k_13": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_13.pdb",
+      "1a2k/1a2k_14": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_14.pdb",
+      "1a2k/1a2k_15": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_15.pdb",
+      "1a2k/1a2k_16": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_16.pdb",
+      "1a2k/1a2k_17": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_17.pdb",
+      "1a2k/1a2k_18": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_18.pdb",
+      "1a2k/1a2k_19": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_19.pdb",
+      "1a2k/1a2k_2": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_2.pdb",
+      "1a2k/1a2k_20": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_20.pdb",
+      "1a2k/1a2k_21": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_21.pdb",
+      "1a2k/1a2k_22": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_22.pdb",
+      "1a2k/1a2k_23": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_23.pdb",
+      "1a2k/1a2k_24": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_24.pdb",
+      "1a2k/1a2k_25": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_25.pdb",
+      "1a2k/1a2k_26": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_26.pdb",
+      "1a2k/1a2k_27": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_27.pdb",
+      "1a2k/1a2k_28": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_28.pdb",
+      "1a2k/1a2k_29": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_29.pdb",
+      "1a2k/1a2k_3": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_3.pdb",
+      "1a2k/1a2k_30": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_30.pdb",
+      "1a2k/1a2k_31": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_31.pdb",
+      "1a2k/1a2k_32": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_32.pdb",
+      "1a2k/1a2k_33": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_33.pdb",
+      "1a2k/1a2k_34": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_34.pdb",
+      "1a2k/1a2k_35": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_35.pdb",
+      "1a2k/1a2k_36": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_36.pdb",
+      "1a2k/1a2k_365130": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_365130.pdb",
+      "1a2k/1a2k_37": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_37.pdb",
+      "1a2k/1a2k_38": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_38.pdb",
+      "1a2k/1a2k_39": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_39.pdb",
+      "1a2k/1a2k_4": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_4.pdb",
+      "1a2k/1a2k_40": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_40.pdb",
+      "1a2k/1a2k_41": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_41.pdb",
+      "1a2k/1a2k_42": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_42.pdb",
+      "1a2k/1a2k_43": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_43.pdb",
+      "1a2k/1a2k_44": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_44.pdb",
+      "1a2k/1a2k_443512": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_443512.pdb",
+      "1a2k/1a2k_45": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_45.pdb",
+      "1a2k/1a2k_46": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_46.pdb",
+      "1a2k/1a2k_47": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_47.pdb",
+      "1a2k/1a2k_48": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_48.pdb",
+      "1a2k/1a2k_49": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_49.pdb",
+      "1a2k/1a2k_5": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_5.pdb",
+      "1a2k/1a2k_50": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_50.pdb",
+      "1a2k/1a2k_51": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_51.pdb",
+      "1a2k/1a2k_52": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_52.pdb",
+      "1a2k/1a2k_53": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_53.pdb",
+      "1a2k/1a2k_54": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_54.pdb",
+      "1a2k/1a2k_55": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_55.pdb",
+      "1a2k/1a2k_56": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_56.pdb",
+      "1a2k/1a2k_57": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_57.pdb",
+      "1a2k/1a2k_58": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_58.pdb",
+      "1a2k/1a2k_59": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_59.pdb",
+      "1a2k/1a2k_6": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_6.pdb",
+      "1a2k/1a2k_60": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_60.pdb",
+      "1a2k/1a2k_61": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_61.pdb",
+      "1a2k/1a2k_62": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_62.pdb",
+      "1a2k/1a2k_63": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_63.pdb",
+      "1a2k/1a2k_64": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_64.pdb",
+      "1a2k/1a2k_65": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_65.pdb",
+      "1a2k/1a2k_66": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_66.pdb",
+      "1a2k/1a2k_67": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_67.pdb",
+      "1a2k/1a2k_68": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_68.pdb",
+      "1a2k/1a2k_69": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_69.pdb",
+      "1a2k/1a2k_7": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_7.pdb",
+      "1a2k/1a2k_70": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_70.pdb",
+      "1a2k/1a2k_71": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_71.pdb",
+      "1a2k/1a2k_72": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_72.pdb",
+      "1a2k/1a2k_73": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_73.pdb",
+      "1a2k/1a2k_74": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_74.pdb",
+      "1a2k/1a2k_75": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_75.pdb",
+      "1a2k/1a2k_76": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_76.pdb",
+      "1a2k/1a2k_77": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_77.pdb",
+      "1a2k/1a2k_78": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_78.pdb",
+      "1a2k/1a2k_79": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_79.pdb",
+      "1a2k/1a2k_8": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_8.pdb",
+      "1a2k/1a2k_80": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_80.pdb",
+      "1a2k/1a2k_81": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_81.pdb",
+      "1a2k/1a2k_82": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_82.pdb",
+      "1a2k/1a2k_83": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_83.pdb",
+      "1a2k/1a2k_84": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_84.pdb",
+      "1a2k/1a2k_85": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_85.pdb",
+      "1a2k/1a2k_86": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_86.pdb",
+      "1a2k/1a2k_87": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_87.pdb",
+      "1a2k/1a2k_88": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_88.pdb",
+      "1a2k/1a2k_89": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_89.pdb",
+      "1a2k/1a2k_9": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_9.pdb",
+      "1a2k/1a2k_90": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_90.pdb",
+      "1a2k/1a2k_91": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_91.pdb",
+      "1a2k/1a2k_92": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_92.pdb",
+      "1a2k/1a2k_93": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_93.pdb",
+      "1a2k/1a2k_94": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_94.pdb",
+      "1a2k/1a2k_95": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_95.pdb",
+      "1a2k/1a2k_96": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_96.pdb",
+      "1a2k/1a2k_97": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_97.pdb",
+      "1a2k/1a2k_98": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_98.pdb",
+      "1a2k/1a2k_99": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_99.pdb",
+      "1a2k/1a2k_p1": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_p1.pdb",
+      "1a2k/1a2k_p2": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_p2.pdb",
+      "1a2k/1a2k_u1": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_u1.pdb",
+      "1a2k/1a2k_u2": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_u2.pdb"
+    },
+    "success": 106
+  },
+  "graph_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/graph_data",
+  "interface": {
+    "elapsed": 8.309294125065207,
+    "failures": [],
+    "log_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/interface_logs",
+    "output_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/work/interface",
+    "processed": 108,
+    "success": 108
+  },
+  "log_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28",
+  "modules": {
+    "edge": {
+      "alias": null,
+      "defaults": {
+        "bands": [
+          {
+            "label": "short",
+            "max_distance": 6.0,
+            "min_distance": 0.0
+          },
+          {
+            "label": "medium",
+            "max_distance": 10.0,
+            "min_distance": 6.0
+          },
+          {
+            "label": "long",
+            "max_distance": 14.0,
+            "min_distance": 10.0
+          }
+        ],
+        "contact_threshold": 5.0,
+        "histogram_bins": [
+          0.0,
+          2.0,
+          4.0,
+          6.0,
+          8.0,
+          10.0,
+          12.0,
+          14.0,
+          16.0,
+          18.0,
+          20.0
+        ],
+        "include_inverse_distance": true,
+        "include_unit_vector": true,
+        "unit_vector_epsilon": 1e-08
+      },
+      "description": "Computes directed residue-residue edges with distance, inverse distance, unit vectors, chain/amino-acid encodings, band indicators, inter-residue distance histograms, and contact counts.",
+      "id": "edge/multi_scale/v24",
+      "inputs": [
+        "interface_residues",
+        "node_features",
+        "pdb_structure"
+      ],
+      "jobs": 8,
+      "kind": "edge",
+      "notes": {},
+      "outputs": [
+        "edge_index",
+        "edge_attr"
+      ],
+      "parameters": {
+        "bands": "Distance band definitions with labels, min, and max distances.",
+        "contact_threshold": "Distance threshold (\u00c5) for counting contacts.",
+        "histogram_bins": "Histogram bin edges (\u00c5) for inter-atomic distances.",
+        "include_inverse_distance": "Include inverse distance feature.",
+        "include_unit_vector": "Include unit vector components.",
+        "unit_vector_epsilon": "Epsilon to avoid division by zero in unit vector calc."
+      },
+      "summary": "24-D multi-scale edge features with distance bands and histograms."
+    },
+    "interface": {
+      "alias": "TopoQA non-default cut-off",
+      "defaults": {
+        "coordinate_decimals": 3,
+        "cutoff": 14.0,
+        "jobs": null
+      },
+      "description": "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding.",
+      "id": "interface/polar_cutoff/v1",
+      "inputs": [
+        "pdb_file"
+      ],
+      "jobs": 8,
+      "kind": "interface",
+      "notes": {},
+      "outputs": [
+        "interface_file"
+      ],
+      "parameters": {
+        "coordinate_decimals": "Decimal places for coordinate rounding in output files.",
+        "cutoff": "Distance cutoff in \u00c5 for interface residue detection.",
+        "jobs": "Optional override for parallel worker count."
+      },
+      "summary": "Polar interface detection using distance cutoff."
+    },
+    "node": {
+      "alias": "TopoQA default",
+      "defaults": {
+        "drop_na": false,
+        "jobs": null
+      },
+      "description": "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs.",
+      "id": "node/dssp_topo_merge/v1",
+      "inputs": [
+        "pdb_file",
+        "interface_file",
+        "topology_csv"
+      ],
+      "jobs": 8,
+      "kind": "node",
+      "notes": {},
+      "outputs": [
+        "node_csv"
+      ],
+      "parameters": {
+        "drop_na": "Drop rows containing NA values after merging.",
+        "jobs": "Optional override for thread worker count."
+      },
+      "summary": "DSSP-derived node features merged with topology statistics."
+    },
+    "topology": {
+      "alias": "TopoQA default",
+      "defaults": {
+        "dedup_sort": false,
+        "element_filters": [
+          [
+            "C"
+          ],
+          [
+            "N"
+          ],
+          [
+            "O"
+          ],
+          [
+            "C",
+            "N"
+          ],
+          [
+            "C",
+            "O"
+          ],
+          [
+            "N",
+            "O"
+          ],
+          [
+            "C",
+            "N",
+            "O"
+          ]
+        ],
+        "filtration_cutoff": 8.0,
+        "jobs": null,
+        "min_persistence": 0.01,
+        "neighbor_distance": 8.0
+      },
+      "description": "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input.",
+      "id": "topology/persistence_basic/v1",
+      "inputs": [
+        "pdb_file",
+        "interface_file"
+      ],
+      "jobs": 8,
+      "kind": "topology",
+      "notes": {},
+      "outputs": [
+        "topology_csv"
+      ],
+      "parameters": {
+        "dedup_sort": "Enable deduplication & sorting of persistence pairs.",
+        "element_filters": "Sequence of element subsets considered for statistics.",
+        "filtration_cutoff": "Maximum filtration value in \u00c5.",
+        "jobs": "Optional override for parallel worker count.",
+        "min_persistence": "Minimum persistence threshold for features.",
+        "neighbor_distance": "Neighbourhood radius in \u00c5 for complex filtration."
+      },
+      "summary": "Persistent homology features with configurable distance thresholds."
+    }
+  },
+  "node": {
+    "elapsed": 32.18632583296858,
+    "failures": [],
+    "log_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/node_feature_logs",
+    "output_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/work/node_features",
+    "processed": 106,
+    "success": 106
+  },
+  "topology": {
+    "elapsed": 55.362638749880716,
+    "failures": [
+      [
+        "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_p2.pdb",
+        "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/topology_logs/1a2k/1a2k_p2.log",
+        "No interface residues found in /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/work/interface/1a2k/1a2k_p2.interface.txt"
+      ],
+      [
+        "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/pilot_batch_Dockground_MAF2/1a2k/1a2k_u2.pdb",
+        "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/topology_logs/1a2k/1a2k_u2.log",
+        "No interface residues found in /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/work/interface/1a2k/1a2k_u2.interface.txt"
+      ]
+    ],
+    "log_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/logs/graph_builder.2025-10-28_17-01-28/topology_logs",
+    "output_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/work/topology",
+    "processed": 108,
+    "success": 106
+  },
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_batch/work"
+}

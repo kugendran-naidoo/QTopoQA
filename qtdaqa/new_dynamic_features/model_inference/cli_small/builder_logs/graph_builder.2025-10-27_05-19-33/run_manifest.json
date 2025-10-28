@@ -1,0 +1,71 @@
+{
+  "config": {
+    "edge": {
+      "bands": [
+        {
+          "label": "short",
+          "max_distance": 6.0,
+          "min_distance": 0.0
+        },
+        {
+          "label": "medium",
+          "max_distance": 10.0,
+          "min_distance": 6.0
+        },
+        {
+          "label": "long",
+          "max_distance": 14.0,
+          "min_distance": 10.0
+        }
+      ],
+      "contact_threshold": 5.0,
+      "histogram_bins": [
+        0.0,
+        2.0,
+        4.0,
+        6.0,
+        8.0,
+        10.0,
+        12.0,
+        14.0,
+        16.0,
+        18.0,
+        20.0
+      ],
+      "include_inverse_distance": true,
+      "include_unit_vector": true,
+      "normalize": "none",
+      "unit_vector_epsilon": 1e-08
+    },
+    "interface": {
+      "coordinate_decimals": 3,
+      "cutoff": 14.0
+    },
+    "node_drop_na": false,
+    "topology": {
+      "dedup_sort": false,
+      "filtration_cutoff": 8.0,
+      "min_persistence": 0.01,
+      "neighbor_distance": 8.0
+    }
+  },
+  "config_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_inference/ARM_cpu_only/cli_small/builder_work/config.yaml",
+  "counts": {
+    "graphs_failures": 0,
+    "graphs_processed": 112,
+    "graphs_success": 112,
+    "interfaces": 116,
+    "node_features": 112,
+    "topology": 112
+  },
+  "dataset_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/pilot_batch_Dockground_MAF2/1AVW",
+  "edge_feature_dim": 24,
+  "graph_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_inference/ARM_cpu_only/cli_small/graph_data",
+  "log_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_inference/ARM_cpu_only/cli_small/builder_logs/graph_builder.2025-10-27_05-19-33",
+  "missing": {
+    "interfaces": 0,
+    "node_features": 0,
+    "topology": 4
+  },
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_inference/ARM_cpu_only/cli_small/builder_work"
+}
