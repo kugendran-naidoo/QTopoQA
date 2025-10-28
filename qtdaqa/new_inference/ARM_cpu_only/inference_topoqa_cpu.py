@@ -147,19 +147,19 @@ def load_config(raw_path: Path) -> InferenceConfig:
 class GraphInferenceDataset(Dataset):
     def __init__(
         self,
-        graph_paths: Sequence[Path],
+        graph_items: Sequence[Tuple[str, Path]],
         label_map: Optional[Dict[str, float]] = None,
         target_map: Optional[Dict[str, str]] = None,
     ):
-        self.graph_paths = list(graph_paths)
+        self.graph_items = [(key, Path(path)) for key, path in graph_items]
         self.label_map = label_map or {}
         self.target_map = target_map or {}
 
     def __len__(self) -> int:
-        return len(self.graph_paths)
+        return len(self.graph_items)
 
     def __getitem__(self, idx: int) -> Data:
-        path = self.graph_paths[idx]
+        model_key, path = self.graph_items[idx]
         data = torch.load(path)
 
         if hasattr(data, "batch"):
@@ -167,20 +167,53 @@ class GraphInferenceDataset(Dataset):
             if batch_attr is None or not torch.is_tensor(batch_attr):
                 delattr(data, "batch")
 
-        name = path.stem
-        normalised_name = _normalise_model_name(name)
-        data.name = name
-        target = self.target_map.get(normalised_name)
-        if target is not None:
-            data.target = target
+        base_name = Path(model_key).name
+        normalised_name = _normalise_model_name(base_name)
+        data.name = base_name
+        data.model_key = model_key
+
+        # Resolve target using composite and fallback keys
+        candidate_keys = [model_key, base_name, normalised_name]
+        if "/" in model_key:
+            prefix, _, suffix = model_key.partition("/")
+            candidate_keys.extend(
+                [
+                    f"{prefix}/{base_name}",
+                    f"{prefix}/{normalised_name}",
+                ]
+            )
+
+        target_value = None
+        for candidate in candidate_keys:
+            if candidate in self.target_map and self.target_map[candidate] is not None:
+                target_value = self.target_map[candidate]
+                break
+        if target_value is None and "/" in model_key:
+            target_value = model_key.split("/", 1)[0]
+        if target_value is not None:
+            data.target = str(target_value)
 
         if self.label_map:
-            label = self.label_map.get(normalised_name)
-            if label is not None:
-                data.y = torch.tensor([label], dtype=torch.float32)
+            label_value = None
+            for candidate in candidate_keys:
+                if candidate in self.label_map:
+                    label_value = self.label_map[candidate]
+                    break
+            if label_value is not None:
+                data.y = torch.tensor([label_value], dtype=torch.float32)
             else:
                 data.y = torch.tensor([float("nan")], dtype=torch.float32)
         return data
+
+
+def _ensure_list(value: object) -> List[object]:
+    if value is None:
+        return []
+    if isinstance(value, torch.Tensor):
+        return value.view(-1).tolist()
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    return [value]
 
 
 def collate_graphs(batch: List[Data]) -> Batch:
@@ -190,6 +223,8 @@ def collate_graphs(batch: List[Data]) -> Batch:
     merged.name = [str(getattr(item, "name", "")) for item in batch]
     if any(hasattr(item, "target") for item in batch):
         merged.target = [getattr(item, "target", None) for item in batch]
+    if any(hasattr(item, "model_key") for item in batch):
+        merged.model_key = [getattr(item, "model_key", None) for item in batch]
     return merged
 
 
@@ -212,23 +247,35 @@ def load_label_map(label_path: Path) -> LabelInfo:
     target_series = df[target_col] if target_col else None
 
     for idx, model_value in enumerate(model_series):
-        norm_key = _normalise_model_name(model_value)
-        raw_keys = {model_value.strip(), norm_key}
+        raw_name = model_value.strip()
+        norm_name = _normalise_model_name(raw_name)
+        base_keys = {raw_name, norm_name}
+        base_keys.discard("")
 
-        dockq_value = dockq_series.iloc[idx]
-        if pd.notna(dockq_value):
-            value = float(dockq_value)
-            for key in raw_keys:
-                if key:
-                    scores[key] = value
-
+        target_value = None
         if target_series is not None:
             raw_target = target_series.iloc[idx]
             if pd.notna(raw_target):
                 target_value = str(raw_target).strip()
-                for key in raw_keys:
-                    if key:
-                        targets[key] = target_value
+
+        composite_keys = set()
+        if target_value:
+            for key in base_keys:
+                if key:
+                    composite_keys.add(f"{target_value}/{key}")
+
+        dockq_value = dockq_series.iloc[idx]
+        if pd.notna(dockq_value):
+            value = float(dockq_value)
+            for key in composite_keys | base_keys:
+                if key:
+                    scores[key] = value
+
+        if target_value:
+            for key in composite_keys:
+                targets[key] = target_value
+            for key in base_keys:
+                targets.setdefault(key, target_value)
 
     return LabelInfo(scores=scores, targets=targets)
 
@@ -363,11 +410,20 @@ def _write_target_reports(df: "pd.DataFrame", output_root: Path) -> None:
             handle.write(top_pred_line + "\n")
 
 
-def gather_graphs(graph_dir: Path) -> List[Path]:
-    paths = sorted(graph_dir.glob("*.pt"))
+def gather_graphs(graph_dir: Path) -> List[Tuple[str, Path]]:
+    paths = sorted(graph_dir.rglob("*.pt"))
     if not paths:
         raise FileNotFoundError(f"No .pt graphs found under {graph_dir}")
-    return paths
+    entries: List[Tuple[str, Path]] = []
+    for path in paths:
+        try:
+            relative = path.relative_to(graph_dir)
+        except ValueError:
+            key = path.stem
+        else:
+            key = relative.with_suffix("").as_posix()
+        entries.append((key, path))
+    return entries
 
 
 def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]) -> GNN_edge1_edgepooling:
@@ -400,11 +456,11 @@ def run_inference(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object
     graph_dir = ensure_graph_dir(cfg)
 
     logging.info("Loading graphs from %s", graph_dir)
-    graph_paths = gather_graphs(graph_dir)
+    graph_entries = gather_graphs(graph_dir)
     label_info = load_label_map(cfg.label_file) if cfg.label_file else None
 
     dataset = GraphInferenceDataset(
-        graph_paths,
+        graph_entries,
         label_info.scores if label_info else None,
         label_info.targets if label_info else None,
     )
@@ -419,54 +475,78 @@ def run_inference(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object
 
     model = load_model(cfg, final_schema["edge_schema"])
 
-    names: List[str] = []
-    preds: List[float] = []
-    trues: List[Optional[float]] = []
-    targets_list: List[Optional[str]] = []
+    results: List[Dict[str, object]] = []
 
     with torch.no_grad():
         for batch in loader:
-            scores = model([batch])
-            scores = scores.view(-1).cpu().tolist()
-            if isinstance(batch.name, (list, tuple)):
-                batch_names = [str(name) for name in batch.name]
-            else:
-                batch_names = [str(batch.name)]
-            names.extend(batch_names)
-            if hasattr(batch, "target"):
-                batch_target_attr = batch.target
-                if isinstance(batch_target_attr, (list, tuple)):
-                    batch_targets = [str(t) if t is not None else None for t in batch_target_attr]
+            scores = model([batch]).view(-1).cpu().tolist()
+            name_attr = getattr(batch, "name", None)
+            key_attr = getattr(batch, "model_key", None)
+            target_attr = getattr(batch, "target", None)
+            truth_attr = getattr(batch, "y", None)
+
+            batch_names = [str(n) for n in _ensure_list(name_attr)]
+            batch_keys = [str(k) for k in _ensure_list(key_attr)]
+            batch_targets = [t if (t is None or isinstance(t, str)) else str(t) for t in _ensure_list(target_attr)]
+
+            truth_values: List[Optional[float]] = []
+            for item in _ensure_list(truth_attr):
+                try:
+                    value = float(item)
+                except (TypeError, ValueError):
+                    truth_values.append(None)
                 else:
-                    batch_targets = [str(batch_target_attr) if batch_target_attr is not None else None]
-            elif label_info and label_info.targets:
-                batch_targets = [label_info.targets.get(name) for name in batch_names]
-            else:
-                batch_targets = [None] * len(batch_names)
-            targets_list.extend(batch_targets)
-            preds.extend(scores)
-            if getattr(batch, "y", None) is not None:
-                values = batch.y.view(-1).cpu().tolist()
-                cleaned = [None if (v != v) else v for v in values]  # NaN check
-                trues.extend(cleaned)
-            else:
-                trues.extend([None] * len(scores))
+                    truth_values.append(None if math.isnan(value) else value)
+
+            for idx_in_batch, pred in enumerate(scores):
+                key = batch_keys[idx_in_batch] if idx_in_batch < len(batch_keys) else None
+                if key is None:
+                    key = batch_names[idx_in_batch] if idx_in_batch < len(batch_names) else f"sample_{len(results) + idx_in_batch}"
+                base_name = batch_names[idx_in_batch] if idx_in_batch < len(batch_names) else Path(key).name
+
+                target_value: Optional[str] = None
+                if idx_in_batch < len(batch_targets):
+                    candidate = batch_targets[idx_in_batch]
+                    if candidate not in (None, ""):
+                        target_value = str(candidate)
+                if label_info and label_info.targets:
+                    target_value = target_value or label_info.targets.get(key)
+                    if target_value is None and "/" in key:
+                        prefix, _, suffix = key.partition("/")
+                        candidates = [
+                            f"{prefix}/{suffix}",
+                            f"{prefix}/{_normalise_model_name(suffix)}",
+                        ]
+                        for candidate_key in candidates:
+                            if candidate_key in label_info.targets:
+                                target_value = label_info.targets[candidate_key]
+                                break
+                if target_value is None and "/" in key:
+                    target_value = key.split("/", 1)[0]
+
+                true_value = truth_values[idx_in_batch] if idx_in_batch < len(truth_values) else None
+
+                results.append(
+                    {
+                        "model_key": key,
+                        "model": base_name,
+                        "target": target_value,
+                        "pred": float(pred),
+                        "true": true_value,
+                    }
+                )
 
     cfg.output_file.parent.mkdir(parents=True, exist_ok=True)
-    if len(names) != len(preds):
-        raise ValueError(f"Mismatched prediction counts: {len(names)} names vs {len(preds)} scores")
-
     rows: List[Dict[str, object]] = []
-    for idx, name in enumerate(names):
-        pred = preds[idx]
-        true = trues[idx] if idx < len(trues) else None
-        target_value = targets_list[idx] if idx < len(targets_list) else None
-
-        row: Dict[str, object] = {"MODEL": name, "PRED_DOCKQ": pred}
-        if target_value is not None:
-            row["TARGET"] = target_value
-        if true is not None:
-            row["DockQ"] = true
+    for item in results:
+        row: Dict[str, object] = {}
+        if item["target"] is not None:
+            row["TARGET"] = str(item["target"])
+        row["MODEL_KEY"] = item["model_key"]
+        row["MODEL"] = item["model"]
+        row["PRED_DOCKQ"] = item["pred"]
+        if item["true"] is not None:
+            row["DockQ"] = item["true"]
         rows.append(row)
 
     import pandas as pd
@@ -476,7 +556,11 @@ def run_inference(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object
         column_order: List[str] = []
         if "TARGET" in df.columns:
             column_order.append("TARGET")
-        column_order.extend(["MODEL", "PRED_DOCKQ"])
+        if "MODEL_KEY" in df.columns:
+            column_order.append("MODEL_KEY")
+        for column in ("MODEL", "PRED_DOCKQ"):
+            if column in df.columns:
+                column_order.append(column)
         if "DockQ" in df.columns:
             column_order.append("DockQ")
         df = df[column_order]

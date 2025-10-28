@@ -31,7 +31,7 @@ import warnings
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 from Bio.PDB import PDBParser
@@ -228,12 +228,33 @@ def _normalise_topology_name(name: str) -> str:
     return _trim_suffix(Path(name).stem, (".topology", "topology", "node_topo"))
 
 
+def _relative_key(base: Path, path: Path, name: str) -> str:
+    try:
+        relative = path.relative_to(base)
+    except ValueError:
+        return name
+    parent_parts = [part for part in relative.parent.parts if part not in ("", ".")]
+    if parent_parts:
+        return str(PurePosixPath(*parent_parts, name))
+    return name
+
+
+def _structure_model_key(dataset_dir: Path, structure_path: Path) -> str:
+    relative = structure_path.relative_to(dataset_dir)
+    parent_parts = [part for part in relative.parent.parts if part not in ("", ".")]
+    if parent_parts:
+        return str(PurePosixPath(*parent_parts, structure_path.stem))
+    return structure_path.stem
+
+
 def _gather_interface_files(root: Path) -> Dict[str, List[Path]]:
     mapping: Dict[str, List[Path]] = {}
     for pattern in ("*.interface.txt", "*.txt"):
         for path in root.rglob(pattern):
             if path.is_file():
-                mapping.setdefault(_normalise_interface_name(path.name), []).append(path)
+                normalised = _normalise_interface_name(path.name)
+                key = _relative_key(root, path, normalised)
+                mapping.setdefault(key, []).append(path)
         if mapping:
             break
     return mapping
@@ -244,7 +265,9 @@ def _gather_topology_files(root: Path) -> Dict[str, List[Path]]:
     for pattern in ("*.topology.csv", "*.csv"):
         for path in root.rglob(pattern):
             if path.is_file():
-                mapping.setdefault(_normalise_topology_name(path.name), []).append(path)
+                normalised = _normalise_topology_name(path.name)
+                key = _relative_key(root, path, normalised)
+                mapping.setdefault(key, []).append(path)
         if mapping:
             break
     return mapping
@@ -259,6 +282,8 @@ def _select_single_path(paths: List[Path]) -> Optional[Path]:
 
 
 def _relative_node_output_path(base_dir: Path, interface_file: Path, model: str) -> Path:
+    if "/" in model or "\\" in model:
+        return Path(model).with_suffix(".csv")
     try:
         relative = interface_file.relative_to(base_dir)
         return relative.parent / f"{model}.csv"
@@ -496,8 +521,12 @@ def _stage_node_feature_inputs(model: str, interface_path: Path, topology_path: 
     topo_dir = root / "topology"
     iface_dir.mkdir(parents=True, exist_ok=True)
     topo_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(interface_path, iface_dir / f"{model}.txt")
-    shutil.copyfile(topology_path, topo_dir / f"{model}.csv")
+    iface_target = iface_dir / Path(f"{model}.txt")
+    topo_target = topo_dir / Path(f"{model}.csv")
+    iface_target.parent.mkdir(parents=True, exist_ok=True)
+    topo_target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(interface_path, iface_target)
+    shutil.copyfile(topology_path, topo_target)
     return temp_dir, iface_dir, topo_dir
 
 
@@ -582,7 +611,8 @@ def _build_node_feature_tasks(
         output_rel = _relative_node_output_path(interface_dir, interface_path, model)
         output_path = (output_dir / output_rel).resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        log_path = (log_dir / output_rel.parent / f"{model}.log").resolve()
+        log_rel = output_rel.with_suffix(".log")
+        log_path = (log_dir / log_rel).resolve()
         tasks.append(
             NodeFeatureTask(
                 model=model,
@@ -702,7 +732,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         pdb_files, cif_files = _collect_structure_files(dataset_dir)
         structure_map: Dict[str, Path] = {}
         for path in list(pdb_files) + list(cif_files):
-            structure_map.setdefault(path.stem, path)
+            model_key = _structure_model_key(dataset_dir, path)
+            structure_map.setdefault(model_key, path)
         _check_rw_directories(
             [
                 (work_dir, "work directory"),
