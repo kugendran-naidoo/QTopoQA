@@ -5,7 +5,7 @@ from torch_geometric.nn import global_add_pool, global_mean_pool, global_max_poo
 import pandas as pd
 import torch.nn as nn
 import warnings
-from typing import Tuple
+from typing import Optional, Tuple
 try:
     from torch_geometric.loader import DataLoader  # PyG >= 2.0
 except Exception:
@@ -71,7 +71,7 @@ def _spearman_safe(a: np.ndarray, b: np.ndarray) -> float:
 
 
 class GNN_edge1_edgepooling(pl.LightningModule):
-    def __init__(self,init_lr,pooling_type,mode,num_net=5,hidden_dim=32,edge_dim=1,output_dim=64,n_output=1,heads=8,edge_schema=None):
+    def __init__(self,init_lr,pooling_type,mode,num_net=5,hidden_dim=32,edge_dim=1,output_dim=64,n_output=1,heads=8,edge_schema=None,node_dim: Optional[int]=None):
         super().__init__()
         self.mode=mode
         self.init_lr=init_lr
@@ -93,6 +93,11 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             num_feature_xd=172
         elif self.mode=='esm':
             num_feature_xd=1252
+
+        if node_dim is not None:
+            num_feature_xd = int(node_dim)
+
+        self.node_dim = num_feature_xd
 
         schema = edge_schema or {}
         self.edge_dim = edge_dim

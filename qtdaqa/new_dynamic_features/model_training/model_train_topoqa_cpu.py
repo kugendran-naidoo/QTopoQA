@@ -46,9 +46,12 @@ from torch_geometric.loader import DataLoader
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 MODEL_DIR = SCRIPT_DIR / "model"
-if str(MODEL_DIR) not in sys.path:
-    sys.path.insert(0, str(MODEL_DIR))
+COMMON_DIR = SCRIPT_DIR.parent / "common"
+for path in (MODEL_DIR, COMMON_DIR):
+    if path.exists() and str(path) not in sys.path:
+        sys.path.insert(0, str(path))
 
+from feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata  # type: ignore  # noqa: E402
 from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
 
 
@@ -58,6 +61,8 @@ class TrainingConfig:
     train_label_file: Path
     val_label_file: Path
     save_dir: Path
+    metadata_path: Optional[Path] = None
+    summary_path: Optional[Path] = None
     accelerator: str = "cpu"
     attention_head: int = 8
     pooling_type: str = "mean"
@@ -79,30 +84,61 @@ class TrainingConfig:
     topology_schema: dict = dataclasses.field(default_factory=dict)
 
 
-def _resolve_path(raw: str, base: Path) -> Path:
+def _resolve_path(
+    raw: str | Path,
+    base: Path,
+    *,
+    allow_missing: bool = False,
+    fallbacks: Optional[Sequence[Path]] = None,
+) -> Path:
     path = Path(raw)
-    if not path.is_absolute():
-        path = (base / raw).resolve()
-    return path
+    if path.is_absolute():
+        return path
+    primary = (base / path).resolve()
+    if primary.exists() or allow_missing:
+        return primary
+    fallbacks = fallbacks or ()
+    for fallback in fallbacks:
+        candidate = (Path(fallback) / path).resolve()
+        if candidate.exists() or allow_missing:
+            return candidate
+    return primary
 
 
 def load_config(path: Path) -> TrainingConfig:
     with path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
 
+    base_dir = path.parent.resolve()
+
     def _get(name: str, default=None):
         return data.get(name, default)
 
-    graph_dir = _resolve_path(_get("graph_dir"), SCRIPT_DIR)
-    train_label_file = _resolve_path(_get("train_label_file"), SCRIPT_DIR)
-    val_label_file = _resolve_path(_get("val_label_file"), SCRIPT_DIR)
-    save_dir = _resolve_path(_get("save_dir"), SCRIPT_DIR)
+    graph_dir = _resolve_path(_get("graph_dir"), base_dir, fallbacks=(SCRIPT_DIR,))
+    train_label_file = _resolve_path(_get("train_label_file"), base_dir, fallbacks=(SCRIPT_DIR,))
+    val_label_file = _resolve_path(_get("val_label_file"), base_dir, fallbacks=(SCRIPT_DIR,))
+    save_dir = _resolve_path(_get("save_dir"), base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+
+    metadata_path_raw = _get("metadata_path")
+    summary_path_raw = _get("summary_path")
+    metadata_path = (
+        _resolve_path(metadata_path_raw, base_dir, fallbacks=(SCRIPT_DIR,))
+        if metadata_path_raw
+        else None
+    )
+    summary_path = (
+        _resolve_path(summary_path_raw, base_dir, fallbacks=(SCRIPT_DIR,))
+        if summary_path_raw
+        else None
+    )
 
     cfg = TrainingConfig(
         graph_dir=graph_dir,
         train_label_file=train_label_file,
         val_label_file=val_label_file,
         save_dir=save_dir,
+        metadata_path=metadata_path,
+        summary_path=summary_path,
         accelerator=str(_get("accelerator", "cpu")),
         attention_head=int(_get("attention_head", 8)),
         pooling_type=str(_get("pooling_type", "mean")),
@@ -138,9 +174,21 @@ def load_label_map(csv_path: Path) -> Dict[str, float]:
     return mapping
 
 
+def _build_graph_lookup(graph_dir: Path) -> Dict[str, List[Path]]:
+    lookup: Dict[str, List[Path]] = {}
+    for path in sorted(graph_dir.rglob("*.pt")):
+        stem_key = path.stem
+        lookup.setdefault(stem_key, []).append(path)
+        rel_key = path.relative_to(graph_dir).as_posix()
+        rel_key = rel_key[:-3] if rel_key.endswith(".pt") else rel_key
+        lookup.setdefault(rel_key, []).append(path)
+    return lookup
+
+
 def _gather_samples(
     graph_dir: Path,
     label_map: Dict[str, float],
+    graph_lookup: Dict[str, List[Path]],
 ) -> Tuple[List[Tuple[str, Path, torch.Tensor]], List[str]]:
     samples: List[Tuple[str, Path, torch.Tensor]] = []
     missing: List[str] = []
@@ -149,8 +197,16 @@ def _gather_samples(
         if candidate.exists():
             tensor = torch.tensor([label], dtype=torch.float32)
             samples.append((model, candidate, tensor))
-        else:
-            missing.append(model)
+            continue
+
+        matches = graph_lookup.get(model) or graph_lookup.get(model.replace("__", "/"))
+        if matches:
+            resolved = matches[0]
+            tensor = torch.tensor([label], dtype=torch.float32)
+            samples.append((model, resolved, tensor))
+            continue
+
+        missing.append(model)
     samples.sort(key=lambda item: item[0])
     return samples, missing
 
@@ -275,8 +331,10 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
     train_labels = load_label_map(cfg.train_label_file)
     val_labels = load_label_map(cfg.val_label_file)
 
-    train_samples, train_missing = _gather_samples(cfg.graph_dir, train_labels)
-    val_samples, val_missing = _gather_samples(cfg.graph_dir, val_labels)
+    graph_lookup = _build_graph_lookup(cfg.graph_dir)
+
+    train_samples, train_missing = _gather_samples(cfg.graph_dir, train_labels, graph_lookup)
+    val_samples, val_missing = _gather_samples(cfg.graph_dir, val_labels, graph_lookup)
 
     if not train_samples:
         raise RuntimeError("No training graphs found; aborting.")
@@ -298,6 +356,23 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         missing=val_missing,
     )
 
+    ordered_models: List[str] = []
+    seen_models = set()
+    for _, path, _ in [*train_samples, *val_samples]:
+        relative_key = path.relative_to(cfg.graph_dir).as_posix()
+        if relative_key.endswith(".pt"):
+            relative_key = relative_key[:-3]
+        if relative_key not in seen_models:
+            ordered_models.append(relative_key)
+            seen_models.add(relative_key)
+
+    feature_metadata = load_graph_feature_metadata(
+        cfg.graph_dir,
+        sample_models=ordered_models,
+        metadata_path=cfg.metadata_path,
+        summary_path=cfg.summary_path,
+    )
+
     train_loader = DataLoader(
         GraphRegressionDataset(train_samples),
         batch_size=cfg.batch_size,
@@ -314,7 +389,8 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         collate_fn=collate_graphs,
         persistent_workers=False,
     )
-    return train_loader, val_loader, {"train_missing": train_missing, "val_missing": val_missing}
+    coverage = {"train_missing": train_missing, "val_missing": val_missing}
+    return train_loader, val_loader, coverage, feature_metadata
 
 
 def parse_args() -> argparse.Namespace:
@@ -419,12 +495,6 @@ def main() -> int:
         if not path.exists():
             raise FileNotFoundError(f"Required path does not exist: {path}")
 
-    feature_metadata = {
-        "edge_schema": cfg.edge_schema,
-        "topology_schema": cfg.topology_schema,
-    }
-    logger.info("Feature metadata: %s", json.dumps(feature_metadata, indent=2))
-
     seed_everything(cfg.seed, workers=True)
 
     warnings.filterwarnings(
@@ -443,7 +513,71 @@ def main() -> int:
         module="pytorch_lightning.trainer.connectors.data_connector",
     )
 
-    train_loader, val_loader, coverage = build_dataloaders(cfg, logger)
+    train_loader, val_loader, coverage, feature_metadata = build_dataloaders(cfg, logger)
+
+    resolved_edge_schema = dict(feature_metadata.edge_schema)
+    configured_edge_schema = dict(cfg.edge_schema or {})
+
+    metadata_edge_dim = resolved_edge_schema.get("dim")
+    config_edge_dim = configured_edge_schema.get("dim")
+    if config_edge_dim is not None and metadata_edge_dim is not None:
+        if int(config_edge_dim) != int(metadata_edge_dim):
+            logger.warning(
+                "Config edge_schema.dim=%s differs from metadata dim=%s; using metadata value.",
+                config_edge_dim,
+                metadata_edge_dim,
+            )
+    if metadata_edge_dim is not None:
+        resolved_edge_schema["dim"] = int(metadata_edge_dim)
+    elif config_edge_dim is not None:
+        resolved_edge_schema["dim"] = int(config_edge_dim)
+
+    for key, value in configured_edge_schema.items():
+        if key == "dim":
+            continue
+        if value is not None:
+            resolved_edge_schema[key] = value
+
+    if "dim" not in resolved_edge_schema or resolved_edge_schema["dim"] is None:
+        raise RuntimeError("Edge feature dimension could not be resolved from metadata or config.")
+
+    cfg.edge_schema = resolved_edge_schema
+    feature_metadata.edge_schema = dict(resolved_edge_schema)
+    feature_metadata_dict = feature_metadata.to_dict()
+    feature_metadata_dict["topology_schema"] = cfg.topology_schema
+
+    node_schema_for_log: Dict[str, object] = dict(feature_metadata.node_schema)
+    node_columns = node_schema_for_log.get("columns")
+    if isinstance(node_columns, list):
+        node_schema_for_log["column_count"] = len(node_columns)
+        node_schema_for_log["columns_preview"] = node_columns[:5]
+        node_schema_for_log.pop("columns")
+
+    module_registry_log: Dict[str, Dict[str, object]] = {}
+    for kind, info in feature_metadata.module_registry.items():
+        if isinstance(info, dict):
+            module_registry_log[kind] = {
+                "id": info.get("id"),
+                "alias": info.get("alias"),
+                "jobs": info.get("jobs"),
+                "summary": info.get("summary"),
+            }
+
+    metadata_for_log = {
+        "edge_schema": feature_metadata.edge_schema,
+        "node_schema": node_schema_for_log,
+        "metadata_path": feature_metadata.metadata_path,
+        "summary_path": feature_metadata.summary_path,
+        "module_registry": module_registry_log,
+        "notes": feature_metadata.notes,
+    }
+    logger.info("Resolved feature metadata: %s", json.dumps(metadata_for_log, indent=2))
+
+    edge_dim_value = int(resolved_edge_schema["dim"])
+    node_dim_value = feature_metadata.node_schema.get("dim")
+    node_dim = int(node_dim_value) if node_dim_value is not None else None
+    if node_dim is None:
+        logger.warning("Node feature dimension unavailable; falling back to architecture default.")
 
     if cfg.num_workers == 0:
         if platform.system().lower() == "darwin":
@@ -467,10 +601,11 @@ def main() -> int:
         lr_scheduler_factor=cfg.lr_scheduler_factor,
         lr_scheduler_patience=cfg.lr_scheduler_patience,
         num_net=1,
-        edge_dim=int(cfg.edge_schema.get("dim", 24)),
+        edge_dim=edge_dim_value,
+        node_dim=node_dim,
         heads=cfg.attention_head,
         edge_schema=cfg.edge_schema,
-        feature_metadata=feature_metadata,
+        feature_metadata=feature_metadata_dict,
     )
 
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
@@ -572,7 +707,7 @@ def main() -> int:
     metadata_path = cfg.save_dir / "feature_metadata.json"
     try:
         with metadata_path.open("w", encoding="utf-8") as handle:
-            json.dump(feature_metadata, handle, indent=2)
+            json.dump(feature_metadata_dict, handle, indent=2)
         logger.info("Feature metadata written to %s", metadata_path)
     except OSError as exc:
         logger.warning("Unable to write feature metadata file: %s", exc)
