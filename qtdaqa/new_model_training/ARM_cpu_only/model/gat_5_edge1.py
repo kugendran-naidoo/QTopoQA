@@ -95,6 +95,7 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             num_feature_xd=1252
 
         schema = edge_schema or {}
+        self.edge_dim = edge_dim
         self.use_edge_layer_norm = bool(schema.get("use_layer_norm", True))
 
         def _edge_encoder():
@@ -158,9 +159,34 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             protein_gat3=module[3]
             protein_fc1=module[4]
             edge_embed=module[5]
-            
-        
+
             x=protein_embed(x)
+            needs_edge_pad = False
+            if edge_attr is None:
+                needs_edge_pad = True
+            elif edge_attr.numel() == 0:
+                needs_edge_pad = True
+            elif edge_attr.dim() > 1 and edge_attr.size(-1) == 0:
+                needs_edge_pad = True
+            if needs_edge_pad:
+                if x is not None:
+                    dtype = x.dtype
+                    device = x.device
+                elif edge_attr is not None:
+                    dtype = edge_attr.dtype
+                    device = edge_attr.device
+                elif edge_index is not None:
+                    dtype = torch.float32
+                    device = edge_index.device
+                else:
+                    dtype = torch.float32
+                    device = torch.device("cpu")
+                edge_attr = torch.zeros((0, self.edge_dim), dtype=dtype, device=device)
+            elif edge_attr.dim() == 1:
+                edge_attr = edge_attr.view(-1, self.edge_dim)
+            elif edge_attr.dim() == 2 and edge_attr.size(-1) != self.edge_dim:
+                raise ValueError(f"Edge feature dimension mismatch: expected {self.edge_dim}, got {edge_attr.size(-1)}")
+
             edge_attr = edge_embed(edge_attr)
             x,edge_attr=protein_gat1(x,edge_index,edge_attr)
             # print(edge_attr.shape)
