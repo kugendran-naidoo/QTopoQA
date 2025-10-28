@@ -1,0 +1,31 @@
+# Inference configuration for the 24-D edge TopoQA model.
+
+# Source data (raw evaluation structures) and working directories
+data_dir: ../../../datasets/evaluation/HAF2/decoy
+label_file: ../../../datasets/evaluation/HAF2/label_info.csv
+work_dir: ./output/HAF2/work
+output_file: ./output/HAF2/results/inference_results.csv
+checkpoint_path: ../../new_model_training/ARM_cpu_only/best.ckpt
+
+batch_size: 32
+num_workers: 0
+
+# Builder options
+builder:
+  jobs: 6
+  topology_dedup_sort: false
+  dump_edges: true
+
+reuse_existing_graphs: false
+use_checkpoint_schema: true
+
+# Optional overrides (used only if use_checkpoint_schema is false)
+edge_schema:
+  dim: 24
+  use_layer_norm: true
+  bands:
+    - {label: short, min_distance: 0.0, max_distance: 6.0}
+    - {label: medium, min_distance: 6.0, max_distance: 10.0}
+    - {label: long, min_distance: 10.0, max_distance: 14.0}
+topology_schema:
+  vector_dim: 140
