@@ -290,6 +290,30 @@ def cmd_run(args: argparse.Namespace) -> None:
     raw_config = _load_yaml(config_path)
     updated_config = _apply_overrides(raw_config, args.override or [])
 
+    overrides_dict: Dict[str, Any] = {}
+    if args.override:
+        for raw in args.override:
+            key, value = _parse_override(raw)
+            overrides_dict[key] = value
+
+    trainer_passthrough: List[str] = []
+    handled_trainer_config: Dict[str, Any] = {}
+    for raw in args.trainer_arg or []:
+        if "=" in raw:
+            key, raw_value = raw.split("=", 1)
+            normalised = key.strip().replace("-", "_")
+            if normalised in {"progress_bar_refresh_rate", "log_every_n_steps"}:
+                try:
+                    handled_trainer_config[normalised] = yaml.safe_load(raw_value)
+                except yaml.YAMLError:
+                    handled_trainer_config[normalised] = raw_value
+                continue
+        trainer_passthrough.append(raw)
+
+    for key, value in handled_trainer_config.items():
+        updated_config[key] = value
+        overrides_dict[key] = value
+
     run_root = (args.output_root or RUN_ROOT).resolve()
     run_dir = _prepare_run_dir(run_root, args.run_name)
 
@@ -300,12 +324,9 @@ def cmd_run(args: argparse.Namespace) -> None:
     shutil.copy2(config_path, original_config_path)
     final_config_path = config_dir / "config.yaml"
     _dump_yaml(updated_config, final_config_path)
-    if args.override:
-        overrides_dict = {k: v for k, v in (_parse_override(o) for o in args.override)}
+    if overrides_dict:
         overrides_path = config_dir / "applied_overrides.yaml"
         _dump_yaml(overrides_dict, overrides_path)
-    else:
-        overrides_dict = {}
 
     git_commit, git_dirty = _resolve_git_info(REPO_ROOT)
     env = _normalise_env()
@@ -321,7 +342,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         limit_train_batches=args.limit_train_batches,
         limit_val_batches=args.limit_val_batches,
         log_lr=args.log_lr,
-        extra_args=args.trainer_arg,
+        extra_args=trainer_passthrough,
     )
 
     log_path = run_dir / "training_console.log"
@@ -515,6 +536,101 @@ def _extract_best_metric(metrics_path: Path) -> Optional[Tuple[int, float]]:
     return best_epoch or 0, best_value
 
 
+def _collect_val_history(metrics_files: Sequence[Path]) -> List[Dict[str, Any]]:
+    import csv
+
+    history: List[Dict[str, Any]] = []
+    for metrics_file in metrics_files:
+        if not metrics_file.exists():
+            continue
+        with metrics_file.open("r", encoding="utf-8") as handle:
+            reader = csv.DictReader(handle)
+            for row in reader:
+                val_loss = row.get("val_loss")
+                if not val_loss:
+                    continue
+                try:
+                    value = float(val_loss)
+                except ValueError:
+                    continue
+                epoch = row.get("epoch")
+                try:
+                    epoch_idx = int(float(epoch)) if epoch is not None else None
+                except ValueError:
+                    epoch_idx = None
+                history.append(
+                    {
+                        "epoch": epoch_idx,
+                        "val_loss": value,
+                        "source": str(metrics_file),
+                    }
+                )
+    history.sort(key=lambda item: item["val_loss"])
+    return history
+
+
+def _format_duration(seconds: float) -> str:
+    seconds = max(0, int(seconds))
+    hours, remainder = divmod(seconds, 3600)
+    minutes = remainder // 60
+    if hours == 0 and minutes == 0 and seconds > 0:
+        return "<1m"
+    if hours == 0:
+        return f"{minutes}m"
+    return f"{hours}h {minutes:02d}m"
+
+
+def _estimate_runtime(
+    run_metadata: Dict[str, Any],
+    config: Dict[str, Any],
+    history: Sequence[Dict[str, Any]],
+) -> Dict[str, Optional[str]]:
+    created_iso = run_metadata.get("created")
+    estimate: Dict[str, Optional[str]] = {
+        "elapsed": None,
+        "best_case": None,
+        "median": None,
+        "worst_case": None,
+    }
+    if not created_iso:
+        return estimate
+    try:
+        start_time = _dt.datetime.fromisoformat(created_iso)
+    except ValueError:
+        return estimate
+    if start_time.tzinfo is None:
+        now = _dt.datetime.now()
+    else:
+        now = _dt.datetime.now(start_time.tzinfo)
+    elapsed_seconds = max((now - start_time).total_seconds(), 0.0)
+    estimate["elapsed"] = _format_duration(elapsed_seconds)
+
+    if not history:
+        return estimate
+
+    completed_epochs = [item["epoch"] for item in history if item.get("epoch") is not None]
+    if not completed_epochs:
+        return estimate
+
+    max_completed_epoch = max(completed_epochs)
+    epochs_completed = max_completed_epoch + 1
+    if epochs_completed <= 0:
+        return estimate
+
+    avg_epoch_duration = elapsed_seconds / epochs_completed
+    total_epochs = int(config.get("num_epochs", epochs_completed))
+    remaining_epochs = max(total_epochs - epochs_completed, 0)
+
+    best_case = avg_epoch_duration if remaining_epochs > 0 else 0.0
+    median_case = avg_epoch_duration * max(remaining_epochs / 2, 0)
+    worst_case = avg_epoch_duration * remaining_epochs
+
+    estimate["best_case"] = _format_duration(best_case)
+    estimate["median"] = _format_duration(median_case)
+    estimate["worst_case"] = _format_duration(worst_case)
+    return estimate
+
+
 def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     run_metadata = {}
     metadata_path = run_dir / "run_metadata.json"
@@ -538,6 +654,17 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
             best_loss = value
             best_epoch = epoch
 
+    val_history = _collect_val_history(metrics_files)
+    top_val_losses = []
+    for idx, entry in enumerate(val_history[:3]):
+        top_val_losses.append(
+            {
+                "rank": idx + 1,
+                "val_loss": entry["val_loss"],
+                "epoch": entry["epoch"],
+            }
+        )
+
     checkpoint_dir = run_dir / "model_checkpoints"
     best_checkpoint = None
     best_symlink = checkpoint_dir / "best.ckpt"
@@ -558,7 +685,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     if feature_metadata_path.exists():
         feature_info = json.loads(feature_metadata_path.read_text(encoding="utf-8"))
 
-    return {
+    summary = {
         "run_dir": str(run_dir),
         "run_name": run_dir.name,
         "best_epoch": best_epoch,
@@ -567,7 +694,14 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "config": config_snippet,
         "feature_metadata": feature_info,
         "run_metadata": run_metadata,
+        "top_val_losses": top_val_losses,
     }
+
+    runtime_estimate = _estimate_runtime(run_metadata, config_snippet, val_history)
+    if runtime_estimate["elapsed"] is not None:
+        summary["runtime_estimate"] = runtime_estimate
+
+    return summary
 
 
 def cmd_summarise(args: argparse.Namespace) -> None:
@@ -615,7 +749,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument(
         "--trainer-arg",
         action="append",
-        help="Additional raw arguments forwarded to model_train_topoqa_cpu.py (may be repeated).",
+        help="Additional trainer arguments; recognised keys progress_bar_refresh_rate and log_every_n_steps override defaults.",
     )
     run_parser.set_defaults(func=cmd_run)
 

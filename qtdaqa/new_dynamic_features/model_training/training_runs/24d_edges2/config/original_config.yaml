@@ -16,12 +16,3 @@ save_dir: ./training_runs
 seed: 222
 train_label_file: ./train.csv
 val_label_file: ./val.csv
-
-# Training telemetry / selection toggles
-use_val_spearman_as_secondary: true
-spearman_secondary_min_delta: 0.0
-spearman_secondary_weight: 1.0
-
-# Console reporting options
-progress_bar_refresh_rate: 0
-log_every_n_steps: 100
