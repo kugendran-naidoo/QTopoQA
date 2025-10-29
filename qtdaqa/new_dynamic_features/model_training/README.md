@@ -14,12 +14,80 @@ If a run is launched against a graph directory that does not contain
 directly.  The resolved schema is injected into the Lightning model and is
 written to `<run_dir>/feature_metadata.json` so inference can reuse it.
 
-Configuration files only need to override behaviour such as
-`edge_schema.use_layer_norm`; fields like `edge_schema.dim` are computed at
-runtime from the graph metadata.  Optional keys `metadata_path` and
-`summary_path` can be supplied in a YAML config for non-standard layouts, but
-they default to `graph_dir/graph_metadata.json` and an auto-discovered
-`graph_builder_summary.json` respectively.
+## Configuration layout
+
+Configuration files are now organised into themed sections.  The default
+`config.yaml` looks like this (abridged):
+
+```yaml
+paths:
+  graph: ../../new_graph_builder/output/.../graph_data
+  train_labels: ./train.csv
+  val_labels: ./val.csv
+  save_dir: ./training_runs
+
+model:
+  pooling_type: mean
+  attention_head: 8
+
+dataloader:
+  batch_size: 16
+  num_workers: 0
+  seed: 222
+
+trainer:
+  accelerator: cpu
+  devices: 1
+  precision: 32
+  num_epochs: 200
+  accumulate_grad_batches: 16
+
+optimizer:
+  learning_rate: 0.005
+
+scheduler:
+  type: reduce_on_plateau
+  factor: 0.4
+  patience: 12
+
+early_stopping:
+  patience: 25
+
+selection:
+  use_val_spearman: true
+  spearman_min_delta: 0.0
+  spearman_weight: 1.0
+
+logging:
+  progress_bar_refresh_rate: 0
+  log_every_n_steps: 100
+
+mlflow:
+  enabled: false
+  tracking_uri: ./mlruns
+  experiment: dynamic_topoqa
+  run_name: null
+  log_artifacts: true
+  tags: {}
+```
+
+Legacy flat configs are still supported for backwards compatibility, but all
+new configurations should follow the structured layout above.
+
+### Secondary selection metric
+
+By default, checkpoints are ranked using a composite score that favours low
+`val_loss` while rewarding improvements in `val_spearman_corr`.  This behaviour
+can be toggled under the `selection` block.  When enabled, the console prints a
+clear notice showing the weight and minimum delta applied to the Spearman term.
+
+### MLflow integration
+
+The `mlflow` section governs optional experiment tracking.  When enabled and
+`mlflow` is installed, the training loop logs hyperparameters, validation
+metrics (including Pearson/Spearman correlations), and key artifacts (coverage
+report, feature metadata, top checkpoints) to the configured tracking URI. If
+the dependency is missing, a warning is emitted and training continues.
 
 ## Training CLI
 
