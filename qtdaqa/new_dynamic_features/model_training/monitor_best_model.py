@@ -44,6 +44,8 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
     config = payload.get("config", {}) if isinstance(payload, dict) else {}
     feature_metadata = payload.get("feature_metadata", {}) if isinstance(payload, dict) else {}
     edge_schema = feature_metadata.get("edge_schema", {}) if isinstance(feature_metadata, dict) else {}
+    top_val_losses = payload.get("top_val_losses", []) if isinstance(payload, dict) else []
+    runtime_estimate = payload.get("runtime_estimate") if isinstance(payload, dict) else None
 
     best_checkpoint = payload.get("best_checkpoint") if isinstance(payload, dict) else None
     checkpoint_name = Path(best_checkpoint).name if best_checkpoint else None
@@ -57,6 +59,8 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
         "learning_parameters": _extract_learning_params(config),
         "edge_feature_dim": edge_schema.get("dim"),
         "notes": payload.get("run_metadata", {}).get("notes") if isinstance(payload.get("run_metadata"), dict) else None,
+        "top_val_losses": top_val_losses,
+        "runtime_estimate": runtime_estimate,
     }
 
 

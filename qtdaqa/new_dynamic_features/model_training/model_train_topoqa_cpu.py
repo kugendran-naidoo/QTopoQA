@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import random
+import re
 import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
@@ -35,9 +36,11 @@ import torch
 import yaml
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.callbacks import (
+    Callback,
     EarlyStopping,
     LearningRateMonitor,
     ModelCheckpoint,
+    TQDMProgressBar,
 )
 from pytorch_lightning.loggers import CSVLogger
 from torch.utils.data import Dataset
@@ -80,6 +83,8 @@ class TrainingConfig:
     limit_train_batches: Optional[float] = None
     limit_val_batches: Optional[float] = None
     log_lr: bool = False
+    progress_bar_refresh_rate: int = 0
+    log_every_n_steps: int = 100
     edge_schema: dict = dataclasses.field(default_factory=dict)
     topology_schema: dict = dataclasses.field(default_factory=dict)
 
@@ -155,6 +160,9 @@ def load_config(path: Path) -> TrainingConfig:
         fast_dev_run=bool(_get("fast_dev_run", False)),
         limit_train_batches=_get("limit_train_batches"),
         limit_val_batches=_get("limit_val_batches"),
+        log_lr=bool(_get("log_lr", False)),
+        progress_bar_refresh_rate=int(_get("progress_bar_refresh_rate", 0)),
+        log_every_n_steps=int(_get("log_every_n_steps", 100)),
         edge_schema=dict(_get("edge_schema", {})),
         topology_schema=dict(_get("topology_schema", {})),
     )
@@ -327,6 +335,293 @@ def _summarise_coverage(
         )
 
 
+def _write_coverage_report(save_dir: Path, coverage: Dict[str, Dict[str, object]]) -> Path:
+    report = {}
+    for split, stats in coverage.items():
+        total = int(stats.get("total", 0))
+        usable = int(stats.get("usable", 0))
+        missing = list(stats.get("missing", []))
+        report[split] = {
+            "total": total,
+            "usable": usable,
+            "coverage": (usable / total) if total else 0.0,
+            "missing": missing,
+        }
+    path = save_dir / "dataset_coverage.json"
+    try:
+        with path.open("w", encoding="utf-8") as handle:
+            json.dump(report, handle, indent=2)
+    except OSError as exc:
+        raise RuntimeError(f"Unable to write dataset coverage report: {exc}")
+    return path
+
+
+def _log_feature_summary(logger: logging.Logger, metadata: GraphFeatureMetadata) -> None:
+    node_dim = metadata.node_schema.get("dim")
+    edge_dim = metadata.edge_schema.get("dim")
+    sample_nodes = metadata.sample_node_count
+    sample_edges = metadata.sample_edge_count
+
+    if metadata.metadata_path and metadata.module_registry:
+        logger.info("Feature metadata source: %s", metadata.metadata_path)
+        if metadata.summary_path:
+            logger.info("Graph builder summary: %s", metadata.summary_path)
+
+        interface_entry = metadata.module_registry.get("interface", {})
+        interface_id = interface_entry.get("id") or "interface stage"
+        cutoff = (interface_entry.get("defaults") or {}).get("cutoff")
+        interface_line = f"Interface: {interface_id}"
+        if cutoff is not None:
+            interface_line += f" (cutoff {cutoff:g} Å)"
+        if sample_nodes is not None:
+            interface_line += f", yielding {sample_nodes} interface residues"
+        interface_line += "."
+        logger.info(interface_line)
+
+        topology_entry = metadata.module_registry.get("topology", {})
+        topology_id = topology_entry.get("id") or "topology stage"
+        topo_defaults = topology_entry.get("defaults") or {}
+        topo_details = []
+        filtration = topo_defaults.get("filtration_cutoff")
+        if filtration is not None:
+            topo_details.append(f"filtration_cutoff {filtration:g} Å")
+        min_persistence = topo_defaults.get("min_persistence")
+        if min_persistence is not None:
+            topo_details.append(f"min_persistence {min_persistence:g}")
+        topology_line = f"Topology: {topology_id}"
+        if topo_details:
+            topology_line += " (" + ", ".join(topo_details) + ")"
+        if node_dim is not None:
+            topology_line += f" supporting the {node_dim}-dimensional node features"
+        topology_line += "."
+        logger.info(topology_line)
+
+        node_entry = metadata.module_registry.get("node", {})
+        node_id = node_entry.get("id") or "node stage"
+        node_line = f"Node: {node_id}"
+        if node_dim is not None:
+            node_line += f"; metadata lists {node_dim} feature columns matching the .pt tensor"
+        node_line += "."
+        logger.info(node_line)
+
+        edge_entry = metadata.module_registry.get("edge", {})
+        edge_id = metadata.edge_schema.get("module") or edge_entry.get("id") or "edge stage"
+        variant = metadata.edge_schema.get("variant")
+        bands = metadata.edge_schema.get("bands") or []
+        module_params = metadata.edge_schema.get("module_params") or {}
+        contact_threshold = module_params.get("contact_threshold")
+        histogram_bins = module_params.get("histogram_bins") or []
+
+        edge_details = []
+        if variant:
+            edge_details.append(f"variant {variant}")
+        if bands:
+            edge_details.append("bands " + "/".join(str(b) for b in bands))
+        if histogram_bins:
+            if len(histogram_bins) >= 2:
+                edge_details.append(f"histogram bins {histogram_bins[0]:g}–{histogram_bins[-1]:g} Å")
+            else:
+                edge_details.append("histogram bins available")
+        if contact_threshold is not None:
+            edge_details.append(f"contact_threshold {contact_threshold:g} Å")
+
+        edge_line = f"Edge: {edge_id}"
+        if edge_details:
+            edge_line += " (" + ", ".join(edge_details) + ")"
+        if sample_edges is not None and edge_dim is not None:
+            edge_line += f"; .pt confirms {sample_edges} directed edges with {edge_dim} feature values each"
+        elif edge_dim is not None:
+            edge_line += f"; edge vectors hold {edge_dim} feature values"
+        edge_line += "."
+        logger.info(edge_line)
+
+        logger.info(
+            "\u2192 Total feature dimensionality observed and confirmed: node_dim = %s, edge_dim = %s.",
+            node_dim if node_dim is not None else "unknown",
+            edge_dim if edge_dim is not None else "unknown",
+        )
+    else:
+        warning_suffix = f" ({metadata.sample_graph})" if metadata.sample_graph else ""
+        logger.warning(
+            "graph_metadata.json not found; summarising feature schema from sample tensors%s.",
+            warning_suffix,
+        )
+        if sample_nodes is not None:
+            logger.info(
+                "Interface: %s interface residues identified (from node tensor).",
+                sample_nodes,
+            )
+        else:
+            logger.info("Interface: interface residues inferred from node tensor.")
+        if node_dim is not None:
+            logger.info(
+                "Topology: topology-derived features present; node vectors are %s-dimensional.",
+                node_dim,
+            )
+            logger.info(
+                "Node: per-residue feature vectors have %s values each.",
+                node_dim,
+            )
+        else:
+            logger.info(
+                "Topology: topology-derived features present; node vector dimensionality unavailable."
+            )
+            logger.info("Node: per-residue feature dimensionality could not be inferred.")
+        if sample_edges is not None and edge_dim is not None:
+            logger.info(
+                "Edge: %s directed edges recorded; each edge vector holds %s values.",
+                sample_edges,
+                edge_dim,
+            )
+        elif edge_dim is not None:
+            logger.info("Edge: edge vectors hold %s values (edge count unavailable).", edge_dim)
+        else:
+            logger.info("Edge: edge feature dimensionality could not be inferred.")
+        logger.info(
+            "\u2192 Total feature dimensionality observed in tensors: node_dim = %s, edge_dim = %s.",
+            node_dim if node_dim is not None else "unknown",
+            edge_dim if edge_dim is not None else "unknown",
+        )
+
+
+_CHECKPOINT_SCORE_RE = re.compile(r"model\.([0-9eE+\-.]+)")
+
+
+def _parse_checkpoint_score(path: Path) -> Optional[float]:
+    match = _CHECKPOINT_SCORE_RE.search(path.name)
+    if not match:
+        return None
+    token = match.group(1).split("-", 1)[0]
+    token = token.rstrip(".")
+    try:
+        return float(token)
+    except ValueError:
+        return None
+
+
+def _rank_checkpoints(checkpoint_dir: Path, limit: int = 3) -> List[Path]:
+    ranked: List[Tuple[float, Path]] = []
+    for candidate in checkpoint_dir.glob("*.chkpt"):
+        score = _parse_checkpoint_score(candidate)
+        if score is None:
+            continue
+        ranked.append((score, candidate.resolve()))
+    ranked.sort(key=lambda item: item[0])
+    return [path for _, path in ranked[:limit]]
+
+
+def _create_checkpoint_symlinks(
+    checkpoint_dir: Path, ranked_paths: Sequence[Path], logger: logging.Logger
+) -> None:
+    names = ["best.ckpt", "second_best.ckpt", "third_best.ckpt"]
+    for name, target_path in zip(names, ranked_paths):
+        symlink_path = checkpoint_dir / name
+        try:
+            if symlink_path.exists() or symlink_path.is_symlink():
+                symlink_path.unlink()
+            symlink_path.symlink_to(target_path)
+            logger.info("Symlinked %s to %s", name, target_path.name)
+        except OSError as exc:
+            logger.warning("Unable to create %s symlink: %s", name, exc)
+    for name in names[len(ranked_paths) :]:
+        orphan = checkpoint_dir / name
+        if orphan.exists() or orphan.is_symlink():
+            try:
+                orphan.unlink()
+            except OSError:
+                pass
+
+
+def _safe_scalar(value: object) -> Optional[float]:
+    if value is None:
+        return None
+    if isinstance(value, torch.Tensor):
+        if value.numel() == 0:
+            return None
+        try:
+            return float(value.detach().cpu().item())
+        except (ValueError, RuntimeError):
+            return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _select_metric(metrics: Dict[str, object], candidates: Sequence[str]) -> Tuple[Optional[str], Optional[float]]:
+    for name in candidates:
+        if name in metrics:
+            value = _safe_scalar(metrics[name])
+            if value is not None:
+                return name, value
+    return None, None
+
+
+class EpochSummaryLogger(Callback):
+    def __init__(self, logger: logging.Logger) -> None:
+        super().__init__()
+        self.logger = logger
+
+    def on_validation_epoch_end(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking:
+            return
+        epoch = trainer.current_epoch
+        metrics = trainer.callback_metrics
+
+        train_name, train_value = _select_metric(metrics, ("train_loss_epoch", "train_loss", "train_mse"))
+        val_name, val_value = _select_metric(metrics, ("val_loss", "val_mse", "val_mean_dockq_loss"))
+
+        best_val = None
+        checkpoint_cb = getattr(trainer, "checkpoint_callback", None)
+        if checkpoint_cb is not None:
+            best_val = _safe_scalar(getattr(checkpoint_cb, "best_model_score", None))
+
+        parts = [f"Epoch {epoch:03d}"]
+        if train_name and train_value is not None:
+            parts.append(f"{train_name}={train_value:.6f}")
+        if val_name and val_value is not None:
+            parts.append(f"{val_name}={val_value:.6f}")
+        if best_val is not None:
+            parts.append(f"best_val_loss={best_val:.6f}")
+
+        if len(parts) > 1:
+            self.logger.info(" | ".join(parts))
+
+
+class TrainingProgressLogger(Callback):
+    def __init__(self, logger: logging.Logger, checkpoints: Optional[Sequence[float]] = None) -> None:
+        super().__init__()
+        self.logger = logger
+        self.default_checkpoints = checkpoints or (0.25, 0.5, 0.75)
+        self._remaining: List[float] = []
+        self._total_batches: int = 0
+
+    def on_train_epoch_start(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking:
+            return
+        total = trainer.num_training_batches or 0
+        self._total_batches = max(int(total), 1)
+        self._remaining = list(self.default_checkpoints)
+
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx: int) -> None:  # type: ignore[override]
+        if trainer.sanity_checking or not self._remaining:
+            return
+        progress = (batch_idx + 1) / self._total_batches
+        triggered = [cp for cp in self._remaining if progress >= cp]
+        if not triggered:
+            return
+        for cp in triggered:
+            self._remaining.remove(cp)
+        epoch = trainer.current_epoch
+        percent = int(progress * 100)
+        self.logger.info(
+            "Epoch %03d | %2d%% complete (batch %d/%d)",
+            epoch,
+            percent,
+            batch_idx + 1,
+            self._total_batches,
+        )
+
 def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
     train_labels = load_label_map(cfg.train_label_file)
     val_labels = load_label_map(cfg.val_label_file)
@@ -389,7 +684,18 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         collate_fn=collate_graphs,
         persistent_workers=False,
     )
-    coverage = {"train_missing": train_missing, "val_missing": val_missing}
+    coverage = {
+        "train": {
+            "total": len(train_labels),
+            "usable": len(train_samples),
+            "missing": list(train_missing),
+        },
+        "val": {
+            "total": len(val_labels),
+            "usable": len(val_samples),
+            "missing": list(val_missing),
+        },
+    }
     return train_loader, val_loader, coverage, feature_metadata
 
 
@@ -541,10 +847,15 @@ def main() -> int:
     if "dim" not in resolved_edge_schema or resolved_edge_schema["dim"] is None:
         raise RuntimeError("Edge feature dimension could not be resolved from metadata or config.")
 
+    coverage_path = _write_coverage_report(cfg.save_dir, coverage)
+    logger.info("Dataset coverage report written to %s", coverage_path)
+
     cfg.edge_schema = resolved_edge_schema
     feature_metadata.edge_schema = dict(resolved_edge_schema)
     feature_metadata_dict = feature_metadata.to_dict()
     feature_metadata_dict["topology_schema"] = cfg.topology_schema
+
+    _log_feature_summary(logger, feature_metadata)
 
     node_schema_for_log: Dict[str, object] = dict(feature_metadata.node_schema)
     node_columns = node_schema_for_log.get("columns")
@@ -629,6 +940,18 @@ def main() -> int:
     if args.log_lr:
         lr_callbacks.append(LearningRateMonitor(logging_interval="epoch"))
 
+    progress_bar_cb = None
+    enable_progress_bar = cfg.progress_bar_refresh_rate > 0
+    if enable_progress_bar:
+        progress_bar_cb = TQDMProgressBar(refresh_rate=cfg.progress_bar_refresh_rate)
+
+    callback_list: List = [checkpoint_cb, early_stop_cb, *lr_callbacks]
+    if progress_bar_cb is not None:
+        callback_list.append(progress_bar_cb)
+
+    callback_list.append(TrainingProgressLogger(logger))
+    callback_list.append(EpochSummaryLogger(logger))
+
     csv_logger = CSVLogger(str(cfg.save_dir), name="cpu_training", flush_logs_every_n_steps=1)
 
     trainer = Trainer(
@@ -637,10 +960,10 @@ def main() -> int:
         precision=cfg.precision,
         max_epochs=cfg.num_epochs,
         accumulate_grad_batches=cfg.accumulate_grad_batches,
-        callbacks=[checkpoint_cb, early_stop_cb, *lr_callbacks],
+        callbacks=callback_list,
         logger=csv_logger,
-        enable_progress_bar=True,
-        log_every_n_steps=10,
+        enable_progress_bar=enable_progress_bar,
+        log_every_n_steps=max(1, cfg.log_every_n_steps),
         deterministic=True,
         default_root_dir=str(cfg.save_dir),
         fast_dev_run=cfg.fast_dev_run,
@@ -685,6 +1008,8 @@ def main() -> int:
     else:
         logger.info("Training completed. No checkpoints were saved (likely fast_dev_run).")
 
+    ranked_checkpoints: List[Path] = []
+
     if cfg.fast_dev_run:
         logger.info("Fast dev run enabled; skipping full validation sweep.")
         best_ckpt_path = checkpoint_cb.best_model_path or None
@@ -698,7 +1023,14 @@ def main() -> int:
         )
         logger.info("Validation metrics: %s", val_metrics)
 
-    if coverage["train_missing"] or coverage["val_missing"]:
+    if checkpoint_dir.exists():
+        ranked_checkpoints = _rank_checkpoints(checkpoint_dir)
+        if ranked_checkpoints:
+            best_ckpt_path = str(ranked_checkpoints[0])
+        _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)
+
+    missing_total = sum(len(stats["missing"]) for stats in coverage.values())
+    if missing_total:
         logger.warning(
             "Training proceeded with missing graphs. Consider regenerating .pt files "
             "to close the gap and potentially improve MSE."
@@ -711,17 +1043,6 @@ def main() -> int:
         logger.info("Feature metadata written to %s", metadata_path)
     except OSError as exc:
         logger.warning("Unable to write feature metadata file: %s", exc)
-
-    if best_ckpt_path:
-        best_ckpt = Path(best_ckpt_path)
-        symlink = checkpoint_dir / "best.ckpt"
-        try:
-            if symlink.exists() or symlink.is_symlink():
-                symlink.unlink()
-            symlink.symlink_to(best_ckpt)
-            logger.info("Symlinked best checkpoint to %s", symlink)
-        except OSError as exc:
-            logger.warning("Unable to create best checkpoint symlink: %s", exc)
 
     return 0
 

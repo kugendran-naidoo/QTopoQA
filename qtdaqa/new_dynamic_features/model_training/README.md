@@ -42,6 +42,13 @@ Key commands:
 - `resume` – continue a run from its best (or explicit) checkpoint.
 - `summarise` – print JSON with the best validation score, checkpoint, and
   resolved schema for a run.
+- `dataset_coverage.json` is generated in each run directory summarising any
+  labels missing `.pt` graphs so gaps can be closed quickly.
+- Checkpoints now expose `best.ckpt`, `second_best.ckpt`, and `third_best.ckpt`
+  symlinks for convenient inspection.
+- During training, the console emits a single mid-epoch progress line (25%,
+  50%, 75%) plus a compact end-of-epoch summary showing train loss and the
+  current best validation loss.
 
 The wrapper scripts (`run_training.sh`, `run_all.sh`, etc.) now call the CLI
 under the hood for compatibility with existing automation.
@@ -53,4 +60,3 @@ invoked from `qtdaqa/new_dynamic_features/model_training/`, or reference it via
 `python qtdaqa/new_dynamic_features/model_training/monitor_best_model.py ...`
 from the repo root to inspect the current best checkpoint, its filesystem
 location, and the learning parameters that produced it.
-
