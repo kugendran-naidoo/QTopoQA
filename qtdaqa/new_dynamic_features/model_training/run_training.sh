@@ -3,32 +3,13 @@ set -euo pipefail
 
 usage() {
   cat <<'USAGE'
-Usage: run_training.sh -c CONFIG [--trial LABEL] [--run-name NAME] [-- python_args...]
+Usage: run_training.sh -c CONFIG [--trial LABEL] [--run-name NAME] [-- extra_args]
 
-Mandatory options:
-  -c, --config PATH     Path to the YAML configuration describing training inputs,
-                        hyper-parameters, and runtime settings.
+This wrapper now delegates to the Python CLI:
+  python -m train_cli run --config CONFIG [...options]
 
-Optional passthrough:
-  Any arguments after the configuration flag are forwarded to train_topoqa_cpu.py.
-  For example:
-    ./run_training.sh -c config.yaml --fast-dev-run
-    ./run_training.sh -c config.yaml -- --limit-train-batches 0.25 --limit-val-batches 0.5
-
-Wrapper options:
-  --trial LABEL         Identifier stored in training.log for bookkeeping.
-  --run-name NAME       Custom directory name under training_runs/ (default timestamp).
-
-Forwarded Python options of note:
-  --fast-dev-run               Lightning dry run (1 batch train/val).
-  --limit-train-batches VALUE  Limit training batches (float fraction or int count).
-  --limit-val-batches VALUE    Limit validation batches (float fraction or int count).
-
-Environment defaults (override via shell exports if required):
-  PYTHONHASHSEED=222
-  PL_SEED_WORKERS=1
-  TORCH_USE_DETERMINISTIC_ALGORITHMS=1
-  CUBLAS_WORKSPACE_CONFIG=:16:8
+Arguments after "--" are forwarded to the underlying trainer. Known flags
+such as --resume-from or --fast-dev-run are mapped automatically.
 USAGE
 }
 
@@ -38,9 +19,9 @@ if [[ $# -lt 2 ]]; then
 fi
 
 CONFIG_FILE=""
-PASSTHRU=()
 TRIAL_LABEL=""
 RUN_NAME=""
+FORWARDED=()
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -58,7 +39,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --)
       shift
-      PASSTHRU=("$@")
+      FORWARDED=("$@")
       break
       ;;
     -h|--help)
@@ -66,14 +47,9 @@ while [[ $# -gt 0 ]]; do
       exit 0
       ;;
     *)
-      if [[ -n "${CONFIG_FILE}" ]]; then
-        PASSTHRU=("$@")
-        break
-      else
-        echo "Unknown option: $1" >&2
-        usage
-        exit 1
-      fi
+      echo "Unknown option: $1" >&2
+      usage
+      exit 1
       ;;
   esac
 done
@@ -84,20 +60,7 @@ if [[ -z "${CONFIG_FILE}" ]]; then
   exit 1
 fi
 
-if [[ -n "${RUN_NAME}" ]]; then
-  if [[ "${RUN_NAME}" == */* ]]; then
-    echo "Error: --run-name must not include '/' characters." >&2
-    exit 1
-  fi
-  if [[ "${RUN_NAME}" =~ [[:space:]] ]]; then
-    echo "Error: --run-name must not include whitespace." >&2
-    exit 1
-  fi
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-
 if [[ "${CONFIG_FILE}" != /* ]]; then
   CONFIG_PATH="${SCRIPT_DIR}/${CONFIG_FILE}"
 else
@@ -110,93 +73,85 @@ if [[ ! -f "${CONFIG_PATH}" ]]; then
   exit 1
 fi
 
-CONFIG_SUMMARY_RAW="$(
-python - "$CONFIG_PATH" <<'PY'
-import sys, yaml
-cfg_path = sys.argv[1]
-with open(cfg_path, "r", encoding="utf-8") as handle:
-    data = yaml.safe_load(handle) or {}
-def _fmt(key):
-    value = data.get(key)
-    if value is None:
-        return "N/A"
-    return value
-print(f"{_fmt('learning_rate')}|{_fmt('num_epochs')}|{_fmt('seed')}")
-PY
-)"
-IFS='|' read -r CFG_LR CFG_EPOCHS CFG_SEED <<<"${CONFIG_SUMMARY_RAW}"
-echo "Config summary: lr=${CFG_LR}, epochs=${CFG_EPOCHS}, seed=${CFG_SEED}"
+RESUME_FROM=""
+LIMIT_TRAIN=""
+LIMIT_VAL=""
+FAST_DEV_RUN="0"
+LOG_LR="0"
+TRAINER_ARGS=()
 
-timestamp="$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ROOT="${SCRIPT_DIR}/training_runs"
-mkdir -p "${RUN_ROOT}"
-
-history_root="${RUN_ROOT}/history"
-mkdir -p "${history_root}"
-shopt -s nullglob
-for prev_run in "${RUN_ROOT}"/training_run_*; do
-  if [[ -d "${prev_run}" ]]; then
-    mv "${prev_run}" "${history_root}/$(basename "${prev_run}")"
-  fi
+while [[ ${#FORWARDED[@]} -gt 0 ]]; do
+  token="${FORWARDED[0]}"
+  case "${token}" in
+    --resume-from)
+      if [[ ${#FORWARDED[@]} -lt 2 ]]; then
+        echo "Missing value for --resume-from" >&2
+        exit 1
+      fi
+      RESUME_FROM="${FORWARDED[1]:-}"
+      FORWARDED=(${FORWARDED[@]:2})
+      ;;
+    --limit-train-batches)
+      if [[ ${#FORWARDED[@]} -lt 2 ]]; then
+        echo "Missing value for --limit-train-batches" >&2
+        exit 1
+      fi
+      LIMIT_TRAIN="${FORWARDED[1]:-}"
+      FORWARDED=(${FORWARDED[@]:2})
+      ;;
+    --limit-val-batches)
+      if [[ ${#FORWARDED[@]} -lt 2 ]]; then
+        echo "Missing value for --limit-val-batches" >&2
+        exit 1
+      fi
+      LIMIT_VAL="${FORWARDED[1]:-}"
+      FORWARDED=(${FORWARDED[@]:2})
+      ;;
+    --fast-dev-run)
+      FAST_DEV_RUN="1"
+      FORWARDED=(${FORWARDED[@]:1})
+      ;;
+    --log-lr)
+      LOG_LR="1"
+      FORWARDED=(${FORWARDED[@]:1})
+      ;;
+    "")
+      FORWARDED=(${FORWARDED[@]:1})
+      ;;
+    *)
+      TRAINER_ARGS+=("${token}")
+      FORWARDED=(${FORWARDED[@]:1})
+      ;;
+  esac
 done
-shopt -u nullglob
 
-run_label="${RUN_NAME:-training_run_${timestamp}}"
-RUN_DIR="${RUN_ROOT}/${run_label}"
-if [[ -e "${RUN_DIR}" ]]; then
-  echo "Error: run directory already exists: ${RUN_DIR}" >&2
-  exit 1
+PYTHON_BIN="${PYTHON:-python}"
+CLI_ARGS=("${PYTHON_BIN}" -m train_cli run --config "${CONFIG_PATH}")
+
+if [[ -n "${RUN_NAME}" ]]; then
+  CLI_ARGS+=(--run-name "${RUN_NAME}")
 fi
-mkdir -p "${RUN_DIR}/config"
-ln -sfn "${RUN_DIR}" "${RUN_ROOT}/latest"
-
-cp "${CONFIG_PATH}" "${RUN_DIR}/config/config.yaml"
-REQUIREMENTS_SRC="${SCRIPT_DIR}/requirements.txt"
-if [[ -f "${REQUIREMENTS_SRC}" ]]; then
-  cp "${REQUIREMENTS_SRC}" "${RUN_DIR}/config/requirements.txt"
-else
-  echo "Warning: requirements.txt not found at ${REQUIREMENTS_SRC}; skipping copy." >&2
-fi
-
-export PYTHONHASHSEED=${PYTHONHASHSEED:-222}
-export PL_SEED_WORKERS=${PL_SEED_WORKERS:-1}
-export TORCH_USE_DETERMINISTIC_ALGORITHMS=${TORCH_USE_DETERMINISTIC_ALGORITHMS:-1}
-export CUBLAS_WORKSPACE_CONFIG=${CUBLAS_WORKSPACE_CONFIG:-:16:8}
-
-GIT_COMMIT="unknown"
-GIT_DIRTY="false"
-if command -v git >/dev/null 2>&1; then
-  if git -C "${REPO_ROOT}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    GIT_COMMIT="$(git -C "${REPO_ROOT}" rev-parse --short HEAD 2>/dev/null || echo "unknown")"
-    if [[ -n "$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null)" ]]; then
-      GIT_DIRTY="true"
-    fi
-  fi
-fi
-
-cd "${REPO_ROOT}"
-
-PYTHON_CMD=(
-  python
-  "${SCRIPT_DIR}/model_train_topoqa_cpu.py"
-  --config
-  "${RUN_DIR}/config/config.yaml"
-  --run-dir
-  "${RUN_DIR}"
-  --git-commit
-  "${GIT_COMMIT}"
-)
-
 if [[ -n "${TRIAL_LABEL}" ]]; then
-  PYTHON_CMD+=(--trial-label "${TRIAL_LABEL}")
+  CLI_ARGS+=(--trial-label "${TRIAL_LABEL}")
 fi
-if [[ "${GIT_DIRTY}" == "true" ]]; then
-  PYTHON_CMD+=(--git-dirty)
+if [[ -n "${RESUME_FROM}" ]]; then
+  CLI_ARGS+=(--resume-from "${RESUME_FROM}")
 fi
-if [[ ${#PASSTHRU[@]} -gt 0 ]]; then
-  PYTHON_CMD+=("${PASSTHRU[@]}")
+if [[ -n "${LIMIT_TRAIN}" ]]; then
+  CLI_ARGS+=(--limit-train-batches "${LIMIT_TRAIN}")
+fi
+if [[ -n "${LIMIT_VAL}" ]]; then
+  CLI_ARGS+=(--limit-val-batches "${LIMIT_VAL}")
+fi
+if [[ "${FAST_DEV_RUN}" == "1" ]]; then
+  CLI_ARGS+=(--fast-dev-run)
+fi
+if [[ "${LOG_LR}" == "1" ]]; then
+  CLI_ARGS+=(--log-lr)
 fi
 
-CONSOLE_LOG="${RUN_DIR}/training_console.log"
-echo "Console output will be streamed to ${CONSOLE_LOG}"
-"${PYTHON_CMD[@]}" 2>&1 | tee "${CONSOLE_LOG}"
+for arg in "${TRAINER_ARGS[@]}"; do
+  CLI_ARGS+=(--trainer-arg "${arg}")
+done
+
+exec "${CLI_ARGS[@]}"

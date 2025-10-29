@@ -1,0 +1,24 @@
+shared:
+  notes: "Batch run generated via train_cli (replacement for run_all.sh)."
+  log_lr: false
+  fast_dev_run: false
+jobs:
+  - name: sched_boost_seed222
+    config: configs/sched_boost_seed222.yaml
+  - name: sched_boost_seed777
+    config: configs/sched_boost_seed777.yaml
+  - name: sched_boost_seed1337
+    config: configs/sched_boost_seed1337.yaml
+  - name: sched_boost_lr035_seed222
+    config: configs/sched_boost_lr035_seed222.yaml
+  - name: sched_boost_lr035_seed777
+    config: configs/sched_boost_lr035_seed777.yaml
+  - name: sched_boost_lr035_seed1337
+    config: configs/sched_boost_lr035_seed1337.yaml
+  - name: large_batch_sched_boost_seed222
+    config: configs/large_batch_sched_boost_seed222.yaml
+  - name: large_batch_sched_boost_seed777
+    config: configs/large_batch_sched_boost_seed777.yaml
+  - name: large_batch_sched_boost_seed1337
+    config: configs/large_batch_sched_boost_seed1337.yaml
+continue_on_error: false

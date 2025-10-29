@@ -1,0 +1,15 @@
+{
+  "edge_schema": {
+    "dim": 24
+  },
+  "node_schema": {
+    "dim": 172
+  },
+  "module_registry": {},
+  "metadata_path": null,
+  "summary_path": null,
+  "notes": [
+    "graph_metadata.json not found at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_graph_builder/output/24d_edges_adjusted_dataset/graph_data/graph_metadata.json"
+  ],
+  "topology_schema": {}
+}
