@@ -14,7 +14,8 @@ trials=(
 # seeds=(222 777 1337)
 # originally tried 3, but 222 worked best on original features
 # originally tried 3, but 777 worked best on 24d edge features
-seeds=(777)
+# seeds=(777)
+seeds=(222 777 1337)
 
 patch_yaml() {
   python - "$1" "$2" <<'PY'

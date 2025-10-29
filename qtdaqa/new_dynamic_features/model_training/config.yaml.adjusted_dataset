@@ -4,19 +4,15 @@ attention_head: 8
 batch_size: 16
 devices: 1
 early_stopping_patience: 25
-edge_schema:
-  use_layer_norm: true
-graph_dir: ../../new_graph_builder/output/24d_edges_adjusted_dataset/graph_data
+graph_dir: ../graph_builder/output/11d_edges_dynamic_adjusted_dataset/graph_data
 learning_rate: 0.005
 lr_scheduler_factor: 0.4
 lr_scheduler_patience: 12
-num_epochs: 200
+num_epochs: 5
 num_workers: 0
 pooling_type: mean
 precision: 32
 save_dir: ./training_runs
-seed: 222
-topology_schema:
-  vector_dim: 140
-train_label_file: ./train.csv
-val_label_file: ./val.csv
+seed: 1337
+train_label_file: ./train_pilot.csv
+val_label_file: ./val_pilot.csv
