@@ -16,6 +16,9 @@ class GraphFeatureMetadata:
     metadata_path: Optional[str] = None
     summary_path: Optional[str] = None
     notes: List[str] = field(default_factory=list)
+    sample_graph: Optional[str] = None
+    sample_edge_count: Optional[int] = None
+    sample_node_count: Optional[int] = None
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -25,7 +28,71 @@ class GraphFeatureMetadata:
             "metadata_path": self.metadata_path,
             "summary_path": self.summary_path,
             "notes": self.notes,
+            "sample_graph": self.sample_graph,
+            "sample_edge_count": self.sample_edge_count,
+            "sample_node_count": self.sample_node_count,
         }
+
+    def feature_stage_summary(self) -> Dict[str, str]:
+        """Produce a compact summary for interface/topology/node/edge stages."""
+        summaries: Dict[str, str] = {}
+
+        def _module_line(kind: str) -> Optional[str]:
+            entry = self.module_registry.get(kind, {})
+            if not isinstance(entry, dict):
+                return None
+            module_id = entry.get("id") or entry.get("module")
+            alias = entry.get("alias")
+            summary = entry.get("summary")
+            components = []
+            if module_id:
+                components.append(str(module_id))
+            if alias:
+                components.append(f"alias={alias}")
+            if summary:
+                components.append(str(summary))
+            return "; ".join(components) if components else None
+
+        node_dim = self.node_schema.get("dim")
+        edge_dim = self.edge_schema.get("dim")
+
+        interface_desc = _module_line("interface")
+        if interface_desc:
+            summaries["interface"] = interface_desc
+
+        topology_desc = _module_line("topology")
+        if topology_desc:
+            summaries["topology"] = topology_desc
+
+        node_desc_parts: List[str] = []
+        node_module_desc = _module_line("node")
+        if node_module_desc:
+            node_desc_parts.append(node_module_desc)
+        if node_dim is not None:
+            node_desc_parts.append(f"node_dim={node_dim}")
+        if self.sample_node_count is not None:
+            node_desc_parts.append(f"sample_nodes={self.sample_node_count}")
+        if node_desc_parts:
+            summaries["node"] = "; ".join(node_desc_parts)
+
+        edge_desc_parts: List[str] = []
+        edge_module_desc = _module_line("edge")
+        if edge_module_desc:
+            edge_desc_parts.append(edge_module_desc)
+        variant = self.edge_schema.get("variant")
+        if variant:
+            edge_desc_parts.append(f"variant={variant}")
+        bands = self.edge_schema.get("bands")
+        if isinstance(bands, list) and bands:
+            edge_desc_parts.append("bands=" + "/".join(str(b) for b in bands))
+        if edge_dim is not None:
+            edge_desc_parts.append(f"edge_dim={edge_dim}")
+        if self.sample_edge_count is not None:
+            edge_desc_parts.append(f"sample_edges={self.sample_edge_count}")
+        if edge_desc_parts:
+            summaries["edge"] = "; ".join(edge_desc_parts)
+
+        return summaries
 
 
 def _ensure_list(value: Optional[Sequence[str]]) -> List[str]:
@@ -275,7 +342,7 @@ def load_graph_feature_metadata(
     node_dims_from_graphs: List[int] = []
     metadata_dicts: List[Dict[str, object]] = []
 
-    for graph_path in graph_paths:
+    for idx, graph_path in enumerate(graph_paths):
         try:
             data = torch.load(graph_path, map_location="cpu")
         except (OSError, RuntimeError) as exc:
@@ -295,6 +362,19 @@ def load_graph_feature_metadata(
                 node_dims_from_graphs.append(int(node_attr.shape[0]))
             elif node_attr.dim() >= 2:
                 node_dims_from_graphs.append(int(node_attr.shape[-1]))
+
+        if metadata.sample_graph is None:
+            metadata.sample_graph = str(graph_path)
+            if edge_attr is not None:
+                try:
+                    metadata.sample_edge_count = int(edge_attr.shape[0])
+                except Exception:
+                    pass
+            if node_attr is not None:
+                try:
+                    metadata.sample_node_count = int(node_attr.shape[0])
+                except Exception:
+                    pass
 
         graph_meta = getattr(data, "metadata", None)
         if isinstance(graph_meta, dict):
