@@ -43,6 +43,11 @@ from pytorch_lightning.callbacks import (
     TQDMProgressBar,
 )
 from pytorch_lightning.loggers import CSVLogger
+
+try:  # Optional MLflow dependency
+    from pytorch_lightning.loggers import MLFlowLogger  # type: ignore
+except Exception:  # pragma: no cover - MLflow optional
+    MLFlowLogger = None  # type: ignore
 from torch.utils.data import Dataset
 from torch_geometric.data import Batch, Data
 from torch_geometric.loader import DataLoader
@@ -59,6 +64,16 @@ from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
 
 
 @dataclasses.dataclass
+class MlflowConfig:
+    enabled: bool = False
+    tracking_uri: str = "./mlruns"
+    experiment: str = "dynamic_topoqa"
+    run_name: Optional[str] = None
+    log_artifacts: bool = True
+    tags: Dict[str, str] = dataclasses.field(default_factory=dict)
+
+
+@dataclasses.dataclass
 class TrainingConfig:
     graph_dir: Path
     train_label_file: Path
@@ -67,6 +82,7 @@ class TrainingConfig:
     metadata_path: Optional[Path] = None
     summary_path: Optional[Path] = None
     accelerator: str = "cpu"
+    devices: int = 1
     attention_head: int = 8
     pooling_type: str = "mean"
     batch_size: int = 16
@@ -76,6 +92,7 @@ class TrainingConfig:
     seed: int = 222
     num_workers: int = 0
     precision: int = 32
+    lr_scheduler_type: str = "reduce_on_plateau"
     early_stopping_patience: int = 20
     lr_scheduler_patience: int = 10
     lr_scheduler_factor: float = 0.5
@@ -85,6 +102,10 @@ class TrainingConfig:
     log_lr: bool = False
     progress_bar_refresh_rate: int = 0
     log_every_n_steps: int = 100
+    use_val_spearman_as_secondary: bool = True
+    spearman_secondary_min_delta: float = 0.0
+    spearman_secondary_weight: float = 1.0
+    mlflow: MlflowConfig = dataclasses.field(default_factory=MlflowConfig)
     edge_schema: dict = dataclasses.field(default_factory=dict)
     topology_schema: dict = dataclasses.field(default_factory=dict)
 
@@ -114,27 +135,140 @@ def load_config(path: Path) -> TrainingConfig:
     with path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
 
+    if not isinstance(data, dict):
+        raise ValueError("Configuration file must contain a mapping at the root")
+
     base_dir = path.parent.resolve()
 
-    def _get(name: str, default=None):
-        return data.get(name, default)
+    if "paths" not in data:
+        def _get(name: str, default=None):
+            return data.get(name, default)
 
-    graph_dir = _resolve_path(_get("graph_dir"), base_dir, fallbacks=(SCRIPT_DIR,))
-    train_label_file = _resolve_path(_get("train_label_file"), base_dir, fallbacks=(SCRIPT_DIR,))
-    val_label_file = _resolve_path(_get("val_label_file"), base_dir, fallbacks=(SCRIPT_DIR,))
-    save_dir = _resolve_path(_get("save_dir"), base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+        graph_dir = _resolve_path(_get("graph_dir"), base_dir, fallbacks=(SCRIPT_DIR,))
+        train_label_file = _resolve_path(_get("train_label_file"), base_dir, fallbacks=(SCRIPT_DIR,))
+        val_label_file = _resolve_path(_get("val_label_file"), base_dir, fallbacks=(SCRIPT_DIR,))
+        save_dir = _resolve_path(_get("save_dir", "./training_runs"), base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
 
-    metadata_path_raw = _get("metadata_path")
-    summary_path_raw = _get("summary_path")
-    metadata_path = (
-        _resolve_path(metadata_path_raw, base_dir, fallbacks=(SCRIPT_DIR,))
-        if metadata_path_raw
-        else None
-    )
-    summary_path = (
-        _resolve_path(summary_path_raw, base_dir, fallbacks=(SCRIPT_DIR,))
-        if summary_path_raw
-        else None
+        metadata_path_raw = _get("metadata_path")
+        summary_path_raw = _get("summary_path")
+        metadata_path = (
+            _resolve_path(metadata_path_raw, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+            if metadata_path_raw
+            else None
+        )
+        summary_path = (
+            _resolve_path(summary_path_raw, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+            if summary_path_raw
+            else None
+        )
+
+        cfg = TrainingConfig(
+            graph_dir=graph_dir,
+            train_label_file=train_label_file,
+            val_label_file=val_label_file,
+            save_dir=save_dir,
+            metadata_path=metadata_path,
+            summary_path=summary_path,
+            accelerator=str(_get("accelerator", "cpu")),
+            devices=int(_get("devices", 1)),
+            attention_head=int(_get("attention_head", 8)),
+            pooling_type=str(_get("pooling_type", "mean")),
+            batch_size=int(_get("batch_size", 16)),
+            learning_rate=float(_get("learning_rate", 5e-3)),
+            num_epochs=int(_get("num_epochs", 200)),
+            accumulate_grad_batches=int(_get("accumulate_grad_batches", 32)),
+            seed=int(_get("seed", 222)),
+            num_workers=int(_get("num_workers", 0)),
+            precision=int(_get("precision", 32)),
+            lr_scheduler_type=str(_get("lr_scheduler_type", "reduce_on_plateau")),
+            early_stopping_patience=int(_get("early_stopping_patience", 20)),
+            lr_scheduler_patience=int(_get("lr_scheduler_patience", 10)),
+            lr_scheduler_factor=float(_get("lr_scheduler_factor", 0.5)),
+            progress_bar_refresh_rate=int(_get("progress_bar_refresh_rate", 0)),
+            log_every_n_steps=int(_get("log_every_n_steps", 100)),
+            use_val_spearman_as_secondary=bool(_get("use_val_spearman_as_secondary", True)),
+            spearman_secondary_min_delta=float(_get("spearman_secondary_min_delta", 0.0)),
+            spearman_secondary_weight=float(_get("spearman_secondary_weight", 1.0)),
+            mlflow=MlflowConfig(),
+            edge_schema=dict(_get("edge_schema", {})),
+            topology_schema=dict(_get("topology_schema", {})),
+        )
+        return cfg
+
+    def _section(name: str) -> Dict[str, object]:
+        value = data.get(name, {})
+        if value is None:
+            return {}
+        if not isinstance(value, dict):
+            raise ValueError(f"Section '{name}' must be a mapping")
+        return value
+
+    paths_cfg = _section("paths")
+    if not paths_cfg:
+        raise ValueError("Configuration section 'paths' is required")
+
+    def _require(cfg: Dict[str, object], key: str) -> object:
+        if key not in cfg:
+            raise KeyError(f"Missing required configuration key: paths.{key}")
+        return cfg[key]
+
+    graph_dir = _resolve_path(_require(paths_cfg, "graph"), base_dir, fallbacks=(SCRIPT_DIR,))
+    train_label_file = _resolve_path(_require(paths_cfg, "train_labels"), base_dir, fallbacks=(SCRIPT_DIR,))
+    val_label_file = _resolve_path(_require(paths_cfg, "val_labels"), base_dir, fallbacks=(SCRIPT_DIR,))
+    save_dir = _resolve_path(paths_cfg.get("save_dir", "./training_runs"), base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+
+    metadata_path = paths_cfg.get("metadata")
+    if metadata_path is not None:
+        metadata_path = _resolve_path(metadata_path, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+
+    summary_path = paths_cfg.get("summary")
+    if summary_path is not None:
+        summary_path = _resolve_path(summary_path, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+
+    model_cfg = _section("model")
+    pooling_type = str(model_cfg.get("pooling_type", "mean"))
+    attention_head = int(model_cfg.get("attention_head", 8))
+
+    dataloader_cfg = _section("dataloader")
+    batch_size = int(dataloader_cfg.get("batch_size", 16))
+    num_workers = int(dataloader_cfg.get("num_workers", 0))
+    seed = int(dataloader_cfg.get("seed", 222))
+
+    trainer_cfg = _section("trainer")
+    accelerator = str(trainer_cfg.get("accelerator", "cpu"))
+    devices = int(trainer_cfg.get("devices", 1))
+    precision = int(trainer_cfg.get("precision", 32))
+    num_epochs = int(trainer_cfg.get("num_epochs", 200))
+    accumulate_grad_batches = int(trainer_cfg.get("accumulate_grad_batches", 32))
+
+    optimizer_cfg = _section("optimizer")
+    learning_rate = float(optimizer_cfg.get("learning_rate", 5e-3))
+
+    scheduler_cfg = _section("scheduler")
+    lr_scheduler_type = str(scheduler_cfg.get("type", "reduce_on_plateau"))
+    lr_scheduler_factor = float(scheduler_cfg.get("factor", 0.5))
+    lr_scheduler_patience = int(scheduler_cfg.get("patience", 10))
+
+    early_cfg = _section("early_stopping")
+    early_stopping_patience = int(early_cfg.get("patience", 20))
+
+    selection_cfg = _section("selection")
+    use_val_spearman = bool(selection_cfg.get("use_val_spearman", True))
+    spearman_min_delta = float(selection_cfg.get("spearman_min_delta", 0.0))
+    spearman_weight = float(selection_cfg.get("spearman_weight", 1.0))
+
+    logging_cfg = _section("logging")
+    progress_bar_refresh_rate = int(logging_cfg.get("progress_bar_refresh_rate", 0))
+    log_every_n_steps = int(logging_cfg.get("log_every_n_steps", 100))
+
+    mlflow_cfg = _section("mlflow")
+    mlflow_config = MlflowConfig(
+        enabled=bool(mlflow_cfg.get("enabled", False)),
+        tracking_uri=str(mlflow_cfg.get("tracking_uri", "./mlruns")),
+        experiment=str(mlflow_cfg.get("experiment", "dynamic_topoqa")),
+        run_name=mlflow_cfg.get("run_name"),
+        log_artifacts=bool(mlflow_cfg.get("log_artifacts", True)),
+        tags=dict(mlflow_cfg.get("tags", {}) or {}),
     )
 
     cfg = TrainingConfig(
@@ -144,27 +278,29 @@ def load_config(path: Path) -> TrainingConfig:
         save_dir=save_dir,
         metadata_path=metadata_path,
         summary_path=summary_path,
-        accelerator=str(_get("accelerator", "cpu")),
-        attention_head=int(_get("attention_head", 8)),
-        pooling_type=str(_get("pooling_type", "mean")),
-        batch_size=int(_get("batch_size", 16)),
-        learning_rate=float(_get("learning_rate", 5e-3)),
-        num_epochs=int(_get("num_epochs", 200)),
-        accumulate_grad_batches=int(_get("accumulate_grad_batches", 32)),
-        seed=int(_get("seed", 222)),
-        num_workers=int(_get("num_workers", 0)),
-        precision=int(_get("precision", 32)),
-        early_stopping_patience=int(_get("early_stopping_patience", 20)),
-        lr_scheduler_patience=int(_get("lr_scheduler_patience", 10)),
-        lr_scheduler_factor=float(_get("lr_scheduler_factor", 0.5)),
-        fast_dev_run=bool(_get("fast_dev_run", False)),
-        limit_train_batches=_get("limit_train_batches"),
-        limit_val_batches=_get("limit_val_batches"),
-        log_lr=bool(_get("log_lr", False)),
-        progress_bar_refresh_rate=int(_get("progress_bar_refresh_rate", 0)),
-        log_every_n_steps=int(_get("log_every_n_steps", 100)),
-        edge_schema=dict(_get("edge_schema", {})),
-        topology_schema=dict(_get("topology_schema", {})),
+        accelerator=accelerator,
+        devices=devices,
+        attention_head=attention_head,
+        pooling_type=pooling_type,
+        batch_size=batch_size,
+        learning_rate=learning_rate,
+        num_epochs=num_epochs,
+        accumulate_grad_batches=accumulate_grad_batches,
+        seed=seed,
+        num_workers=num_workers,
+        precision=precision,
+        lr_scheduler_type=lr_scheduler_type,
+        early_stopping_patience=early_stopping_patience,
+        lr_scheduler_patience=lr_scheduler_patience,
+        lr_scheduler_factor=lr_scheduler_factor,
+        progress_bar_refresh_rate=progress_bar_refresh_rate,
+        log_every_n_steps=log_every_n_steps,
+        use_val_spearman_as_secondary=use_val_spearman,
+        spearman_secondary_min_delta=spearman_min_delta,
+        spearman_secondary_weight=spearman_weight,
+        mlflow=mlflow_config,
+        edge_schema=dict(data.get("edge_schema", {})),
+        topology_schema=dict(data.get("topology_schema", {})),
     )
     return cfg
 
@@ -557,6 +693,49 @@ def _select_metric(metrics: Dict[str, object], candidates: Sequence[str]) -> Tup
     return None, None
 
 
+class SelectionMetricLogger(Callback):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        enabled: bool,
+        weight: float,
+        min_delta: float,
+    ) -> None:
+        super().__init__()
+        self.logger = logger
+        self.enabled = enabled
+        self.weight = weight
+        self.min_delta = min_delta
+
+    def on_validation_epoch_end(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking:
+            return
+        metrics = trainer.callback_metrics
+        val_loss = _safe_scalar(metrics.get("val_loss"))
+        if val_loss is None:
+            return
+
+        if not self.enabled:
+            metrics["selection_metric"] = torch.tensor(val_loss, device=pl_module.device if hasattr(pl_module, "device") else None)
+            return
+
+        val_spearman = _safe_scalar(metrics.get("val_spearman_corr"))
+        if val_spearman is None:
+            selection_metric = val_loss
+        else:
+            improvement = max(0.0, val_spearman - self.min_delta)
+            selection_metric = val_loss - self.weight * improvement
+
+        metrics["selection_metric"] = selection_metric
+        metrics["selection_metric"] = torch.tensor(selection_metric, device=pl_module.device if hasattr(pl_module, "device") else None)
+        self.logger.info(
+            "Selection metric (val_loss - %.3f*max(0,val_spearman_corr-%.3f)) = %.6f",
+            self.weight,
+            self.min_delta,
+            selection_metric,
+        )
+
+
 class EpochSummaryLogger(Callback):
     def __init__(self, logger: logging.Logger) -> None:
         super().__init__()
@@ -857,6 +1036,15 @@ def main() -> int:
 
     _log_feature_summary(logger, feature_metadata)
 
+    if cfg.use_val_spearman_as_secondary:
+        logger.info(
+            "Secondary selection metric enabled: val_spearman_corr (weight=%.3f, min_delta=%.3f)",
+            cfg.spearman_secondary_weight,
+            cfg.spearman_secondary_min_delta,
+        )
+    else:
+        logger.info("Secondary selection metric disabled; using val_loss only.")
+
     node_schema_for_log: Dict[str, object] = dict(feature_metadata.node_schema)
     node_columns = node_schema_for_log.get("columns")
     if isinstance(node_columns, list):
@@ -921,47 +1109,103 @@ def main() -> int:
 
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+    monitor_metric_name = "selection_metric" if cfg.use_val_spearman_as_secondary else "val_loss"
+
     checkpoint_cb = ModelCheckpoint(
         dirpath=str(checkpoint_dir),
         filename="model.{val_loss:.5f}",
         auto_insert_metric_name=False,
-        monitor="val_loss",
+        monitor=monitor_metric_name,
         mode="min",
         save_top_k=3,
         save_last=False,
     )
     early_stop_cb = EarlyStopping(
-        monitor="val_loss",
+        monitor=monitor_metric_name,
         mode="min",
         patience=cfg.early_stopping_patience,
         verbose=True,
     )
-    lr_callbacks = []
+    lr_callbacks: List[Callback] = []
     if args.log_lr:
         lr_callbacks.append(LearningRateMonitor(logging_interval="epoch"))
+
+    selection_callback = SelectionMetricLogger(
+        logger,
+        enabled=cfg.use_val_spearman_as_secondary,
+        weight=cfg.spearman_secondary_weight,
+        min_delta=cfg.spearman_secondary_min_delta,
+    )
 
     progress_bar_cb = None
     enable_progress_bar = cfg.progress_bar_refresh_rate > 0
     if enable_progress_bar:
         progress_bar_cb = TQDMProgressBar(refresh_rate=cfg.progress_bar_refresh_rate)
 
-    callback_list: List = [checkpoint_cb, early_stop_cb, *lr_callbacks]
+    callback_list: List[Callback] = [selection_callback, checkpoint_cb, early_stop_cb, *lr_callbacks]
     if progress_bar_cb is not None:
         callback_list.append(progress_bar_cb)
-
     callback_list.append(TrainingProgressLogger(logger))
     callback_list.append(EpochSummaryLogger(logger))
 
     csv_logger = CSVLogger(str(cfg.save_dir), name="cpu_training", flush_logs_every_n_steps=1)
 
+    loggers: List = [csv_logger]
+    mlflow_logger = None
+    if cfg.mlflow.enabled:
+        if MLFlowLogger is None:
+            logger.warning("MLflow logging requested but the dependency is not installed; disabling.")
+        else:
+            try:
+                run_name = cfg.mlflow.run_name or (args.trial_label or (run_dir.name if run_dir else cfg.save_dir.name))
+                mlflow_logger = MLFlowLogger(
+                    experiment_name=cfg.mlflow.experiment,
+                    tracking_uri=cfg.mlflow.tracking_uri,
+                    run_name=run_name,
+                )
+                if cfg.mlflow.tags:
+                    mlflow_logger.experiment.set_tags(mlflow_logger.run_id, cfg.mlflow.tags)
+                hparams = {
+                    "paths.graph": str(cfg.graph_dir),
+                    "paths.train_labels": str(cfg.train_label_file),
+                    "paths.val_labels": str(cfg.val_label_file),
+                    "model.pooling_type": cfg.pooling_type,
+                    "model.attention_head": cfg.attention_head,
+                    "trainer.accelerator": cfg.accelerator,
+                    "trainer.devices": cfg.devices,
+                    "trainer.precision": cfg.precision,
+                    "trainer.num_epochs": cfg.num_epochs,
+                    "trainer.accumulate_grad_batches": cfg.accumulate_grad_batches,
+                    "dataloader.batch_size": cfg.batch_size,
+                    "dataloader.num_workers": cfg.num_workers,
+                    "optimizer.learning_rate": cfg.learning_rate,
+                    "scheduler.type": cfg.lr_scheduler_type,
+                    "scheduler.factor": cfg.lr_scheduler_factor,
+                    "scheduler.patience": cfg.lr_scheduler_patience,
+                    "selection.use_val_spearman": cfg.use_val_spearman_as_secondary,
+                    "selection.spearman_weight": cfg.spearman_secondary_weight,
+                    "selection.spearman_min_delta": cfg.spearman_secondary_min_delta,
+                }
+                mlflow_logger.log_hyperparams(hparams)
+                logger.info(
+                    "MLflow logging enabled (experiment=%s, run_id=%s)",
+                    cfg.mlflow.experiment,
+                    mlflow_logger.run_id,
+                )
+                loggers.append(mlflow_logger)
+            except Exception as exc:  # pragma: no cover - optional dependency
+                logger.warning("Unable to initialise MLflow logging: %s", exc)
+                mlflow_logger = None
+
     trainer = Trainer(
         accelerator=cfg.accelerator,
-        devices=1,
+        devices=cfg.devices,
         precision=cfg.precision,
         max_epochs=cfg.num_epochs,
         accumulate_grad_batches=cfg.accumulate_grad_batches,
         callbacks=callback_list,
-        logger=csv_logger,
+        logger=loggers if len(loggers) > 1 else loggers[0],
         enable_progress_bar=enable_progress_bar,
         log_every_n_steps=max(1, cfg.log_every_n_steps),
         deterministic=True,
@@ -1009,6 +1253,7 @@ def main() -> int:
         logger.info("Training completed. No checkpoints were saved (likely fast_dev_run).")
 
     ranked_checkpoints: List[Path] = []
+    val_metrics: List[Dict[str, object]] = []
 
     if cfg.fast_dev_run:
         logger.info("Fast dev run enabled; skipping full validation sweep.")
@@ -1043,6 +1288,39 @@ def main() -> int:
         logger.info("Feature metadata written to %s", metadata_path)
     except OSError as exc:
         logger.warning("Unable to write feature metadata file: %s", exc)
+
+    if mlflow_logger is not None:
+        try:
+            metrics_to_log: Dict[str, float] = {}
+            best_score = _safe_scalar(getattr(checkpoint_cb, "best_model_score", None))
+            if best_score is not None:
+                metrics_to_log["best_val_loss"] = best_score
+
+            final_selection = _safe_scalar(trainer.callback_metrics.get("selection_metric"))
+            if final_selection is not None:
+                metrics_to_log["selection_metric"] = final_selection
+
+            if val_metrics:
+                first_metrics = val_metrics[0]
+                for key in ("val_loss", "val_pearson_corr", "val_spearman_corr"):
+                    if key in first_metrics:
+                        value = _safe_scalar(first_metrics[key])
+                        if value is not None:
+                            metrics_to_log[key] = value
+
+            if metrics_to_log:
+                mlflow_logger.log_metrics(metrics_to_log)
+
+            if cfg.mlflow.log_artifacts:
+                if coverage_path.exists():
+                    mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(coverage_path))
+                if metadata_path.exists():
+                    mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(metadata_path))
+                for artifact_path in ranked_checkpoints[:3]:
+                    if artifact_path.exists():
+                        mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(artifact_path))
+        except Exception as exc:  # pragma: no cover - optional dependency
+            logger.warning("Unable to log metrics/artifacts to MLflow: %s", exc)
 
     return 0
 

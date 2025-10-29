@@ -32,7 +32,7 @@ early_stopping:
   patience: 25
 
 selection:
-  use_val_spearman: true
+  use_val_spearman: false
   spearman_min_delta: 0.0
   spearman_weight: 1.0
 
@@ -41,8 +41,8 @@ logging:
   log_every_n_steps: 100
 
 mlflow:
-  enabled: true
-  tracking_uri: ./ml_runs
+  enabled: false
+  tracking_uri: ./mlruns
   experiment: dynamic_topoqa
   run_name: null
   log_artifacts: true
