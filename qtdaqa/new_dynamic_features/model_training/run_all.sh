@@ -2,36 +2,12 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-log() {
-  printf '%s | %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1"
-}
+MANIFEST="${SCRIPT_DIR}/manifests/run_all.yaml"
 
-run_step() {
-  local name="$1"
-  shift
-  local status
-  local start_ts end_ts elapsed
-  start_ts=$(date +%s)
-  log "Starting ${name}"
-  set +e
-  "$@"
-  status=$?
-  set -e
-  end_ts=$(date +%s)
-  elapsed=$((end_ts - start_ts))
-  if [[ $status -eq 0 ]]; then
-    log "Completed ${name} (elapsed: ${elapsed}s)"
-  else
-    log "FAILED ${name} (elapsed: ${elapsed}s)" >&2
-  fi
-  return $status
-}
-
-run_step "0_tune_and_run_training" bash "${SCRIPT_DIR}/0_tune_and_run_training.sh" || exit 1
-
-if run_step "1_fine_tune_part1" bash "${SCRIPT_DIR}/1_fine_tune_after_tune_and_run_part1.sh"; then
-  run_step "2_fine_tune_part2" bash "${SCRIPT_DIR}/2_fine_tune_after_tune_and_run_part2.sh" || exit 1
-else
-  log "Skipping 2_fine_tune_part2 because 1_fine_tune_part1 failed." >&2
+if [[ ! -f "${MANIFEST}" ]]; then
+  echo "Expected manifest not found: ${MANIFEST}" >&2
   exit 1
 fi
+
+PYTHON_BIN="${PYTHON:-python}"
+exec "${PYTHON_BIN}" -m train_cli batch --manifest "${MANIFEST}" "$@"

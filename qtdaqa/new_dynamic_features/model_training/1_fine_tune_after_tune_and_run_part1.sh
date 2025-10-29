@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # set -euo pipefail
 
+PYTHON_BIN="${PYTHON:-python}"
+
 cfg_path="configs/sched_boost_finetune.yaml"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -90,5 +92,10 @@ CKPT_PATH="${STABLE_CKPT_PATH}"
 
 printf "Selected checkpoint (cached) = %s\n" "${CKPT_PATH}"
 
-printf  "=== Fine-tuning Phase 1 ===\n"
-./run_training.sh -c "${cfg_path}" -- --resume-from "${CKPT_PATH}"
+printf "=== Fine-tuning Phase 1 ===\n"
+CONFIG_ABS="${SCRIPT_DIR}/${cfg_path}"
+if [[ ! -f "${CONFIG_ABS}" ]]; then
+  echo "Config not found: ${CONFIG_ABS}" >&2
+  exit 1
+fi
+exec "${PYTHON_BIN}" -m train_cli run --config "${CONFIG_ABS}" --resume-from "${CKPT_PATH}" "$@"

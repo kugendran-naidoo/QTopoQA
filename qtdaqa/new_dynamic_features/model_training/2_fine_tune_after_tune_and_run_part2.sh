@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 # set -euo pipefail
 
+PYTHON_BIN="${PYTHON:-python}"
+
 BASE_CFG="configs/sched_boost_finetune.yaml"
 SEEDS=(101 555 888)
+
+CONFIG_ABS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/${BASE_CFG}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -89,23 +93,16 @@ CKPT_PATH="${STABLE_CKPT_PATH}"
 
 printf "Selected checkpoint (cached) = %s\n" "${CKPT_PATH}"
 
+if [[ ! -f "${CONFIG_ABS}" ]]; then
+  echo "Config not found: ${CONFIG_ABS}" >&2
+  exit 1
+fi
+
 for seed in "${SEEDS[@]}"; do
-
-  cfg_path="configs/sched_boost_finetune_seed${seed}.yaml"
-
-  cp "${BASE_CFG}" "${cfg_path}"
-
-  python - <<'PY' "${cfg_path}" "${seed}"
-import sys, yaml
-cfg_path, seed = sys.argv[1], int(sys.argv[2])
-with open(cfg_path) as fh:
-    cfg = yaml.safe_load(fh)
-cfg["seed"] = seed
-with open(cfg_path, "w") as fh:
-    yaml.safe_dump(cfg, fh)
-PY
-
-  printf "=== Fine-tuning Phase 2 - seed ${seed} ===\n"
-  ./run_training.sh -c "${cfg_path}" -- --resume-from "${CKPT_PATH}"
-
+  printf "=== Fine-tuning Phase 2 - seed %s ===\n" "${seed}"
+  "${PYTHON_BIN}" -m train_cli run \
+    --config "${CONFIG_ABS}" \
+    --override "seed=${seed}" \
+    --run-name "finetune_seed${seed}" \
+    --resume-from "${CKPT_PATH}" "$@"
 done
