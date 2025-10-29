@@ -4,8 +4,6 @@ attention_head: 8
 batch_size: 16
 devices: 1
 early_stopping_patience: 25
-edge_schema:
-  use_layer_norm: true
 graph_dir: ../graph_builder/output/pilot_batch/graph_data
 learning_rate: 0.005
 lr_scheduler_factor: 0.4
@@ -16,7 +14,5 @@ pooling_type: mean
 precision: 32
 save_dir: ./training_runs
 seed: 1337
-topology_schema:
-  vector_dim: 140
 train_label_file: ./train_pilot.csv
 val_label_file: ./val_pilot.csv
