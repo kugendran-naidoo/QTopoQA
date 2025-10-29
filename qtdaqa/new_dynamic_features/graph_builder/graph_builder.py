@@ -279,6 +279,10 @@ def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None
 
 
 def _list_registered_modules() -> None:
+    print("Select exactly one module per category (interface → topology → node → edge) when configuring features.\n")
+    print("Need to blend or extend feature logic? Copy an existing module (interface/topology/node/edge), "
+          "adapt or compose it, add @register_feature_module, and reference the new module ID in feature-config.yaml. "
+          "Each run still selects exactly one interface, one topology, one node, and one edge module.\n")
     for kind in ("interface", "topology", "node", "edge"):
         print(f"{kind.upper()} modules")
         for meta in sorted(list_modules(kind=kind), key=lambda m: m.module_id):
