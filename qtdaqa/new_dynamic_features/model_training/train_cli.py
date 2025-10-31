@@ -387,6 +387,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
     if not manifest_path.exists():
         raise CLIError(f"Manifest file not found: {manifest_path}")
     manifest = _load_manifest(manifest_path)
+    manifest_dir = manifest_path.parent
     shared = manifest.get("shared", {})
     shared_overrides = shared.get("overrides") or {}
     shared_notes = shared.get("notes")
@@ -424,14 +425,46 @@ def cmd_batch(args: argparse.Namespace) -> None:
 
         trainer_args = shared_trainer_args + list(job.get("trainer_args", []) or [])
 
+        config_path = Path(config_path)
+        if not config_path.is_absolute():
+            candidates = [
+                (manifest_dir / config_path),
+                (manifest_dir.parent / config_path),
+                Path.cwd() / config_path,
+            ]
+            for candidate in candidates:
+                if candidate.exists():
+                    config_path = candidate.resolve()
+                    break
+            else:
+                config_path = (manifest_dir / config_path).resolve()
+
+        resume_from = job.get("resume_from")
+        resume_path = None
+        if resume_from:
+            resume_candidate = Path(resume_from)
+            if not resume_candidate.is_absolute():
+                candidates = [
+                    (manifest_dir / resume_candidate),
+                    (manifest_dir.parent / resume_candidate),
+                    Path.cwd() / resume_candidate,
+                ]
+                for candidate in candidates:
+                    if candidate.exists():
+                        resume_candidate = candidate.resolve()
+                        break
+                else:
+                    resume_candidate = (manifest_dir / resume_candidate).resolve()
+            resume_path = resume_candidate
+
         job_args = argparse.Namespace(
-            config=Path(config_path),
+            config=config_path,
             output_root=output_root,
             run_name=run_name,
             override=overrides,
             notes=job.get("notes", shared_notes),
             trial_label=job.get("trial_label", shared_trial),
-            resume_from=Path(job["resume_from"]).resolve() if job.get("resume_from") else None,
+            resume_from=resume_path,
             fast_dev_run=bool(job.get("fast_dev_run", shared_fast_dev)),
             limit_train_batches=job.get("limit_train_batches", shared_limit_train),
             limit_val_batches=job.get("limit_val_batches", shared_limit_val),
@@ -536,8 +569,34 @@ def _extract_best_metric(metrics_path: Path) -> Optional[Tuple[int, float]]:
     return best_epoch or 0, best_value
 
 
-def _collect_val_history(metrics_files: Sequence[Path]) -> List[Dict[str, Any]]:
+def _collect_val_history(
+    metrics_files: Sequence[Path],
+    selection_cfg: Optional[Dict[str, Any]] = None,
+) -> Tuple[List[Dict[str, Any]], bool]:
     import csv
+
+    selection_enabled = True
+    weight = 1.0
+    min_delta = 0.0
+    if selection_cfg:
+        use_flag = selection_cfg.get("use_val_spearman")
+        if use_flag is None:
+            use_flag = selection_cfg.get("use_val_spearman_as_secondary")
+        if use_flag is not None:
+            selection_enabled = bool(use_flag)
+        try:
+            weight = float(selection_cfg.get("spearman_weight", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            weight = 1.0 if selection_enabled else 0.0
+        try:
+            min_delta = float(selection_cfg.get("spearman_min_delta", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            min_delta = 0.0
+    else:
+        # Mirror TrainingConfig defaults
+        selection_enabled = True
+        weight = 1.0
+        min_delta = 0.0
 
     history: List[Dict[str, Any]] = []
     for metrics_file in metrics_files:
@@ -558,15 +617,30 @@ def _collect_val_history(metrics_files: Sequence[Path]) -> List[Dict[str, Any]]:
                     epoch_idx = int(float(epoch)) if epoch is not None else None
                 except ValueError:
                     epoch_idx = None
+                spearman_raw = row.get("val_spearman_corr")
+                val_spearman = None
+                if spearman_raw not in (None, ""):
+                    try:
+                        val_spearman = float(spearman_raw)
+                    except ValueError:
+                        val_spearman = None
+                selection_metric = None
+                if selection_enabled:
+                    if val_spearman is None:
+                        selection_metric = value
+                    else:
+                        improvement = max(0.0, val_spearman - min_delta)
+                        selection_metric = value - weight * improvement
                 history.append(
                     {
                         "epoch": epoch_idx,
                         "val_loss": value,
+                        "val_spearman_corr": val_spearman,
+                        "selection_metric": selection_metric,
                         "source": str(metrics_file),
                     }
                 )
-    history.sort(key=lambda item: item["val_loss"])
-    return history
+    return history, selection_enabled
 
 
 def _format_duration(seconds: float) -> str:
@@ -643,6 +717,16 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     if not metrics_files:
         # Fall back to Lightning default location
         metrics_files = sorted(run_dir.glob("cpu_training/**/metrics.csv"))
+
+    config_path = run_dir / "config" / "config.yaml"
+    config_snippet: Dict[str, Any] = {}
+    selection_cfg: Dict[str, Any] = {}
+    if config_path.exists():
+        config_snippet = _load_yaml(config_path)
+        raw_selection = config_snippet.get("selection", {})
+        if isinstance(raw_selection, dict):
+            selection_cfg = raw_selection
+
     best_epoch = None
     best_loss = None
     for metrics_file in metrics_files:
@@ -654,16 +738,36 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
             best_loss = value
             best_epoch = epoch
 
-    val_history = _collect_val_history(metrics_files)
+    val_history, selection_enabled = _collect_val_history(metrics_files, selection_cfg)
+    sorted_by_loss = sorted(val_history, key=lambda item: item["val_loss"])
     top_val_losses = []
-    for idx, entry in enumerate(val_history[:3]):
+    for idx, entry in enumerate(sorted_by_loss[:3]):
         top_val_losses.append(
             {
                 "rank": idx + 1,
                 "val_loss": entry["val_loss"],
                 "epoch": entry["epoch"],
+                "val_spearman_corr": entry.get("val_spearman_corr"),
+                "selection_metric": entry.get("selection_metric"),
             }
         )
+
+    selection_top: List[Dict[str, Any]] = []
+    selection_best: Optional[Dict[str, Any]] = None
+    selection_candidates = [entry for entry in val_history if entry.get("selection_metric") is not None]
+    if selection_candidates:
+        sorted_by_selection = sorted(selection_candidates, key=lambda item: item["selection_metric"])
+        for idx, entry in enumerate(sorted_by_selection[:3]):
+            selection_top.append(
+                {
+                    "rank": idx + 1,
+                    "selection_metric": entry["selection_metric"],
+                    "val_loss": entry["val_loss"],
+                    "val_spearman_corr": entry.get("val_spearman_corr"),
+                    "epoch": entry["epoch"],
+                }
+            )
+        selection_best = sorted_by_selection[0]
 
     checkpoint_dir = run_dir / "model_checkpoints"
     best_checkpoint = None
@@ -674,11 +778,6 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         candidates = sorted(checkpoint_dir.glob("*.chkpt"))
         if candidates:
             best_checkpoint = str(candidates[0])
-
-    config_path = run_dir / "config" / "config.yaml"
-    config_snippet = {}
-    if config_path.exists():
-        config_snippet = _load_yaml(config_path)
 
     feature_metadata_path = run_dir / "feature_metadata.json"
     feature_info = {}
@@ -695,6 +794,12 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "feature_metadata": feature_info,
         "run_metadata": run_metadata,
         "top_val_losses": top_val_losses,
+        "selection_metric_enabled": selection_enabled,
+        "top_selection_metrics": selection_top,
+        "best_selection_metric": selection_best.get("selection_metric") if selection_best else None,
+        "best_selection_epoch": selection_best.get("epoch") if selection_best else None,
+        "best_selection_val_loss": selection_best.get("val_loss") if selection_best else None,
+        "best_selection_val_spearman": selection_best.get("val_spearman_corr") if selection_best else None,
     }
 
     runtime_estimate = _estimate_runtime(run_metadata, config_snippet, val_history)

@@ -89,6 +89,48 @@ metrics (including Pearson/Spearman correlations), and key artifacts (coverage
 report, feature metadata, top checkpoints) to the configured tracking URI. If
 the dependency is missing, a warning is emitted and training continues.
 
+## Automated pipeline helper
+
+The convenience script `run_full_pipeline.sh` orchestrates a full training cycle inside
+`training_runs/` (and `training_runs/history/` for archived jobs). It was last validated
+against the runs under `training_runs/`.
+
+1. **Seed/config sweep** – kicks off every job described in the manifest and waits for
+   them to finish. The fresh run directories land in `training_runs/`.
+
+   ```bash
+   python -m train_cli batch --manifest manifests/run_all.yaml
+   ```
+
+   After the sweep, the script inspects the new runs and picks the checkpoint with the
+   lowest validation loss (using `train_cli._summarise_run`).
+
+2. **Fine-tuning Phase 1** – resumes the best checkpoint with the phase-1 fine-tune
+   config. The run is tagged `<best-run-dir>_finetune_phase1`.
+
+   ```bash
+   python -m train_cli run \
+     --config configs/sched_boost_finetune.yaml \
+     --run-name "<best-run>_finetune_phase1" \
+     --resume-from <path/to/best.ckpt>
+   ```
+
+3. **Fine-tuning Phase 2** – repeats the resume for each high-variance seed
+   (`101`, `555`, `888`). Each launch reuses the same best checkpoint and stores the
+   outputs as `<best-run>_finetune_phase1_seed<seed>`.
+
+   ```bash
+   for seed in 101 555 888; do
+     python -m train_cli run \
+       --config "configs/sched_boost_finetune_seed${seed}.yaml" \
+       --run-name "<best-run>_finetune_phase1_seed${seed}" \
+       --resume-from <path/to/best.ckpt>
+   done
+   ```
+
+Run `./run_full_pipeline.sh` (from this directory) to execute all three stages
+sequentially with the current configs.
+
 ## Training CLI
 
 The legacy bash wrappers now delegate to the Python CLI.  Invoke the CLI
