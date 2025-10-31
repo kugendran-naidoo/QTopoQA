@@ -1,7 +1,7 @@
 paths:
   graph: ../../new_graph_builder/output/24d_edges_adjusted_dataset/graph_data
-  train_labels: ./train.csv
-  val_labels: ./val.csv
+  train_labels: ./data.train.csv
+  val_labels: ./data.validate.csv
   save_dir: ./training_runs
 
 model:

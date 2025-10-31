@@ -3,9 +3,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+cd "${SCRIPT_DIR}"
+
 RUN_ROOT="${SCRIPT_DIR}/training_runs"
-MANIFEST="${SCRIPT_DIR}/manifests/run_all.yaml"
-PHASE1_CONFIG="${SCRIPT_DIR}/configs/sched_boost_finetune.yaml"
+MANIFEST="manifests/run_all.yaml"
+PHASE1_CONFIG="configs/sched_boost_finetune.yaml"
 PHASE2_SEEDS=(101 555 888)
 
 if [[ ! -f "${MANIFEST}" ]]; then
@@ -13,13 +15,15 @@ if [[ ! -f "${MANIFEST}" ]]; then
   exit 1
 fi
 
-START_TS="$(python - <<'PY'
-import time
-print(int(time.time()))
+START_DATA="$(python - <<'PY'
+from datetime import datetime, timezone
+now = datetime.now(timezone.utc)
+print(now.isoformat(), int(now.timestamp()))
 PY
 )"
+read -r START_ISO START_TS <<< "${START_DATA}"
 
-echo "[run_full_pipeline] Starting sweep at $(date --iso-8601=seconds)"
+echo "[run_full_pipeline] Starting sweep at ${START_ISO}"
 python -m train_cli batch --manifest "${MANIFEST}"
 
 BEST_INFO="$(python - <<'PY' "${START_TS}" "${RUN_ROOT}"

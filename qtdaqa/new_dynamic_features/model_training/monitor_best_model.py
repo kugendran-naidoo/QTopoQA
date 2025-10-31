@@ -45,10 +45,13 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
     feature_metadata = payload.get("feature_metadata", {}) if isinstance(payload, dict) else {}
     edge_schema = feature_metadata.get("edge_schema", {}) if isinstance(feature_metadata, dict) else {}
     top_val_losses = payload.get("top_val_losses", []) if isinstance(payload, dict) else []
+    top_selection = payload.get("top_selection_metrics", []) if isinstance(payload, dict) else []
+    selection_enabled = bool(payload.get("selection_metric_enabled")) if isinstance(payload, dict) else False
     runtime_estimate = payload.get("runtime_estimate") if isinstance(payload, dict) else None
 
     best_checkpoint = payload.get("best_checkpoint") if isinstance(payload, dict) else None
     checkpoint_name = Path(best_checkpoint).name if best_checkpoint else None
+    selection_best = top_selection[0] if top_selection else None
     return {
         "run_dir": str(run_dir),
         "run_name": run_dir.name,
@@ -60,6 +63,9 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
         "edge_feature_dim": edge_schema.get("dim"),
         "notes": payload.get("run_metadata", {}).get("notes") if isinstance(payload.get("run_metadata"), dict) else None,
         "top_val_losses": top_val_losses,
+        "selection_metric_enabled": selection_enabled,
+        "best_selection": selection_best,
+        "selection_alternates": top_selection[1:] if top_selection else [],
         "runtime_estimate": runtime_estimate,
     }
 
