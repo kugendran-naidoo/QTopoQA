@@ -159,3 +159,85 @@ Canonical featuriser wrappers – Instead of relying on raw Data tensors, wrap t
 Learned adapters – Replace the first linear layer with a small adaptive module that can accept variable-length inputs (e.g. attention over dict-encoded features, or projecting via MLP that reads a metadata dictionary). This is more complex but might eliminate fixed widths entirely.
 Model ensembles – Maintain different checkpoints tuned for specific feature variants (11-D legacy vs 24-D multi-scale) and dispatch at runtime based on detected edge_attr width. The new metadata loader makes detecting the variant trivial; you only need to preserve the appropriate checkpoint.
 In short, the code now reads the .pt tensors, matches network dimensions to them, and falls back when metadata is missing. Edge attributes stand out because the first trainable layer is tied directly to their width—so those dimensions must be correct—but the same principle applies to any tensor consumed by the model.
+
+Explain what run_full_pipeline.sh does and what is the high level approach that it takes to training.
+
+Why is a the scan of three seeds 222, 777, 1337 first and why were these chosen ? Are they typically what one uses or arbitrary?
+
+Then explain how fine tuning works and why its required post the first scan of the 3 seeds and cant be done as part of the initial training. How does a resume work from the previously trained model and why is this necessary - is this a typical ML approach
+
+
+Pipeline Flow
+
+run_full_pipeline.sh first launches a manifest sweep (python -m train_cli batch --manifest manifests/run_all.yaml) to explore every config/seed combo listed in manifests/run_all.yaml and stash fresh runs under training_runs/ (qtdaqa/new_dynamic_features/model_training/run_full_pipeline.sh:26-28, manifests/run_all.yaml:5-23).
+After the sweep finishes it scans the new run folders, summarises each via train_cli._summarise_run, and selects the checkpoint with the lowest validation loss (run_full_pipeline.sh:29-79). This isolates the strongest base model before any extra tuning.
+Phase 1 fine-tuning resumes that best checkpoint with a dedicated config (configs/sched_boost_finetune.yaml) to keep training but under a tighter schedule/recipe (run_full_pipeline.sh:100-106).
+Phase 2 replays the same best checkpoint three more times with seed-specific configs for 101/555/888, giving additional stochastic restarts while preserving the learned representation (run_full_pipeline.sh:108-119). The script ends after these staged runs complete.
+Seed Sweep Rationale
+
+The initial manifest hits three baseline seeds (222/777/1337) and repeats them across three schedule variants (default, lower LR, larger batch) to sample performance variance and isolate robust settings (manifests/run_all.yaml:5-23). Those seed values aren’t industry “standards”; they’re simply a spaced trio that’s been used across prior experiments so comparisons stay consistent. Running multiple seeds up front gives a better estimate of how sensitive each configuration is before investing in deeper fine-tuning.
+Fine-Tuning Strategy
+
+The fine-tune configs intentionally differ from the sweep configs (usually lower learning rates, longer patience, or extra regularisation). Folding them into the initial sweep would blur the hyperparameter comparison, so the pipeline first finds the strongest baseline and only then applies the specialised schedules.
+--resume-from loads the exact weights/checkpoint from the chosen sweep run so Phase 1 (and each Phase 2 seed) continue training from that mature state rather than starting from random initialisation (run_full_pipeline.sh:102-118). This is a common ML pattern: perform a broad search, lock in the best checkpoint, then resume training with a narrower, often more aggressive fine-tuning recipe to squeeze out extra performance without repeating the whole sweep.
+Resuming is necessary because fine-tuning assumes the model already captured general structure during the sweep; starting from scratch with the fine-tune configs wouldn’t benefit from the wide exploration that identified a strong baseline, and it would multiply training cost.
+
+The training regime used to be very fast overall but has now slowed down alot for each sweep. Is this because of the model training now being able to dynamically adjust to the structure of the features from the .pt files or the use of spearman values for secondary decisions on learning or both or other reasons? Explain.
+
+Given that the .pt files that constitute the training data features are a total of +- 12GB, does this mean that the train code loads 12GB into memory and then uses it every epoch ? How does this work ?
+
+
+run_full_pipeline.sh still does three things: sweep every config in manifests/run_all.yaml, pick the lowest validation-loss checkpoint, then resume it for Phase 1 and the three Phase 2 fine-tunes (qtdaqa/new_dynamic_features/model_training/run_full_pipeline.sh:26-119). That flow has not changed, but each stage now processes a much heavier dataset.
+
+The slowdown you’re seeing is dominated by three factors:
+• Graph size + batch accumulation – Each .pt graph now carries the 24‑dimensional edge feature stack coming out of the new graph builder. With ~8.7k training graphs (see the coverage logs your recent run printed), Lightning executes 545 forward/backward passes per epoch, and accumulate_grad_batches=16 delays optimizer steps but still runs all 545 batches.
+• Single-process data loading – The DataLoader is pinned to num_workers=0 for macOS stability (qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py:843-859). That means the training loop has to synchronously torch.load each graph from disk, so every batch waits on I/O/CPU deserialization. Raising num_workers or moving to a machine where worker processes behave improves throughput far more than any metric tweak.
+• Dynamic schema inference – The dynamic feature detection only samples up to 32 graphs up front to lock in node/edge dimensions (qtdaqa/new_dynamic_features/common/feature_metadata.py:200-360). It adds a short, one-off cost, not per-batch overhead.
+
+Spearman-as-secondary selection runs once per validation epoch and just sorts ~3k numbers; compared to 500+ forward/backward passes, that’s negligible. So the slowdown is primarily compute/data size driven, not the new metadata logic or the extra metric.
+
+You’re not loading 12 GB into RAM at once. Each graph lives in its own .pt file; the GraphRegressionDataset leaves them on disk and the PyG DataLoader pulls a handful of files per batch, collates them, then frees them before the next batch (model_train_topoqa_cpu.py:843-878). The operating system will cache hot pages, but Python never holds the whole corpus in memory. That’s why num_workers and disk speed matter—every epoch still re-reads the graphs, but only the current mini-batch sits in RAM.
+
+Next steps
+
+Try bumping num_workers to 2 or 4 in the sweep configs and monitor stability; the loader will overlap disk reads with compute.
+If you have GPU access, switching accelerator to gpu in the configs will dwarf the current CPU runtime, especially with the larger edge feature stacks.
+If startup metadata sampling still feels slow, cut max_pt_samples in load_graph_feature_metadata to 8–16; it shaves seconds while keeping the feature dimension checks.
+This a mac system but training is using cpu only. If I switch from cpu to mps in the config.yaml will that dramatically improve performance of the training? Is mps supported for the code I'm running? Will the results be consistent or the same as if I ran with cpu just faster? Is the code able to switch over to mps without modification as it stands?
+
+
+MPS viability
+
+The entry point you’re using (qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py:10) is deliberately built for CPU. PyTorch Lightning will happily accept accelerator='mps' (model_train_topoqa_cpu.py:281), but the GNN stack behind train_cli relies on torch_geometric scatter/sparse ops that only ship CPU/CUDA kernels today. On MPS these ops either fall back to the CPU or error out, so a pure config flip won’t give you native MPS execution.
+Expected performance
+
+Because the heavy PyG layers can’t execute on Apple Silicon cores today, pointing the Trainer at MPS usually just bounces tensors back to CPU, wiping out any speed gain. Even if it ran, a single M2 GPU core isn’t dramatically faster than the CPU for this workload—most wall-clock time is still spent loading thousands of .pt graphs and crunching 500+ batches per epoch on one device (manifests/run_all.yaml:5-23, model_train_topoqa_cpu.py:843-875).
+Result consistency
+
+Lightning is already in deterministic mode (deterministic=True, model_train_topoqa_cpu.py:1205), so CPU vs MPS should yield numerically similar results given identical seeds. But because the current build can’t keep the whole graph network on MPS, you’d end up back on CPU anyway, just with extra data copies.
+What it would take
+
+To really leverage Apple metal you’d need PyTorch Geometric (and its compiled extensions) with MPS kernels, plus a trainer script that moves data/model to that device. Without those updates—and without reinstalling PyG from a fork that supports MPS—setting accelerator: mps will at best run no faster, and at worst crash once the first scatter/sparse op fires.
+Natural next step: keep the configs on CPU, and reclaim time by raising num_workers (if macOS allows) or moving runs to a CUDA-capable box.
+
+If I move to an x86 box with more cores and with an nvidia gpu, should I do to get good results and improved speed? Mention was made of "most wall-clock time is still spent loading thousands of .pt graphs and crunching 500+ batches per epoch on one device" - what does imply and how can I overcome this on the x86 box?
+
+What can I do on apple for now to speed up training apart from mps which will not work?
+
+
+On an x86 + NVIDIA box
+
+Move training to the CUDA trainer entry point (accelerator: gpu, devices: 1 or more). PyTorch Geometric has full CUDA kernels, so your GNN layers and attention blocks will finally run on GPU instead of CPU-only. You’ll see the biggest gains by:
+installing the matching CUDA wheels for PyTorch, PyTorch Geometric, torch-scatter/sparse (the “extra-index” commands from the PyG install docs),
+bumping num_workers in every config so the DataLoader can stream .pt graphs from disk while the GPU trains (start with 4–8 workers and scale until the GPU stays busy),
+raising batch_size or reducing accumulate_grad_batches once the model fits in GPU memory; this cuts iteration count per epoch.
+The “500+ batches per epoch” comment means each epoch currently walks through ~8.7k graphs in batches of 16 on a single device, with 16 gradient accumulations to mimic batch 256. On a multi-core CPU + fast SSD, using more workers plus a GPU means those 500 loader steps can overlap disk I/O and compute instead of running serially. With multiple GPUs you can also set devices: N and strategy: ddp to split the batch across cards.
+Monitor CPU, disk, and GPU usage (nvidia-smi, iostat). If the GPU sits idle, increase workers; if disk is saturated, store the dataset on NVMe or a local SSD instead of network storage.
+Apple Silicon options today
+
+Stay on CPU but raise num_workers above 0; macOS spawn penalties exist, yet on M-series chips 2 workers often work fine. Watch for hangs; revert to 0 if they appear.
+Use mixed precision (precision: 16-mixed) to lighten math per batch; even on CPU this trims some work, though gains are modest. It becomes more relevant once you have GPU access.
+Reduce accumulate_grad_batches (e.g., 8 instead of 16) and compensate by shrinking batch_size slightly, which halves optimizer updates per epoch.
+Cache hot .pt graphs on an external SSD or RAM disk to improve read bandwidth.
+Run targeted sweeps (fewer configs/seeds) before the full manifest so you’re not spending hours on runs that you’ll discard.
+When you move to the NVIDIA rig, replicate the environment (requirements, configs) but flip the accelerator, bump loader workers and batch sizing, and make sure the dataset lives on fast local storage. That combination tackles both bottlenecks: disk serialization and single-device math.
