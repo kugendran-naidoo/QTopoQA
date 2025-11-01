@@ -241,3 +241,10 @@ Reduce accumulate_grad_batches (e.g., 8 instead of 16) and compensate by shrinki
 Cache hot .pt graphs on an external SSD or RAM disk to improve read bandwidth.
 Run targeted sweeps (fewer configs/seeds) before the full manifest so you’re not spending hours on runs that you’ll discard.
 When you move to the NVIDIA rig, replicate the environment (requirements, configs) but flip the accelerator, bump loader workers and batch sizing, and make sure the dataset lives on fast local storage. That combination tackles both bottlenecks: disk serialization and single-device math.
+
+Options for running training:
+
+./run_full_pipeline.sh – ensure the manifest sweep runs, the best checkpoint is identified, and both fine-tune phases complete. Check training_runs/<best>/model_checkpoints/best.ckpt.
+SKIP_SWEEP=1 ./run_full_pipeline.sh – verify it skips the sweep, reuses an existing run, and still reports the correct best checkpoint.
+SKIP_FINE=1 ./run_full_pipeline.sh – confirm it performs only the sweep and exits cleanly after announcing the winner.
+RESUME_FROM=/absolute/path/to/model.chkpt ./run_full_pipeline.sh – confirm Phase 1 and Phase 2 fine-tunes run off the provided checkpoint with expected run names.
