@@ -40,6 +40,15 @@ DEFAULT_ENV = {
     "CUBLAS_WORKSPACE_CONFIG": ":16:8",
 }
 
+ENV_SNAPSHOT_KEYS = frozenset(
+    {
+        "PYTHONHASHSEED",
+        "PL_SEED_WORKERS",
+        "TORCH_USE_DETERMINISTIC_ALGORITHMS",
+        "CUBLAS_WORKSPACE_CONFIG",
+    }
+)
+
 TIMESTAMP_FMT = "%Y-%m-%d_%H-%M-%S"
 RUN_PREFIX = "training_run"
 
@@ -163,6 +172,11 @@ def _write_run_metadata(
     command: Sequence[str],
     env: Dict[str, str],
 ) -> None:
+    env_snapshot = {
+        key: env[key]
+        for key in sorted(ENV_SNAPSHOT_KEYS)
+        if key in env
+    }
     metadata = {
         "run_name": run_name,
         "created": _dt.datetime.now().isoformat(),
@@ -171,7 +185,7 @@ def _write_run_metadata(
         "notes": notes,
         "trial_label": trial_label,
         "command": list(command),
-        "environment": {key: env[key] for key in sorted(env)},
+        "environment": env_snapshot,
     }
     metadata_path = run_dir / "run_metadata.json"
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
