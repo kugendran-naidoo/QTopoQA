@@ -18,5 +18,11 @@ save_dir: ./training_runs
 seed: 555
 topology_schema:
   vector_dim: 140
-train_label_file: ./train.csv
-val_label_file: ./val.csv
+train_label_file: ./data.train.csv
+val_label_file: ./data.validate.csv
+mlflow:
+  enabled: true
+  tracking_uri: ./mlruns
+  experiment: dynamic_topoqa
+  log_artifacts: true
+

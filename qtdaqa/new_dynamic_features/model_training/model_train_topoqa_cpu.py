@@ -398,6 +398,17 @@ class CpuTopoQAModule(GNN_edge1_edgepooling):
         self.lr_scheduler_factor = lr_scheduler_factor
         self.lr_scheduler_patience = lr_scheduler_patience
         self.feature_metadata = feature_metadata or {}
+        self.model_hparams: Dict[str, object] = {
+            "lr": lr,
+            "pooling_type": pooling_type,
+            "lr_scheduler_factor": lr_scheduler_factor,
+            "lr_scheduler_patience": lr_scheduler_patience,
+        }
+        for key in ("heads", "edge_dim", "node_dim", "num_net"):
+            if key in kwargs:
+                self.model_hparams[key] = kwargs[key]
+        if edge_schema is not None:
+            self.model_hparams["edge_schema_source"] = edge_schema.get("source") if isinstance(edge_schema, dict) else None
 
     def configure_optimizers(self):
         optimizer = super().configure_optimizers()
@@ -417,9 +428,11 @@ class CpuTopoQAModule(GNN_edge1_edgepooling):
 
     def on_save_checkpoint(self, checkpoint: Dict[str, object]) -> None:
         checkpoint["feature_metadata"] = self.feature_metadata
+        checkpoint["model_hyperparameters"] = self.model_hparams
 
     def on_load_checkpoint(self, checkpoint: Dict[str, object]) -> None:
         self.feature_metadata = checkpoint.get("feature_metadata", {})
+        self.model_hparams = checkpoint.get("model_hyperparameters", getattr(self, "model_hparams", {}))
 
 
 
@@ -635,7 +648,29 @@ def _parse_checkpoint_score(path: Path) -> Optional[float]:
         return None
 
 
-def _rank_checkpoints(checkpoint_dir: Path, limit: int = 3) -> List[Path]:
+def _rank_checkpoints(
+    checkpoint_dir: Path,
+    limit: int = 3,
+    scores: Optional[Dict[str, object]] = None,
+) -> List[Path]:
+    if scores:
+        ranked_score_list: List[Tuple[float, Path]] = []
+        for path_str, score in scores.items():
+            try:
+                metric = float(score)
+            except (TypeError, ValueError):
+                continue
+            path = Path(path_str)
+            if not path.exists():
+                candidate = checkpoint_dir / path.name
+                if candidate.exists():
+                    path = candidate
+                else:
+                    continue
+            ranked_score_list.append((metric, path.resolve()))
+        ranked_score_list.sort(key=lambda item: item[0])
+        return [path for _, path in ranked_score_list[:limit]]
+
     ranked: List[Tuple[float, Path]] = []
     for candidate in checkpoint_dir.glob("*.chkpt"):
         score = _parse_checkpoint_score(candidate)
@@ -1234,12 +1269,18 @@ def main() -> int:
     renamed_checkpoints: List[Path] = []
     ckpt_dir = Path(checkpoint_cb.dirpath) if checkpoint_cb.dirpath else checkpoint_dir
     if ckpt_dir.exists():
-        for ckpt_file in ckpt_dir.glob("*.ckpt"):
+        updated_best_k_models: Dict[str, float] = {}
+        for ckpt_file in list(ckpt_dir.glob("*.ckpt")):
             new_path = ckpt_file.with_suffix(".chkpt")
             ckpt_file.rename(new_path)
             renamed_checkpoints.append(new_path)
             if checkpoint_cb.best_model_path and Path(checkpoint_cb.best_model_path) == ckpt_file:
                 checkpoint_cb.best_model_path = str(new_path)
+        if checkpoint_cb.best_k_models:
+            for old_path, score in checkpoint_cb.best_k_models.items():
+                new_path = Path(old_path).with_suffix(".chkpt")
+                updated_best_k_models[str(new_path)] = float(score)
+            checkpoint_cb.best_k_models = updated_best_k_models
         if renamed_checkpoints:
             logger.info(
                 "Renamed checkpoint files: %s",
@@ -1269,7 +1310,10 @@ def main() -> int:
         logger.info("Validation metrics: %s", val_metrics)
 
     if checkpoint_dir.exists():
-        ranked_checkpoints = _rank_checkpoints(checkpoint_dir)
+        ranked_checkpoints = _rank_checkpoints(
+            checkpoint_dir,
+            scores={k: v for k, v in checkpoint_cb.best_k_models.items()} if checkpoint_cb.best_k_models else None,
+        )
         if ranked_checkpoints:
             best_ckpt_path = str(ranked_checkpoints[0])
         _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)

@@ -14,5 +14,11 @@ pooling_type: mean
 precision: 32
 save_dir: ./training_runs
 seed: 101
-train_label_file: ./train.csv
-val_label_file: ./val.csv
+train_label_file: ./data.train.csv
+val_label_file: ./data.validate.csv
+mlflow:
+  enabled: true
+  tracking_uri: ./mlruns
+  experiment: dynamic_topoqa
+  log_artifacts: true
+

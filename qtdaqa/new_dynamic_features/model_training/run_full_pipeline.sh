@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${SCRIPT_DIR}"
 
 RUN_ROOT="${SCRIPT_DIR}/training_runs"
@@ -10,23 +10,48 @@ MANIFEST="manifests/run_all.yaml"
 PHASE1_CONFIG="configs/sched_boost_finetune.yaml"
 PHASE2_SEEDS=(101 555 888)
 
-if [[ ! -f "${MANIFEST}" ]]; then
-  echo "Manifest not found at ${MANIFEST}" >&2
-  exit 1
-fi
+export PYTHONPATH="${REPO_ROOT}:${PYTHONPATH:-}"
 
-START_DATA="$(python - <<'PY'
+SKIP_SWEEP="${SKIP_SWEEP:-}"
+SKIP_FINE="${SKIP_FINE:-}"
+RESUME_FROM="${RESUME_FROM:-}"
+
+START_TS=""
+if [[ -z "${SKIP_SWEEP}" ]]; then
+  if [[ ! -f "${MANIFEST}" ]]; then
+    echo "Manifest not found at ${MANIFEST}" >&2
+    exit 1
+  fi
+  START_DATA="$(python - <<'PY'
 from datetime import datetime, timezone
 now = datetime.now(timezone.utc)
 print(now.isoformat(), int(now.timestamp()))
 PY
 )"
-read -r START_ISO START_TS <<< "${START_DATA}"
+  read -r START_ISO START_TS <<< "${START_DATA}"
 
-echo "[run_full_pipeline] Starting sweep at ${START_ISO}"
-python -m train_cli batch --manifest "${MANIFEST}"
+  echo "[run_full_pipeline] Starting sweep at ${START_ISO}"
+  python -m train_cli batch --manifest "${MANIFEST}"
+else
+  echo "[run_full_pipeline] SKIP_SWEEP detected; skipping manifest sweep."
+fi
 
-BEST_INFO="$(python - <<'PY' "${START_TS}" "${RUN_ROOT}"
+if [[ -n "${RESUME_FROM}" ]]; then
+  ABS_RESUME="$(python - <<'PY' "${RESUME_FROM}"
+import os
+import sys
+print(os.path.abspath(sys.argv[1]))
+PY
+)"
+  if [[ ! -f "${ABS_RESUME}" ]]; then
+    echo "[run_full_pipeline] RESUME_FROM path not found: ${ABS_RESUME}" >&2
+    exit 1
+  fi
+  BEST_CKPT="${ABS_RESUME}"
+  BEST_RUN_DIR="$(dirname "$(dirname "${ABS_RESUME}")")"
+  BEST_LOSS="n/a"
+else
+  BEST_INFO="$(python - <<'PY' "${START_TS}" "${RUN_ROOT}"
 import json
 import sys
 from pathlib import Path
@@ -34,9 +59,16 @@ from datetime import datetime
 
 from qtdaqa.new_dynamic_features.model_training import train_cli
 
-start_ts = int(sys.argv[1])
 run_root = Path(sys.argv[2])
-start_dt = datetime.fromtimestamp(start_ts)
+start_arg = sys.argv[1]
+start_dt = None
+if start_arg:
+    try:
+        start_ts = int(start_arg)
+    except ValueError:
+        start_ts = None
+    if start_ts and start_ts > 0:
+        start_dt = datetime.fromtimestamp(start_ts)
 
 def iter_runs(root: Path):
     if not root.exists():
@@ -59,7 +91,7 @@ for directory in iter_runs(run_root) + iter_runs(run_root / "history"):
         created_dt = datetime.fromisoformat(created)
     except ValueError:
         continue
-    if created_dt < start_dt:
+    if start_dt and created_dt < start_dt:
         continue
     summary = train_cli._summarise_run(directory)
     best_loss = summary.get("best_val_loss")
@@ -80,14 +112,15 @@ print(best_loss)
 PY
 )"
 
-if [[ -z "${BEST_INFO}" ]]; then
-  echo "[run_full_pipeline] Unable to identify best checkpoint." >&2
-  exit 1
-fi
+  if [[ -z "${BEST_INFO}" ]]; then
+    echo "[run_full_pipeline] Unable to identify best checkpoint." >&2
+    exit 1
+  fi
 
-BEST_CKPT="$(echo "${BEST_INFO}" | sed -n '1p')"
-BEST_RUN_DIR="$(echo "${BEST_INFO}" | sed -n '2p')"
-BEST_LOSS="$(echo "${BEST_INFO}" | sed -n '3p')"
+  BEST_CKPT="$(echo "${BEST_INFO}" | sed -n '1p')"
+  BEST_RUN_DIR="$(echo "${BEST_INFO}" | sed -n '2p')"
+  BEST_LOSS="$(echo "${BEST_INFO}" | sed -n '3p')"
+fi
 
 echo "[run_full_pipeline] Best run: ${BEST_RUN_DIR} (val_loss=${BEST_LOSS})"
 echo "[run_full_pipeline] Best checkpoint: ${BEST_CKPT}"
@@ -95,6 +128,11 @@ echo "[run_full_pipeline] Best checkpoint: ${BEST_CKPT}"
 if [[ ! -f "${BEST_CKPT}" ]]; then
   echo "[run_full_pipeline] Best checkpoint path not found: ${BEST_CKPT}" >&2
   exit 1
+fi
+
+if [[ -n "${SKIP_FINE}" ]]; then
+  echo "[run_full_pipeline] SKIP_FINE detected; stopping after coarse sweep."
+  exit 0
 fi
 
 PHASE1_RUN_NAME="$(basename "${BEST_RUN_DIR}")_finetune_phase1"
@@ -119,4 +157,5 @@ for seed in "${PHASE2_SEEDS[@]}"; do
     --resume-from "${BEST_CKPT}"
 done
 
-echo "[run_full_pipeline] Pipeline complete at $(date --iso-8601=seconds)"
+ISO_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%SZ')"
+echo "[run_full_pipeline] Pipeline complete at ${ISO_TS}"

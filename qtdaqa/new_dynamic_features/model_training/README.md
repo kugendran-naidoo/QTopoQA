@@ -102,8 +102,8 @@ against the runs under `training_runs/`.
    python -m train_cli batch --manifest manifests/run_all.yaml
    ```
 
-   After the sweep, the script inspects the new runs and picks the checkpoint with the
-   lowest validation loss (using `train_cli._summarise_run`).
+   After the sweep, the script inspects recent runs (or all runs when a sweep is skipped)
+   and chooses the checkpoint with the lowest *selection metric* exposed by the trainer.
 
 2. **Fine-tuning Phase 1** – resumes the best checkpoint with the phase-1 fine-tune
    config. The run is tagged `<best-run-dir>_finetune_phase1`.
@@ -112,7 +112,7 @@ against the runs under `training_runs/`.
    python -m train_cli run \
      --config configs/sched_boost_finetune.yaml \
      --run-name "<best-run>_finetune_phase1" \
-     --resume-from <path/to/best.ckpt>
+     --resume-from <path/to/best.chkpt>
    ```
 
 3. **Fine-tuning Phase 2** – repeats the resume for each high-variance seed
@@ -124,12 +124,19 @@ against the runs under `training_runs/`.
      python -m train_cli run \
        --config "configs/sched_boost_finetune_seed${seed}.yaml" \
        --run-name "<best-run>_finetune_phase1_seed${seed}" \
-       --resume-from <path/to/best.ckpt>
+       --resume-from <path/to/best.chkpt>
    done
    ```
 
-Run `./run_full_pipeline.sh` (from this directory) to execute all three stages
-sequentially with the current configs.
+Run `./run_full_pipeline.sh` (from this directory) to execute all three stages sequentially.
+Optional environment flags keep the behaviour flexible without editing the script:
+
+- `SKIP_SWEEP=1` skips the manifest sweep and reuses the best checkpoint from existing runs.
+- `SKIP_FINE=1` exits after reporting the winning checkpoint (useful when you only need the sweep).
+- `RESUME_FROM=/abs/path/to/model.chkpt` forces the fine-tune phases to resume from a specific checkpoint.
+
+All three flags can be combined; for example `SKIP_SWEEP=1 RESUME_FROM=/path/best.chkpt ./run_full_pipeline.sh`
+launches only the fine-tune stages with a hand-picked checkpoint.
 
 ## Training CLI
 
