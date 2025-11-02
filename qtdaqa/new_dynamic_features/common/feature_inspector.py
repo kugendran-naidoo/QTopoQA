@@ -17,7 +17,10 @@ from typing import Dict, Iterable, List, Optional, Sequence
 
 import torch
 
-from feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata
+try:  # Allow running as package or standalone script.
+    from .feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata
+except ImportError:  # pragma: no cover - fallback when executed directly
+    from feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata
 
 
 DEFAULT_MAX_GRAPHS = 25
@@ -31,6 +34,72 @@ class GraphDiagnostics:
     has_metadata: bool
     edge_module: Optional[str]
     notes: List[str]
+
+
+def format_override_block(metadata: GraphFeatureMetadata) -> str:
+    """
+    Render a commented YAML block that mirrors the metadata-derived override schemas.
+    """
+    edge = dict(getattr(metadata, "edge_schema", {}) or {})
+    topo = dict(getattr(metadata, "topology_schema", {}) or {})
+    if not topo:
+        topology_entry = metadata.module_registry.get("topology") if isinstance(metadata.module_registry, dict) else None
+        if isinstance(topology_entry, dict):
+            for key in ("id", "alias", "summary", "jobs"):
+                value = topology_entry.get(key)
+                if value is not None:
+                    topo.setdefault(key, value)
+            defaults = topology_entry.get("defaults")
+            if isinstance(defaults, dict) and defaults:
+                topo.setdefault("defaults", defaults)
+            parameters = topology_entry.get("parameters")
+            if isinstance(parameters, dict) and parameters:
+                topo.setdefault("parameters", parameters)
+
+    lines = [
+        "# Suggested override block (paste into a config and uncomment if needed).",
+        "# edge/topology overrides are optional: the loader already reads every feature stage from graph_metadata.json",
+        "# (see feature_metadata.module_registry). Only define this block when you deliberately want to override the",
+        "# recorded metadata for a specific stage.",
+        "# edge_schema:  # edge metadata",
+    ]
+    preferred_edge_keys = (
+        "module",
+        "variant",
+        "dim",
+        "bands",
+        "use_layer_norm",
+        "module_params",
+        "jobs",
+        "summary",
+    )
+    added_any = False
+    for key in preferred_edge_keys:
+        if key in edge:
+            value = edge[key]
+            if isinstance(value, (dict, list)):
+                lines.append(f"#   {key}: {json.dumps(value, ensure_ascii=True)}")
+            else:
+                lines.append(f"#   {key}: {value!r}")
+            added_any = True
+
+    if not added_any and edge:
+        for key, value in edge.items():
+            if isinstance(value, (dict, list)):
+                lines.append(f"#   {key}: {json.dumps(value, ensure_ascii=True)}")
+            else:
+                lines.append(f"#   {key}: {value!r}")
+
+    lines.append("# topology_schema:  # topology metadata")
+    if topo:
+        for key, value in topo.items():
+            if isinstance(value, (dict, list)):
+                lines.append(f"#   {key}: {json.dumps(value, ensure_ascii=True)}")
+            else:
+                lines.append(f"#   {key}: {value!r}")
+    else:
+        lines.append("#   {}  # (metadata is empty)")
+    return "\n".join(lines)
 
 
 def _summarise_metadata(metadata: GraphFeatureMetadata) -> Dict[str, object]:
@@ -116,6 +185,7 @@ def inspect_graphs(
     max_graphs: int,
     enumerate_all: bool,
     json_output: Optional[Path],
+    emit_override_block: bool,
 ) -> None:
     metadata = load_graph_feature_metadata(
         graph_dir=graph_dir,
@@ -123,6 +193,10 @@ def inspect_graphs(
         summary_path=summary_path,
         max_pt_samples=max_graphs,
     )
+
+    if emit_override_block:
+        print(format_override_block(metadata))
+        return
 
     per_graph: List[GraphDiagnostics] = []
     for graph_path in _iter_graphs(graph_dir, None if enumerate_all else max_graphs, recursive=True):
@@ -196,6 +270,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional file path to write the inspection report as JSON.",
     )
+    parser.add_argument(
+        "--emit-override-block",
+        action="store_true",
+        help="Print a commented YAML block with edge/topology override hints derived from metadata.",
+    )
     return parser
 
 
@@ -219,6 +298,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             max_graphs=max(1, args.max_graphs),
             enumerate_all=bool(args.all),
             json_output=args.json_output.resolve() if args.json_output else None,
+            emit_override_block=bool(args.emit_override_block),
         )
     except Exception as exc:  # pragma: no cover - CLI surfaces errors directly
         print(f"[FATAL] {exc}", file=sys.stderr)
