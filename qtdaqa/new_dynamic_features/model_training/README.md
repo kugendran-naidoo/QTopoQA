@@ -106,7 +106,7 @@ against the runs under `training_runs/`.
    and chooses the checkpoint with the lowest *selection metric* exposed by the trainer.
 
 2. **Fine-tuning Phase 1** – resumes the best checkpoint with the phase-1 fine-tune
-   config. The run is tagged `<best-run-dir>_finetune_phase1`.
+   config. The run is tagged `<best-run>_phase1`.
 
    ```bash
    python -m train_cli run \
@@ -117,7 +117,7 @@ against the runs under `training_runs/`.
 
 3. **Fine-tuning Phase 2** – repeats the resume for each high-variance seed
    (`101`, `555`, `888`). Each launch reuses the same best checkpoint and stores the
-   outputs as `<best-run>_finetune_phase1_seed<seed>`.
+   outputs as `<best-run>_phase2_seed<seed>`.
 
    ```bash
    for seed in 101 555 888; do
@@ -134,6 +134,8 @@ Optional environment flags keep the behaviour flexible without editing the scrip
 - `SKIP_SWEEP=1` skips the manifest sweep and reuses the best checkpoint from existing runs.
 - `SKIP_FINE=1` exits after reporting the winning checkpoint (useful when you only need the sweep).
 - `RESUME_FROM=/abs/path/to/model.chkpt` forces the fine-tune phases to resume from a specific checkpoint.
+- `GRAPH_DIR=/path/to/graphs` overrides the graph directory for every stage (the script forwards
+  `--override paths.graph=...` to `train_cli`).
 
 All three flags can be combined; for example `SKIP_SWEEP=1 RESUME_FROM=/path/best.chkpt ./run_full_pipeline.sh`
 launches only the fine-tune stages with a hand-picked checkpoint.
@@ -149,6 +151,7 @@ python -m train_cli run --config configs/sched_boost.yaml --override seed=777
 python -m train_cli batch --manifest manifests/run_all.yaml
 python -m train_cli resume --run-id training_run_2025-10-28_18-16-16
 python -m train_cli summarise --run-dir training_runs/latest
+python -m train_cli leaderboard --limit 5
 ```
 
 Key commands:

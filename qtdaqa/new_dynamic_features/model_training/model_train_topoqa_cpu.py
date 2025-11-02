@@ -46,8 +46,10 @@ from pytorch_lightning.loggers import CSVLogger
 
 try:  # Optional MLflow dependency
     from pytorch_lightning.loggers import MLFlowLogger  # type: ignore
-except Exception:  # pragma: no cover - MLflow optional
+    _MLFLOW_IMPORT_ERROR: Optional[Exception] = None
+except Exception as exc:  # pragma: no cover - MLflow optional
     MLFlowLogger = None  # type: ignore
+    _MLFLOW_IMPORT_ERROR = exc
 from torch.utils.data import Dataset
 from torch_geometric.data import Batch, Data
 from torch_geometric.loader import DataLoader
@@ -443,7 +445,7 @@ def _setup_logging(save_dir: Path) -> logging.Logger:
 
     save_dir.mkdir(parents=True, exist_ok=True)
     log_path = save_dir / "training.log"
-    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
+    formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
     file_handler = logging.FileHandler(log_path, encoding="utf-8")
     file_handler.setFormatter(formatter)
@@ -1190,7 +1192,12 @@ def main() -> int:
     mlflow_logger = None
     if cfg.mlflow.enabled:
         if MLFlowLogger is None:
-            logger.warning("MLflow logging requested but the dependency is not installed; disabling.")
+            formatted = (
+                "MLflow logging requested but the dependency could not be imported: %s"
+                % (_MLFLOW_IMPORT_ERROR or "unknown error")
+            )
+            logger.error(formatted)
+            raise RuntimeError(formatted)
         else:
             try:
                 run_name = cfg.mlflow.run_name or (args.trial_label or (run_dir.name if run_dir else cfg.save_dir.name))

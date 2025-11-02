@@ -404,6 +404,12 @@ def cmd_batch(args: argparse.Namespace) -> None:
     manifest_dir = manifest_path.parent
     shared = manifest.get("shared", {})
     shared_overrides = shared.get("overrides") or {}
+    if args.override:
+        cli_override_map: Dict[str, Any] = {}
+        for raw in args.override:
+            key, value = _parse_override(raw)
+            cli_override_map[key] = value
+        shared_overrides = _merge_dicts(shared_overrides, cli_override_map)
     shared_notes = shared.get("notes")
     shared_trial = shared.get("trial_label")
     shared_output_root = Path(shared["output_root"]).resolve() if shared.get("output_root") else None
@@ -823,6 +829,42 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     return summary
 
 
+def cmd_leaderboard(args: argparse.Namespace) -> None:
+    root = (args.root or RUN_ROOT).resolve()
+    if not root.exists():
+        raise CLIError(f"Leaderboard root does not exist: {root}")
+
+    rows: List[Tuple[float, Dict[str, Any]]] = []
+    for run_dir in sorted(root.iterdir()):
+        if not run_dir.is_dir() or not (run_dir / "run_metadata.json").exists():
+            continue
+        summary = _summarise_run(run_dir)
+        sel_metric = summary.get("best_selection_metric")
+        val_loss = summary.get("best_val_loss")
+        if sel_metric is None and val_loss is None:
+            continue
+        metric_value = float(sel_metric if sel_metric is not None else val_loss)
+        rows.append((metric_value, summary))
+
+    if not rows:
+        print("[train_cli][leaderboard] No runs with selection/val metrics found under", root)
+        return
+
+    rows.sort(key=lambda item: item[0])
+    limit = max(1, args.limit)
+    for rank, (_, summary) in enumerate(rows[:limit], start=1):
+        sel_metric = summary.get("best_selection_metric")
+        val_loss = summary.get("best_val_loss")
+        checkpoint = summary.get("best_checkpoint")
+        print(f"{rank}. {summary['run_name']}")
+        if sel_metric is not None:
+            print(f"   selection_metric={sel_metric}")
+        if val_loss is not None:
+            print(f"   val_loss={val_loss}")
+        if checkpoint:
+            print(f"   checkpoint={checkpoint}")
+
+
 def cmd_summarise(args: argparse.Namespace) -> None:
     run_dir = _resolve_run_dir_argument(args.run_id, args.run_dir)
     summary = _summarise_run(run_dir)
@@ -879,6 +921,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     batch_parser.add_argument("--manifest", type=Path, required=True, help="Path to batch manifest YAML.")
     batch_parser.add_argument("--output-root", type=Path, default=RUN_ROOT, help="Root directory for created runs.")
+    batch_parser.add_argument(
+        "--override",
+        action="append",
+        help="Override YAML values using dotted.path=value syntax (applied to every job).",
+    )
     batch_parser.set_defaults(func=cmd_batch)
 
     resume_parser = subparsers.add_parser(
@@ -909,6 +956,15 @@ def build_parser() -> argparse.ArgumentParser:
     summarise_parser.add_argument("--run-id", type=str, help="Run identifier under training_runs/.")
     summarise_parser.add_argument("--run-dir", type=Path, help="Explicit path to run directory.")
     summarise_parser.set_defaults(func=cmd_summarise)
+
+    leaderboard_parser = subparsers.add_parser(
+        "leaderboard",
+        help="Rank training runs by selection metric and show top checkpoints.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    leaderboard_parser.add_argument("--root", type=Path, default=RUN_ROOT, help="Directory containing run folders.")
+    leaderboard_parser.add_argument("--limit", type=int, default=5, help="Number of runs to display.")
+    leaderboard_parser.set_defaults(func=cmd_leaderboard)
 
     return parser
 
