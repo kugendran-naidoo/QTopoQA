@@ -17,6 +17,8 @@ datasets/training/*
 !datasets/training/.gitkeep
 
 # keep empty directories although ignored
+qtdaqa/Improvements.md
+qtdaqa/Questions.md
 qtdaqa/new_dynamic_features/model_inference/output*
 qtdaqa/new_dynamic_features/graph_builder/output*
 qtdaqa/new_inference/ARM_cpu_only/output*
@@ -256,3 +258,5 @@ marimo/_lsp/
 __marimo__/
 
 feature-config.yaml
+CODEX_SESSION_NOTES.md
+mlruns/
