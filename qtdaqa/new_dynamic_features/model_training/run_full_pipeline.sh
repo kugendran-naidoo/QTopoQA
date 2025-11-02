@@ -16,6 +16,19 @@ SKIP_SWEEP="${SKIP_SWEEP:-}"
 SKIP_FINE="${SKIP_FINE:-}"
 RESUME_FROM="${RESUME_FROM:-}"
 
+GRAPH_DIR="${GRAPH_DIR:-}"
+
+declare -a GRAPH_ARGS
+GRAPH_ARGS=()
+if [[ -n "${GRAPH_DIR}" ]]; then
+  GRAPH_ARGS=("--override" "paths.graph=${GRAPH_DIR}")
+fi
+
+declare -a GRAPH_ARGS=()
+if [[ -n "${GRAPH_DIR:-}" ]]; then
+  GRAPH_ARGS=("--override" "paths.graph=${GRAPH_DIR}")
+fi
+
 START_TS=""
 if [[ -z "${SKIP_SWEEP}" ]]; then
   if [[ ! -f "${MANIFEST}" ]]; then
@@ -31,7 +44,11 @@ PY
   read -r START_ISO START_TS <<< "${START_DATA}"
 
   echo "[run_full_pipeline] Starting sweep at ${START_ISO}"
-  python -m train_cli batch --manifest "${MANIFEST}"
+  if [[ ${#GRAPH_ARGS[@]} -gt 0 ]]; then
+    python -m train_cli batch --manifest "${MANIFEST}" "${GRAPH_ARGS[@]}"
+  else
+    python -m train_cli batch --manifest "${MANIFEST}"
+  fi
 else
   echo "[run_full_pipeline] SKIP_SWEEP detected; skipping manifest sweep."
 fi
@@ -135,13 +152,22 @@ if [[ -n "${SKIP_FINE}" ]]; then
   exit 0
 fi
 
-PHASE1_RUN_NAME="$(basename "${BEST_RUN_DIR}")_finetune_phase1"
+BASE_RUN_NAME="$(basename "${BEST_RUN_DIR}")"
+PHASE1_RUN_NAME="${BASE_RUN_NAME}_phase1"
 
 echo "[run_full_pipeline] Phase 1 fine-tuning -> ${PHASE1_RUN_NAME}"
-python -m train_cli run \
-  --config "${PHASE1_CONFIG}" \
-  --run-name "${PHASE1_RUN_NAME}" \
-  --resume-from "${BEST_CKPT}"
+if [[ ${#GRAPH_ARGS[@]} -gt 0 ]]; then
+  python -m train_cli run \
+    --config "${PHASE1_CONFIG}" \
+    --run-name "${PHASE1_RUN_NAME}" \
+    --resume-from "${BEST_CKPT}" \
+    "${GRAPH_ARGS[@]}"
+else
+  python -m train_cli run \
+    --config "${PHASE1_CONFIG}" \
+    --run-name "${PHASE1_RUN_NAME}" \
+    --resume-from "${BEST_CKPT}"
+fi
 
 for seed in "${PHASE2_SEEDS[@]}"; do
   PHASE2_CONFIG="${SCRIPT_DIR}/configs/sched_boost_finetune_seed${seed}.yaml"
@@ -149,12 +175,20 @@ for seed in "${PHASE2_SEEDS[@]}"; do
     echo "[run_full_pipeline] Skipping seed ${seed} (config not found: ${PHASE2_CONFIG})" >&2
     continue
   fi
-  RUN_NAME="${PHASE1_RUN_NAME}_seed${seed}"
+  RUN_NAME="${BASE_RUN_NAME}_phase2_seed${seed}"
   echo "[run_full_pipeline] Phase 2 fine-tuning (seed ${seed}) -> ${RUN_NAME}"
-  python -m train_cli run \
-    --config "${PHASE2_CONFIG}" \
-    --run-name "${RUN_NAME}" \
-    --resume-from "${BEST_CKPT}"
+  if [[ ${#GRAPH_ARGS[@]} -gt 0 ]]; then
+    python -m train_cli run \
+      --config "${PHASE2_CONFIG}" \
+      --run-name "${RUN_NAME}" \
+      --resume-from "${BEST_CKPT}" \
+      "${GRAPH_ARGS[@]}"
+  else
+    python -m train_cli run \
+      --config "${PHASE2_CONFIG}" \
+      --run-name "${RUN_NAME}" \
+      --resume-from "${BEST_CKPT}"
+  fi
 done
 
 ISO_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%SZ')"
