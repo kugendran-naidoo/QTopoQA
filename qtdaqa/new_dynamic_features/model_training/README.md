@@ -99,7 +99,7 @@ against the runs under `training_runs/`.
    them to finish. The fresh run directories land in `training_runs/`.
 
    ```bash
-   python -m train_cli batch --manifest manifests/run_all.yaml
+   python -m train_cli batch --manifest manifests/run_core.yaml
    ```
 
    After the sweep, the script inspects recent runs (or all runs when a sweep is skipped)
@@ -136,9 +136,109 @@ Optional environment flags keep the behaviour flexible without editing the scrip
 - `RESUME_FROM=/abs/path/to/model.chkpt` forces the fine-tune phases to resume from a specific checkpoint.
 - `GRAPH_DIR=/path/to/graphs` overrides the graph directory for every stage (the script forwards
   `--override paths.graph=...` to `train_cli`).
+- `--manifest PATH` (or `PIPELINE_MANIFEST=PATH`) selects an alternate sweep manifest. The default
+  is `manifests/run_core.yaml`; `manifests/run_extended.yaml` widens the seed coverage.
 
 All three flags can be combined; for example `SKIP_SWEEP=1 RESUME_FROM=/path/best.chkpt ./run_full_pipeline.sh`
 launches only the fine-tune stages with a hand-picked checkpoint.
+
+### RAM-disk wrapper
+
+When you want to compare the pipeline with and without a RAM-backed graph directory,
+use `ramdisk_run_pipeline.sh`. The wrapper reads defaults from `configs/ramdisk.yaml`
+(`ramdisk.size`, `ramdisk.headroom`, `ramdisk.name`, and per-mode `num_workers`),
+stages the configured graph tree onto a temporary volume, and runs the pipeline twice:
+
+1. Baseline run against the original graph path (unless `--skip-baseline` is passed).
+2. A RAM-disk run with `GRAPH_DIR` pointing at the mounted volume.
+
+Command-line switches allow you to override the config on the fly:
+
+```
+./ramdisk_run_pipeline.sh \
+  --graph-dir /Volumes/Data/qtdaqa/new_dynamic_features/graph_builder/output/.../graph_data \
+  --baseline-num-workers 0 \
+  --ram-num-workers 2 \
+  -- --some-pipeline-flag
+```
+
+- `--graph-dir` changes the source directory copied onto the RAM disk.
+- `--manifest` forwards a specific manifest to the pipeline (mirrors `PIPELINE_MANIFEST`).
+- `--size`, `--headroom`, and `--name` override the provisioning parameters.
+- `--baseline-num-workers` / `--ram-num-workers` temporarily set `NUM_WORKERS_OVERRIDE`.
+- Pass `--skip-baseline` if you only care about the RAM run.
+
+The script respects an existing `GRAPH_DIR` in the environment (useful when the pipeline
+is already configured for a bespoke dataset) and records timing/metadata snapshots under
+`training_runs/ramdisk_benchmarks/` for later comparison. Set `SAFE_RAMDISK_TEST_MODE=1`
+to dry-run provisioning on systems where attaching disks is restricted—the wrapper will use
+the source directory directly while still exercising the pipeline. It also forwards
+`PIPELINE_MANIFEST` (or the `--manifest` override) so both runs evaluate the same sweep.
+
+### Focused sweeps & follow-up fine-tunes
+
+The default manifest (`manifests/run_core.yaml`) keeps the sweep nimble:
+
+- `sched_boost_seed222.yaml` – baseline configuration.
+- `sched_boost_lr035_seed222.yaml` – higher learning rate probe.
+- `large_batch_sched_boost_seed222.yaml` – batch-size stress test.
+
+When you need the wider seed sweep (222/777/1337) and batch/LR combinations, point the pipeline at
+`manifests/run_extended.yaml`:
+
+```bash
+./run_full_pipeline.sh --manifest manifests/run_extended.yaml
+```
+
+You can achieve the same via `PIPELINE_MANIFEST=manifests/run_extended.yaml ./run_full_pipeline.sh` or by
+invoking `python -m train_cli batch --manifest manifests/run_extended.yaml` directly.
+
+After a sweep completes, use `./run_fine_tune_only.sh` to replay the Phase 1/Phase 2 schedule against a chosen
+checkpoint. The script auto-detects the best run in `training_runs/` when no arguments are supplied:
+
+```bash
+./run_fine_tune_only.sh
+# or resume from a specific checkpoint
+./run_fine_tune_only.sh \
+  --checkpoint training_runs/sched_boost_seed222_2025-11-03_11-03-07/model_checkpoints/checkpoint.sel-0.69302_val-0.05648_epoch090.chkpt \
+  --run-dir sched_boost_seed222_2025-11-03_11-03-07
+```
+
+The helper now chains Phase 2 fine-tunes from the best Phase 1 checkpoint automatically, producing
+`<base>_phase2_seed{101,555,888}` runs that match the pipeline workflow.
+
+### GPU / MPS quick-start
+
+Prototype configs are available under `configs/` for experimenting with hardware acceleration:
+
+- `configs/sched_boost_seed222_cuda.yaml` – single-GPU (CUDA) settings, mixed precision enabled.
+- `configs/sched_boost_seed222_mps.yaml` – Apple Silicon (MPS) settings for macOS 13+.
+
+Usage examples:
+
+```bash
+# CUDA
+python -m train_cli run --config configs/sched_boost_seed222_cuda.yaml --run-name seed222_cuda_test
+
+# Apple MPS
+PYTORCH_ENABLE_MPS_FALLBACK=1 \
+python -m train_cli run --config configs/sched_boost_seed222_mps.yaml --run-name seed222_mps_test
+```
+
+Before running, confirm your environment:
+
+```bash
+python - <<'PY'
+import torch
+print("CUDA available:", torch.cuda.is_available())
+print("MPS available :", torch.backends.mps.is_available())
+PY
+```
+
+- For CUDA, install the matching NVIDIA driver and a `torch` build with GPU wheels (see https://pytorch.org/get-started/locally/). Adjust `dataloader.num_workers`, `trainer.devices`, and `precision` in the config to match your hardware.
+- For Apple Silicon, keep precision at 32-bit and export `PYTORCH_ENABLE_MPS_FALLBACK=1` so unsupported ops transparently fall back to CPU.
+
+These configs are baselines—you can copy them and tweak optimiser settings or batch sizes as your hardware allows.
 
 ## Training CLI
 
@@ -148,7 +248,7 @@ directly for clarity:
 ```bash
 python -m train_cli run --config config.yaml
 python -m train_cli run --config configs/sched_boost.yaml --override seed=777
-python -m train_cli batch --manifest manifests/run_all.yaml
+python -m train_cli batch --manifest manifests/run_core.yaml
 python -m train_cli resume --run-id training_run_2025-10-28_18-16-16
 python -m train_cli summarise --run-dir training_runs/latest
 python -m train_cli leaderboard --limit 5
@@ -157,8 +257,8 @@ python -m train_cli leaderboard --limit 5
 Key commands:
 
 - `run` – single training job, optional overrides via `--override key=value`.
-- `batch` – execute multiple jobs described in a YAML manifest.  See
-  `manifests/run_all.yaml` for an example.
+- `batch` – execute multiple jobs described in a YAML manifest. See
+  `manifests/run_core.yaml` (core sweep) and `manifests/run_extended.yaml` (expanded sweep) for templates.
 - `resume` – continue a run from its best (or explicit) checkpoint.
 - `summarise` – print JSON with the best validation score, checkpoint, and
   resolved schema for a run.

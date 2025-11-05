@@ -23,10 +23,12 @@ import logging
 import os
 import random
 import re
+import statistics
 import sys
+import time
+import warnings
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
-import warnings
 
 import platform
 
@@ -107,9 +109,27 @@ class TrainingConfig:
     use_val_spearman_as_secondary: bool = True
     spearman_secondary_min_delta: float = 0.0
     spearman_secondary_weight: float = 1.0
+    coverage_minimum: float = 0.0
+    coverage_fail_on_missing: bool = False
+    graph_load_profiling: bool = False
+    graph_load_top_k: int = 5
     mlflow: MlflowConfig = dataclasses.field(default_factory=MlflowConfig)
     edge_schema: dict = dataclasses.field(default_factory=dict)
     topology_schema: dict = dataclasses.field(default_factory=dict)
+
+
+def _normalise_ratio(value: float | int | str, default: float = 0.0) -> float:
+    if value is None:
+        return default
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return default
+    if numeric < 0:
+        return 0.0
+    if numeric > 1.0:
+        numeric = numeric / 100.0
+    return min(max(numeric, 0.0), 1.0)
 
 
 def _resolve_path(
@@ -164,6 +184,23 @@ def load_config(path: Path) -> TrainingConfig:
             else None
         )
 
+        coverage_cfg = _get("coverage", {})
+        if not isinstance(coverage_cfg, dict):
+            coverage_cfg = {}
+        profiling_cfg = _get("profiling", {})
+        if not isinstance(profiling_cfg, dict):
+            profiling_cfg = {}
+        coverage_minimum = _normalise_ratio(
+            coverage_cfg.get("minimum_percent", coverage_cfg.get("minimum", 0.0)), default=0.0
+        )
+        coverage_fail_on_missing = bool(coverage_cfg.get("fail_on_missing", False))
+        try:
+            graph_load_top_k = int(profiling_cfg.get("graph_load_top_k", 5))
+        except (TypeError, ValueError):
+            graph_load_top_k = 5
+        graph_load_top_k = max(1, graph_load_top_k)
+        graph_load_profiling = bool(profiling_cfg.get("graph_load", False))
+
         cfg = TrainingConfig(
             graph_dir=graph_dir,
             train_label_file=train_label_file,
@@ -191,6 +228,10 @@ def load_config(path: Path) -> TrainingConfig:
             use_val_spearman_as_secondary=bool(_get("use_val_spearman_as_secondary", True)),
             spearman_secondary_min_delta=float(_get("spearman_secondary_min_delta", 0.0)),
             spearman_secondary_weight=float(_get("spearman_secondary_weight", 1.0)),
+            coverage_minimum=coverage_minimum,
+            coverage_fail_on_missing=coverage_fail_on_missing,
+            graph_load_profiling=graph_load_profiling,
+            graph_load_top_k=graph_load_top_k,
             mlflow=MlflowConfig(),
             edge_schema=dict(_get("edge_schema", {})),
             topology_schema=dict(_get("topology_schema", {})),
@@ -273,6 +314,20 @@ def load_config(path: Path) -> TrainingConfig:
         tags=dict(mlflow_cfg.get("tags", {}) or {}),
     )
 
+    coverage_cfg = _section("coverage")
+    coverage_minimum = _normalise_ratio(
+        coverage_cfg.get("minimum_percent", coverage_cfg.get("minimum", 0.0)), default=0.0
+    )
+    coverage_fail_on_missing = bool(coverage_cfg.get("fail_on_missing", False))
+
+    profiling_cfg = _section("profiling")
+    graph_load_profiling = bool(profiling_cfg.get("graph_load", False))
+    try:
+        graph_load_top_k = int(profiling_cfg.get("graph_load_top_k", 5))
+    except (TypeError, ValueError):
+        graph_load_top_k = 5
+    graph_load_top_k = max(1, graph_load_top_k)
+
     cfg = TrainingConfig(
         graph_dir=graph_dir,
         train_label_file=train_label_file,
@@ -300,6 +355,10 @@ def load_config(path: Path) -> TrainingConfig:
         use_val_spearman_as_secondary=use_val_spearman,
         spearman_secondary_min_delta=spearman_min_delta,
         spearman_secondary_weight=spearman_weight,
+        coverage_minimum=coverage_minimum,
+        coverage_fail_on_missing=coverage_fail_on_missing,
+        graph_load_profiling=graph_load_profiling,
+        graph_load_top_k=graph_load_top_k,
         mlflow=mlflow_config,
         edge_schema=dict(data.get("edge_schema", {})),
         topology_schema=dict(data.get("topology_schema", {})),
@@ -357,16 +416,94 @@ def _gather_samples(
     return samples, missing
 
 
+class GraphLoadProfiler:
+    def __init__(self, enabled: bool, top_k: int, num_workers: int, logger: Optional[logging.Logger]):
+        top_k = max(1, int(top_k)) if top_k else 5
+        if enabled and num_workers > 0:
+            if logger is not None:
+                logger.warning(
+                    "Graph load profiling is only supported with dataloader.num_workers=0; disabling profiler."
+                )
+            enabled = False
+        self.enabled = bool(enabled)
+        self.top_k = top_k
+        self._records: List[Tuple[float, str]] = []
+
+    def record(self, path: Path, duration: float) -> None:
+        if not self.enabled:
+            return
+        entry = (float(duration), str(path))
+        self._records.append(entry)
+
+    def finalise(self, save_dir: Optional[Path], logger: logging.Logger) -> Optional[Dict[str, object]]:
+        if not self.enabled:
+            return None
+        records = list(self._records)
+        if not records:
+            logger.info("Graph load profiling enabled but no samples were collected.")
+            return None
+
+        durations = sorted(duration for duration, _ in records)
+        count = len(durations)
+        total = sum(durations)
+        mean = total / count
+        median = statistics.median(durations)
+        p95 = durations[int(min(count - 1, max(0, round(0.95 * (count - 1)))))]
+        maximum_duration, maximum_path = max(records, key=lambda entry: entry[0])
+        top_records = sorted(records, key=lambda entry: entry[0], reverse=True)[: self.top_k]
+        summary = {
+            "count": count,
+            "mean_ms": mean * 1000.0,
+            "median_ms": median * 1000.0,
+            "p95_ms": p95 * 1000.0,
+            "max_ms": maximum_duration * 1000.0,
+            "max_path": maximum_path,
+            "top_samples": [
+                {"path": path, "ms": duration * 1000.0} for duration, path in top_records
+            ],
+        }
+
+        logger.info(
+            "Graph load profiling: count=%d mean=%.2fms median=%.2fms p95=%.2fms max=%.2fms (%s)",
+            count,
+            summary["mean_ms"],
+            summary["median_ms"],
+            summary["p95_ms"],
+            summary["max_ms"],
+            maximum_path,
+        )
+        top_preview = ", ".join(f"{item['ms']:.2f}ms:{item['path']}" for item in summary["top_samples"])
+        logger.info("Graph load profiling slowest paths: %s", top_preview)
+
+        if save_dir:
+            output_path = Path(save_dir) / "graph_load_profile.json"
+            try:
+                with output_path.open("w", encoding="utf-8") as handle:
+                    json.dump(summary, handle, indent=2)
+                summary["output_path"] = str(output_path)
+                logger.info("Graph load profiling summary written to %s", output_path)
+            except OSError as exc:
+                logger.warning("Unable to write graph load profiling summary: %s", exc)
+        return summary
+
+
 class GraphRegressionDataset(Dataset):
-    def __init__(self, samples: Sequence[Tuple[str, Path, torch.Tensor]]):
+    def __init__(self, samples: Sequence[Tuple[str, Path, torch.Tensor]], profiler: Optional[GraphLoadProfiler] = None):
         self.samples = list(samples)
+        self.profiler = profiler
 
     def __len__(self) -> int:
         return len(self.samples)
 
     def __getitem__(self, idx: int) -> Data:
         model, path, label = self.samples[idx]
-        data = torch.load(path)
+        if self.profiler and self.profiler.enabled:
+            start = time.perf_counter()
+            data = torch.load(path)
+            duration = time.perf_counter() - start
+            self.profiler.record(path, duration)
+        else:
+            data = torch.load(path)
 
         if hasattr(data, "batch"):
             batch_attr = getattr(data, "batch")
@@ -478,8 +615,9 @@ def _summarise_coverage(
     )
     if missing:
         preview = ", ".join(missing[:5])
-        logger.warning(
-            "[%s] %d label entries missing matching .pt graphs (first examples: %s)",
+        logger.error(
+            "[%s] %d label entries missing matching .pt graphs (first examples: %s). "
+            "Regenerate graph tensors or adjust coverage settings to proceed safely.",
             split,
             len(missing),
             preview,
@@ -492,10 +630,12 @@ def _write_coverage_report(save_dir: Path, coverage: Dict[str, Dict[str, object]
         total = int(stats.get("total", 0))
         usable = int(stats.get("usable", 0))
         missing = list(stats.get("missing", []))
+        coverage_ratio = (usable / total) if total else 0.0
+        stats["coverage"] = coverage_ratio
         report[split] = {
             "total": total,
             "usable": usable,
-            "coverage": (usable / total) if total else 0.0,
+            "coverage": coverage_ratio,
             "missing": missing,
         }
     path = save_dir / "dataset_coverage.json"
@@ -505,6 +645,57 @@ def _write_coverage_report(save_dir: Path, coverage: Dict[str, Dict[str, object]
     except OSError as exc:
         raise RuntimeError(f"Unable to write dataset coverage report: {exc}")
     return path
+
+
+def _evaluate_coverage(
+    cfg: TrainingConfig,
+    coverage: Dict[str, Dict[str, object]],
+    logger: logging.Logger,
+    report_path: Path,
+) -> None:
+    min_ratio = max(0.0, min(1.0, cfg.coverage_minimum))
+    missing_issues: List[str] = []
+    threshold_issues: List[str] = []
+
+    for split, stats in coverage.items():
+        total = int(stats.get("total", 0))
+        usable = int(stats.get("usable", 0))
+        missing = list(stats.get("missing", []))
+        ratio = stats.get("coverage", (usable / total) if total else 0.0)
+
+        if missing:
+            message = (
+                f"{split} split: {len(missing)}/{total} labels missing graph tensors "
+                f"(coverage {ratio * 100.0:.2f}%)."
+            )
+            logger.error(
+                "[coverage] %s See %s for details.", message, report_path
+            )
+            if cfg.coverage_fail_on_missing:
+                missing_issues.append(message)
+
+        if ratio < min_ratio:
+            threshold_message = (
+                f"{split} split coverage {ratio * 100.0:.2f}% is below the required "
+                f"{min_ratio * 100.0:.2f}%."
+            )
+            logger.error(
+                "[coverage] %s Regenerate graphs or lower coverage.minimum_percent to continue.", threshold_message
+            )
+            threshold_issues.append(threshold_message)
+
+    error_messages: List[str] = []
+    if threshold_issues:
+        error_messages.extend(threshold_issues)
+    if missing_issues:
+        error_messages.extend(missing_issues)
+
+    if error_messages:
+        joined = " ".join(error_messages)
+        raise RuntimeError(
+            f"Coverage requirements not met. {joined} "
+            "Review dataset_coverage.json or regenerate missing graph tensors."
+        )
 
 
 def _log_feature_summary(logger: logging.Logger, metadata: GraphFeatureMetadata) -> None:
@@ -635,19 +826,70 @@ def _log_feature_summary(logger: logging.Logger, metadata: GraphFeatureMetadata)
         )
 
 
-_CHECKPOINT_SCORE_RE = re.compile(r"model\.([0-9eE+\-.]+)")
+_CHECKPOINT_NEW_RE = re.compile(
+    r"checkpoint\.(?:sel-(?P<sel>[0-9eE+\-.]+)_)?val-(?P<val>[0-9eE+\-.]+)_epoch(?P<epoch>\d+)"
+)
+_CHECKPOINT_LEGACY_RE = re.compile(r"model\.([0-9eE+\-.]+)")
 
 
 def _parse_checkpoint_score(path: Path) -> Optional[float]:
-    match = _CHECKPOINT_SCORE_RE.search(path.name)
-    if not match:
-        return None
-    token = match.group(1).split("-", 1)[0]
-    token = token.rstrip(".")
-    try:
-        return float(token)
-    except ValueError:
-        return None
+    name = path.name
+    match = _CHECKPOINT_NEW_RE.search(name)
+    if match:
+        sel_value = match.group("sel")
+        val_value = match.group("val")
+        token = sel_value or val_value
+        if token is not None:
+            try:
+                return float(token)
+            except ValueError:
+                pass
+    legacy_match = _CHECKPOINT_LEGACY_RE.search(name)
+    if legacy_match:
+        token = legacy_match.group(1).split("-", 1)[0].rstrip(".")
+        try:
+            return float(token)
+        except ValueError:
+            return None
+    return None
+
+
+def _format_checkpoint_stem(path: Path) -> str:
+    stem = path.stem
+    match = _CHECKPOINT_NEW_RE.search(stem)
+    if match:
+        parts = []
+        sel_value = match.group("sel")
+        val_value = match.group("val")
+        epoch_value = match.group("epoch")
+        if sel_value is not None:
+            try:
+                sel_float = float(sel_value)
+                parts.append(f"sel-{abs(sel_float):.5f}")
+            except ValueError:
+                parts.append(f"sel{sel_value}")
+        if val_value is not None:
+            try:
+                val_float = float(val_value)
+                parts.append(f"val-{abs(val_float):.5f}")
+            except ValueError:
+                parts.append(f"val{val_value}")
+        if epoch_value is not None:
+            try:
+                parts.append(f"epoch{int(epoch_value):03d}")
+            except ValueError:
+                parts.append(f"epoch{epoch_value}")
+        if parts:
+            return "checkpoint." + "_".join(parts)
+    legacy_match = _CHECKPOINT_LEGACY_RE.search(stem)
+    if legacy_match:
+        token = legacy_match.group(1)
+        try:
+            value = float(token)
+            return f"model.{value:.5f}"
+        except ValueError:
+            return f"model.{token}"
+    return stem
 
 
 def _rank_checkpoints(
@@ -884,8 +1126,19 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         summary_path=cfg.summary_path,
     )
 
+    load_profiler = GraphLoadProfiler(cfg.graph_load_profiling, cfg.graph_load_top_k, cfg.num_workers, logger)
+
+    train_dataset = GraphRegressionDataset(
+        train_samples,
+        profiler=load_profiler if load_profiler.enabled else None,
+    )
+    val_dataset = GraphRegressionDataset(
+        val_samples,
+        profiler=load_profiler if load_profiler.enabled else None,
+    )
+
     train_loader = DataLoader(
-        GraphRegressionDataset(train_samples),
+        train_dataset,
         batch_size=cfg.batch_size,
         shuffle=True,
         num_workers=cfg.num_workers,
@@ -893,7 +1146,7 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         persistent_workers=False,
     )
     val_loader = DataLoader(
-        GraphRegressionDataset(val_samples),
+        val_dataset,
         batch_size=cfg.batch_size,
         shuffle=False,
         num_workers=cfg.num_workers,
@@ -905,14 +1158,16 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
             "total": len(train_labels),
             "usable": len(train_samples),
             "missing": list(train_missing),
+            "coverage": (len(train_samples) / len(train_labels)) if train_labels else 0.0,
         },
         "val": {
             "total": len(val_labels),
             "usable": len(val_samples),
             "missing": list(val_missing),
+            "coverage": (len(val_samples) / len(val_labels)) if val_labels else 0.0,
         },
     }
-    return train_loader, val_loader, coverage, feature_metadata
+    return train_loader, val_loader, coverage, feature_metadata, load_profiler
 
 
 def parse_args() -> argparse.Namespace:
@@ -1035,7 +1290,8 @@ def main() -> int:
         module="pytorch_lightning.trainer.connectors.data_connector",
     )
 
-    train_loader, val_loader, coverage, feature_metadata = build_dataloaders(cfg, logger)
+    train_loader, val_loader, coverage, feature_metadata, load_profiler = build_dataloaders(cfg, logger)
+    load_profile_summary: Optional[Dict[str, object]] = None
 
     resolved_edge_schema = dict(feature_metadata.edge_schema)
     configured_edge_schema = dict(cfg.edge_schema or {})
@@ -1065,6 +1321,13 @@ def main() -> int:
 
     coverage_path = _write_coverage_report(cfg.save_dir, coverage)
     logger.info("Dataset coverage report written to %s", coverage_path)
+    _evaluate_coverage(cfg, coverage, logger, coverage_path)
+
+    if load_profiler.enabled:
+        logger.info(
+            "Graph load profiling enabled (top_k=%d); summary will be captured after training.",
+            cfg.graph_load_top_k,
+        )
 
     cfg.edge_schema = resolved_edge_schema
     feature_metadata.edge_schema = dict(resolved_edge_schema)
@@ -1149,9 +1412,14 @@ def main() -> int:
 
     monitor_metric_name = "selection_metric" if cfg.use_val_spearman_as_secondary else "val_loss"
 
+    if monitor_metric_name == "selection_metric":
+        checkpoint_filename = "checkpoint.sel-{selection_metric:.5f}_val-{val_loss:.5f}_epoch{epoch:03d}"
+    else:
+        checkpoint_filename = "checkpoint.val-{val_loss:.5f}_epoch{epoch:03d}"
+
     checkpoint_cb = ModelCheckpoint(
         dirpath=str(checkpoint_dir),
-        filename="model.{val_loss:.5f}",
+        filename=checkpoint_filename,
         auto_insert_metric_name=False,
         monitor=monitor_metric_name,
         mode="min",
@@ -1277,15 +1545,27 @@ def main() -> int:
     ckpt_dir = Path(checkpoint_cb.dirpath) if checkpoint_cb.dirpath else checkpoint_dir
     if ckpt_dir.exists():
         updated_best_k_models: Dict[str, float] = {}
-        for ckpt_file in list(ckpt_dir.glob("*.ckpt")):
-            new_path = ckpt_file.with_suffix(".chkpt")
-            ckpt_file.rename(new_path)
-            renamed_checkpoints.append(new_path)
+        renamed_lookup: Dict[str, Path] = {}
+        for ckpt_file in sorted(ckpt_dir.glob("*.ckpt")):
+            stem = _format_checkpoint_stem(ckpt_file)
+            candidate = ckpt_dir / f"{stem}.chkpt"
+            counter = 1
+            while candidate.exists():
+                candidate = ckpt_dir / f"{stem}_dup{counter}.chkpt"
+                counter += 1
+            ckpt_file.rename(candidate)
+            renamed_checkpoints.append(candidate)
+            renamed_lookup[str(ckpt_file)] = candidate
             if checkpoint_cb.best_model_path and Path(checkpoint_cb.best_model_path) == ckpt_file:
-                checkpoint_cb.best_model_path = str(new_path)
+                checkpoint_cb.best_model_path = str(candidate)
         if checkpoint_cb.best_k_models:
             for old_path, score in checkpoint_cb.best_k_models.items():
-                new_path = Path(old_path).with_suffix(".chkpt")
+                old_path_obj = Path(old_path)
+                new_path = renamed_lookup.get(str(old_path_obj))
+                if new_path is None:
+                    stem = _format_checkpoint_stem(old_path_obj)
+                    tentative = ckpt_dir / f"{stem}.chkpt"
+                    new_path = tentative if tentative.exists() else old_path_obj.with_suffix(".chkpt")
                 updated_best_k_models[str(new_path)] = float(score)
             checkpoint_cb.best_k_models = updated_best_k_models
         if renamed_checkpoints:
@@ -1321,9 +1601,18 @@ def main() -> int:
             checkpoint_dir,
             scores={k: v for k, v in checkpoint_cb.best_k_models.items()} if checkpoint_cb.best_k_models else None,
         )
+        if not ranked_checkpoints:
+            # Fall back to filesystem order if Lightning did not populate best_k_models.
+            ranked_checkpoints = sorted(
+                checkpoint_dir.glob("*.chkpt"),
+                key=lambda p: p.stat().st_mtime,
+            )
         if ranked_checkpoints:
             best_ckpt_path = str(ranked_checkpoints[0])
         _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)
+
+    if load_profiler.enabled:
+        load_profile_summary = load_profiler.finalise(cfg.save_dir, logger)
 
     missing_total = sum(len(stats["missing"]) for stats in coverage.values())
     if missing_total:
@@ -1358,6 +1647,19 @@ def main() -> int:
                         value = _safe_scalar(first_metrics[key])
                         if value is not None:
                             metrics_to_log[key] = value
+            if load_profile_summary:
+                mean_ms = load_profile_summary.get("mean_ms")
+                if mean_ms is not None:
+                    metrics_to_log["graph_load_mean_ms"] = float(mean_ms)
+                p95_ms = load_profile_summary.get("p95_ms")
+                if p95_ms is not None:
+                    metrics_to_log["graph_load_p95_ms"] = float(p95_ms)
+                max_ms = load_profile_summary.get("max_ms")
+                if max_ms is not None:
+                    metrics_to_log["graph_load_max_ms"] = float(max_ms)
+                count = load_profile_summary.get("count")
+                if count is not None:
+                    metrics_to_log["graph_load_samples"] = float(count)
 
             if metrics_to_log:
                 mlflow_logger.log_metrics(metrics_to_log)
@@ -1367,6 +1669,12 @@ def main() -> int:
                     mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(coverage_path))
                 if metadata_path.exists():
                     mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(metadata_path))
+                profile_path = load_profile_summary.get("output_path") if load_profile_summary else None
+                if profile_path:
+                    try:
+                        mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(profile_path))
+                    except Exception as artifact_exc:  # pragma: no cover
+                        logger.warning("Unable to log graph load profiling summary to MLflow: %s", artifact_exc)
                 for artifact_path in ranked_checkpoints[:3]:
                     if artifact_path.exists():
                         mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(artifact_path))

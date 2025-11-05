@@ -1,0 +1,25 @@
+{
+  "run_name": "large_batch_sched_boost_seed222_2025-11-04_22-46-00",
+  "created": "2025-11-04T22:46:09.603839",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/large_batch_sched_boost_seed222.yaml",
+  "overrides": {},
+  "notes": "Core sweep (seed 222 variants).",
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/large_batch_sched_boost_seed222_2025-11-04_22-46-00/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/large_batch_sched_boost_seed222_2025-11-04_22-46-00",
+    "--git-commit",
+    "3013066b9",
+    "--git-dirty"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  }
+}
