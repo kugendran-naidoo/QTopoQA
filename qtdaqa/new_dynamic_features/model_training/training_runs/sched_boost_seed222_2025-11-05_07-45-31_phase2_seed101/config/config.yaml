@@ -1,0 +1,31 @@
+paths:
+  graph: ../graph_builder/output/11d_edges_dynamic_adjusted_dataset/graph_data
+  train_labels: ./data.train.csv
+  val_labels: ./data.validate.csv
+  save_dir: ./training_runs
+model:
+  pooling_type: mean
+  attention_head: 8
+dataloader:
+  batch_size: 16
+  num_workers: 0
+  seed: 101
+trainer:
+  accelerator: cpu
+  devices: 1
+  precision: 32
+  num_epochs: 320
+  accumulate_grad_batches: 16
+optimizer:
+  learning_rate: 0.001
+scheduler:
+  factor: 0.2
+  patience: 4
+  type: reduce_on_plateau
+early_stopping:
+  patience: 20
+mlflow:
+  enabled: true
+  tracking_uri: ./qtdaqa/new_dynamic_features/model_training/ml_runs
+  experiment: dynamic_topoqa
+  log_artifacts: true
