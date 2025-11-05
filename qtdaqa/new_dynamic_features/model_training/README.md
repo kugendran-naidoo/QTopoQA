@@ -207,6 +207,28 @@ checkpoint. The script auto-detects the best run in `training_runs/` when no arg
 The helper now chains Phase 2 fine-tunes from the best Phase 1 checkpoint automatically, producing
 `<base>_phase2_seed{101,555,888}` runs that match the pipeline workflow.
 
+### Manifest bundles at a glance
+
+`run_manifest_sweep.sh` is a thin wrapper around `python -m train_cli batch` with a few presets:
+
+```bash
+# default: manifests/run_core.yaml
+./run_manifest_sweep.sh
+
+# fast smoke-test manifest (fast_dev_run enabled in YAML)
+./run_manifest_sweep.sh --bundle experiments
+
+# broader seed sweep with LR/batch probes
+./run_manifest_sweep.sh --bundle extended
+
+# forward additional batch arguments after --
+./run_manifest_sweep.sh --bundle core -- --limit 2
+```
+
+Use `--fast-dev` to inject `--override fast_dev_run=true` regardless of the manifest defaults, or
+`--manifest path/to/custom.yaml` when you want an ad-hoc sweep. Pair the sweep with
+`./run_fine_tune_only.sh` to replay the staged fine-tunes without rerunning Phase 0.
+
 ### GPU / MPS quick-start
 
 Prototype configs are available under `configs/` for experimenting with hardware acceleration:
@@ -265,7 +287,9 @@ Key commands:
 - `dataset_coverage.json` is generated in each run directory summarising any
   labels missing `.pt` graphs so gaps can be closed quickly.
 - Checkpoints now expose `best.ckpt`, `second_best.ckpt`, and `third_best.ckpt`
-  symlinks for convenient inspection.
+  symlinks for convenient inspection. The underlying filenames retain the signed
+  selection metric (for example `checkpoint.sel--0.69959_val-0.05479_epoch128.chkpt`),
+  so the most negative score always lines up with `best.ckpt`.
 - During training, the console emits a single mid-epoch progress line (25%,
   50%, 75%) plus a compact end-of-epoch summary showing train loss and the
   current best validation loss.

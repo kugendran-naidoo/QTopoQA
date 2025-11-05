@@ -171,6 +171,7 @@ def _write_run_metadata(
     trial_label: Optional[str],
     command: Sequence[str],
     env: Dict[str, str],
+    training_parameters: Optional[Dict[str, Any]] = None,
 ) -> None:
     env_snapshot = {
         key: env[key]
@@ -187,10 +188,61 @@ def _write_run_metadata(
         "command": list(command),
         "environment": env_snapshot,
     }
+    if training_parameters:
+        metadata["training_parameters"] = training_parameters
     metadata_path = run_dir / "run_metadata.json"
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     if notes:
         (run_dir / "notes.txt").write_text(notes, encoding="utf-8")
+
+
+def _compact_mapping(mapping: Dict[str, Any]) -> Dict[str, Any]:
+    return {key: value for key, value in mapping.items() if value is not None}
+
+
+def _extract_training_parameters(config: Dict[str, Any], args: argparse.Namespace) -> Dict[str, Any]:
+    trainer_cfg = dict(config.get("trainer", {}) or {})
+    dataloader_cfg = dict(config.get("dataloader", {}) or {})
+
+    trainer_plan = _compact_mapping(
+        {
+            "num_epochs": trainer_cfg.get("num_epochs"),
+            "min_epochs": trainer_cfg.get("min_epochs"),
+            "max_epochs": trainer_cfg.get("max_epochs"),
+            "accumulate_grad_batches": trainer_cfg.get("accumulate_grad_batches"),
+            "precision": trainer_cfg.get("precision"),
+            "accelerator": trainer_cfg.get("accelerator"),
+            "devices": trainer_cfg.get("devices"),
+        }
+    )
+    dataloader_plan = _compact_mapping(
+        {
+            "batch_size": dataloader_cfg.get("batch_size"),
+            "num_workers": dataloader_cfg.get("num_workers"),
+            "seed": dataloader_cfg.get("seed"),
+        }
+    )
+    limits_plan = _compact_mapping(
+        {
+            "limit_train_batches": args.limit_train_batches,
+            "limit_val_batches": args.limit_val_batches,
+        }
+    )
+
+    plan: Dict[str, Any] = {}
+    if trainer_plan:
+        plan["trainer"] = trainer_plan
+    if dataloader_plan:
+        plan["dataloader"] = dataloader_plan
+    if limits_plan:
+        plan["limits"] = limits_plan
+    plan["fast_dev_run"] = bool(
+        args.fast_dev_run
+        or config.get("fast_dev_run")
+        or trainer_cfg.get("fast_dev_run")
+    )
+    plan["seed"] = config.get("seed")
+    return _compact_mapping(plan)
 
 
 def _stream_subprocess(cmd: Sequence[str], log_path: Path, cwd: Path, env: Dict[str, str]) -> int:
@@ -245,6 +297,20 @@ def _post_process_run(run_dir: Path) -> None:
     for metrics_csv in run_dir.glob("cpu_training/**/metrics.csv"):
         target = metrics_root / f"{metrics_csv.parent.parent.name}_{metrics_csv.parent.name}.csv"
         shutil.copy2(metrics_csv, target)
+
+    metadata_path = run_dir / "run_metadata.json"
+    if metadata_path.exists():
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        metadata["completed"] = _dt.datetime.now().isoformat()
+        artifacts = metadata.get("artifacts", {}) if isinstance(metadata.get("artifacts"), dict) else {}
+        artifacts.update(
+            {
+                "logs_dir": str(logs_dir.relative_to(run_dir)),
+                "metrics_dir": str(metrics_root.relative_to(run_dir)),
+            }
+        )
+        metadata["artifacts"] = artifacts
+        metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
 
 def _build_training_command(
@@ -360,6 +426,8 @@ def cmd_run(args: argparse.Namespace) -> None:
     )
 
     log_path = run_dir / "training_console.log"
+    training_plan = _extract_training_parameters(updated_config, args)
+
     _write_run_metadata(
         run_dir,
         run_name=run_dir.name,
@@ -369,6 +437,7 @@ def cmd_run(args: argparse.Namespace) -> None:
         trial_label=args.trial_label,
         command=command,
         env=env,
+        training_parameters=training_plan,
     )
 
     print(f"[train_cli] run_id={run_dir.name} | command={' '.join(command)}")
@@ -699,29 +768,66 @@ def _estimate_runtime(
     elapsed_seconds = max((now - start_time).total_seconds(), 0.0)
     estimate["elapsed"] = _format_duration(elapsed_seconds)
 
+    training_plan = run_metadata.get("training_parameters")
+    trainer_plan = training_plan.get("trainer") if isinstance(training_plan, dict) else None
+    total_epochs = None
+    if isinstance(trainer_plan, dict):
+        total_epochs = trainer_plan.get("num_epochs")
+    if total_epochs is None:
+        trainer_cfg = config.get("trainer") if isinstance(config, dict) else None
+        if isinstance(trainer_cfg, dict):
+            total_epochs = trainer_cfg.get("num_epochs")
+    if total_epochs is None and isinstance(config, dict):
+        total_epochs = config.get("num_epochs")
+    try:
+        total_epochs = int(total_epochs) if total_epochs is not None else None
+    except (TypeError, ValueError):
+        total_epochs = None
+
     if not history:
+        if total_epochs is not None:
+            estimate["epochs_total"] = total_epochs
         return estimate
 
     completed_epochs = [item["epoch"] for item in history if item.get("epoch") is not None]
     if not completed_epochs:
+        if total_epochs is not None:
+            estimate["epochs_total"] = total_epochs
         return estimate
 
     max_completed_epoch = max(completed_epochs)
     epochs_completed = max_completed_epoch + 1
     if epochs_completed <= 0:
+        if total_epochs is not None:
+            estimate["epochs_total"] = total_epochs
         return estimate
 
-    avg_epoch_duration = elapsed_seconds / epochs_completed
-    total_epochs = int(config.get("num_epochs", epochs_completed))
+    avg_epoch_duration = elapsed_seconds / epochs_completed if epochs_completed > 0 else 0.0
+    if total_epochs is None:
+        total_epochs = epochs_completed
     remaining_epochs = max(total_epochs - epochs_completed, 0)
 
-    best_case = avg_epoch_duration if remaining_epochs > 0 else 0.0
-    median_case = avg_epoch_duration * max(remaining_epochs / 2, 0)
-    worst_case = avg_epoch_duration * remaining_epochs
+    best_case_seconds = avg_epoch_duration if remaining_epochs > 0 else 0.0
+    median_case_seconds = avg_epoch_duration * max(remaining_epochs / 2, 0)
+    worst_case_seconds = avg_epoch_duration * remaining_epochs
 
-    estimate["best_case"] = _format_duration(best_case)
-    estimate["median"] = _format_duration(median_case)
-    estimate["worst_case"] = _format_duration(worst_case)
+    estimate.update(
+        {
+            "epochs_completed": epochs_completed,
+            "epochs_total": total_epochs,
+            "remaining_epochs": remaining_epochs,
+            "avg_epoch_seconds": avg_epoch_duration if epochs_completed > 0 else None,
+            "avg_epoch": _format_duration(avg_epoch_duration) if epochs_completed > 0 else None,
+            "eta_seconds": worst_case_seconds,
+            "eta": _format_duration(worst_case_seconds),
+            "progress_percent": round((epochs_completed / total_epochs) * 100, 2)
+            if total_epochs > 0
+            else None,
+        }
+    )
+    estimate["best_case"] = _format_duration(best_case_seconds)
+    estimate["median"] = _format_duration(median_case_seconds)
+    estimate["worst_case"] = _format_duration(worst_case_seconds)
     return estimate
 
 
@@ -823,8 +929,20 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     }
 
     runtime_estimate = _estimate_runtime(run_metadata, config_snippet, val_history)
-    if runtime_estimate["elapsed"] is not None:
-        summary["runtime_estimate"] = runtime_estimate
+    summary["runtime_estimate"] = runtime_estimate
+
+    progress = {
+        "epochs_completed": runtime_estimate.get("epochs_completed"),
+        "epochs_total": runtime_estimate.get("epochs_total"),
+        "remaining_epochs": runtime_estimate.get("remaining_epochs"),
+        "progress_percent": runtime_estimate.get("progress_percent"),
+        "avg_epoch_seconds": runtime_estimate.get("avg_epoch_seconds"),
+        "avg_epoch": runtime_estimate.get("avg_epoch"),
+        "eta_seconds": runtime_estimate.get("eta_seconds"),
+        "eta": runtime_estimate.get("eta"),
+    }
+    if any(value is not None for value in progress.values()):
+        summary["progress"] = progress
 
     return summary
 
