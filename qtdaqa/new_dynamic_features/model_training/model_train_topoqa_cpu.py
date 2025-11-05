@@ -1700,6 +1700,27 @@ def main() -> int:
                 for artifact_path in ranked_checkpoints[:3]:
                     if artifact_path.exists():
                         mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(artifact_path))
+            try:
+                tracking_uri = None
+                experiment = mlflow_logger.experiment
+                if hasattr(experiment, "get_tracking_uri"):
+                    tracking_uri = experiment.get_tracking_uri()
+                elif hasattr(experiment, "tracking_uri"):
+                    tracking_uri = experiment.tracking_uri
+                from qtdaqa.new_dynamic_features.model_training import train_cli  # local import to avoid cycle
+
+                train_cli._mutate_run_metadata(  # type: ignore[attr-defined]
+                    cfg.save_dir,
+                    lambda metadata: metadata.setdefault("mlflow", {}).update(  # type: ignore[arg-type]
+                        {
+                            "run_id": mlflow_logger.run_id,
+                            "experiment": mlflow_logger.experiment_name,
+                            "tracking_uri": tracking_uri,
+                        }
+                    ),
+                )
+            except Exception as mlflow_meta_exc:  # pragma: no cover
+                logger.warning("Unable to record MLflow metadata: %s", mlflow_meta_exc)
         except Exception as exc:  # pragma: no cover - optional dependency
             logger.warning("Unable to log metrics/artifacts to MLflow: %s", exc)
 
