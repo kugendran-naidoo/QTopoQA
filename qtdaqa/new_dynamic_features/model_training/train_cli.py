@@ -23,7 +23,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Callable
 
 import yaml
 
@@ -196,6 +196,15 @@ def _write_run_metadata(
         (run_dir / "notes.txt").write_text(notes, encoding="utf-8")
 
 
+def _mutate_run_metadata(run_dir: Path, mutator: Callable[[Dict[str, Any]], None]) -> None:
+    metadata_path = run_dir / "run_metadata.json"
+    if not metadata_path.exists():
+        return
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    mutator(metadata)
+    metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+
+
 def _compact_mapping(mapping: Dict[str, Any]) -> Dict[str, Any]:
     return {key: value for key, value in mapping.items() if value is not None}
 
@@ -298,9 +307,7 @@ def _post_process_run(run_dir: Path) -> None:
         target = metrics_root / f"{metrics_csv.parent.parent.name}_{metrics_csv.parent.name}.csv"
         shutil.copy2(metrics_csv, target)
 
-    metadata_path = run_dir / "run_metadata.json"
-    if metadata_path.exists():
-        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    def _update_completion(metadata: Dict[str, Any]) -> None:
         metadata["completed"] = _dt.datetime.now().isoformat()
         artifacts = metadata.get("artifacts", {}) if isinstance(metadata.get("artifacts"), dict) else {}
         artifacts.update(
@@ -310,7 +317,8 @@ def _post_process_run(run_dir: Path) -> None:
             }
         )
         metadata["artifacts"] = artifacts
-        metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+
+    _mutate_run_metadata(run_dir, _update_completion)
 
 
 def _build_training_command(
@@ -910,6 +918,8 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     if feature_metadata_path.exists():
         feature_info = json.loads(feature_metadata_path.read_text(encoding="utf-8"))
 
+    training_parameters = run_metadata.get("training_parameters") if isinstance(run_metadata, dict) else None
+
     summary = {
         "run_dir": str(run_dir),
         "run_name": run_dir.name,
@@ -927,6 +937,9 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "best_selection_val_loss": selection_best.get("val_loss") if selection_best else None,
         "best_selection_val_spearman": selection_best.get("val_spearman_corr") if selection_best else None,
     }
+
+    if isinstance(training_parameters, dict):
+        summary["training_parameters"] = training_parameters
 
     runtime_estimate = _estimate_runtime(run_metadata, config_snippet, val_history)
     summary["runtime_estimate"] = runtime_estimate

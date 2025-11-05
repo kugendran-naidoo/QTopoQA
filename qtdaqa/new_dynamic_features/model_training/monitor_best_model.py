@@ -26,7 +26,10 @@ if str(REPO_ROOT) not in sys.path:
 from qtdaqa.new_dynamic_features.model_training import train_cli
 
 
-def _extract_learning_params(config: Dict[str, Any]) -> Dict[str, Any]:
+def _extract_learning_params(
+    config: Dict[str, Any],
+    training_parameters: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     keys = [
         "learning_rate",
         "batch_size",
@@ -36,12 +39,55 @@ def _extract_learning_params(config: Dict[str, Any]) -> Dict[str, Any]:
         "attention_head",
         "pooling_type",
     ]
-    return {key: config.get(key) for key in keys if key in config}
+    params: Dict[str, Any] = {key: config.get(key) for key in keys if key in config}
+    if isinstance(training_parameters, dict):
+        trainer_cfg = training_parameters.get("trainer")
+        dataloader_cfg = training_parameters.get("dataloader")
+        if isinstance(trainer_cfg, dict):
+            for key in ("num_epochs", "accumulate_grad_batches", "precision", "accelerator", "devices"):
+                if key in trainer_cfg:
+                    params.setdefault(key, trainer_cfg[key])
+        if isinstance(dataloader_cfg, dict):
+            for key in ("batch_size", "num_workers", "seed"):
+                if key in dataloader_cfg:
+                    params.setdefault(key, dataloader_cfg[key])
+        if training_parameters.get("fast_dev_run") is not None:
+            params.setdefault("fast_dev_run", training_parameters.get("fast_dev_run"))
+    return {key: value for key, value in params.items() if value is not None}
+
+
+def _collect_warnings(
+    best_checkpoint: Optional[str],
+    selection_enabled: bool,
+    run_metadata: Any,
+    progress: Optional[Dict[str, Any]],
+) -> list[str]:
+    warnings: list[str] = []
+    if not best_checkpoint:
+        warnings.append("No checkpoint has been saved yet.")
+    if not selection_enabled:
+        warnings.append("Selection metric is disabled; ranking relies on validation loss only.")
+
+    completed = None
+    if isinstance(run_metadata, dict):
+        completed = run_metadata.get("completed")
+
+    if completed is None:
+        remaining_epochs = None
+        if isinstance(progress, dict):
+            remaining_epochs = progress.get("remaining_epochs")
+        if isinstance(remaining_epochs, (int, float)) and remaining_epochs > 0:
+            warnings.append("Run appears in progress; best checkpoint may change as training continues.")
+        else:
+            warnings.append("Run metadata does not yet include a completion timestamp.")
+
+    return warnings
 
 
 def _summarise_best(run_dir: Path) -> Dict[str, Any]:
     payload = train_cli._summarise_run(run_dir)  # type: ignore[attr-defined]
     config = payload.get("config", {}) if isinstance(payload, dict) else {}
+    training_parameters = payload.get("training_parameters") if isinstance(payload, dict) else None
     feature_metadata = payload.get("feature_metadata", {}) if isinstance(payload, dict) else {}
     edge_schema = feature_metadata.get("edge_schema", {}) if isinstance(feature_metadata, dict) else {}
     top_val_losses = payload.get("top_val_losses", []) if isinstance(payload, dict) else []
@@ -94,7 +140,7 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
         "best_epoch": payload.get("best_epoch") if isinstance(payload, dict) else None,
         "best_checkpoint_path": best_checkpoint,
         "best_checkpoint_name": checkpoint_name,
-        "learning_parameters": _extract_learning_params(config),
+        "learning_parameters": _extract_learning_params(config, training_parameters),
         "edge_feature_dim": edge_schema.get("dim"),
         "notes": payload.get("run_metadata", {}).get("notes") if isinstance(payload.get("run_metadata"), dict) else None,
         "top_val_losses": top_val_losses,
@@ -104,6 +150,7 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
         "runtime_estimate": runtime_estimate,
         "progress": progress,
         "best_summary_line": best_summary_line,
+        "warnings": _collect_warnings(best_checkpoint, selection_enabled, payload.get("run_metadata", {}), progress),
     }
 
 
