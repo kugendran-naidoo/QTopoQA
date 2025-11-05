@@ -143,18 +143,49 @@ python -m train_cli run \
   --run-name "${PHASE1_RUN_NAME}" \
   --resume-from "${BEST_CKPT}"
 
+PHASE1_RUN_DIR="${RUN_ROOT}/${PHASE1_RUN_NAME}"
+if [[ ! -d "${PHASE1_RUN_DIR}" ]]; then
+  echo "[run_fine_tune_only] Phase 1 run directory not found at ${PHASE1_RUN_DIR}" >&2
+  exit 1
+fi
+
+PHASE1_INFO="$(python - <<'PY' "${PHASE1_RUN_DIR}"
+import sys
+from pathlib import Path
+
+from qtdaqa.new_dynamic_features.model_training import train_cli
+
+run_dir = Path(sys.argv[1]).resolve()
+summary = train_cli._summarise_run(run_dir)
+best_ckpt = summary.get("best_checkpoint")
+best_loss = summary.get("best_val_loss")
+if not best_ckpt:
+    print("ERROR", file=sys.stderr)
+    sys.exit(1)
+print(best_ckpt)
+print("" if best_loss is None else best_loss)
+PY
+)"
+if [[ -z "${PHASE1_INFO}" ]]; then
+  echo "[run_fine_tune_only] Phase 1 summary did not return a checkpoint." >&2
+  exit 1
+fi
+PHASE1_BEST_CKPT="$(echo "${PHASE1_INFO}" | sed -n '1p')"
+PHASE1_BEST_LOSS="$(echo "${PHASE1_INFO}" | sed -n '2p')"
+echo "[run_fine_tune_only] Phase 1 best checkpoint: ${PHASE1_BEST_CKPT} (val_loss=${PHASE1_BEST_LOSS:-n/a})"
+
 for seed in "${PHASE2_SEEDS[@]}"; do
   PHASE2_CONFIG="${SCRIPT_DIR}/configs/sched_boost_finetune_seed${seed}.yaml"
   if [[ ! -f "${PHASE2_CONFIG}" ]]; then
     echo "[run_fine_tune_only] Skipping seed ${seed} (missing config: ${PHASE2_CONFIG})" >&2
     continue
   fi
-  RUN_NAME="${PHASE1_RUN_NAME}_seed${seed}"
+  RUN_NAME="${BEST_RUN_NAME}_phase2_seed${seed}"
   echo "[run_fine_tune_only] Launching Phase 2 fine-tune (seed ${seed}) -> ${RUN_NAME}"
   python -m train_cli run \
     --config "${PHASE2_CONFIG}" \
     --run-name "${RUN_NAME}" \
-    --resume-from "${BEST_CKPT}"
+    --resume-from "${PHASE1_BEST_CKPT}"
 done
 
 ISO_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%SZ')"

@@ -5,8 +5,65 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 cd "${SCRIPT_DIR}"
 
+DEFAULT_MANIFEST="${SCRIPT_DIR}/manifests/run_core.yaml"
+MANIFEST="${PIPELINE_MANIFEST:-${DEFAULT_MANIFEST}}"
+
+usage() {
+  cat <<'EOF'
+Usage: ./run_full_pipeline.sh [--manifest PATH]
+
+Options:
+  --manifest PATH   Manifest file to use for the sweep (overrides PIPELINE_MANIFEST).
+  -h, --help        Show this help message.
+
+Environment overrides:
+  PIPELINE_MANIFEST   Alternative way to point at a manifest file.
+EOF
+}
+
+declare -a POSITIONAL_ARGS=()
+MANIFEST_FLAG=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --manifest)
+      if [[ $# -lt 2 ]]; then
+        echo "[run_full_pipeline] --manifest requires a path" >&2
+        usage
+        exit 1
+      fi
+      MANIFEST_FLAG="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [[ ${#POSITIONAL_ARGS[@]} -gt 0 ]]; then
+  echo "[run_full_pipeline] Unknown arguments: ${POSITIONAL_ARGS[*]}" >&2
+  usage
+  exit 1
+fi
+
+if [[ -n "${MANIFEST_FLAG}" ]]; then
+  MANIFEST="${MANIFEST_FLAG}"
+fi
+
+if [[ "${MANIFEST}" != /* ]]; then
+  MANIFEST="${SCRIPT_DIR}/${MANIFEST}"
+fi
+
 RUN_ROOT="${SCRIPT_DIR}/training_runs"
-MANIFEST="manifests/run_all.yaml"
 PHASE1_CONFIG="configs/sched_boost_finetune.yaml"
 PHASE2_SEEDS=(101 555 888)
 
@@ -17,22 +74,24 @@ SKIP_FINE="${SKIP_FINE:-}"
 RESUME_FROM="${RESUME_FROM:-}"
 
 GRAPH_DIR="${GRAPH_DIR:-}"
+NUM_WORKERS_OVERRIDE="${NUM_WORKERS_OVERRIDE:-}"
 
-declare -a GRAPH_ARGS
-GRAPH_ARGS=()
-if [[ -n "${GRAPH_DIR}" ]]; then
-  GRAPH_ARGS=("--override" "paths.graph=${GRAPH_DIR}")
+if [[ -n "${RESUME_FROM}" && -z "${SKIP_SWEEP}" ]]; then
+  echo "[run_full_pipeline][warning] RESUME_FROM is set without SKIP_SWEEP=1; the sweep will run again before fine-tuning." >&2
 fi
 
-declare -a GRAPH_ARGS=()
-if [[ -n "${GRAPH_DIR:-}" ]]; then
-  GRAPH_ARGS=("--override" "paths.graph=${GRAPH_DIR}")
+declare -a EXTRA_OVERRIDES=()
+if [[ -n "${GRAPH_DIR}" ]]; then
+  EXTRA_OVERRIDES+=("--override" "paths.graph=${GRAPH_DIR}")
+fi
+if [[ -n "${NUM_WORKERS_OVERRIDE}" ]]; then
+  EXTRA_OVERRIDES+=("--override" "dataloader.num_workers=${NUM_WORKERS_OVERRIDE}")
 fi
 
 START_TS=""
 if [[ -z "${SKIP_SWEEP}" ]]; then
   if [[ ! -f "${MANIFEST}" ]]; then
-    echo "Manifest not found at ${MANIFEST}" >&2
+    echo "[run_full_pipeline] Manifest not found: ${MANIFEST}" >&2
     exit 1
   fi
   START_DATA="$(python - <<'PY'
@@ -43,9 +102,9 @@ PY
 )"
   read -r START_ISO START_TS <<< "${START_DATA}"
 
-  echo "[run_full_pipeline] Starting sweep at ${START_ISO}"
-  if [[ ${#GRAPH_ARGS[@]} -gt 0 ]]; then
-    python -m train_cli batch --manifest "${MANIFEST}" "${GRAPH_ARGS[@]}"
+  echo "[run_full_pipeline] Starting sweep at ${START_ISO} using manifest ${MANIFEST}"
+  if [[ ${#EXTRA_OVERRIDES[@]} -gt 0 ]]; then
+    python -m train_cli batch --manifest "${MANIFEST}" "${EXTRA_OVERRIDES[@]}"
   else
     python -m train_cli batch --manifest "${MANIFEST}"
   fi
@@ -54,21 +113,64 @@ else
 fi
 
 if [[ -n "${RESUME_FROM}" ]]; then
-  ABS_RESUME="$(python - <<'PY' "${RESUME_FROM}"
+  if ! ABS_RESUME="$(python - <<'PY' "${RESUME_FROM}"
 import os
 import sys
 print(os.path.abspath(sys.argv[1]))
 PY
-)"
+)"; then
+    echo "[run_full_pipeline] Failed to resolve RESUME_FROM path: ${RESUME_FROM}" >&2
+    exit 1
+  fi
   if [[ ! -f "${ABS_RESUME}" ]]; then
     echo "[run_full_pipeline] RESUME_FROM path not found: ${ABS_RESUME}" >&2
     exit 1
   fi
   BEST_CKPT="${ABS_RESUME}"
   BEST_RUN_DIR="$(dirname "$(dirname "${ABS_RESUME}")")"
-  BEST_LOSS="n/a"
+  if ! RESUME_INFO_RAW="$(python - <<'PY' "${BEST_RUN_DIR}"
+import sys
+from pathlib import Path
+
+from qtdaqa.new_dynamic_features.model_training import train_cli
+
+run_dir = Path(sys.argv[1]).resolve()
+if not run_dir.exists():
+    print(f"[run_full_pipeline] ERROR: Run directory not found: {run_dir}", file=sys.stderr)
+    sys.exit(1)
+
+summary = train_cli._summarise_run(run_dir)
+best_ckpt = summary.get("best_checkpoint")
+best_loss = summary.get("best_val_loss")
+if not best_ckpt:
+    print(f"[run_full_pipeline] ERROR: Run {run_dir.name} produced no checkpoint.", file=sys.stderr)
+    sys.exit(1)
+
+ckpt_path = Path(best_ckpt)
+if not ckpt_path.exists():
+    print(f"[run_full_pipeline] ERROR: Reported checkpoint does not exist: {ckpt_path}", file=sys.stderr)
+    sys.exit(1)
+
+print(str(ckpt_path))
+print("" if best_loss is None else best_loss)
+PY
+  )"; then
+    echo "[run_full_pipeline] Resumed run ${BEST_RUN_DIR} did not produce a usable checkpoint summary." >&2
+    exit 1
+  fi
+  RESUME_INFO_CLEAN="${RESUME_INFO_RAW%$'\n'}"
+  RESUME_CKPT="${RESUME_INFO_CLEAN%%$'\n'*}"
+  if [[ "${RESUME_INFO_CLEAN}" == "${RESUME_CKPT}" ]]; then
+    RESUME_LOSS=""
+  else
+    RESUME_LOSS="${RESUME_INFO_CLEAN#*$'\n'}"
+  fi
+  BEST_LOSS="${RESUME_LOSS:-n/a}"
+  if [[ -n "${RESUME_CKPT}" && "${RESUME_CKPT}" != "${BEST_CKPT}" ]]; then
+    echo "[run_full_pipeline][warning] RESUME_FROM checkpoint differs from run summary: ${RESUME_CKPT}" >&2
+  fi
 else
-  BEST_INFO="$(python - <<'PY' "${START_TS}" "${RUN_ROOT}"
+  if ! BEST_INFO="$(python - <<'PY' "${START_TS}" "${RUN_ROOT}"
 import json
 import sys
 from pathlib import Path
@@ -127,7 +229,10 @@ print(best_ckpt)
 print(best_run)
 print(best_loss)
 PY
-)"
+  )"; then
+    echo "[run_full_pipeline] Unable to identify best checkpoint from sweep results." >&2
+    exit 1
+  fi
 
   if [[ -z "${BEST_INFO}" ]]; then
     echo "[run_full_pipeline] Unable to identify best checkpoint." >&2
@@ -156,18 +261,70 @@ BASE_RUN_NAME="$(basename "${BEST_RUN_DIR}")"
 PHASE1_RUN_NAME="${BASE_RUN_NAME}_phase1"
 
 echo "[run_full_pipeline] Phase 1 fine-tuning -> ${PHASE1_RUN_NAME}"
-if [[ ${#GRAPH_ARGS[@]} -gt 0 ]]; then
+if [[ ${#EXTRA_OVERRIDES[@]} -gt 0 ]]; then
   python -m train_cli run \
     --config "${PHASE1_CONFIG}" \
     --run-name "${PHASE1_RUN_NAME}" \
     --resume-from "${BEST_CKPT}" \
-    "${GRAPH_ARGS[@]}"
+    "${EXTRA_OVERRIDES[@]}"
 else
   python -m train_cli run \
     --config "${PHASE1_CONFIG}" \
     --run-name "${PHASE1_RUN_NAME}" \
     --resume-from "${BEST_CKPT}"
 fi
+
+PHASE1_RUN_DIR="${RUN_ROOT}/${PHASE1_RUN_NAME}"
+if [[ ! -d "${PHASE1_RUN_DIR}" ]]; then
+  echo "[run_full_pipeline] Phase 1 run directory not found: ${PHASE1_RUN_DIR}" >&2
+  exit 1
+fi
+
+if ! PHASE1_INFO_RAW="$(python - <<'PY' "${PHASE1_RUN_DIR}"
+import sys
+from pathlib import Path
+
+from qtdaqa.new_dynamic_features.model_training import train_cli
+
+run_dir = Path(sys.argv[1]).resolve()
+if not run_dir.exists():
+    print(f"[run_full_pipeline] ERROR: Run directory not found: {run_dir}", file=sys.stderr)
+    sys.exit(1)
+
+summary = train_cli._summarise_run(run_dir)
+best_ckpt = summary.get("best_checkpoint")
+best_loss = summary.get("best_val_loss")
+if not best_ckpt:
+    print(f"[run_full_pipeline] ERROR: Run {run_dir.name} produced no checkpoint.", file=sys.stderr)
+    sys.exit(1)
+
+ckpt_path = Path(best_ckpt)
+if not ckpt_path.exists():
+    print(f"[run_full_pipeline] ERROR: Reported checkpoint does not exist: {ckpt_path}", file=sys.stderr)
+    sys.exit(1)
+
+print(str(ckpt_path))
+print("" if best_loss is None else best_loss)
+PY
+)"; then
+  echo "[run_full_pipeline] Phase 1 fine-tune did not produce a usable checkpoint." >&2
+  exit 1
+fi
+
+PHASE1_INFO_CLEAN="${PHASE1_INFO_RAW%$'\n'}"
+PHASE1_BEST_CKPT="${PHASE1_INFO_CLEAN%%$'\n'*}"
+if [[ "${PHASE1_INFO_CLEAN}" == "${PHASE1_BEST_CKPT}" ]]; then
+  PHASE1_BEST_LOSS=""
+else
+  PHASE1_BEST_LOSS="${PHASE1_INFO_CLEAN#*$'\n'}"
+fi
+PHASE1_BEST_CKPT="${PHASE1_BEST_CKPT:-}"
+PHASE1_BEST_LOSS="${PHASE1_BEST_LOSS:-n/a}"
+if [[ -z "${PHASE1_BEST_CKPT}" ]]; then
+  echo "[run_full_pipeline] Phase 1 summary did not return a checkpoint path." >&2
+  exit 1
+fi
+echo "[run_full_pipeline] Phase 1 best checkpoint: ${PHASE1_BEST_CKPT} (val_loss=${PHASE1_BEST_LOSS})"
 
 for seed in "${PHASE2_SEEDS[@]}"; do
   PHASE2_CONFIG="${SCRIPT_DIR}/configs/sched_boost_finetune_seed${seed}.yaml"
@@ -177,18 +334,70 @@ for seed in "${PHASE2_SEEDS[@]}"; do
   fi
   RUN_NAME="${BASE_RUN_NAME}_phase2_seed${seed}"
   echo "[run_full_pipeline] Phase 2 fine-tuning (seed ${seed}) -> ${RUN_NAME}"
-  if [[ ${#GRAPH_ARGS[@]} -gt 0 ]]; then
+  if [[ ${#EXTRA_OVERRIDES[@]} -gt 0 ]]; then
     python -m train_cli run \
       --config "${PHASE2_CONFIG}" \
       --run-name "${RUN_NAME}" \
-      --resume-from "${BEST_CKPT}" \
-      "${GRAPH_ARGS[@]}"
+      --resume-from "${PHASE1_BEST_CKPT}" \
+      "${EXTRA_OVERRIDES[@]}"
   else
     python -m train_cli run \
       --config "${PHASE2_CONFIG}" \
       --run-name "${RUN_NAME}" \
-      --resume-from "${BEST_CKPT}"
+      --resume-from "${PHASE1_BEST_CKPT}"
   fi
+
+  PHASE2_RUN_DIR="${RUN_ROOT}/${RUN_NAME}"
+  if [[ ! -d "${PHASE2_RUN_DIR}" ]]; then
+    echo "[run_full_pipeline] Phase 2 run directory not found: ${PHASE2_RUN_DIR}" >&2
+    exit 1
+  fi
+
+  if ! PHASE2_INFO_RAW="$(python - <<'PY' "${PHASE2_RUN_DIR}"
+import sys
+from pathlib import Path
+
+from qtdaqa.new_dynamic_features.model_training import train_cli
+
+run_dir = Path(sys.argv[1]).resolve()
+if not run_dir.exists():
+    print(f"[run_full_pipeline] ERROR: Run directory not found: {run_dir}", file=sys.stderr)
+    sys.exit(1)
+
+summary = train_cli._summarise_run(run_dir)
+best_ckpt = summary.get("best_checkpoint")
+best_loss = summary.get("best_val_loss")
+if not best_ckpt:
+    print(f"[run_full_pipeline] ERROR: Run {run_dir.name} produced no checkpoint.", file=sys.stderr)
+    sys.exit(1)
+
+ckpt_path = Path(best_ckpt)
+if not ckpt_path.exists():
+    print(f"[run_full_pipeline] ERROR: Reported checkpoint does not exist: {ckpt_path}", file=sys.stderr)
+    sys.exit(1)
+
+print(str(ckpt_path))
+print("" if best_loss is None else best_loss)
+PY
+  )"; then
+    echo "[run_full_pipeline] Phase 2 fine-tune (seed ${seed}) did not produce a usable checkpoint." >&2
+    exit 1
+  fi
+
+  PHASE2_INFO_CLEAN="${PHASE2_INFO_RAW%$'\n'}"
+  PHASE2_BEST_CKPT="${PHASE2_INFO_CLEAN%%$'\n'*}"
+  if [[ "${PHASE2_INFO_CLEAN}" == "${PHASE2_BEST_CKPT}" ]]; then
+    PHASE2_BEST_LOSS=""
+  else
+    PHASE2_BEST_LOSS="${PHASE2_INFO_CLEAN#*$'\n'}"
+  fi
+  PHASE2_BEST_CKPT="${PHASE2_BEST_CKPT:-}"
+  PHASE2_BEST_LOSS="${PHASE2_BEST_LOSS:-n/a}"
+  if [[ -z "${PHASE2_BEST_CKPT}" ]]; then
+    echo "[run_full_pipeline] Phase 2 summary for seed ${seed} did not return a checkpoint path." >&2
+    exit 1
+  fi
+  echo "[run_full_pipeline] Phase 2 (seed ${seed}) best checkpoint: ${PHASE2_BEST_CKPT} (val_loss=${PHASE2_BEST_LOSS})"
 done
 
 ISO_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%SZ')"

@@ -1,0 +1,3 @@
+trainer.num_epochs: 2
+dataloader.limit_train_batches: 0.05
+dataloader.limit_val_batches: 0.05
