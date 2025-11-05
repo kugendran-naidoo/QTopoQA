@@ -865,13 +865,13 @@ def _format_checkpoint_stem(path: Path) -> str:
         if sel_value is not None:
             try:
                 sel_float = float(sel_value)
-                parts.append(f"sel-{abs(sel_float):.5f}")
+                parts.append(f"sel-{sel_float:.5f}")
             except ValueError:
                 parts.append(f"sel{sel_value}")
         if val_value is not None:
             try:
                 val_float = float(val_value)
-                parts.append(f"val-{abs(val_float):.5f}")
+                parts.append(f"val-{val_float:.5f}")
             except ValueError:
                 parts.append(f"val{val_value}")
         if epoch_value is not None:
@@ -1580,21 +1580,28 @@ def main() -> int:
     else:
         logger.info("Training completed. No checkpoints were saved (likely fast_dev_run).")
 
+    best_ckpt_path: Optional[str] = checkpoint_cb.best_model_path or None
+    best_path_obj: Optional[Path] = None
+    if best_ckpt_path:
+        best_path_obj = Path(best_ckpt_path).resolve(strict=False)
+
     ranked_checkpoints: List[Path] = []
     val_metrics: List[Dict[str, object]] = []
 
     if cfg.fast_dev_run:
         logger.info("Fast dev run enabled; skipping full validation sweep.")
-        best_ckpt_path = checkpoint_cb.best_model_path or None
     else:
         logger.info("Running final validation/evaluation pass on full validation set.")
-        best_ckpt_path = checkpoint_cb.best_model_path or None
         val_metrics = trainer.validate(
             model,
             dataloaders=val_loader,
             ckpt_path=best_ckpt_path,
         )
         logger.info("Validation metrics: %s", val_metrics)
+
+    best_ckpt_path = checkpoint_cb.best_model_path or best_ckpt_path
+    if best_ckpt_path:
+        best_path_obj = Path(best_ckpt_path).resolve(strict=False)
 
     if checkpoint_dir.exists():
         ranked_checkpoints = _rank_checkpoints(
@@ -1607,8 +1614,23 @@ def main() -> int:
                 checkpoint_dir.glob("*.chkpt"),
                 key=lambda p: p.stat().st_mtime,
             )
+        if best_path_obj and best_path_obj.exists():
+            best_path_resolved = best_path_obj.resolve()
+            if ranked_checkpoints:
+                ranked_checkpoints = [best_path_resolved] + [
+                    path for path in ranked_checkpoints if path != best_path_resolved
+                ]
+            else:
+                ranked_checkpoints = [best_path_resolved]
+        elif best_ckpt_path:
+            candidate_path = Path(best_ckpt_path)
+            if candidate_path.exists():
+                ranked_checkpoints = [candidate_path.resolve()] + [
+                    path for path in ranked_checkpoints if path != candidate_path.resolve()
+                ]
         if ranked_checkpoints:
             best_ckpt_path = str(ranked_checkpoints[0])
+            checkpoint_cb.best_model_path = best_ckpt_path
         _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)
 
     if load_profiler.enabled:

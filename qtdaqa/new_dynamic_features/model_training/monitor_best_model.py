@@ -48,10 +48,45 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
     top_selection = payload.get("top_selection_metrics", []) if isinstance(payload, dict) else []
     selection_enabled = bool(payload.get("selection_metric_enabled")) if isinstance(payload, dict) else False
     runtime_estimate = payload.get("runtime_estimate") if isinstance(payload, dict) else None
+    progress = payload.get("progress") if isinstance(payload, dict) else None
 
     best_checkpoint = payload.get("best_checkpoint") if isinstance(payload, dict) else None
     checkpoint_name = Path(best_checkpoint).name if best_checkpoint else None
     selection_best = top_selection[0] if top_selection else None
+
+    metric_label = "val_loss"
+    metric_value: Optional[Any] = payload.get("best_val_loss") if isinstance(payload, dict) else None
+    metric_epoch = payload.get("best_epoch") if isinstance(payload, dict) else None
+    if selection_enabled and selection_best and selection_best.get("selection_metric") is not None:
+        metric_label = "selection_metric"
+        metric_value = selection_best.get("selection_metric")
+        if selection_best.get("epoch") is not None:
+            metric_epoch = selection_best.get("epoch")
+
+    def _format_number(value: Any) -> Optional[str]:
+        if isinstance(value, float):
+            return f"{value:.5f}"
+        if isinstance(value, int):
+            return str(value)
+        return str(value) if value is not None else None
+
+    summary_parts: list[str] = []
+    if checkpoint_name:
+        summary_parts.append(checkpoint_name)
+    if metric_epoch is not None:
+        summary_parts.append(f"epoch={metric_epoch}")
+    metric_repr = _format_number(metric_value)
+    if metric_repr is not None:
+        summary_parts.append(f"{metric_label}={metric_repr}")
+    if isinstance(progress, dict):
+        progress_percent = progress.get("progress_percent")
+        if isinstance(progress_percent, (int, float)):
+            summary_parts.append(f"{progress_percent:.1f}% complete")
+        eta = progress.get("eta")
+        if eta:
+            summary_parts.append(f"ETA {eta}")
+    best_summary_line = " | ".join(summary_parts) if summary_parts else None
+
     return {
         "run_dir": str(run_dir),
         "run_name": run_dir.name,
@@ -67,6 +102,8 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
         "best_selection": selection_best,
         "selection_alternates": top_selection[1:] if top_selection else [],
         "runtime_estimate": runtime_estimate,
+        "progress": progress,
+        "best_summary_line": best_summary_line,
     }
 
 
