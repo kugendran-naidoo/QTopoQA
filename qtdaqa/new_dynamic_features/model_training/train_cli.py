@@ -920,6 +920,33 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
 
     training_parameters = run_metadata.get("training_parameters") if isinstance(run_metadata, dict) else None
 
+    recent_metrics: List[Dict[str, Any]] = []
+    latest_metric: Optional[Dict[str, Any]] = None
+    if val_history:
+        ordered_history = sorted(
+            enumerate(val_history),
+            key=lambda item: (
+                item[1].get("epoch") if isinstance(item[1].get("epoch"), (int, float)) else float("inf"),
+                item[0],
+            ),
+        )
+
+        def _pruned(entry: Dict[str, Any]) -> Dict[str, Any]:
+            payload = {
+                "epoch": entry.get("epoch"),
+                "val_loss": entry.get("val_loss"),
+                "val_spearman_corr": entry.get("val_spearman_corr"),
+                "selection_metric": entry.get("selection_metric"),
+            }
+            if entry.get("source"):
+                payload["source"] = entry.get("source")
+            return {key: value for key, value in payload.items() if value is not None}
+
+        trimmed = [_pruned(entry) for _, entry in ordered_history]
+        recent_metrics = trimmed[-10:]
+        if recent_metrics:
+            latest_metric = recent_metrics[-1]
+
     summary = {
         "run_dir": str(run_dir),
         "run_name": run_dir.name,
@@ -940,6 +967,10 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
 
     if isinstance(training_parameters, dict):
         summary["training_parameters"] = training_parameters
+    if recent_metrics:
+        summary["recent_metrics"] = recent_metrics
+    if latest_metric:
+        summary["latest_metric"] = latest_metric
 
     runtime_estimate = _estimate_runtime(run_metadata, config_snippet, val_history)
     summary["runtime_estimate"] = runtime_estimate

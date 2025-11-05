@@ -17,7 +17,7 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(REPO_ROOT) not in sys.path:
@@ -84,7 +84,7 @@ def _collect_warnings(
     return warnings
 
 
-def _summarise_best(run_dir: Path) -> Dict[str, Any]:
+def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Dict[str, Any]:
     payload = train_cli._summarise_run(run_dir)  # type: ignore[attr-defined]
     config = payload.get("config", {}) if isinstance(payload, dict) else {}
     training_parameters = payload.get("training_parameters") if isinstance(payload, dict) else None
@@ -95,6 +95,12 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
     selection_enabled = bool(payload.get("selection_metric_enabled")) if isinstance(payload, dict) else False
     runtime_estimate = payload.get("runtime_estimate") if isinstance(payload, dict) else None
     progress = payload.get("progress") if isinstance(payload, dict) else None
+    recent_metrics: List[Dict[str, Any]] = []
+    if isinstance(payload, dict):
+        candidate = payload.get("recent_metrics")
+        if isinstance(candidate, list):
+            recent_metrics = [item for item in candidate if isinstance(item, dict)]
+    latest_metric = payload.get("latest_metric") if isinstance(payload, dict) else None
 
     best_checkpoint = payload.get("best_checkpoint") if isinstance(payload, dict) else None
     checkpoint_name = Path(best_checkpoint).name if best_checkpoint else None
@@ -133,7 +139,13 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
             summary_parts.append(f"ETA {eta}")
     best_summary_line = " | ".join(summary_parts) if summary_parts else None
 
-    return {
+    if metrics_limit is not None:
+        if metrics_limit > 0:
+            recent_metrics = recent_metrics[-metrics_limit:]
+        else:
+            recent_metrics = []
+
+    summary: Dict[str, Any] = {
         "run_dir": str(run_dir),
         "run_name": run_dir.name,
         "best_val_loss": payload.get("best_val_loss") if isinstance(payload, dict) else None,
@@ -153,6 +165,13 @@ def _summarise_best(run_dir: Path) -> Dict[str, Any]:
         "warnings": _collect_warnings(best_checkpoint, selection_enabled, payload.get("run_metadata", {}), progress),
     }
 
+    if latest_metric:
+        summary["latest_metric"] = latest_metric
+    if metrics_limit and recent_metrics:
+        summary["recent_metrics"] = recent_metrics
+
+    return summary
+
 
 def _resolve_run_dir(args: argparse.Namespace) -> Path:
     try:
@@ -161,11 +180,66 @@ def _resolve_run_dir(args: argparse.Namespace) -> Path:
         raise SystemExit(f"[monitor_best_model] {exc}")
 
 
-def _render_once(run_dir: Path) -> None:
-    summary = _summarise_best(run_dir)
-    json.dump(summary, sys.stdout, indent=2)
-    sys.stdout.write("\n")
-    sys.stdout.flush()
+def _render_table(summary: Dict[str, Any], metrics_limit: Optional[int]) -> None:
+    def _fmt_metric(entry: Dict[str, Any]) -> str:
+        parts = []
+        epoch = entry.get("epoch")
+        if epoch is not None:
+            parts.append(f"epoch={epoch}")
+        val_loss = entry.get("val_loss")
+        if isinstance(val_loss, float):
+            parts.append(f"val_loss={val_loss:.5f}")
+        elif val_loss is not None:
+            parts.append(f"val_loss={val_loss}")
+        spearman = entry.get("val_spearman_corr")
+        if isinstance(spearman, float):
+            parts.append(f"spearman={spearman:.3f}")
+        selection_metric = entry.get("selection_metric")
+        if isinstance(selection_metric, float):
+            parts.append(f"selection={selection_metric:.5f}")
+        return ", ".join(parts) if parts else "(no metrics)"
+
+    print(f"Run: {summary.get('run_name')} ({summary.get('run_dir')})")
+    if summary.get("best_summary_line"):
+        print(f"Best: {summary['best_summary_line']}")
+    else:
+        checkpoint = summary.get("best_checkpoint_name") or "N/A"
+        print(f"Best checkpoint: {checkpoint}")
+    checkpoint_path = summary.get("best_checkpoint_path")
+    if checkpoint_path:
+        print(f"Path: {checkpoint_path}")
+
+    learning = summary.get("learning_parameters") or {}
+    if learning:
+        ordered = ", ".join(f"{key}={value}" for key, value in sorted(learning.items()))
+        print(f"Learning params: {ordered}")
+
+    warnings = summary.get("warnings") or []
+    if warnings:
+        print("Warnings:")
+        for item in warnings:
+            print(f"  - {item}")
+
+    latest_metric = summary.get("latest_metric")
+    if isinstance(latest_metric, dict):
+        print(f"Latest metric: {_fmt_metric(latest_metric)}")
+
+    recent_metrics = summary.get("recent_metrics")
+    if metrics_limit and recent_metrics:
+        print("Recent epochs:")
+        for entry in recent_metrics:
+            print(f"  - {_fmt_metric(entry)}")
+
+
+def _render_once(run_dir: Path, args: argparse.Namespace) -> None:
+    metrics_limit = args.metrics if args.metrics is not None else None
+    summary = _summarise_best(run_dir, metrics_limit=metrics_limit)
+    if args.output_format == "json":
+        json.dump(summary, sys.stdout, indent=2)
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+    else:
+        _render_table(summary, metrics_limit)
 
 
 def main(argv: Optional[list[str]] = None) -> int:
@@ -174,18 +248,31 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser.add_argument("--run-dir", type=Path, help="Explicit path to a training run directory.")
     parser.add_argument("--follow", action="store_true", help="Poll indefinitely, emitting summaries every interval seconds.")
     parser.add_argument("--interval", type=int, default=30, help="Polling interval in seconds when --follow is enabled.")
+    parser.add_argument(
+        "--format",
+        dest="output_format",
+        choices=("json", "table"),
+        default="json",
+        help="Select output format (json or table).",
+    )
+    parser.add_argument(
+        "--metrics",
+        type=int,
+        default=0,
+        help="Include the last N epochs of metrics in the output (0 disables the snippet).",
+    )
     args = parser.parse_args(argv)
 
     run_dir = _resolve_run_dir(args)
     if args.follow:
         try:
             while True:
-                _render_once(run_dir)
+                _render_once(run_dir, args)
                 time.sleep(max(1, args.interval))
         except KeyboardInterrupt:
             return 0
     else:
-        _render_once(run_dir)
+        _render_once(run_dir, args)
     return 0
 
 
