@@ -37,3 +37,7 @@ mlflow:
 # or `python qtdaqa/new_dynamic_features/model_training/tools/emit_override_block.py <graph_dir>` to print a ready-to-paste snippet.
 # edge_schema:  # edge metadata override (uncomment and tweak only the keys you need)
 # topology_schema:  # topology metadata override
+coverage:
+  fail_on_missing: false
+  minimum_percent: 0
+

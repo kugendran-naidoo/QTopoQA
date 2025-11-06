@@ -30,3 +30,7 @@ mlflow:
   tracking_uri: ./qtdaqa/new_dynamic_features/model_training/ml_runs
   experiment: dynamic_topoqa
   log_artifacts: true
+coverage:
+  fail_on_missing: false
+  minimum_percent: 0
+

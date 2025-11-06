@@ -26,6 +26,47 @@ if str(REPO_ROOT) not in sys.path:
 from qtdaqa.new_dynamic_features.model_training import train_cli
 
 
+def _to_repo_relative(path_value: Optional[str]) -> Optional[str]:
+    if not path_value:
+        return path_value
+    try:
+        candidate = Path(path_value)
+    except (TypeError, ValueError):
+        return path_value
+    bases = [
+        getattr(train_cli, "RUN_ROOT", None),
+        REPO_ROOT,
+    ]
+    for resolver in (candidate.resolve, lambda: candidate):
+        try:
+            resolved = resolver()
+        except Exception:
+            continue
+        for base in bases:
+            if base is None:
+                continue
+            try:
+                return str(
+                    (Path("training_runs") / resolved.relative_to(base))
+                    if base == getattr(train_cli, "RUN_ROOT", None)
+                    else resolved.relative_to(base)
+                )
+            except Exception:
+                continue
+    for base in bases:
+        if base is None:
+            continue
+        try:
+            return str(
+                (Path("training_runs") / candidate.relative_to(base))
+                if base == getattr(train_cli, "RUN_ROOT", None)
+                else candidate.relative_to(base)
+            )
+        except Exception:
+            continue
+    return str(candidate)
+
+
 def _extract_learning_params(
     config: Dict[str, Any],
     training_parameters: Optional[Dict[str, Any]] = None,
@@ -146,11 +187,11 @@ def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Di
             recent_metrics = []
 
     summary: Dict[str, Any] = {
-        "run_dir": str(run_dir),
+        "run_dir": _to_repo_relative(str(run_dir)),
         "run_name": run_dir.name,
         "best_val_loss": payload.get("best_val_loss") if isinstance(payload, dict) else None,
         "best_epoch": payload.get("best_epoch") if isinstance(payload, dict) else None,
-        "best_checkpoint_path": best_checkpoint,
+        "best_checkpoint_path": _to_repo_relative(best_checkpoint),
         "best_checkpoint_name": checkpoint_name,
         "learning_parameters": _extract_learning_params(config, training_parameters),
         "edge_feature_dim": edge_schema.get("dim"),
@@ -165,10 +206,30 @@ def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Di
         "warnings": _collect_warnings(best_checkpoint, selection_enabled, payload.get("run_metadata", {}), progress),
     }
 
-    if latest_metric:
-        summary["latest_metric"] = latest_metric
+    def _normalise_metric(metric: Dict[str, Any]) -> Dict[str, Any]:
+        payload = dict(metric)
+        source = payload.get("source")
+        if source:
+            payload["source"] = _to_repo_relative(source)
+        return payload
+
+    if isinstance(latest_metric, dict):
+        summary["latest_metric"] = _normalise_metric(latest_metric)
     if metrics_limit and recent_metrics:
-        summary["recent_metrics"] = recent_metrics
+        summary["recent_metrics"] = [_normalise_metric(item) for item in recent_metrics]
+    checkpoint_symlinks = payload.get("checkpoint_symlinks")
+    if isinstance(checkpoint_symlinks, list):
+        normalised_symlinks: List[Dict[str, Any]] = []
+        for entry in checkpoint_symlinks:
+            if not isinstance(entry, dict):
+                continue
+            normalised = dict(entry)
+            path_value = normalised.get("path")
+            if path_value:
+                normalised["path"] = _to_repo_relative(path_value)
+            normalised_symlinks.append(normalised)
+        if normalised_symlinks:
+            summary["checkpoint_symlinks"] = normalised_symlinks
 
     return summary
 
@@ -229,6 +290,24 @@ def _render_table(summary: Dict[str, Any], metrics_limit: Optional[int]) -> None
         print("Recent epochs:")
         for entry in recent_metrics:
             print(f"  - {_fmt_metric(entry)}")
+    symlinks = summary.get("checkpoint_symlinks") or []
+    if symlinks:
+        print("Checkpoint ranking:")
+        for entry in symlinks:
+            target = entry.get("path")
+            parts = [entry.get("name", "")]
+            if target:
+                parts.append(f"-> {target}")
+            sel = entry.get("selection_metric")
+            if isinstance(sel, (int, float)):
+                parts.append(f"selection_metric={sel:.6f}")
+            val_loss = entry.get("val_loss")
+            if isinstance(val_loss, (int, float)):
+                parts.append(f"val_loss={val_loss:.6f}")
+            epoch = entry.get("epoch")
+            if isinstance(epoch, int):
+                parts.append(f"epoch={epoch}")
+            print(f"  - {' '.join(part for part in parts if part)}")
 
 
 def _render_once(run_dir: Path, args: argparse.Namespace) -> None:
