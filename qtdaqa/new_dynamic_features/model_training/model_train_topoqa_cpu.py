@@ -67,6 +67,18 @@ from feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata  
 from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
 
 
+def _update_run_metadata(save_dir: Path, mutator: Callable[[Dict[str, Any]], None]) -> None:
+    metadata_path = save_dir / "run_metadata.json"
+    if not metadata_path.exists():
+        return
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return
+    mutator(metadata)
+    metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+
+
 @dataclasses.dataclass
 class MlflowConfig:
     enabled: bool = False
@@ -110,7 +122,7 @@ class TrainingConfig:
     spearman_secondary_min_delta: float = 0.0
     spearman_secondary_weight: float = 1.0
     coverage_minimum: float = 0.0
-    coverage_fail_on_missing: bool = False
+    coverage_fail_on_missing: bool = True
     graph_load_profiling: bool = False
     graph_load_top_k: int = 5
     mlflow: MlflowConfig = dataclasses.field(default_factory=MlflowConfig)
@@ -193,7 +205,8 @@ def load_config(path: Path) -> TrainingConfig:
         coverage_minimum = _normalise_ratio(
             coverage_cfg.get("minimum_percent", coverage_cfg.get("minimum", 0.0)), default=0.0
         )
-        coverage_fail_on_missing = bool(coverage_cfg.get("fail_on_missing", False))
+        coverage_fail_raw = coverage_cfg.get("fail_on_missing")
+        coverage_fail_on_missing = True if coverage_fail_raw is None else bool(coverage_fail_raw)
         try:
             graph_load_top_k = int(profiling_cfg.get("graph_load_top_k", 5))
         except (TypeError, ValueError):
@@ -318,7 +331,8 @@ def load_config(path: Path) -> TrainingConfig:
     coverage_minimum = _normalise_ratio(
         coverage_cfg.get("minimum_percent", coverage_cfg.get("minimum", 0.0)), default=0.0
     )
-    coverage_fail_on_missing = bool(coverage_cfg.get("fail_on_missing", False))
+    coverage_fail_raw = coverage_cfg.get("fail_on_missing")
+    coverage_fail_on_missing = True if coverage_fail_raw is None else bool(coverage_fail_raw)
 
     profiling_cfg = _section("profiling")
     graph_load_profiling = bool(profiling_cfg.get("graph_load", False))
@@ -1046,6 +1060,25 @@ class EpochSummaryLogger(Callback):
             self.logger.info(" | ".join(parts))
 
 
+class EpochTimingCallback(Callback):
+    def __init__(self) -> None:
+        super().__init__()
+        self._epoch_start: Optional[float] = None
+        self.epoch_durations: List[float] = []
+
+    def on_train_epoch_start(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking:
+            return
+        self._epoch_start = time.perf_counter()
+
+    def on_train_epoch_end(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking or self._epoch_start is None:
+            return
+        duration = max(0.0, time.perf_counter() - self._epoch_start)
+        self.epoch_durations.append(duration)
+        self._epoch_start = None
+
+
 class TrainingProgressLogger(Callback):
     def __init__(self, logger: logging.Logger, checkpoints: Optional[Sequence[float]] = None) -> None:
         super().__init__()
@@ -1453,6 +1486,8 @@ def main() -> int:
         callback_list.append(progress_bar_cb)
     callback_list.append(TrainingProgressLogger(logger))
     callback_list.append(EpochSummaryLogger(logger))
+    timing_callback = EpochTimingCallback()
+    callback_list.append(timing_callback)
 
     csv_logger = CSVLogger(str(cfg.save_dir), name="cpu_training", flush_logs_every_n_steps=1)
 
@@ -1526,6 +1561,7 @@ def main() -> int:
     )
 
     logger.info("Starting training (fast_dev_run=%s)", cfg.fast_dev_run)
+    fit_start_time = time.perf_counter()
     if cfg.accelerator == "cpu" and (
         torch.cuda.is_available()
         or (hasattr(torch.backends, "mps") and torch.backends.mps.is_available())
@@ -1540,6 +1576,7 @@ def main() -> int:
         val_dataloaders=val_loader,
         ckpt_path=args.resume_from,
     )
+    fit_duration = max(0.0, time.perf_counter() - fit_start_time)
 
     renamed_checkpoints: List[Path] = []
     ckpt_dir = Path(checkpoint_cb.dirpath) if checkpoint_cb.dirpath else checkpoint_dir
@@ -1587,6 +1624,25 @@ def main() -> int:
 
     ranked_checkpoints: List[Path] = []
     val_metrics: List[Dict[str, object]] = []
+
+    epoch_durations = timing_callback.epoch_durations[:]
+    runtime_summary: Dict[str, Any] = {
+        "training_seconds": int(round(fit_duration)),
+        "epochs_completed": len(epoch_durations),
+        "epochs_total": cfg.num_epochs,
+    }
+    if epoch_durations:
+        runtime_summary["epoch_seconds"] = [int(round(max(0.0, d))) for d in epoch_durations]
+        runtime_summary["epoch_seconds_stats"] = {
+            "mean": float(statistics.mean(epoch_durations)),
+            "median": float(statistics.median(epoch_durations)),
+            "min": float(min(epoch_durations)),
+            "max": float(max(epoch_durations)),
+        }
+    try:
+        _update_run_metadata(cfg.save_dir, lambda metadata: metadata.setdefault("runtime", {}).update(runtime_summary))
+    except Exception as runtime_exc:  # pragma: no cover
+        logger.warning("Unable to record runtime metadata: %s", runtime_exc)
 
     if cfg.fast_dev_run:
         logger.info("Fast dev run enabled; skipping full validation sweep.")
@@ -1701,24 +1757,51 @@ def main() -> int:
                     if artifact_path.exists():
                         mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(artifact_path))
             try:
-                tracking_uri = None
                 experiment = mlflow_logger.experiment
-                if hasattr(experiment, "get_tracking_uri"):
-                    tracking_uri = experiment.get_tracking_uri()
-                elif hasattr(experiment, "tracking_uri"):
-                    tracking_uri = experiment.tracking_uri
-                from qtdaqa.new_dynamic_features.model_training import train_cli  # local import to avoid cycle
+                tracking_uri = getattr(mlflow_logger, "tracking_uri", None)
+                if not tracking_uri and hasattr(experiment, "get_tracking_uri"):
+                    try:
+                        tracking_uri = experiment.get_tracking_uri()
+                    except Exception:
+                        tracking_uri = None
+                if not tracking_uri and hasattr(experiment, "tracking_uri"):
+                    tracking_uri = getattr(experiment, "tracking_uri", None)
 
-                train_cli._mutate_run_metadata(  # type: ignore[attr-defined]
-                    cfg.save_dir,
-                    lambda metadata: metadata.setdefault("mlflow", {}).update(  # type: ignore[arg-type]
-                        {
-                            "run_id": mlflow_logger.run_id,
-                            "experiment": mlflow_logger.experiment_name,
-                            "tracking_uri": tracking_uri,
-                        }
-                    ),
-                )
+                experiment_name = getattr(mlflow_logger, "experiment_name", None)
+                if not experiment_name:
+                    experiment_name = getattr(mlflow_logger, "_experiment_name", None)
+                experiment_id = getattr(mlflow_logger, "experiment_id", None)
+                if not experiment_name and experiment_id and experiment is not None:
+                    try:
+                        exp_info = experiment.get_experiment(experiment_id)
+                        if exp_info is not None:
+                            experiment_name = getattr(exp_info, "name", experiment_name)
+                    except Exception:
+                        pass
+
+                run_name = getattr(mlflow_logger, "run_name", None) or getattr(mlflow_logger, "_run_name", None)
+
+                if not tracking_uri:
+                    try:  # pragma: no cover - mlflow optional
+                        import mlflow  # type: ignore
+
+                        tracking_uri = mlflow.get_tracking_uri()
+                    except Exception:
+                        tracking_uri = None
+
+                def _update_mlflow_metadata(metadata: Dict[str, Any]) -> None:
+                    mlflow_section = metadata.setdefault("mlflow", {})
+                    mlflow_section.update({"run_id": mlflow_logger.run_id})
+                    if experiment_name:
+                        mlflow_section["experiment"] = experiment_name
+                    if experiment_id and "experiment_id" not in mlflow_section:
+                        mlflow_section["experiment_id"] = experiment_id
+                    if run_name:
+                        mlflow_section.setdefault("run_name", run_name)
+                    if tracking_uri:
+                        mlflow_section["tracking_uri"] = tracking_uri
+
+                _update_run_metadata(cfg.save_dir, _update_mlflow_metadata)
             except Exception as mlflow_meta_exc:  # pragma: no cover
                 logger.warning("Unable to record MLflow metadata: %s", mlflow_meta_exc)
         except Exception as exc:  # pragma: no cover - optional dependency

@@ -22,6 +22,7 @@ import os
 import shutil
 import subprocess
 import sys
+import statistics
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Callable
 
@@ -583,7 +584,11 @@ def _resolve_run_dir_argument(run_id: Optional[str], run_dir: Optional[Path]) ->
     if run_dir and run_id:
         raise CLIError("Provide either --run-id or --run-dir, not both.")
     if run_dir:
-        resolved = run_dir.resolve()
+        if run_dir.is_absolute():
+            resolved = run_dir.resolve()
+        else:
+            base = RUN_ROOT.parent if run_dir.parts and run_dir.parts[0] == "training_runs" else REPO_ROOT
+            resolved = (base / run_dir).resolve()
     elif run_id:
         resolved = RUN_ROOT / run_id
     else:
@@ -591,6 +596,27 @@ def _resolve_run_dir_argument(run_id: Optional[str], run_dir: Optional[Path]) ->
     if not resolved.exists():
         raise CLIError(f"Run directory does not exist: {resolved}")
     return resolved
+
+
+def _as_repo_relative(path_value: Any) -> str:
+    try:
+        candidate = Path(path_value)
+    except (TypeError, ValueError):
+        return str(path_value)
+    for resolver in (candidate.resolve, lambda: candidate):
+        try:
+            resolved = resolver()
+            if resolved.is_relative_to(RUN_ROOT):
+                return str(Path("training_runs") / resolved.relative_to(RUN_ROOT))
+            return str(resolved.relative_to(REPO_ROOT))
+        except Exception:
+            continue
+    try:
+        if candidate.is_relative_to(RUN_ROOT):
+            return str(Path("training_runs") / candidate.relative_to(RUN_ROOT))
+    except Exception:
+        pass
+    return str(candidate)
 
 
 def _select_checkpoint(run_dir: Path, preferred: Optional[str]) -> Path:
@@ -751,12 +777,17 @@ def _format_duration(seconds: float) -> str:
     return f"{hours}h {minutes:02d}m"
 
 
+def _round_seconds(value: float) -> int:
+    return int(round(max(value, 0.0)))
+
+
 def _estimate_runtime(
     run_metadata: Dict[str, Any],
     config: Dict[str, Any],
     history: Sequence[Dict[str, Any]],
 ) -> Dict[str, Optional[str]]:
     created_iso = run_metadata.get("created")
+    runtime_info = run_metadata.get("runtime") if isinstance(run_metadata.get("runtime"), dict) else {}
     estimate: Dict[str, Optional[str]] = {
         "elapsed": None,
         "best_case": None,
@@ -774,7 +805,11 @@ def _estimate_runtime(
     else:
         now = _dt.datetime.now(start_time.tzinfo)
     elapsed_seconds = max((now - start_time).total_seconds(), 0.0)
+    runtime_training_seconds = runtime_info.get("training_seconds")
+    if isinstance(runtime_training_seconds, (int, float)):
+        elapsed_seconds = max(float(runtime_training_seconds), 0.0)
     estimate["elapsed"] = _format_duration(elapsed_seconds)
+    completed_iso = run_metadata.get("completed")
 
     training_plan = run_metadata.get("training_parameters")
     trainer_plan = training_plan.get("trainer") if isinstance(training_plan, dict) else None
@@ -799,12 +834,19 @@ def _estimate_runtime(
 
     completed_epochs = [item["epoch"] for item in history if item.get("epoch") is not None]
     if not completed_epochs:
-        if total_epochs is not None:
-            estimate["epochs_total"] = total_epochs
-        return estimate
+        recorded_epochs = runtime_info.get("epochs_completed")
+        if isinstance(recorded_epochs, int) and recorded_epochs >= 0:
+            completed_epochs = list(range(recorded_epochs))
+        else:
+            if total_epochs is not None:
+                estimate["epochs_total"] = total_epochs
+            return estimate
 
     max_completed_epoch = max(completed_epochs)
     epochs_completed = max_completed_epoch + 1
+    runtime_epochs_completed = runtime_info.get("epochs_completed")
+    if isinstance(runtime_epochs_completed, int) and runtime_epochs_completed > epochs_completed:
+        epochs_completed = runtime_epochs_completed
     if epochs_completed <= 0:
         if total_epochs is not None:
             estimate["epochs_total"] = total_epochs
@@ -818,15 +860,32 @@ def _estimate_runtime(
     best_case_seconds = avg_epoch_duration if remaining_epochs > 0 else 0.0
     median_case_seconds = avg_epoch_duration * max(remaining_epochs / 2, 0)
     worst_case_seconds = avg_epoch_duration * remaining_epochs
+    avg_epoch_seconds_value = _round_seconds(avg_epoch_duration) if epochs_completed > 0 else None
+    eta_seconds_value = _round_seconds(worst_case_seconds)
+    recorded_epoch_seconds = runtime_info.get("epoch_seconds")
+    cleaned_epoch_seconds = []
+    if isinstance(recorded_epoch_seconds, (list, tuple)):
+        for value in recorded_epoch_seconds:
+            if isinstance(value, (int, float)):
+                cleaned_epoch_seconds.append(float(value))
+    if cleaned_epoch_seconds:
+        avg_epoch_seconds_value = _round_seconds(statistics.mean(cleaned_epoch_seconds))
+        median_duration = statistics.median(cleaned_epoch_seconds)
+        best_each = min(cleaned_epoch_seconds)
+        worst_each = max(cleaned_epoch_seconds)
+        best_case_seconds = best_each * remaining_epochs
+        median_case_seconds = median_duration * remaining_epochs
+        worst_case_seconds = worst_each * remaining_epochs
+        eta_seconds_value = _round_seconds(median_duration * remaining_epochs)
 
     estimate.update(
         {
             "epochs_completed": epochs_completed,
             "epochs_total": total_epochs,
             "remaining_epochs": remaining_epochs,
-            "avg_epoch_seconds": avg_epoch_duration if epochs_completed > 0 else None,
+            "avg_epoch_seconds": avg_epoch_seconds_value,
             "avg_epoch": _format_duration(avg_epoch_duration) if epochs_completed > 0 else None,
-            "eta_seconds": worst_case_seconds,
+            "eta_seconds": eta_seconds_value,
             "eta": _format_duration(worst_case_seconds),
             "progress_percent": round((epochs_completed / total_epochs) * 100, 2)
             if total_epochs > 0
@@ -836,6 +895,25 @@ def _estimate_runtime(
     estimate["best_case"] = _format_duration(best_case_seconds)
     estimate["median"] = _format_duration(median_case_seconds)
     estimate["worst_case"] = _format_duration(worst_case_seconds)
+    progress_percent = estimate.get("progress_percent")
+    if isinstance(progress_percent, (int, float)):
+        estimate["progress_percent"] = min(progress_percent, 100.0)
+
+    if completed_iso:
+        estimate["remaining_epochs"] = 0
+        estimate["eta_seconds"] = 0
+        estimate["eta"] = _format_duration(0)
+        estimate["best_case"] = estimate["median"] = estimate["worst_case"] = _format_duration(0)
+        completed_epochs_value = estimate.get("epochs_completed")
+        if total_epochs is not None:
+            estimate["epochs_completed"] = total_epochs
+            estimate["epochs_total"] = total_epochs
+        elif isinstance(completed_epochs_value, int) and completed_epochs_value > 0:
+            estimate["epochs_completed"] = completed_epochs_value
+        estimate["progress_percent"] = 100.0
+        if estimate.get("avg_epoch_seconds") is not None:
+            estimate["avg_epoch"] = _format_duration(estimate["avg_epoch_seconds"])
+
     return estimate
 
 
@@ -971,6 +1049,29 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         summary["recent_metrics"] = recent_metrics
     if latest_metric:
         summary["latest_metric"] = latest_metric
+    checkpoint_dir = run_dir / "model_checkpoints"
+    selection_lookup = {entry.get("rank"): entry for entry in selection_top if isinstance(entry, dict)}
+    symlink_entries: List[Dict[str, Any]] = []
+    for rank, name in enumerate(["best.ckpt", "second_best.ckpt", "third_best.ckpt"], start=1):
+        symlink_path = checkpoint_dir / name
+        if not symlink_path.exists():
+            continue
+        try:
+            target = symlink_path.resolve(strict=False)
+        except OSError:
+            target = symlink_path
+        entry = selection_lookup.get(rank, {})
+        symlink_entries.append(
+            {
+                "name": name,
+                "path": _as_repo_relative(target),
+                "selection_metric": entry.get("selection_metric"),
+                "val_loss": entry.get("val_loss"),
+                "epoch": entry.get("epoch"),
+            }
+        )
+    if symlink_entries:
+        summary["checkpoint_symlinks"] = symlink_entries
 
     runtime_estimate = _estimate_runtime(run_metadata, config_snippet, val_history)
     summary["runtime_estimate"] = runtime_estimate
@@ -998,6 +1099,8 @@ def cmd_leaderboard(args: argparse.Namespace) -> None:
 
     rows: List[Tuple[float, Dict[str, Any]]] = []
     for run_dir in sorted(root.iterdir()):
+        if run_dir.is_symlink():
+            continue
         if not run_dir.is_dir() or not (run_dir / "run_metadata.json").exists():
             continue
         summary = _summarise_run(run_dir)
@@ -1024,7 +1127,7 @@ def cmd_leaderboard(args: argparse.Namespace) -> None:
         if val_loss is not None:
             print(f"   val_loss={val_loss}")
         if checkpoint:
-            print(f"   checkpoint={checkpoint}")
+            print(f"   checkpoint={_as_repo_relative(checkpoint)}")
 
 
 def cmd_summarise(args: argparse.Namespace) -> None:
