@@ -7,7 +7,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Any
 
 import yaml
 
@@ -103,7 +103,57 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
     )
 
 
-def run_graph_builder(cfg) -> Path:
+def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str, object]]:
+    if not isinstance(feature_metadata, dict):
+        return None
+    modules = feature_metadata.get("module_registry")
+    if not isinstance(modules, dict):
+        return None
+
+    payload: Dict[str, object] = {}
+    for stage in ("interface", "topology", "node", "edge"):
+        entry = modules.get(stage)
+        if not isinstance(entry, dict):
+            return None
+        module_id = entry.get("id") or entry.get("module")
+        if not module_id:
+            return None
+
+        stage_block: Dict[str, object] = {"module": module_id}
+        alias = entry.get("alias")
+        if alias:
+            stage_block["alias"] = alias
+
+        params = None
+        if stage == "edge":
+            edge_schema = feature_metadata.get("edge_schema")
+            if isinstance(edge_schema, dict):
+                params = edge_schema.get("module_params")
+        if not isinstance(params, dict):
+            defaults = entry.get("defaults")
+            if isinstance(defaults, dict):
+                params = defaults
+        if isinstance(params, dict) and params:
+            stage_block["params"] = params
+        payload[stage] = stage_block
+
+    payload["options"] = {}
+    return payload
+
+
+def _write_metadata_feature_config(feature_metadata: Any, work_dir: Path) -> Optional[Path]:
+    payload = _build_metadata_feature_payload(feature_metadata)
+    if not payload:
+        return None
+    target_dir = work_dir / "builder_features"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    output_path = target_dir / "features.from_metadata.yaml"
+    with output_path.open("w", encoding="utf-8") as handle:
+        yaml.safe_dump(payload, handle, sort_keys=False)
+    return output_path
+
+
+def run_graph_builder(cfg, metadata_feature_config: Optional[Path] = None) -> Path:
     if not cfg.data_dir.exists():
         raise FileNotFoundError(f"Data directory not found: {cfg.data_dir}")
     graph_dir = cfg.work_dir / "graph_data"
@@ -115,7 +165,7 @@ def run_graph_builder(cfg) -> Path:
             shutil.rmtree(path)
         path.mkdir(parents=True, exist_ok=True)
 
-    feature_config_path = cfg.builder.prepare_feature_config(cfg.work_dir)
+    feature_config_path = metadata_feature_config or cfg.builder.prepare_feature_config(cfg.work_dir)
 
     cmd = [
         sys.executable,
@@ -201,10 +251,18 @@ def validate_graph_metadata(
     return metadata
 
 
-def ensure_graph_dir(cfg, final_schema: Dict[str, Dict[str, object]]) -> Path:
+def ensure_graph_dir(
+    cfg,
+    final_schema: Dict[str, Dict[str, object]],
+    feature_metadata: Optional[Dict[str, object]] = None,
+) -> Path:
     work_dir = Path(cfg.work_dir)
     graph_dir = work_dir / "graph_data"
     reuse = bool(getattr(cfg, "reuse_existing_graphs", False))
+
+    metadata_feature_config = None
+    if feature_metadata:
+        metadata_feature_config = _write_metadata_feature_config(feature_metadata, work_dir)
 
     if reuse and graph_dir.exists() and any(graph_dir.glob("*.pt")):
         matches, reason = _graph_metadata_matches(graph_dir, final_schema)
@@ -214,4 +272,4 @@ def ensure_graph_dir(cfg, final_schema: Dict[str, Dict[str, object]]) -> Path:
         logging.warning(
             "Existing graphs at %s are incompatible with checkpoint metadata (%s); rebuilding.", graph_dir, reason
         )
-    return run_graph_builder(cfg)
+    return run_graph_builder(cfg, metadata_feature_config=metadata_feature_config)

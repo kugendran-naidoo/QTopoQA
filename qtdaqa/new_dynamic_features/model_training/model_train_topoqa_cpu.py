@@ -65,6 +65,10 @@ for path in (MODEL_DIR, COMMON_DIR):
 
 from feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata  # type: ignore  # noqa: E402
 from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
+try:
+    from common.graph_cache import GraphTensorCache  # type: ignore  # noqa: E402
+except ImportError:  # pragma: no cover
+    GraphTensorCache = None  # type: ignore
 
 
 def _update_run_metadata(save_dir: Path, mutator: Callable[[Dict[str, Any]], None]) -> None:
@@ -121,10 +125,13 @@ class TrainingConfig:
     use_val_spearman_as_secondary: bool = True
     spearman_secondary_min_delta: float = 0.0
     spearman_secondary_weight: float = 1.0
+    selection_primary_metric: str = "val_loss"
     coverage_minimum: float = 0.0
     coverage_fail_on_missing: bool = True
     graph_load_profiling: bool = False
     graph_load_top_k: int = 5
+    enable_graph_cache: bool = True
+    graph_cache_size: int = 256
     mlflow: MlflowConfig = dataclasses.field(default_factory=MlflowConfig)
     edge_schema: dict = dataclasses.field(default_factory=dict)
     topology_schema: dict = dataclasses.field(default_factory=dict)
@@ -312,6 +319,13 @@ def load_config(path: Path) -> TrainingConfig:
     use_val_spearman = bool(selection_cfg.get("use_val_spearman", True))
     spearman_min_delta = float(selection_cfg.get("spearman_min_delta", 0.0))
     spearman_weight = float(selection_cfg.get("spearman_weight", 1.0))
+    primary_metric_raw = selection_cfg.get("primary_metric", "val_loss")
+    if isinstance(primary_metric_raw, str):
+        selection_primary_metric = primary_metric_raw.strip().lower() or "val_loss"
+    else:
+        selection_primary_metric = "val_loss"
+    if selection_primary_metric not in {"val_loss", "selection_metric"}:
+        raise ValueError("selection.primary_metric must be 'val_loss' or 'selection_metric'.")
 
     logging_cfg = _section("logging")
     progress_bar_refresh_rate = int(logging_cfg.get("progress_bar_refresh_rate", 0))
@@ -342,6 +356,14 @@ def load_config(path: Path) -> TrainingConfig:
         graph_load_top_k = 5
     graph_load_top_k = max(1, graph_load_top_k)
 
+    cache_cfg = _section("cache")
+    enable_graph_cache = bool(cache_cfg.get("enable_graph_cache", True))
+    try:
+        graph_cache_size = int(cache_cfg.get("graph_cache_size", 256))
+    except (TypeError, ValueError):
+        graph_cache_size = 256
+    graph_cache_size = max(1, graph_cache_size)
+
     cfg = TrainingConfig(
         graph_dir=graph_dir,
         train_label_file=train_label_file,
@@ -369,10 +391,13 @@ def load_config(path: Path) -> TrainingConfig:
         use_val_spearman_as_secondary=use_val_spearman,
         spearman_secondary_min_delta=spearman_min_delta,
         spearman_secondary_weight=spearman_weight,
+        selection_primary_metric=selection_primary_metric,
         coverage_minimum=coverage_minimum,
         coverage_fail_on_missing=coverage_fail_on_missing,
         graph_load_profiling=graph_load_profiling,
         graph_load_top_k=graph_load_top_k,
+        enable_graph_cache=enable_graph_cache,
+        graph_cache_size=graph_cache_size,
         mlflow=mlflow_config,
         edge_schema=dict(data.get("edge_schema", {})),
         topology_schema=dict(data.get("topology_schema", {})),
@@ -502,22 +527,36 @@ class GraphLoadProfiler:
 
 
 class GraphRegressionDataset(Dataset):
-    def __init__(self, samples: Sequence[Tuple[str, Path, torch.Tensor]], profiler: Optional[GraphLoadProfiler] = None):
+    def __init__(
+        self,
+        samples: Sequence[Tuple[str, Path, torch.Tensor]],
+        profiler: Optional[GraphLoadProfiler] = None,
+        cache: Optional[GraphTensorCache] = None,
+    ):
         self.samples = list(samples)
         self.profiler = profiler
+        self.cache = cache
 
     def __len__(self) -> int:
         return len(self.samples)
 
     def __getitem__(self, idx: int) -> Data:
         model, path, label = self.samples[idx]
+        def _load_tensor(p: Path):
+            return torch.load(p)
+
+        start = None
         if self.profiler and self.profiler.enabled:
             start = time.perf_counter()
-            data = torch.load(path)
+
+        if self.cache:
+            data = self.cache.get(path, _load_tensor)
+        else:
+            data = _load_tensor(path)
+
+        if self.profiler and self.profiler.enabled and start is not None:
             duration = time.perf_counter() - start
             self.profiler.record(path, duration)
-        else:
-            data = torch.load(path)
 
         if hasattr(data, "batch"):
             batch_attr = getattr(data, "batch")
@@ -1161,13 +1200,23 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
 
     load_profiler = GraphLoadProfiler(cfg.graph_load_profiling, cfg.graph_load_top_k, cfg.num_workers, logger)
 
+    cache_instance = None
+    if cfg.enable_graph_cache and GraphTensorCache is not None:
+        cache_instance = GraphTensorCache(max_items=cfg.graph_cache_size)
+        logger.info(
+            "Graph cache enabled (max_items=%d). Disable via selection cache.enable_graph_cache=false in config.",
+            cfg.graph_cache_size,
+        )
+
     train_dataset = GraphRegressionDataset(
         train_samples,
         profiler=load_profiler if load_profiler.enabled else None,
+        cache=cache_instance,
     )
     val_dataset = GraphRegressionDataset(
         val_samples,
         profiler=load_profiler if load_profiler.enabled else None,
+        cache=cache_instance,
     )
 
     train_loader = DataLoader(
@@ -1443,7 +1492,16 @@ def main() -> int:
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-    monitor_metric_name = "selection_metric" if cfg.use_val_spearman_as_secondary else "val_loss"
+    primary_metric = (cfg.selection_primary_metric or "val_loss").lower()
+    if primary_metric == "selection_metric" and not cfg.use_val_spearman_as_secondary:
+        logger.warning(
+            "selection.primary_metric=selection_metric requires use_val_spearman_as_secondary=true; enabling it for this run."
+        )
+        cfg.use_val_spearman_as_secondary = True
+    if primary_metric not in {"val_loss", "selection_metric"}:
+        primary_metric = "val_loss"
+
+    monitor_metric_name = "selection_metric" if primary_metric == "selection_metric" else "val_loss"
 
     if monitor_metric_name == "selection_metric":
         checkpoint_filename = "checkpoint.sel-{selection_metric:.5f}_val-{val_loss:.5f}_epoch{epoch:03d}"

@@ -11,6 +11,9 @@ dataloader:
   batch_size: 16
   num_workers: 0
   seed: 222
+cache:
+  enable_graph_cache: true
+  graph_cache_size: 256
 trainer:
   accelerator: cpu
   devices: 1
@@ -40,4 +43,3 @@ mlflow:
 coverage:
   fail_on_missing: false
   minimum_percent: 0
-

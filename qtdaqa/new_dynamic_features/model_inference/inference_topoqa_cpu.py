@@ -514,9 +514,13 @@ def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]):
     return model
 
 
-def run_inference(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object]]) -> None:
+def run_inference(
+    cfg: InferenceConfig,
+    final_schema: Dict[str, Dict[str, object]],
+    feature_metadata: Dict[str, object],
+) -> None:
     cfg.work_dir.mkdir(parents=True, exist_ok=True)
-    graph_dir = ensure_graph_dir(cfg, final_schema)
+    graph_dir = ensure_graph_dir(cfg, final_schema, feature_metadata)
     metadata = validate_graph_metadata(graph_dir, final_schema)
     metadata_source = metadata.metadata_path or str(graph_dir / "graph_metadata.json")
     logging.info("Verified graph metadata compatibility (%s).", metadata_source)
@@ -722,7 +726,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         json.dump(final_schema, handle, indent=2)
     logging.info("Feature metadata written to %s", schema_dump_path)
 
-    run_inference(cfg, final_schema)
+    run_inference(cfg, final_schema, checkpoint_meta)
     return 0
 
 

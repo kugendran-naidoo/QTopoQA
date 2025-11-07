@@ -35,6 +35,7 @@ from qtdaqa.new_dynamic_features.model_inference.builder_runner import (  # noqa
     BuilderConfig,
     parse_builder_config,
     run_graph_builder,
+    _write_metadata_feature_config,
 )
 
 
@@ -117,3 +118,41 @@ def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> No
     assert invoked_cmd[0] == sys.executable
     assert invoked_cmd[1:3] == ["-m", "qtdaqa.new_dynamic_features.graph_builder.graph_builder"]
     assert "--feature-config" in invoked_cmd
+
+
+def test_run_graph_builder_prefers_metadata_feature_config(tmp_path: Path) -> None:
+    builder = BuilderConfig()
+    cfg = _make_dummy_config(tmp_path, builder)
+    metadata_path = tmp_path / "metadata_features.yaml"
+    metadata_path.write_text("options: {}", encoding="utf-8")
+
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.subprocess.run"
+    ) as mocked_run:
+        mocked_run.return_value = SimpleNamespace(returncode=0)
+        run_graph_builder(cfg, metadata_feature_config=metadata_path)
+
+    invoked_cmd = mocked_run.call_args[0][0]
+    feature_flag_index = invoked_cmd.index("--feature-config")
+    assert invoked_cmd[feature_flag_index + 1] == str(metadata_path)
+    generated_features = cfg.work_dir / "builder_features" / "features.generated.yaml"
+    assert not generated_features.exists(), "metadata path should bypass builder overrides"
+
+
+def test_write_metadata_feature_config_produces_expected_yaml(tmp_path: Path) -> None:
+    feature_metadata = {
+        "module_registry": {
+            "interface": {"id": "interface/polar_cutoff/v1", "defaults": {"cutoff": 13.5}},
+            "topology": {"id": "topology/persistence_basic/v1", "defaults": {"neighbor_distance": 7.0}},
+            "node": {"id": "node/dssp_topo_merge/v1", "defaults": {"drop_na": True}},
+            "edge": {"id": "edge/multi_scale/v24", "defaults": {"contact_threshold": 5.0}},
+        },
+        "edge_schema": {"module_params": {"contact_threshold": 6.0}},
+    }
+
+    path = _write_metadata_feature_config(feature_metadata, tmp_path)
+    assert path is not None
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload["edge"]["params"]["contact_threshold"] == 6.0
+    assert payload["interface"]["module"] == "interface/polar_cutoff/v1"
+    assert "options" in payload

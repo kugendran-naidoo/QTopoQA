@@ -41,6 +41,21 @@ def _make_config(tmp_path: Path, reuse: bool = True):
     )
 
 
+FEATURE_METADATA = {
+    "module_registry": {
+        "interface": {"id": "interface/polar_cutoff/v1", "defaults": {"cutoff": 14.0}},
+        "topology": {"id": "topology/persistence_basic/v1", "defaults": {"neighbor_distance": 8.0}},
+        "node": {"id": "node/dssp_topo_merge/v1", "defaults": {"drop_na": False}},
+        "edge": {"id": "edge/multi_scale/v24", "defaults": {"contact_threshold": 5.0}},
+    },
+    "edge_schema": {
+        "module_params": {
+            "contact_threshold": 5.0,
+        }
+    },
+}
+
+
 def test_graph_metadata_matches_success(tmp_path: Path) -> None:
     final_schema = {"edge_schema": {"module": "edge/multi_scale/v24", "dim": 24}}
     fake_metadata = SimpleNamespace(edge_schema={"module": "edge/multi_scale/v24", "dim": 24})
@@ -77,7 +92,7 @@ def test_ensure_graph_dir_reuses_when_metadata_matches(tmp_path: Path) -> None:
     ) as matches_mock, mock.patch(
         "qtdaqa.new_dynamic_features.model_inference.builder_runner.run_graph_builder"
     ) as run_mock:
-        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema)
+        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, None)
 
     assert chosen_dir == graph_dir
     matches_mock.assert_called_once()
@@ -98,11 +113,11 @@ def test_ensure_graph_dir_rebuilds_when_metadata_mismatch(tmp_path: Path) -> Non
         "qtdaqa.new_dynamic_features.model_inference.builder_runner.run_graph_builder",
         return_value=rebuilt_dir,
     ) as run_mock:
-        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema)
+        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, None)
 
     assert chosen_dir == rebuilt_dir
     matches_mock.assert_called_once()
-    run_mock.assert_called_once_with(cfg)
+    run_mock.assert_called_once_with(cfg, metadata_feature_config=None)
 
 
 def test_ensure_graph_dir_builds_when_no_cached_graphs(tmp_path: Path) -> None:
@@ -114,7 +129,22 @@ def test_ensure_graph_dir_builds_when_no_cached_graphs(tmp_path: Path) -> None:
         "qtdaqa.new_dynamic_features.model_inference.builder_runner.run_graph_builder",
         return_value=rebuilt_dir,
     ) as run_mock:
-        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema)
+        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, None)
 
-    assert chosen_dir == rebuilt_dir
-    run_mock.assert_called_once_with(cfg)
+
+def test_ensure_graph_dir_writes_metadata_feature_config(tmp_path: Path) -> None:
+    cfg = _make_config(tmp_path, reuse=False)
+    final_schema = {"edge_schema": {"module": "edge/multi_scale/v24"}}
+    built_dir = Path(cfg.work_dir) / "rebuilt_graphs"
+
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.run_graph_builder",
+        return_value=built_dir,
+    ) as run_mock:
+        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, FEATURE_METADATA)
+
+    assert chosen_dir == built_dir
+    run_mock.assert_called_once()
+    metadata_yaml = Path(cfg.work_dir) / "builder_features" / "features.from_metadata.yaml"
+    assert metadata_yaml.exists()
+    run_mock.assert_called_once_with(cfg, metadata_feature_config=metadata_yaml)

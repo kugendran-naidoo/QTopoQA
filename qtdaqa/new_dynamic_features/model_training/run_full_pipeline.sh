@@ -141,7 +141,6 @@ if not run_dir.exists():
 
 summary = train_cli._summarise_run(run_dir)
 best_ckpt = summary.get("best_checkpoint")
-best_loss = summary.get("best_val_loss")
 if not best_ckpt:
     print(f"[run_full_pipeline] ERROR: Run {run_dir.name} produced no checkpoint.", file=sys.stderr)
     sys.exit(1)
@@ -151,21 +150,21 @@ if not ckpt_path.exists():
     print(f"[run_full_pipeline] ERROR: Reported checkpoint does not exist: {ckpt_path}", file=sys.stderr)
     sys.exit(1)
 
+metric_name, metric_value = train_cli._resolve_primary_metric_value(summary)
 print(str(ckpt_path))
-print("" if best_loss is None else best_loss)
+print("" if metric_value is None else metric_value)
+print(metric_name or "")
 PY
   )"; then
     echo "[run_full_pipeline] Resumed run ${BEST_RUN_DIR} did not produce a usable checkpoint summary." >&2
     exit 1
   fi
   RESUME_INFO_CLEAN="${RESUME_INFO_RAW%$'\n'}"
-  RESUME_CKPT="${RESUME_INFO_CLEAN%%$'\n'*}"
-  if [[ "${RESUME_INFO_CLEAN}" == "${RESUME_CKPT}" ]]; then
-    RESUME_LOSS=""
-  else
-    RESUME_LOSS="${RESUME_INFO_CLEAN#*$'\n'}"
-  fi
-  BEST_LOSS="${RESUME_LOSS:-n/a}"
+  RESUME_CKPT="$(echo "${RESUME_INFO_CLEAN}" | sed -n '1p')"
+  RESUME_SCORE="$(echo "${RESUME_INFO_CLEAN}" | sed -n '2p')"
+  RESUME_METRIC="$(echo "${RESUME_INFO_CLEAN}" | sed -n '3p')"
+  BEST_SCORE="${RESUME_SCORE:-n/a}"
+  BEST_METRIC="${RESUME_METRIC:-val_loss}"
   if [[ -n "${RESUME_CKPT}" && "${RESUME_CKPT}" != "${BEST_CKPT}" ]]; then
     echo "[run_full_pipeline][warning] RESUME_FROM checkpoint differs from run summary: ${RESUME_CKPT}" >&2
   fi
@@ -213,21 +212,23 @@ for directory in iter_runs(run_root) + iter_runs(run_root / "history"):
     if start_dt and created_dt < start_dt:
         continue
     summary = train_cli._summarise_run(directory)
-    best_loss = summary.get("best_val_loss")
     best_ckpt = summary.get("best_checkpoint")
-    if best_loss is None or best_ckpt is None:
+    if best_ckpt is None:
         continue
-    candidates.append((float(best_loss), best_ckpt, str(directory)))
+    metric_name, metric_value = train_cli._resolve_primary_metric_value(summary)
+    if metric_value is None:
+        continue
+    candidates.append((float(metric_value), metric_name, best_ckpt, str(directory)))
 
 if not candidates:
     print("ERROR: No new training runs detected after sweep.", file=sys.stderr)
     sys.exit(1)
 
-candidates.sort()
-best_loss, best_ckpt, best_run = candidates[0]
+best_score, metric_name, best_ckpt, best_run = sorted(candidates)[0]
 print(best_ckpt)
 print(best_run)
-print(best_loss)
+print(best_score)
+print(metric_name)
 PY
   )"; then
     echo "[run_full_pipeline] Unable to identify best checkpoint from sweep results." >&2
@@ -241,10 +242,11 @@ PY
 
   BEST_CKPT="$(echo "${BEST_INFO}" | sed -n '1p')"
   BEST_RUN_DIR="$(echo "${BEST_INFO}" | sed -n '2p')"
-  BEST_LOSS="$(echo "${BEST_INFO}" | sed -n '3p')"
+  BEST_SCORE="$(echo "${BEST_INFO}" | sed -n '3p')"
+  BEST_METRIC="$(echo "${BEST_INFO}" | sed -n '4p')"
 fi
 
-echo "[run_full_pipeline] Best run: ${BEST_RUN_DIR} (val_loss=${BEST_LOSS})"
+echo "[run_full_pipeline] Best run: ${BEST_RUN_DIR} (${BEST_METRIC:-val_loss}=${BEST_SCORE:-n/a})"
 echo "[run_full_pipeline] Best checkpoint: ${BEST_CKPT}"
 
 if [[ ! -f "${BEST_CKPT}" ]]; then
@@ -293,7 +295,6 @@ if not run_dir.exists():
 
 summary = train_cli._summarise_run(run_dir)
 best_ckpt = summary.get("best_checkpoint")
-best_loss = summary.get("best_val_loss")
 if not best_ckpt:
     print(f"[run_full_pipeline] ERROR: Run {run_dir.name} produced no checkpoint.", file=sys.stderr)
     sys.exit(1)
@@ -303,8 +304,10 @@ if not ckpt_path.exists():
     print(f"[run_full_pipeline] ERROR: Reported checkpoint does not exist: {ckpt_path}", file=sys.stderr)
     sys.exit(1)
 
+metric_name, metric_value = train_cli._resolve_primary_metric_value(summary)
 print(str(ckpt_path))
-print("" if best_loss is None else best_loss)
+print("" if metric_value is None else metric_value)
+print(metric_name or "")
 PY
 )"; then
   echo "[run_full_pipeline] Phase 1 fine-tune did not produce a usable checkpoint." >&2
@@ -312,19 +315,17 @@ PY
 fi
 
 PHASE1_INFO_CLEAN="${PHASE1_INFO_RAW%$'\n'}"
-PHASE1_BEST_CKPT="${PHASE1_INFO_CLEAN%%$'\n'*}"
-if [[ "${PHASE1_INFO_CLEAN}" == "${PHASE1_BEST_CKPT}" ]]; then
-  PHASE1_BEST_LOSS=""
-else
-  PHASE1_BEST_LOSS="${PHASE1_INFO_CLEAN#*$'\n'}"
-fi
+PHASE1_BEST_CKPT="$(echo "${PHASE1_INFO_CLEAN}" | sed -n '1p')"
+PHASE1_BEST_SCORE="$(echo "${PHASE1_INFO_CLEAN}" | sed -n '2p')"
+PHASE1_BEST_METRIC="$(echo "${PHASE1_INFO_CLEAN}" | sed -n '3p')"
 PHASE1_BEST_CKPT="${PHASE1_BEST_CKPT:-}"
-PHASE1_BEST_LOSS="${PHASE1_BEST_LOSS:-n/a}"
+PHASE1_BEST_SCORE="${PHASE1_BEST_SCORE:-n/a}"
+PHASE1_BEST_METRIC="${PHASE1_BEST_METRIC:-val_loss}"
 if [[ -z "${PHASE1_BEST_CKPT}" ]]; then
   echo "[run_full_pipeline] Phase 1 summary did not return a checkpoint path." >&2
   exit 1
 fi
-echo "[run_full_pipeline] Phase 1 best checkpoint: ${PHASE1_BEST_CKPT} (val_loss=${PHASE1_BEST_LOSS})"
+echo "[run_full_pipeline] Phase 1 best checkpoint: ${PHASE1_BEST_CKPT} (${PHASE1_BEST_METRIC}=${PHASE1_BEST_SCORE})"
 
 for seed in "${PHASE2_SEEDS[@]}"; do
   PHASE2_CONFIG="${SCRIPT_DIR}/configs/sched_boost_finetune_seed${seed}.yaml"
@@ -366,7 +367,6 @@ if not run_dir.exists():
 
 summary = train_cli._summarise_run(run_dir)
 best_ckpt = summary.get("best_checkpoint")
-best_loss = summary.get("best_val_loss")
 if not best_ckpt:
     print(f"[run_full_pipeline] ERROR: Run {run_dir.name} produced no checkpoint.", file=sys.stderr)
     sys.exit(1)
@@ -376,8 +376,10 @@ if not ckpt_path.exists():
     print(f"[run_full_pipeline] ERROR: Reported checkpoint does not exist: {ckpt_path}", file=sys.stderr)
     sys.exit(1)
 
+metric_name, metric_value = train_cli._resolve_primary_metric_value(summary)
 print(str(ckpt_path))
-print("" if best_loss is None else best_loss)
+print("" if metric_value is None else metric_value)
+print(metric_name or "")
 PY
   )"; then
     echo "[run_full_pipeline] Phase 2 fine-tune (seed ${seed}) did not produce a usable checkpoint." >&2
@@ -385,19 +387,17 @@ PY
   fi
 
   PHASE2_INFO_CLEAN="${PHASE2_INFO_RAW%$'\n'}"
-  PHASE2_BEST_CKPT="${PHASE2_INFO_CLEAN%%$'\n'*}"
-  if [[ "${PHASE2_INFO_CLEAN}" == "${PHASE2_BEST_CKPT}" ]]; then
-    PHASE2_BEST_LOSS=""
-  else
-    PHASE2_BEST_LOSS="${PHASE2_INFO_CLEAN#*$'\n'}"
-  fi
+  PHASE2_BEST_CKPT="$(echo "${PHASE2_INFO_CLEAN}" | sed -n '1p')"
+  PHASE2_BEST_SCORE="$(echo "${PHASE2_INFO_CLEAN}" | sed -n '2p')"
+  PHASE2_BEST_METRIC="$(echo "${PHASE2_INFO_CLEAN}" | sed -n '3p')"
   PHASE2_BEST_CKPT="${PHASE2_BEST_CKPT:-}"
-  PHASE2_BEST_LOSS="${PHASE2_BEST_LOSS:-n/a}"
+  PHASE2_BEST_SCORE="${PHASE2_BEST_SCORE:-n/a}"
+  PHASE2_BEST_METRIC="${PHASE2_BEST_METRIC:-val_loss}"
   if [[ -z "${PHASE2_BEST_CKPT}" ]]; then
     echo "[run_full_pipeline] Phase 2 summary for seed ${seed} did not return a checkpoint path." >&2
     exit 1
   fi
-  echo "[run_full_pipeline] Phase 2 (seed ${seed}) best checkpoint: ${PHASE2_BEST_CKPT} (val_loss=${PHASE2_BEST_LOSS})"
+  echo "[run_full_pipeline] Phase 2 (seed ${seed}) best checkpoint: ${PHASE2_BEST_CKPT} (${PHASE2_BEST_METRIC}=${PHASE2_BEST_SCORE})"
 done
 
 ISO_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%SZ')"

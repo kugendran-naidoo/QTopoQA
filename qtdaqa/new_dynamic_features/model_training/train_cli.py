@@ -52,6 +52,32 @@ ENV_SNAPSHOT_KEYS = frozenset(
 
 TIMESTAMP_FMT = "%Y-%m-%d_%H-%M-%S"
 RUN_PREFIX = "training_run"
+PRIMARY_METRICS = ("val_loss", "selection_metric")
+DEFAULT_PRIMARY_METRIC = "val_loss"
+
+
+def _normalise_primary_metric(value: Optional[str]) -> str:
+    if not value:
+        return DEFAULT_PRIMARY_METRIC
+    candidate = str(value).strip().lower()
+    if candidate in PRIMARY_METRICS:
+        return candidate
+    return DEFAULT_PRIMARY_METRIC
+
+
+def _resolve_primary_metric_value(summary: Dict[str, Any]) -> Tuple[str, Optional[float]]:
+    requested = _normalise_primary_metric(summary.get("selection_primary_metric"))
+    if requested == "selection_metric":
+        value = summary.get("best_selection_metric")
+        if value is None:
+            requested = "val_loss"
+            value = summary.get("best_val_loss")
+    else:
+        value = summary.get("best_val_loss")
+        if value is None:
+            requested = "selection_metric"
+            value = summary.get("best_selection_metric")
+    return requested, value
 
 
 class CLIError(RuntimeError):
@@ -933,11 +959,13 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     config_path = run_dir / "config" / "config.yaml"
     config_snippet: Dict[str, Any] = {}
     selection_cfg: Dict[str, Any] = {}
+    selection_primary_metric = DEFAULT_PRIMARY_METRIC
     if config_path.exists():
         config_snippet = _load_yaml(config_path)
         raw_selection = config_snippet.get("selection", {})
         if isinstance(raw_selection, dict):
             selection_cfg = raw_selection
+            selection_primary_metric = _normalise_primary_metric(selection_cfg.get("primary_metric"))
 
     best_epoch = None
     best_loss = None
@@ -1041,6 +1069,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "best_selection_epoch": selection_best.get("epoch") if selection_best else None,
         "best_selection_val_loss": selection_best.get("val_loss") if selection_best else None,
         "best_selection_val_spearman": selection_best.get("val_spearman_corr") if selection_best else None,
+        "selection_primary_metric": selection_primary_metric,
     }
 
     if isinstance(training_parameters, dict):

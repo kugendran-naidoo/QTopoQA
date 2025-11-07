@@ -98,3 +98,9 @@ Each `.pt` file embeds a `data.metadata` dictionary capturing the edge module
 ID, the resolved parameters, and any edge-specific metadata. The run summary
 JSON records the same information alongside per-stage success counts, making it
 easy for downstream training or inference code to validate schema compatibility.
+
+> **Tip for inference:** the training/inference pipelines now consume the
+> auto-generated `graph_metadata.json` and `graph_builder_summary.json` to
+> recreate the exact feature configuration downstream. Keep these sidecar files
+> alongside your `.pt` tensors so inference can regenerate graphs with identical
+> modules/params when needed.
