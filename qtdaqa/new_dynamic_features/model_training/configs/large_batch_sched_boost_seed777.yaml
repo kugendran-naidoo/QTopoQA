@@ -10,12 +10,16 @@ dataloader:
   batch_size: 24
   num_workers: 0
   seed: 777
+selection:
+  primary_metric: val_loss
 trainer:
   accelerator: cpu
   devices: 1
   precision: 32
   num_epochs: 260
   accumulate_grad_batches: 16
+  use_val_spearman_as_secondary: true
+  spearman_secondary_weight: 1.0       # default 1.0, 0=false, make it 0.25–0.5 if secondary metric causes premature stopping
 optimizer:
   learning_rate: 0.005
 scheduler:
