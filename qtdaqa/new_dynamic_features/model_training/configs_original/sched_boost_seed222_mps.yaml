@@ -1,6 +1,6 @@
-# CUDA-oriented variant of sched_boost_seed222.
-# Adjust num_workers/devices to match your GPU host.
+# Apple Silicon (MPS) oriented variant of sched_boost_seed222.
 paths:
+  graph: ../graph_builder/output/11d_edges_dynamic_adjusted_dataset/graph_data
   train_labels: ./data.train.csv
   val_labels: ./data.validate.csv
   save_dir: ./training_runs
@@ -9,16 +9,16 @@ model:
   attention_head: 8
 dataloader:
   batch_size: 16
-  num_workers: 4
+  num_workers: 2
   seed: 222
 trainer:
-  accelerator: gpu
-  devices: 1          # set to "auto" or a list if you have multiple GPUs
-  precision: 16       # use 32 if bf16/amp is unavailable
+  accelerator: mps
+  devices: 1
+  precision: 32          # AMP is not available on MPS yet
   num_epochs: 260
-  accumulate_grad_batches: 8
+  accumulate_grad_batches: 16
 optimizer:
-  learning_rate: 0.003
+  learning_rate: 0.005
 scheduler:
   factor: 0.2
   patience: 6

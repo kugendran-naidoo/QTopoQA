@@ -64,7 +64,14 @@ for path in (MODEL_DIR, COMMON_DIR):
         sys.path.insert(0, str(path))
 
 from feature_metadata import GraphFeatureMetadata, load_graph_feature_metadata  # type: ignore  # noqa: E402
-from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
+try:
+    from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
+except ImportError as exc:  # pragma: no cover - helpful hint for misconfigured launches
+    raise ImportError(
+        "Unable to import the GNN model. If you are running this script directly, ensure "
+        "you launch it from the repository root (so PYTHONPATH includes qtdaqa/new_dynamic_features/model_training) "
+        "or run it as a module: 'python -m qtdaqa.new_dynamic_features.model_training.model_train_topoqa_cpu ...'."
+    ) from exc
 try:
     from common.graph_cache import GraphTensorCache  # type: ignore  # noqa: E402
 except ImportError:  # pragma: no cover

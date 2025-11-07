@@ -1,6 +1,7 @@
 # CUDA-oriented variant of sched_boost_seed222.
 # Adjust num_workers/devices to match your GPU host.
 paths:
+  graph: ../graph_builder/output/11d_edges_dynamic_adjusted_dataset/graph_data
   train_labels: ./data.train.csv
   val_labels: ./data.validate.csv
   save_dir: ./training_runs
