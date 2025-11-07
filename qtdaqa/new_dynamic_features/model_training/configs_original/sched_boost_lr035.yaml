@@ -1,5 +1,6 @@
 # paths.* values are resolved relative to this file; mlflow.tracking_uri uses MLflow's cwd (repo root).
 paths:
+  graph: ../graph_builder/output/11d_edges_dynamic_adjusted_dataset/graph_data
   train_labels: ./data.train.csv
   val_labels: ./data.validate.csv
   save_dir: ./training_runs
@@ -7,7 +8,7 @@ model:
   pooling_type: mean
   attention_head: 8
 dataloader:
-  batch_size: 24
+  batch_size: 16
   num_workers: 0
   seed: 222
 trainer:
@@ -17,7 +18,7 @@ trainer:
   num_epochs: 260
   accumulate_grad_batches: 16
 optimizer:
-  learning_rate: 0.005
+  learning_rate: 0.0035
 scheduler:
   factor: 0.2
   patience: 6

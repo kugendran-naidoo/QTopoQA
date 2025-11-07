@@ -76,6 +76,15 @@ RESUME_FROM="${RESUME_FROM:-}"
 GRAPH_DIR="${GRAPH_DIR:-}"
 NUM_WORKERS_OVERRIDE="${NUM_WORKERS_OVERRIDE:-}"
 
+if [[ -z "${GRAPH_DIR}" ]]; then
+  echo "[run_full_pipeline] ERROR: GRAPH_DIR is not set. Point it at the graph builder output (…/graph_builder/output/<run>/graph_data)." >&2
+  exit 1
+fi
+if [[ ! -d "${GRAPH_DIR}" ]]; then
+  echo "[run_full_pipeline] ERROR: GRAPH_DIR does not exist: ${GRAPH_DIR}" >&2
+  exit 1
+fi
+
 if [[ -n "${RESUME_FROM}" && -z "${SKIP_SWEEP}" ]]; then
   echo "[run_full_pipeline][warning] RESUME_FROM is set without SKIP_SWEEP=1; the sweep will run again before fine-tuning." >&2
 fi
