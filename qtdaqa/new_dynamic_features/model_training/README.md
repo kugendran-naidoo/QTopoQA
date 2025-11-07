@@ -88,6 +88,11 @@ Key environment toggles:
   `paths.graph`.
 - `NUM_WORKERS_OVERRIDE=<int>` – overrides `dataloader.num_workers`.
 - `PIPELINE_MANIFEST=/path/file.yaml` (or `--manifest`) – change the sweep plan.
+- Selection metric preference now comes from the config (`selection.primary_metric`).
+  `run_full_pipeline.sh` automatically honors the metric recorded in each run’s
+  config/metadata when deciding which checkpoint to fine-tune. Override it per
+  job via `--override selection.primary_metric=selection_metric` or keep the
+  default `val_loss`.
 
 Logs for each invocation are timestamped:
 `full_pipeline_<context>_<timestamp>.log`.
@@ -181,6 +186,10 @@ frequency.
 - Always review `coverage.*` settings when pointing at a new graph directory.
   Set `coverage.fail_on_missing=false` and `coverage.minimum_percent=0` only
   when you intentionally want to ignore gaps.
+- The `cache` block toggles the deterministic graph tensor cache used during
+  training. By default `cache.enable_graph_cache=true` caches recent `.pt`
+  loads (size controlled via `graph_cache_size`, default 256). Set the flag to
+  `false` if you prefer the legacy behavior or are debugging disk I/O.
 
 ## Suggested verification steps
 
