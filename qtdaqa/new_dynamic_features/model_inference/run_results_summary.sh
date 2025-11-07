@@ -75,9 +75,11 @@ if [[ ! -d "${RESULTS_DIR}" ]]; then
   exit 1
 fi
 
+RESULTS_DIR_ABS="$(cd "${RESULTS_DIR}" && pwd)"
+
 cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}:${PYTHONPATH:-}"
 python -m qtdaqa.new_dynamic_features.model_inference.results_summary \
-  --results-dir "$(cd "${RESULTS_DIR}" && pwd)" \
+  --results-dir "${RESULTS_DIR_ABS}" \
   --mode "${MODE}" \
   $( [[ "${ALLOW_MISSING}" -eq 1 ]] && printf -- "--allow-missing" )
