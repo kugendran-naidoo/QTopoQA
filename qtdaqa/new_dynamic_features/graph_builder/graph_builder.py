@@ -25,18 +25,34 @@ import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from lib.features_config import FeatureSelection, load_feature_config
-from lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
-from lib.edge_runner import run_edge_stage
-from lib.log_dirs import LogDirectoryInfo, prepare_log_directory
-from lib.stage_common import index_structures
-from modules import instantiate_module, list_modules
-from modules.base import (
-    EdgeFeatureModule,
-    InterfaceFeatureModule,
-    NodeFeatureModule,
-    TopologyFeatureModule,
-)
+try:
+    from .lib.features_config import FeatureSelection, load_feature_config
+    from .lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
+    from .lib.edge_runner import run_edge_stage
+    from .lib.log_dirs import LogDirectoryInfo, prepare_log_directory
+    from .lib.stage_common import index_structures
+except ImportError:  # pragma: no cover - fallback for direct execution
+    from lib.features_config import FeatureSelection, load_feature_config
+    from lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
+    from lib.edge_runner import run_edge_stage
+    from lib.log_dirs import LogDirectoryInfo, prepare_log_directory
+    from lib.stage_common import index_structures
+try:
+    from .modules import instantiate_module, list_modules
+    from .modules.base import (
+        EdgeFeatureModule,
+        InterfaceFeatureModule,
+        NodeFeatureModule,
+        TopologyFeatureModule,
+    )
+except ImportError:  # pragma: no cover - fallback for direct execution
+    from modules import instantiate_module, list_modules
+    from modules.base import (
+        EdgeFeatureModule,
+        InterfaceFeatureModule,
+        NodeFeatureModule,
+        TopologyFeatureModule,
+    )
 
 
 LOG = logging.getLogger("graph_builder")

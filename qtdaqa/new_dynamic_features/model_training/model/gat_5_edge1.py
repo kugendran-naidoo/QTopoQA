@@ -17,7 +17,8 @@ from scipy import stats
 from scipy.stats import ConstantInputWarning
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pytorch_lightning as pl
-from gat_with_edge import GATv2ConvWithEdgeEmbedding1
+
+from .gat_with_edge import GATv2ConvWithEdgeEmbedding1
 
 
 

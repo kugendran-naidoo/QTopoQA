@@ -7,11 +7,9 @@ import dataclasses
 import json
 import logging
 import math
-import shutil
-import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import torch
 import yaml
@@ -20,15 +18,19 @@ from torch_geometric.data import Batch, Data
 from torch_geometric.loader import DataLoader
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-TRAIN_MODEL_DIR = (SCRIPT_DIR / "../.." / "new_model_training" / "ARM_cpu_only" / "model").resolve()
-if str(TRAIN_MODEL_DIR) not in sys.path:
-    sys.path.insert(0, str(TRAIN_MODEL_DIR))
 
-from gat_5_edge1 import GNN_edge1_edgepooling  # type: ignore  # noqa: E402
+from .builder_runner import (
+    BuilderConfig,
+    ensure_graph_dir,
+    parse_builder_config,
+    validate_graph_metadata,
+)
+from qtdaqa.new_dynamic_features.model_training import train_cli
 
-BUILDER_SCRIPT = (SCRIPT_DIR.parents[1] / "new_graph_builder" / "graph_builder.py").resolve()
-if not BUILDER_SCRIPT.exists():
-    raise FileNotFoundError(f"Graph builder script not found at {BUILDER_SCRIPT}")
+if TYPE_CHECKING:  # pragma: no cover
+    from qtdaqa.new_dynamic_features.model_training.model.gat_5_edge1 import (
+        GNN_edge1_edgepooling,
+    )
 
 
 @dataclasses.dataclass
@@ -40,11 +42,12 @@ class InferenceConfig:
     label_file: Optional[Path] = None
     batch_size: int = 32
     num_workers: int = 0
-    builder: Dict[str, object] = dataclasses.field(default_factory=dict)
+    builder: BuilderConfig = dataclasses.field(default_factory=BuilderConfig)
     reuse_existing_graphs: bool = False
     use_checkpoint_schema: bool = True
     edge_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     topology_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
+    training_root: Optional[Path] = None
 
 
 @dataclasses.dataclass
@@ -81,67 +84,123 @@ def resolve_feature_schema(cfg: InferenceConfig, checkpoint_meta: Dict[str, obje
     return {"edge_schema": edge_schema, "topology_schema": topo_schema}
 
 
-def run_graph_builder(cfg: InferenceConfig) -> Path:
-    if not cfg.data_dir.exists():
-        raise FileNotFoundError(f"Data directory not found: {cfg.data_dir}")
-    graph_dir = cfg.work_dir / "graph_data"
-    builder_work = cfg.work_dir / "builder_work"
-    builder_logs = cfg.work_dir / "builder_logs"
-
-    for path in (graph_dir, builder_work, builder_logs):
-        if path.exists():
-            shutil.rmtree(path)
-        path.mkdir(parents=True, exist_ok=True)
-
-    cmd = [
-        sys.executable,
-        str(BUILDER_SCRIPT),
-        "--dataset-dir",
-        str(cfg.data_dir),
-        "--work-dir",
-        str(builder_work),
-        "--graph-dir",
-        str(graph_dir),
-        "--log-dir",
-        str(builder_logs),
-        "--jobs",
-        str(cfg.builder.get("jobs", 4)),
-    ]
-    if cfg.builder.get("topology_dedup_sort"):
-        cmd.append("--topology-dedup-sort")
-    if not cfg.builder.get("dump_edges", True):
-        cmd.append("--no-dump-graph-edges")
-    logging.info("Running graph builder: %s", " ".join(cmd))
-    subprocess.run(cmd, check=True)
-    return graph_dir
+def _default_training_root() -> Path:
+    return SCRIPT_DIR.parent / "model_training" / "training_runs"
 
 
-def ensure_graph_dir(cfg: InferenceConfig) -> Path:
-    graph_dir = cfg.work_dir / "graph_data"
-    if cfg.reuse_existing_graphs and graph_dir.exists() and any(graph_dir.glob("*.pt")):
-        logging.info("Reusing existing graphs at %s", graph_dir)
-        return graph_dir
-    return run_graph_builder(cfg)
+def _auto_select_checkpoint(training_root: Path) -> Path:
+    root = training_root.resolve()
+    if not root.exists():
+        raise FileNotFoundError(f"Training root does not exist: {root}")
+
+    candidates: List[Tuple[float, Path, str]] = []
+    for run_dir in sorted(root.iterdir()):
+        if run_dir.is_symlink() or not run_dir.is_dir():
+            continue
+        try:
+            summary = train_cli._summarise_run(run_dir)  # type: ignore[attr-defined]
+        except Exception as exc:  # pragma: no cover - defensive
+            logging.warning("Failed to summarise training run %s: %s", run_dir, exc)
+            continue
+
+        checkpoint = summary.get("best_checkpoint")
+        if not checkpoint:
+            continue
+        selection_metric = summary.get("best_selection_metric")
+        val_loss = summary.get("best_val_loss")
+        if selection_metric is None and val_loss is None:
+            continue
+        score = float(selection_metric if selection_metric is not None else val_loss)
+        candidates.append((score, Path(checkpoint), summary.get("run_name", run_dir.name)))
+
+    if not candidates:
+        raise RuntimeError(f"No eligible checkpoints found under {root}")
+
+    candidates.sort(key=lambda item: item[0])
+    best_score, checkpoint_path, run_name = candidates[0]
+    resolved = checkpoint_path.resolve()
+    logging.info(
+        "Auto-selected checkpoint %s (score=%s, run=%s) from training root %s",
+        resolved,
+        best_score,
+        run_name,
+        root,
+    )
+    return resolved
 
 
 def load_config(raw_path: Path) -> InferenceConfig:
     with raw_path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
-    cfg = InferenceConfig(
-        data_dir=_resolve(data["data_dir"], raw_path.parent),
-        work_dir=_resolve(data["work_dir"], raw_path.parent),
-        checkpoint_path=_resolve(data["checkpoint_path"], raw_path.parent),
-        output_file=_resolve(data["output_file"], raw_path.parent),
-        label_file=_resolve(data["label_file"], raw_path.parent) if data.get("label_file") else None,
+    if not isinstance(data, dict):
+        raise ValueError("Inference configuration must be a mapping.")
+
+    legacy_keys = {
+        "data_dir",
+        "work_dir",
+        "output_file",
+        "checkpoint_path",
+        "label_file",
+        "reuse_existing_graphs",
+        "use_checkpoint_schema",
+        "edge_schema",
+        "topology_schema",
+    }
+    legacy_present = sorted(legacy_keys.intersection(data))
+    if legacy_present:
+        raise ValueError(
+            "Inference config must use the structured layout with 'paths', 'builder', and 'options' sections. "
+            f"Legacy top-level keys detected: {', '.join(legacy_present)}."
+        )
+
+    paths_cfg = data.get("paths") or {}
+    if not isinstance(paths_cfg, dict):
+        raise ValueError("Inference configuration must contain a 'paths' mapping.")
+
+    def _require(key: str) -> object:
+        if key not in paths_cfg:
+            raise KeyError(f"paths.{key} is required in inference configuration.")
+        return paths_cfg[key]
+
+    data_dir = _resolve(_require("data_dir"), raw_path.parent)
+    work_dir = _resolve(_require("work_dir"), raw_path.parent)
+    checkpoint_raw = paths_cfg.get("checkpoint")
+    training_root_raw = paths_cfg.get("training_root")
+    output_file = _resolve(_require("output_file"), raw_path.parent)
+    label_file_raw = paths_cfg.get("label_file")
+    label_file = _resolve(label_file_raw, raw_path.parent) if label_file_raw else None
+    training_root = (
+        _resolve(training_root_raw, raw_path.parent)
+        if training_root_raw
+        else _default_training_root()
+    )
+
+    builder_cfg = parse_builder_config(data.get("builder"), raw_path.parent)
+    options_cfg = data.get("options") or {}
+    if options_cfg and not isinstance(options_cfg, dict):
+        raise ValueError("options section must be a mapping when provided.")
+    reuse_existing = bool(options_cfg.get("reuse_existing_graphs", False)) if options_cfg else False
+
+    if checkpoint_raw:
+        checkpoint_path = _resolve(checkpoint_raw, raw_path.parent)
+    else:
+        checkpoint_path = _auto_select_checkpoint(training_root)
+
+    return InferenceConfig(
+        data_dir=data_dir,
+        work_dir=work_dir,
+        checkpoint_path=checkpoint_path,
+        output_file=output_file,
+        label_file=label_file,
         batch_size=int(data.get("batch_size", 32)),
         num_workers=int(data.get("num_workers", 0)),
-        builder=dict(data.get("builder", {})),
-        reuse_existing_graphs=bool(data.get("reuse_existing_graphs", False)),
-        use_checkpoint_schema=bool(data.get("use_checkpoint_schema", True)),
-        edge_schema=dict(data.get("edge_schema", {})),
-        topology_schema=dict(data.get("topology_schema", {})),
+        builder=builder_cfg,
+        reuse_existing_graphs=reuse_existing,
+        use_checkpoint_schema=True,
+        edge_schema={},
+        topology_schema={},
+        training_root=training_root,
     )
-    return cfg
 
 
 class GraphInferenceDataset(Dataset):
@@ -426,7 +485,11 @@ def gather_graphs(graph_dir: Path) -> List[Tuple[str, Path]]:
     return entries
 
 
-def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]) -> GNN_edge1_edgepooling:
+def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]):
+    from qtdaqa.new_dynamic_features.model_training.model.gat_5_edge1 import (  # noqa: WPS433
+        GNN_edge1_edgepooling,
+    )
+
     edge_dim = int(edge_schema.get("dim", 24))
     model = GNN_edge1_edgepooling(
         init_lr=1.0,
@@ -453,7 +516,10 @@ def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]) -> GNN_edge
 
 def run_inference(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object]]) -> None:
     cfg.work_dir.mkdir(parents=True, exist_ok=True)
-    graph_dir = ensure_graph_dir(cfg)
+    graph_dir = ensure_graph_dir(cfg, final_schema)
+    metadata = validate_graph_metadata(graph_dir, final_schema)
+    metadata_source = metadata.metadata_path or str(graph_dir / "graph_metadata.json")
+    logging.info("Verified graph metadata compatibility (%s).", metadata_source)
 
     logging.info("Loading graphs from %s", graph_dir)
     graph_entries = gather_graphs(graph_dir)
@@ -570,7 +636,21 @@ def run_inference(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object
 
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run inference with the 24-D edge TopoQA model")
+    parser = argparse.ArgumentParser(
+        prog="./run_model_inference.sh",
+        description="Run inference with the 24-D edge TopoQA model.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  ./run_model_inference.sh --config config.yaml.BM55-AF2\n"
+            "  ./run_model_inference.sh --config config.yaml --dump-metadata\n"
+            "  ./run_model_inference.sh --data-dir data --work-dir work --checkpoint-path best.ckpt "
+            "--output-file results.csv\n"
+            "\n"
+            "Direct module invocation:\n"
+            "  python -m qtdaqa.new_dynamic_features.model_inference.inference_topoqa_cpu --config config.yaml\n"
+        ),
+    )
     parser.add_argument("--config", type=str, default=None, help="Path to inference YAML config")
     parser.add_argument("--log-level", default="INFO", help="Logging level")
     parser.add_argument("--dump-metadata", action="store_true", help="Print checkpoint feature metadata and exit")
@@ -581,13 +661,12 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--label-file", type=str, help="Optional label CSV")
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--num-workers", type=int, default=0)
-    parser.add_argument("--builder-jobs", type=int, default=4)
-    parser.add_argument("--builder-topology-dedup-sort", action="store_true")
-    parser.add_argument("--no-builder-dump-edges", action="store_true")
-    parser.add_argument("--reuse-existing-graphs", action="store_true")
-    parser.add_argument("--no-use-checkpoint-schema", action="store_true")
-    parser.add_argument("--edge-schema-json", type=str, help="Override edge schema JSON string")
-    parser.add_argument("--topology-schema-json", type=str, help="Override topology schema JSON string")
+    parser.add_argument("--builder-jobs", type=int, default=4, help="Worker count for graph builder stages.")
+    parser.add_argument(
+        "--reuse-existing-graphs",
+        action="store_true",
+        help="Reuse graphs already present in the work directory when compatible.",
+    )
     return parser.parse_args(argv)
 
 
@@ -608,6 +687,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         if missing:
             raise SystemExit(f"Missing required arguments without --config: {', '.join(missing)}")
 
+        builder_cfg = BuilderConfig(
+            jobs=args.builder_jobs,
+        )
+
         cfg = InferenceConfig(
             data_dir=_resolve(args.data_dir, Path.cwd()),
             work_dir=_resolve(args.work_dir, Path.cwd()),
@@ -616,15 +699,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else None,
             batch_size=args.batch_size,
             num_workers=args.num_workers,
-            builder={
-                "jobs": args.builder_jobs,
-                "topology_dedup_sort": args.builder_topology_dedup_sort,
-                "dump_edges": not args.no_builder_dump_edges,
-            },
+            builder=builder_cfg,
             reuse_existing_graphs=args.reuse_existing_graphs,
-            use_checkpoint_schema=not args.no_use_checkpoint_schema,
-            edge_schema=json.loads(args.edge_schema_json) if args.edge_schema_json else {},
-            topology_schema=json.loads(args.topology_schema_json) if args.topology_schema_json else {},
+            use_checkpoint_schema=True,
+            edge_schema={},
+            topology_schema={},
+            training_root=_default_training_root(),
         )
 
     checkpoint_meta = extract_feature_metadata(cfg.checkpoint_path)

@@ -1138,16 +1138,19 @@ def cmd_summarise(args: argparse.Namespace) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="python -m train_cli",
+        prog="./run_model_training.sh",
         description="Dynamic TopoQA training command line interface.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
-            "  python -m train_cli run --config config.yaml\n"
-            "  python -m train_cli run --config configs/sched_boost.yaml --override seed=777\n"
-            "  python -m train_cli batch --manifest manifests/run_all.yaml\n"
-            "  python -m train_cli resume --run-id training_run_2025-10-28_18-16-16\n"
-            "  python -m train_cli summarise --run-dir training_runs/history/training_run_2025-10-28_18-16-16\n"
+            "  ./run_model_training.sh run --config config.yaml\n"
+            "  ./run_model_training.sh run --config configs/sched_boost.yaml --override seed=777\n"
+            "  ./run_model_training.sh batch --manifest manifests/run_all.yaml\n"
+            "  ./run_model_training.sh resume --run-id training_run_2025-10-28_18-16-16\n"
+            "  ./run_model_training.sh summarise --run-dir training_runs/history/training_run_2025-10-28_18-16-16\n"
+            "\n"
+            "Direct module invocation:\n"
+            "  python -m qtdaqa.new_dynamic_features.model_training.train_cli run --config config.yaml\n"
         ),
     )
     subparsers = parser.add_subparsers(dest="command")
