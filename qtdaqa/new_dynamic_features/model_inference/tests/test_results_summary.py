@@ -44,8 +44,11 @@ def test_generate_dockq_and_hit_rate_summaries(tmp_path: Path) -> None:
     assert "5ABC,1/2/3" in hit_lines[1:]
 
 
-def test_generate_summary_no_data(tmp_path: Path) -> None:
-    results_dir = tmp_path / "empty"
-    results_dir.mkdir()
-    with pytest.raises(RuntimeError):
+def test_generate_summary_missing_files_strict(tmp_path: Path) -> None:
+    results_dir = tmp_path / "results"
+    (results_dir / "3SE8").mkdir(parents=True, exist_ok=True)
+    with pytest.raises(RuntimeError, match="Targets missing summary files"):
         results_summary.generate_dockq_summary(results_dir)
+    # Relaxed mode should log a warning but not crash.
+    dockq_path = results_summary.generate_dockq_summary(results_dir, allow_missing=True)
+    assert dockq_path.exists()

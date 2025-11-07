@@ -28,15 +28,19 @@ def collect_target_values(
     results_dir: Path,
     column_indexes: Sequence[int],
     formatter: Callable[[List[str]], str],
+    *,
+    allow_missing: bool = False,
 ) -> List[Tuple[str, str]]:
     """Collect (target, formatted_value) pairs from per-target summary files."""
     pairs: List[Tuple[str, str]] = []
     missing: List[str] = []
+    targets_checked = 0
     for target_dir in sorted(results_dir.iterdir()):
         if not target_dir.is_dir():
             continue
         target = target_dir.name
         summary_path = target_dir / f"{target}.summary_metrics.csv"
+        targets_checked += 1
         if not summary_path.exists():
             missing.append(target)
             continue
@@ -54,7 +58,13 @@ def collect_target_values(
         pairs.append((target, value))
 
     if missing:
-        LOG.warning("Targets missing summary files: %s", ", ".join(sorted(missing)))
+        message = "Targets missing summary files: %s" % ", ".join(sorted(missing))
+        if allow_missing:
+            LOG.warning(message)
+        else:
+            raise RuntimeError(message)
+    if targets_checked == 0:
+        raise RuntimeError(f"No target directories found under {results_dir}")
     return pairs
 
 
@@ -84,14 +94,15 @@ def _format_dockq(row: List[str], column_index: int = 4) -> str:
     return f"{number:.3f}"
 
 
-def generate_dockq_summary(results_dir: Path) -> Path:
+def generate_dockq_summary(results_dir: Path, *, allow_missing: bool = False) -> Path:
     """Create final_results_dockq.csv using column 5 (DockQ) rounded to 3 decimals."""
     pairs = collect_target_values(
         results_dir,
         column_indexes=[4],
         formatter=lambda row: _format_dockq(row, 4),
+        allow_missing=allow_missing,
     )
-    if not pairs:
+    if not pairs and not allow_missing:
         raise RuntimeError(f"No summary metrics found under {results_dir}")
     return write_summary(results_dir, sorted(pairs), "final_results_dockq.csv", ["target", "dockq"])
 
@@ -101,15 +112,16 @@ def _format_hit_rate(row: List[str], offsets: Sequence[int]) -> str:
     return "/".join(values)
 
 
-def generate_hit_rate_summary(results_dir: Path) -> Path:
+def generate_hit_rate_summary(results_dir: Path, *, allow_missing: bool = False) -> Path:
     """Create final_results_hit_rate.csv using columns 6/7/8 joined by '/'."""
     offsets = [5, 6, 7]
     pairs = collect_target_values(
         results_dir,
         column_indexes=offsets,
         formatter=lambda row: _format_hit_rate(row, offsets),
+        allow_missing=allow_missing,
     )
-    if not pairs:
+    if not pairs and not allow_missing:
         raise RuntimeError(f"No summary metrics found under {results_dir}")
     return write_summary(
         results_dir,
@@ -129,6 +141,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Which summary to generate.",
     )
     parser.add_argument("--log-level", default="INFO", help="Logging level.")
+    parser.add_argument(
+        "--allow-missing",
+        action="store_true",
+        help="Do not fail when some targets are missing summary files.",
+    )
     return parser.parse_args(argv)
 
 
@@ -140,9 +157,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise SystemExit(f"Results directory not found: {results_dir}")
     outputs: List[Path] = []
     if args.mode in ("dockq", "all"):
-        outputs.append(generate_dockq_summary(results_dir))
+        outputs.append(generate_dockq_summary(results_dir, allow_missing=args.allow_missing))
     if args.mode in ("hit-rate", "all"):
-        outputs.append(generate_hit_rate_summary(results_dir))
+        outputs.append(generate_hit_rate_summary(results_dir, allow_missing=args.allow_missing))
     for path in outputs:
         LOG.info("Summary written to %s", path)
     return 0
