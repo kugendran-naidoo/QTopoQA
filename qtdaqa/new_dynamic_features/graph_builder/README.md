@@ -8,14 +8,22 @@ features and the legacy 11‑D variant without touching code.
 
 ## Quick start
 
+From `qtdaqa/new_dynamic_features/graph_builder` run:
+
 ```bash
-python qtdaqa/new_dynamic_features/graph_builder/graph_builder.py \
+./run_graph_builder.sh \
   --dataset-dir datasets/training/adjusted/Dockground_MAF2 \
   --work-dir runs/dynamic_work \
   --graph-dir runs/dynamic_graphs \
   --log-dir runs/dynamic_logs \
   --jobs 8
 ```
+
+The wrapper resolves the repository root, exports `PYTHONPATH`, and falls back to
+`python3`/`python` unless you override the interpreter with `PYTHON=/path/to/python`.
+If you prefer direct module execution, run
+`python -m qtdaqa.new_dynamic_features.graph_builder.graph_builder ...`
+from anywhere with the repo root on `PYTHONPATH`.
 
 The run creates a timestamped folder under `runs/dynamic_logs`, fills
 `runs/dynamic_work` with intermediate CSVs, and writes `.pt` graphs to
@@ -69,7 +77,7 @@ Place `features.yaml` in your work directory to override the defaults, or supply
 ## Discovering installed modules
 
 ```bash
-python qtdaqa/new_dynamic_features/graph_builder/graph_builder.py --list-modules
+./run_graph_builder.sh --list-modules
 ```
 
 This prints all registered interface/topology/node/edge modules along with a
