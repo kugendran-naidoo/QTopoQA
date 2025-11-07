@@ -1,9 +1,9 @@
 defaults:
   jobs: 12
 
-Interface modules:
-- module: interface/polar_cutoff/v1
-  alias: "TopoQA non-default 14 cut-off"
+interface:
+  module: interface/polar_cutoff/v1
+  alias: "TopoQA default 10A cut-off"
   summary: Polar interface detection using distance cutoff.
   description: Identifies interface residues across chains using the polar interface
     routine (new_calculate_interface.process_pdb_file) with configurable distance
@@ -12,8 +12,8 @@ Interface modules:
     cutoff: 10.0
     coordinate_decimals: -1 # skip rounding to keep raw coords
     jobs: 12
-Topology modules:
-- module: topology/persistence_basic/v1
+topology:
+  module: topology/persistence_basic/v1
   alias: "TopoQA default"
   summary: Persistent homology features with configurable distance thresholds.
   description: Generates per-residue topological descriptors using the persistent
@@ -24,11 +24,17 @@ Topology modules:
     filtration_cutoff: 8.0
     min_persistence: 0.01
     dedup_sort: false
-    element_filters: (('C',), ('N',), ('O',), ('C', 'N'), ('C', 'O'), ('N', 'O'),
-      ('C', 'N', 'O'))
+    element_filters:
+    - ['C']
+    - ['N']
+    - ['O']
+    - ['C', 'N']
+    - ['C', 'O']
+    - ['N', 'O']
+    - ['C', 'N', 'O']
     jobs: 12
-Node modules:
-- module: node/dssp_topo_merge/v1
+node:
+  module: node/dssp_topo_merge/v1
   alias: "TopoQA default"
   summary: DSSP-derived node features merged with topology statistics.
   description: Runs the DSSP-based node feature extractor (node_fea) and merges results
@@ -36,9 +42,9 @@ Node modules:
   params:
     drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
     jobs: 12
-Edge modules:
-- module: edge/legacy_band/v11
-  alias: "TopoQA non-default 14 cut-off"
+edge:
+  module: edge/legacy_band/v11
+  alias: "TopoQA default 10A cut-off"
   summary: 11-D legacy edge features (distance + atom distance histogram).
   description: Reproduces the original 11-dimensional edge attributes consisting of
     residue pair distance and a 10-bin histogram of inter-atomic distances, scaled

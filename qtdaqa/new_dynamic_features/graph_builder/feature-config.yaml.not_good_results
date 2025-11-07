@@ -1,8 +1,8 @@
 defaults:
   jobs: 12
 
-Interface modules:
-- module: interface/polar_cutoff/v1
+interface:
+  module: interface/polar_cutoff/v1
   alias: "TopoQA non-default 14 cut-off"
   summary: Polar interface detection using distance cutoff.
   description: Identifies interface residues across chains using the polar interface
@@ -12,8 +12,8 @@ Interface modules:
     cutoff: 14.0
     coordinate_decimals: 3
     jobs: 12
-Topology modules:
-- module: topology/persistence_basic/v1
+topology:
+  module: topology/persistence_basic/v1
   alias: "TopoQA default"
   summary: Persistent homology features with configurable distance thresholds.
   description: Generates per-residue topological descriptors using the persistent
@@ -24,11 +24,17 @@ Topology modules:
     filtration_cutoff: 8.0
     min_persistence: 0.01
     dedup_sort: false
-    element_filters: (('C',), ('N',), ('O',), ('C', 'N'), ('C', 'O'), ('N', 'O'),
-      ('C', 'N', 'O'))
+    element_filters:
+    - ['C']
+    - ['N']
+    - ['O']
+    - ['C', 'N']
+    - ['C', 'O']
+    - ['N', 'O']
+    - ['C', 'N', 'O']
     jobs: 12
-Node modules:
-- module: node/dssp_topo_merge/v1
+node:
+  module: node/dssp_topo_merge/v1
   alias: "TopoQA default"
   summary: DSSP-derived node features merged with topology statistics.
   description: Runs the DSSP-based node feature extractor (node_fea) and merges results
@@ -36,14 +42,17 @@ Node modules:
   params:
     drop_na: false
     jobs: 12
-Edge modules:
-- module: edge/legacy_band/v11
-  alias: "TopoQA non-default 14 cut-off"
-  summary: 11-D legacy edge features (distance + atom distance histogram).
-  description: Reproduces the original 11-dimensional edge attributes consisting of
-    residue pair distance and a 10-bin histogram of inter-atomic distances, scaled
-    to [0, 1].
+edge:
+  module: edge/multi_scale/v24
+  alias: "Kugendran 24D Scalars"
+  summary: "24-D multi-scale edge features with distance bands and histograms."
+  description: "Computes directed residue-residue edges with distance, inverse distance, unit vectors, chain/amino-acid encodings, band indicators, inter-residue distance histograms, and contact counts."
   params:
-    distance_min: 0.0
-    distance_max: 14.0
-    scale_features: true
+    # Distance band definitions with labels, min, and max distances.
+    bands: [{'label': 'short', 'min_distance': 0.0, 'max_distance': 6.0}, {'label': 'medium', 'min_distance': 6.0, 'max_distance': 10.0}, {'label': 'long', 'min_distance': 10.0, 'max_distance': 14.0}]        
+    # Histogram bin edges (Å) for inter-atomic distances.
+    histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0] 
+    contact_threshold: 5.0         # Distance threshold (Å) for counting contacts.
+    include_inverse_distance: True # Include inverse distance feature.
+    include_unit_vector: True      # Include unit vector components.
+    unit_vector_epsilon: 1e-08     # Epsilon to avoid division by zero in unit vector calc.

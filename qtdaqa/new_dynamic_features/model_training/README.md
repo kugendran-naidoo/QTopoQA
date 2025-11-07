@@ -1,214 +1,163 @@
 # Dynamic Model Training Pipeline
 
 This directory contains the orchestration layer for training dynamic TopoQA
-models. The tooling is built around a sweep → fine-tune workflow and exposes a
-unified Python CLI (`train_cli.py`) plus a set of bash wrappers that bundle
-common sequences.
+models. It wraps PyTorch Lightning, handles sweep → selection → fine-tune, and
+records all metadata needed for inference to stay in sync.
 
-## Quick start
+The tooling is built around three pieces:
+
+- `train_cli.py` – unified Python CLI (commands: `run`, `batch`, `resume`,
+  `summarise`, `leaderboard`). Handles config parsing, overrides, logging, and
+  deterministic environment settings.
+- `run_model_training.sh` – thin wrapper over `train_cli.py` for direct runs.
+- `run_full_pipeline.sh` – higher-level orchestrator that runs a manifest sweep,
+  picks the best checkpoint based on `selection.primary_metric`, launches Phase 1
+  fine-tuning, then spawns Phase 2 runs for the configured seeds.
+
+Outputs live under `training_runs/`. Each run folder is self-contained: configs,
+logs, metrics, coverage, checkpoints, and `feature_metadata.json`. Inference can
+discover everything it needs (best checkpoint, feature schema) from these
+directories.
+
+---
+
+## Quick Start
 
 ```bash
-# from qtdaqa/new_dynamic_features/model_training
+cd qtdaqa/new_dynamic_features/model_training
+GRAPH_DIR=/abs/path/to/graph_builder/output/<run>/graph_data \
 ./run_full_pipeline.sh
 ```
 
-By default the pipeline:
+Environment overrides (prefix the command):
 
-1. Runs a manifest-driven sweep (`train_cli batch`) to explore several configs.
-2. Picks the strongest checkpoint (selection metric aware).
-3. Launches Phase 1 fine-tuning.
-4. Fans out three Phase 2 fine-tunes (seeds 101/555/888).
-
-Outputs are written under `training_runs/`, with the most recent run symlinked
-at `training_runs/latest`.
-
-### Development shortcuts
-
-- Use `SKIP_SWEEP=1 SKIP_FINE=1` to dry-run manifest selection without training.
-- Prefer `--fast-dev-run` or `limit_*_batches` overrides for smoke tests.
-- `SAFE_RAMDISK_TEST_MODE=1` (when using the RAM-disk wrapper) avoids creating
-  a real disk while still exercising the pipeline.
-
-## Training run artefacts
-
-Each run directory contains:
-
-| Path | Notes |
-| --- | --- |
-| `config/config.yaml` | Final config after CLI overrides. |
-| `config/original_config.yaml` | Copy of the source YAML. |
-| `config/applied_overrides.yaml` | Only present when overrides were supplied. |
-| `run_metadata.json` | Command, environment snapshot, trainer/dataloader settings, progress metadata. |
-| `training_console.log` | Captured stdout/stderr from the Lightning trainer. |
-| `feature_metadata.json` | Resolved node/edge schemas and graph builder provenance. |
-| `dataset_coverage.json` | Coverage totals; training aborts if thresholds are not met. |
-| `model_checkpoints/` | Checkpoints plus `best`, `second_best`, `third_best` symlinks named with the ranking metric. |
-
-Older runs are rolled into `training_runs/history/` automatically.
-
-## Script overview
-
-### `run_model_training.sh`
-
-Wrapper for the unified CLI. It resolves the repo root, exports `PYTHONPATH`,
-and chooses `python3`/`python` unless you override the interpreter via
-`PYTHON=/path/to/python`.
-
-```bash
-# Examples
-./run_model_training.sh run --config configs/sched_boost_seed222.yaml
-PYTHON=../../../../venv_qtopo/bin/python ./run_model_training.sh batch --manifest manifests/run_core.yaml
-```
-
-Direct module execution remains available:
-
-```bash
-python -m qtdaqa.new_dynamic_features.model_training.train_cli run --config configs/sched_boost_seed222.yaml
-```
-
-### `run_full_pipeline.sh`
-
-End-to-end sweep + fine-tune orchestrator.
-
-```bash
-./run_full_pipeline.sh                   # use manifests/run_core.yaml
-./run_full_pipeline.sh --manifest manifests/run_extended.yaml
-SKIP_SWEEP=1 SKIP_FINE=1 ./run_full_pipeline.sh
-RESUME_FROM=/abs/path/model.chkpt ./run_full_pipeline.sh
-GRAPH_DIR=/alt/graphs NUM_WORKERS_OVERRIDE=2 ./run_full_pipeline.sh
-```
-
-Key environment toggles:
-
-- `SKIP_SWEEP=1` – reuse existing sweep results; skip Phase 0.
+- `SKIP_SWEEP=1` – reuse existing sweep runs; jump straight to fine-tuning.
 - `SKIP_FINE=1` – stop after reporting the winning checkpoint.
-- `RESUME_FROM=/path/model.chkpt` – bypass sweep discovery and fine-tune a
-  specific checkpoint (warned if `SKIP_SWEEP` is omitted).
-- `GRAPH_DIR=/path/to/graph_data` – forwarded to every `train_cli` call as
-  `paths.graph`.
+- `RESUME_FROM=/path/to/model.ckpt` – bypass sweep discovery and fine-tune the
+  specified checkpoint (the script warns if `SKIP_SWEEP` isn’t set).
+- `GRAPH_DIR=/path/to/graphs` – forwarded to every `train_cli` invocation as
+  `paths.graph` (required; there is no default).
 - `NUM_WORKERS_OVERRIDE=<int>` – overrides `dataloader.num_workers`.
-- `PIPELINE_MANIFEST=/path/file.yaml` (or `--manifest`) – change the sweep plan.
-- Selection metric preference now comes from the config (`selection.primary_metric`).
-  `run_full_pipeline.sh` automatically honors the metric recorded in each run’s
-  config/metadata when deciding which checkpoint to fine-tune. Override it per
-  job via `--override selection.primary_metric=selection_metric` or keep the
-  default `val_loss`.
+- `PIPELINE_MANIFEST=/path/to/manifest.yaml` or `--manifest` – choose a different
+  sweep manifest.
 
-Logs for each invocation are timestamped:
-`full_pipeline_<context>_<timestamp>.log`.
+Syntax check before long runs: `bash -n run_full_pipeline.sh`.
 
-### `run_fine_tune_only.sh`
+---
 
-Replays the Phase 1 + Phase 2 schedule without re-running a sweep.
+## Config Guide (`configs/*.yaml`)
 
-```bash
-./run_fine_tune_only.sh                                 # auto-picks best run
-./run_fine_tune_only.sh --checkpoint /path/model.chkpt \
-  --run-dir training_runs/sched_boost_seed222_...       # manual resume
-```
+Key sections you’ll encounter:
 
-- By default the script scans `training_runs/` and `training_runs/history/`
-  for the lowest validation loss and resumes its best checkpoint.
-- `--checkpoint` requires `--run-dir` to label outputs; both paths are validated.
-- Creates new runs `<base>_finetune_phase1` and `<base>_phase2_seed{seed}`.
+### `paths`
+- `graph` – builder output directory (must contain `graph_metadata.json`).
+- `train_labels`, `val_labels` – CSVs with model IDs and DockQ scores.
+- `save_dir` – where `training_runs/<run_id>` will be created.
 
-### `train_cli.py`
+### `selection`
+- `primary_metric` – choose how sweeps/fine-tunes rank runs:
+  - `val_loss` (default) – best validation loss wins.
+  - `selection_metric` – uses the Spearman-aware metric logged by Lightning
+    (val loss adjusted by Spearman corr). Useful when correlation matters more
+    than absolute loss.
+- `use_val_spearman` / `spearman_*` – control the secondary metric fed to the
+  checkpoint callback.
 
-Unified Python entry point hosting the underlying training commands.
+### `dataloader`
+- `num_workers` – default `0` for macOS (spawning workers can hurt stability).
+- `batch_size`, `seed` – standard knobs.
+- `cache` block:
+  ```yaml
+  cache:
+    enable_graph_cache: true
+    graph_cache_size: 256
+  ```
+  When enabled (default), `GraphRegressionDataset` keeps a bounded in-process
+  cache of recently loaded graphs. This speeds up CPU-only runs while remaining
+  deterministic (`num_workers=0`). Set `enable_graph_cache: false` to revert to
+  legacy behavior.
+
+### `trainer`, `optimizer`, `scheduler`, `early_stopping`
+Standard Lightning knobs. Pay special attention to `num_epochs` and
+`accumulate_grad_batches` to control total updates.
+
+### `coverage`
+Controls the fail-fast coverage checks. By default training aborts if any split
+has missing graphs (`coverage.fail_on_missing: true`). You can relax this for
+experimentation, but keep `dataset_coverage.json` around for auditing.
+
+### `mlflow`
+Optional logging; disable if you don’t need remote tracking.
+
+---
+
+## Workflow Details
+
+1. **Sweep (`train_cli batch …`)** – executes the manifest jobs under
+   `manifests/`. Each job gets its own `training_runs/<run_id>` folder.
+2. **Selection** – `run_full_pipeline.sh` inspects `run_metadata.json`/metrics
+   and ranks runs using `selection.primary_metric`. The metric choice is recorded
+   in each run’s metadata so inference knows whether val loss or the selection
+   metric defined “best”.
+3. **Phase 1 fine-tune** – restarts the winning checkpoint with the Phase 1
+   config (default `configs/sched_boost_finetune.yaml`).
+4. **Phase 2 seeds** – spawns multiple fine-tunes (default seeds 101/555/888).
+
+Throughout the process, each run stores:
+
+- `config/` – `config.yaml`, `original_config.yaml`, and `applied_overrides.yaml`.
+- `feature_metadata.json` – copied from `graph_metadata.json`; also embedded in
+  every `.ckpt` under `checkpoint["feature_metadata"]`.
+- `model_checkpoints/` – `best.ckpt`, `second_best.ckpt`, `third_best.ckpt`
+  symlinks plus full checkpoint files.
+- `dataset_coverage.json` – label vs. graph coverage for each split.
+- Logs: `training.log` (file) and `training_console.log` (Lightning stdout).
+- Metrics: CSV logs under `metrics/`, ready for plotting.
+
+These artifacts let you pause/resume runs (`train_cli resume`), inspect progress
+(`train_cli summarise`), or monitor training (`monitor_best_model.py`). They’re
+also what inference uses to auto-select the best checkpoint later.
+
+---
+
+## CLI Reference (Python layer)
 
 ```bash
 ./run_model_training.sh run --config configs/sched_boost_seed222.yaml \
-  --run-name demo_run --fast-dev-run --override dataloader.num_workers=0
+  --run-name demo_run \
+  --override cache.graph_cache_size=512 \
+  --notes "quick smoke test"
 
 ./run_model_training.sh batch --manifest manifests/run_core.yaml \
-  --override shared.overrides.paths.graph=/alt/graph_data
-
-./run_model_training.sh resume --run-dir training_runs/demo_run
+  --override shared.overrides.paths.graph=/alt/graphs
 
 ./run_model_training.sh summarise --run-dir training_runs/demo_run
 ./run_model_training.sh leaderboard --limit 5
-
-# Direct module form (requires repo root on PYTHONPATH)
-python -m qtdaqa.new_dynamic_features.model_training.train_cli summarise --run-dir training_runs/demo_run
 ```
 
-Key subcommands (all share `--help`):
+All commands ultimately call `python -m qtdaqa.new_dynamic_features.model_training.train_cli ...`.
 
-| Command | Purpose | Highlights |
-| --- | --- | --- |
-| `run` | Launch one job from a YAML config. | `--run-name`, `--fast-dev-run`, `--resume-from`, `--override key=value`, `--notes`, `--trainer-arg`. |
-| `batch` | Execute a manifest of jobs. | Supports shared overrides, per-job overrides, fast-dev, and `continue_on_error`. |
-| `resume` | Continue a paused run. | Points at an existing `training_runs/<id>` directory. |
-| `summarise` | Emit run metadata/metrics as JSON. | Includes checkpoint ranking, runtime estimates, coverage, symlink targets. |
-| `leaderboard` | Rank runs by selection metric. | `--limit`, `--run-root`, `--reverse`. |
+Useful options:
+- `--override key=value` – dotted overrides (e.g., `paths.graph=...`).
+- `--trainer-arg` – forward raw Lightning flags (`--trainer-arg log_every_n_steps=10`).
+- `--fast-dev-run`, `--limit-train-batches`, `--limit-val-batches` – quick
+  sanity checks.
+- `--notes` – stored alongside `run_metadata.json` for documentation.
 
-Behavioural notes:
+---
 
-- Environment determinism flags (`PYTHONHASHSEED`, deterministic Torch) are
-  injected automatically.
-- Coverage defaults to fail-fast: if any split falls below the configured
-  threshold (`coverage.minimum_percent`, default 100%), the trainer aborts with
-  guidance to regenerate missing graphs or relax the threshold.
-- Overrides adopt dotted-key syntax (`paths.graph=/path`, `trainer.num_epochs=10`).
-- Run metadata captures trainer/dataloader configuration to support later
-  comparisons and `monitor_best_model` reporting.
+## Suggested Verification Steps
 
-### `monitor_best_model.py`
+1. `bash -n ./run_full_pipeline.sh` – confirm the wrapper has no syntax errors.
+2. `SKIP_SWEEP=1 SKIP_FINE=1 ./run_full_pipeline.sh` – dry-run manifest parsing
+   and checkpoint discovery without launching Lightning.
+3. `./run_model_training.sh run --config configs/sched_boost_seed777.yaml \
+     --fast-dev-run --run-name smoke_test` – exercise a single job with minimal
+   batches.
+4. `./run_model_training.sh summarise --run-dir training_runs/smoke_test` – view
+   metadata JSON (best checkpoint, metrics history, coverage, etc.).
+5. `python monitor_best_model.py --run-dir training_runs/smoke_test --follow` –
+   tail checkpoint progress in real time.
 
-Summarises the best checkpoint from a run directory and (optionally) follows it
-as training progresses.
-
-```bash
-python monitor_best_model.py --run-dir training_runs/latest
-python monitor_best_model.py --run-id sched_boost_seed222_... --follow --interval 60
-python monitor_best_model.py --run-dir training_runs/demo_run --metrics-limit 10
-```
-
-Output is JSON with:
-
-- Repository-relative paths to checkpoints and run directories.
-- Winning metric (selection metric if enabled, otherwise `val_loss`).
-- Learning parameters (LR, batch size, epochs, accelerator, etc.).
-- Recent metric history, runtime estimates, and warnings when training is still
-  in progress or checkpoints are missing.
-
-Use `--follow` to poll until interrupted; `--interval` controls the polling
-frequency.
-
-## Working with configs & manifests
-
-- Configs live in `configs/`. Fine-tune stages use
-  `sched_boost_finetune*.yaml`, while sweep jobs rely on the sched\_boost
-  variants referenced by the manifests.
-- Manifests under `manifests/` define job batches. `run_core.yaml` is a
-  compact sweep, whereas `run_extended.yaml` widens learning-rate and
-  batch-size coverage.
-- Always review `coverage.*` settings when pointing at a new graph directory.
-  Set `coverage.fail_on_missing=false` and `coverage.minimum_percent=0` only
-  when you intentionally want to ignore gaps.
-- The `cache` block toggles the deterministic graph tensor cache used during
-  training. By default `cache.enable_graph_cache=true` caches recent `.pt`
-  loads (size controlled via `graph_cache_size`, default 256). Set the flag to
-  `false` if you prefer the legacy behavior or are debugging disk I/O.
-
-## Suggested verification steps
-
-Reference checklist (adapt / extend as needed):
-
-1. `bash -n ./run_full_pipeline.sh` – syntax check before a long run.
-2. `SKIP_SWEEP=1 SKIP_FINE=1 ./run_full_pipeline.sh` – confirm manifest parsing
-   and checkpoint discovery without training.
-3. `python -m train_cli run --config configs/sched_boost_seed777.yaml \
-     --fast-dev-run --run-name smoke_test` – exercise the training stack with
-   minimal batches.
-4. `python -m train_cli summarise --run-dir training_runs/smoke_test` – inspect
-   metadata, coverage, symlinks.
-5. `python monitor_best_model.py --run-dir training_runs/smoke_test` – verify
-   reporting in both JSON and human-readable form (`jq` friendly).
-
-## See also
-
-- `ramdisk_run_pipeline.sh` – optional wrapper to benchmark RAM-disk graph
-  staging (reads defaults from `configs/ramdisk.yaml`).
-- `run_manifest_sweep.sh` – helper to execute just the manifest stage.
-- `tools/` & `tests/` – assorted utilities for hygiene scans and smoke tests.
+Keep the resulting `training_runs/` folders intact; inference relies on the
+feature metadata and best-checkpoint links stored there.
