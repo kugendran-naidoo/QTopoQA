@@ -197,7 +197,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dataset-dir", type=Path, default=None, help="Input directory containing PDB structures.")
     parser.add_argument("--work-dir", type=Path, default=None, help="Working directory for intermediate files.")
     parser.add_argument("--graph-dir", type=Path, default=None, help="Destination directory for .pt graph files.")
-    parser.add_argument("--log-dir", type=Path, default=Path("logs"), help="Directory to store run logs.")
+    parser.add_argument("--log-dir", type=Path, default=None, help="Directory to store run logs.")
     parser.add_argument("--jobs", type=int, default=4, help="Maximum worker count for parallel stages.")
     parser.add_argument(
         "--feature-config",
@@ -238,6 +238,10 @@ def parse_args(argv: Optional[List[str]] = None) -> Optional[argparse.Namespace]
         missing.append("--work-dir")
     if args.graph_dir is None:
         missing.append("--graph-dir")
+    if args.log_dir is None:
+        missing.append("--log-dir")
+    if args.feature_config is None:
+        missing.append("--feature-config")
     if missing:
         parser.error(f"the following arguments are required: {', '.join(missing)}")
 
@@ -259,21 +263,12 @@ def _setup_logging(run_info: LogDirectoryInfo) -> None:
 
 
 def _resolve_feature_config(args: argparse.Namespace) -> FeatureSelection:
-    candidate_paths = []
-    if args.feature_config:
-        candidate_paths.append(Path(args.feature_config))
-    work_default = Path(args.work_dir) / "features.yaml"
-    candidate_paths.append(work_default)
-    repo_default = Path(__file__).resolve().parent / "features.yaml"
-    candidate_paths.append(repo_default)
-
-    for path in candidate_paths:
-        if path is not None and path.exists():
-            LOG.info("Loading feature configuration from %s", path)
-            return load_feature_config(path)
-
-    LOG.info("No user feature config found; using built-in defaults.")
-    return load_feature_config(None)
+    user_path = Path(args.feature_config)
+    if not user_path.exists():
+        LOG.error("Feature configuration not found at %s", user_path)
+        raise FileNotFoundError(f"Requested feature-config not found: {user_path}")
+    LOG.info("Loading feature configuration from %s", user_path)
+    return load_feature_config(user_path)
 
 
 def _instantiate_modules(selection: FeatureSelection) -> Dict[str, object]:
@@ -284,6 +279,31 @@ def _instantiate_modules(selection: FeatureSelection) -> Dict[str, object]:
         "edge": instantiate_module(selection.edge["module"], **selection.edge.get("params", {})),
     }
     return modules
+
+
+def _validate_feature_selection(selection: FeatureSelection) -> None:
+    topo_params = selection.topology.get("params", {})
+    filters = topo_params.get("element_filters")
+    if filters is None:
+        return
+    if isinstance(filters, str):
+        raise ValueError(
+            "topology.params.element_filters must be a YAML list (e.g., '- [C]' entries), "
+            "not a single string literal. See --create-feature-config template for examples."
+        )
+    if not isinstance(filters, (list, tuple)):
+        raise ValueError("topology.params.element_filters must be a list of element sequences.")
+    normalised = []
+    for item in filters:
+        if not isinstance(item, (list, tuple)):
+            raise ValueError("Each element_filters entry must be a list/tuple of element symbols.")
+        if not item:
+            raise ValueError("Element filter sequences must contain at least one symbol.")
+        for symbol in item:
+            if not isinstance(symbol, str) or not symbol.strip():
+                raise ValueError("Element filter symbols must be non-empty strings.")
+        normalised.append(tuple(symbol.strip() for symbol in item))
+    topo_params["element_filters"] = normalised
 
 
 def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None:
@@ -353,53 +373,42 @@ Final output: torch_geometric Data (.pt)
 
 
 def write_feature_config(output_path: Path) -> None:
-    categories = [
-        ("interface", "Interface modules"),
-        ("topology", "Topology modules"),
-        ("node", "Node modules"),
-        ("edge", "Edge modules"),
-    ]
-    lines: list[str] = []
-    lines.append("# Auto-generated feature configuration template")
-    lines.append("# Select one module per category and adjust parameter values as needed.")
-    collected_aliases: Dict[str, Optional[str]] = {}
+    template = """# Minimal feature-config template
+# Fill in the module IDs you want to use for each required stage.
+# Run `./run_graph_builder.sh --list-modules` to discover all available IDs.
+defaults:
+  jobs: 8  # Optional global worker override; remove if unused.
 
-    for kind, heading in categories:
-        lines.append("")
-        lines.append(f"{heading}:")
-        for meta in sorted(list_modules(kind=kind), key=lambda m: m.module_id):
-            lines.append(f"  - module: {meta.module_id}")
-            lines.append("    alias: null")
-            collected_aliases[meta.module_id] = None
-            if meta.summary:
-                lines.append(f"    summary: \"{meta.summary}\"")
-            if meta.description:
-                lines.append(f"    description: \"{meta.description}\"")
-            if meta.parameters:
-                lines.append("    params:")
-                for param, desc in meta.parameters.items():
-                    if param == "jobs" and meta.module_kind in {"interface", "topology", "node"}:
-                        default_value = 2
-                    else:
-                        default_value = meta.defaults.get(param, None)
-                    if default_value is None:
-                        default_str = "null"
-                    elif isinstance(default_value, str):
-                        default_str = f"\"{default_value}\""
-                    else:
-                        default_str = default_value
-                    lines.append(f"      {param}: {default_str}")
-                    if desc:
-                        lines.append(f"      # {desc}")
-            else:
-                lines.append("    params: {}")
+interface:
+  module: interface/polar_cutoff/v1
+  params:
+    cutoff: 14.0
+    coordinate_decimals: 3
 
-    lines.append("")
-    lines.append("aliases:")
-    for module_id in sorted(collected_aliases):
-        lines.append(f"  {module_id}: null")
+topology:
+  module: topology/persistence_basic/v1
+  params:
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
 
-    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+node:
+  module: node/dssp_topo_merge/v1
+  params:
+    drop_na: false
+
+edge:
+  module: edge/multi_scale/v24
+  params:
+    histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
+    contact_threshold: 5.0
+
+# Optional additional stages. Rename the key (e.g., \"mol\") and provide module/params:
+# mol:
+#   module: custom/mol_stage/v1
+#   params: {}
+"""
+    output_path.write_text(template.strip() + "\n", encoding="utf-8")
 
 
 def main(argv: Optional[List[str]] = None) -> int:
@@ -439,6 +448,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     try:
         selection = _resolve_feature_config(args)
+        _validate_feature_selection(selection)
     except Exception as exc:
         message = f"Feature configuration invalid: {exc}"
         LOG.error(message)

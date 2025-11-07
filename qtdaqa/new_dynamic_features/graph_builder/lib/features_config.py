@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Mapping, Optional
 
 import yaml
+
+LOG = logging.getLogger(__name__)
 
 DEFAULT_FEATURES = {
     "interface": {
@@ -75,6 +78,7 @@ def load_feature_config(config_path: Optional[Path]) -> FeatureSelection:
             if not isinstance(content, dict):
                 raise ValueError(f"Feature config at {config_path} must be a mapping.")
             data = content
+        _validate_schema(data, config_path)
 
     alias_map_raw = data.pop("aliases", {})
     defaults_raw = data.get("defaults", {})
@@ -128,3 +132,31 @@ def load_feature_config(config_path: Optional[Path]) -> FeatureSelection:
         edge=selections["edge"],
         options=options,
     )
+
+
+REQUIRED_SECTIONS = ("interface", "node", "edge")
+META_SECTIONS = {"defaults", "aliases", "options"}
+
+
+def _validate_schema(data: Mapping[str, Any], config_path: Path) -> None:
+    missing = [section for section in REQUIRED_SECTIONS if section not in data]
+    if missing:
+        raise ValueError(
+            f"Feature config {config_path} missing required sections: {', '.join(missing)}. "
+            "Each run must specify interface/node/edge modules explicitly."
+        )
+    for section in REQUIRED_SECTIONS:
+        entry = data.get(section)
+        if not isinstance(entry, Mapping) or "module" not in entry:
+            raise ValueError(
+                f"Feature config {config_path} section '{section}' must provide a 'module' field."
+            )
+
+    for section, entry in data.items():
+        if section in REQUIRED_SECTIONS or section in META_SECTIONS:
+            continue
+        if isinstance(entry, Mapping) and "module" in entry:
+            continue  # optional, stage-like block
+        raise ValueError(
+            f"Unsupported section '{section}' in {config_path}. Remove catalog/template blocks and keep only concrete stage definitions."
+        )

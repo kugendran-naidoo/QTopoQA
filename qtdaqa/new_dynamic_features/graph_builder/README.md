@@ -1,50 +1,80 @@
-# Dynamic Graph Builder (modular)
+# Dynamic Graph Builder
 
-This copy of the graph builder implements a fully modular pipeline where every
-feature stage (interface, topology, node, edge) is provided by a pluggable
-module. Feature selection, thresholds, and per-stage options are controlled by
-`features.yaml`, making it simple to switch between the current 24‑D edge
-features and the legacy 11‑D variant without touching code.
+This directory contains the feature-extraction engine for the dynamic TopoQA
+pipeline. For each PDB structure it runs four pluggable stages:
 
-## Quick start
+1. **Interface** – identify interface residues and coordinates.
+2. **Topology** – compute persistent-homology descriptors around each residue.
+3. **Node** – merge DSSP-derived features with topology statistics.
+4. **Edge** – connect residues across chains and emit edge attributes.
 
-From `qtdaqa/new_dynamic_features/graph_builder` run:
+Outputs are PyTorch Geometric graphs (`*.pt`) plus metadata files that model
+training and inference rely on (`graph_metadata.json`,
+`graph_builder_summary.json`). Everything is driven by a user-supplied
+`feature-config.yaml`.
+
+---
+
+## Quick Start
 
 ```bash
+cd qtdaqa/new_dynamic_features/graph_builder
 ./run_graph_builder.sh \
-  --dataset-dir datasets/training/adjusted/Dockground_MAF2 \
-  --work-dir runs/dynamic_work \
-  --graph-dir runs/dynamic_graphs \
-  --log-dir runs/dynamic_logs \
-  --jobs 8
+  --dataset-dir /path/to/PDBs \
+  --work-dir /tmp/graph_builder/work \
+  --graph-dir /tmp/graph_builder/graph_data \
+  --log-dir /tmp/graph_builder/logs \
+  --jobs 12 \
+  --feature-config /abs/path/feature-config.yaml
 ```
 
-The wrapper resolves the repository root, exports `PYTHONPATH`, and falls back to
-`python3`/`python` unless you override the interpreter with `PYTHON=/path/to/python`.
-If you prefer direct module execution, run
-`python -m qtdaqa.new_dynamic_features.graph_builder.graph_builder ...`
-from anywhere with the repo root on `PYTHONPATH`.
+All five path flags are **mandatory**; the builder will exit immediately if any
+is missing or if the feature config cannot be read. You can also run the Python
+module directly:
 
-The run creates a timestamped folder under `runs/dynamic_logs`, fills
-`runs/dynamic_work` with intermediate CSVs, and writes `.pt` graphs to
-`runs/dynamic_graphs`. A machine-readable summary (including active modules and
-parameters) is emitted as `graph_builder_summary.json`.
+```bash
+python -m qtdaqa.new_dynamic_features.graph_builder.graph_builder ...
+```
 
-## Feature configuration (`features.yaml`)
+Helpers:
+
+- `./run_graph_builder.sh --list-modules` – list every registered interface,
+  topology, node, and edge module with summaries and parameter descriptions.
+- `./run_graph_builder.sh --create-feature-config` – write a minimal template
+  with inline instructions (no giant catalog to edit by hand).
+
+---
+
+## Feature Configuration
+
+`feature-config.yaml` selects one module per stage and optionally sets global
+defaults. The builder validates the schema up front (missing sections or
+malformed parameters cause the run to stop immediately).
 
 ```yaml
+defaults:
+  jobs: 12          # optional global override for stage workers
+
 interface:
   module: interface/polar_cutoff/v1
   params:
     cutoff: 14.0
     coordinate_decimals: 3
 
-topology:
+topology:           # optional, but common
   module: topology/persistence_basic/v1
   params:
     neighbor_distance: 8.0
     filtration_cutoff: 8.0
     min_persistence: 0.01
+    element_filters:
+      - ['C']
+      - ['N']
+      - ['O']
+      - ['C', 'N']
+      - ['C', 'O']
+      - ['N', 'O']
+      - ['C', 'N', 'O']
 
 node:
   module: node/dssp_topo_merge/v1
@@ -57,50 +87,51 @@ edge:
     histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
     contact_threshold: 5.0
 
-options:
-  edge_dump: false
+# Optional extra stage (custom modules):
+# mol:
+#   module: custom/mol_stage/v1
+#   params: {}
 ```
 
-Switch to the legacy 11‑D edges by changing the edge block:
+Rules:
 
-```yaml
-edge:
-  module: edge/legacy_band/v11
-  params:
-    distance_min: 0.0
-    distance_max: 10.0
-```
+- `interface`, `node`, and `edge` sections are required.
+- Additional sections (e.g., `topology`, `mol`) are allowed as long as they have
+  the same `module`/`params` structure.
+- Common mistakes (like writing tuple literals for `element_filters`) are caught
+  before the builder starts processing PDBs.
 
-Place `features.yaml` in your work directory to override the defaults, or supply
-`--feature-config /path/to/features.yaml` on the CLI.
+To switch to the legacy 11‑D edge features, change the `edge` block to
+`edge/legacy_band/v11` with the desired distance window.
 
-## Discovering installed modules
+---
 
-```bash
-./run_graph_builder.sh --list-modules
-```
+## Outputs & Metadata
 
-This prints all registered interface/topology/node/edge modules along with a
-short description and their configurable parameters. New modules can be added
-under `modules/` by subclassing the appropriate base class and calling
-`register_feature_module`.
+For each run you’ll find:
 
-## Stage outputs
+- `graph_dir/*.pt` – PyTorch Geometric graphs. Each `data` object includes
+  `data.metadata` describing the edge module, parameters, and sample counts.
+- `graph_dir/graph_metadata.json` – canonical schema used by model training and
+  inference to learn the node/edge layouts (dimensions, module IDs, node column
+  names, sample graphs, etc.).
+- `log_dir/graph_builder_summary.json` – run summary (module selections, job
+  counts, success/failure tallies) plus stage logs for debugging.
 
-| Stage | Module key | Output |
-| --- | --- | --- |
-| Interface | `interface/*` | `work_dir/interface/*.interface.txt` and per-PDB logs |
-| Topology | `topology/*` | `work_dir/topology/*.topology.csv` |
-| Node | `node/*` | `work_dir/node_features/*.csv` |
-| Edge | `edge/*` | `.pt` graphs in `graph_dir`, metadata sidecar, optional edge dumps |
+Keep these metadata files with your graphs. Model training automatically loads
+`graph_metadata.json`, and model inference regenerates graphs from the metadata
+embedded in training checkpoints.
 
-Each `.pt` file embeds a `data.metadata` dictionary capturing the edge module
-ID, the resolved parameters, and any edge-specific metadata. The run summary
-JSON records the same information alongside per-stage success counts, making it
-easy for downstream training or inference code to validate schema compatibility.
+---
 
-> **Tip for inference:** the training/inference pipelines now consume the
-> auto-generated `graph_metadata.json` and `graph_builder_summary.json` to
-> recreate the exact feature configuration downstream. Keep these sidecar files
-> alongside your `.pt` tensors so inference can regenerate graphs with identical
-> modules/params when needed.
+## Troubleshooting
+
+- **“Feature configuration not found…”** – the builder now requires
+  `--feature-config`; double-check the absolute path you passed.
+- **Schema errors at startup** – the YAML is missing a required section or has a
+  malformed parameter (e.g., `element_filters` not written as a YAML list). Fix
+  the config and rerun; the builder won’t process any PDBs until the config is
+  valid.
+- **Need to inspect modules/params** – use `--list-modules`. Each entry lists
+  the default parameters and descriptions so you can craft custom configs
+  without digging through the source.
