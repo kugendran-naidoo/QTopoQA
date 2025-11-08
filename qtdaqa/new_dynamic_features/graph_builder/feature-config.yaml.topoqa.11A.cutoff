@@ -3,13 +3,13 @@ defaults:
 
 interface:
   module: interface/polar_cutoff/v1
-  alias: "TopoQA non-default 9A cut-off"
+  alias: "TopoQA non-default 11A cut-off"
   summary: Polar interface detection using distance cutoff.
   description: Identifies interface residues across chains using the polar interface
     routine (new_calculate_interface.process_pdb_file) with configurable distance
     cutoff and coordinate rounding.
   params:
-    cutoff: 9.0
+    cutoff: 11.0
     coordinate_decimals: -1 # skip rounding to keep raw coords
     jobs: 6
 topology:
@@ -35,7 +35,7 @@ topology:
     jobs: 6
 node:
   module: node/dssp_topo_merge/v1
-  alias: "TopoQA default"
+  alias: "TopoQA non-default"
   summary: DSSP-derived node features merged with topology statistics.
   description: Runs the DSSP-based node feature extractor (node_fea) and merges results
     with persistent homology statistics aligned by residue IDs.
@@ -44,12 +44,12 @@ node:
     jobs: 6
 edge:
   module: edge/legacy_band/v11
-  alias: "TopoQA non-default 9A cut-off"
+  alias: "TopoQA non-default 11A cut-off"
   summary: 11-D legacy edge features (distance + atom distance histogram).
   description: Reproduces the original 11-dimensional edge attributes consisting of
     residue pair distance and a 10-bin histogram of inter-atomic distances, scaled
     to [0, 1].
   params:
     distance_min: 0.0
-    distance_max: 9.0
+    distance_max: 11.0
     scale_features: true

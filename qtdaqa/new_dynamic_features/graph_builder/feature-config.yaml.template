@@ -1,5 +1,5 @@
 defaults:
-  jobs: 12
+  jobs: 6
 
 interface:
   module: interface/polar_cutoff/v1
@@ -11,7 +11,7 @@ interface:
   params:
     cutoff: 14.0
     coordinate_decimals: -1 # skip rounding to keep raw coords
-    jobs: 12
+    jobs: 6
 topology:
   module: topology/persistence_basic/v1
   alias: "TopoQA default"
@@ -32,7 +32,7 @@ topology:
     - ['C', 'O']
     - ['N', 'O']
     - ['C', 'N', 'O']
-    jobs: 12
+    jobs: 6
 node:
   module: node/dssp_topo_merge/v1
   alias: "TopoQA default"
@@ -41,7 +41,7 @@ node:
     with persistent homology statistics aligned by residue IDs.
   params:
     drop_na: true   # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
-    jobs: 12
+    jobs: 6
 edge:
 
   module: edge/legacy_band/v11

@@ -1,5 +1,5 @@
 defaults:
-  jobs: 12
+  jobs: 6
 
 interface:
   module: interface/polar_cutoff/v1
@@ -11,7 +11,7 @@ interface:
   params:
     cutoff: 14.0
     coordinate_decimals: 3
-    jobs: 12
+    jobs: 6
 topology:
   module: topology/persistence_basic/v1
   alias: "TopoQA default"
@@ -32,7 +32,7 @@ topology:
     - ['C', 'O']
     - ['N', 'O']
     - ['C', 'N', 'O']
-    jobs: 12
+    jobs: 6
 node:
   module: node/dssp_topo_merge/v1
   alias: "TopoQA default"
@@ -41,7 +41,7 @@ node:
     with persistent homology statistics aligned by residue IDs.
   params:
     drop_na: false
-    jobs: 12
+    jobs: 6
 edge:
   module: edge/multi_scale/v24
   alias: "Kugendran 24D Scalars"
