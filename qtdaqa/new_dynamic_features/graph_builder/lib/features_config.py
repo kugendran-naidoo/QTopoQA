@@ -136,6 +136,7 @@ def load_feature_config(config_path: Optional[Path]) -> FeatureSelection:
 
 REQUIRED_SECTIONS = ("interface", "node", "edge")
 META_SECTIONS = {"defaults", "aliases", "options"}
+OPTIONAL_SECTIONS = {"topology"}
 
 
 def _validate_schema(data: Mapping[str, Any], config_path: Path) -> None:
@@ -156,7 +157,14 @@ def _validate_schema(data: Mapping[str, Any], config_path: Path) -> None:
         if section in REQUIRED_SECTIONS or section in META_SECTIONS:
             continue
         if isinstance(entry, Mapping) and "module" in entry:
-            continue  # optional, stage-like block
+            if section not in OPTIONAL_SECTIONS:
+                LOG.warning(
+                    "Feature config %s defines custom stage '%s'. Ensure the builder actually uses this stage "
+                    "or remove it from the YAML.",
+                    config_path,
+                    section,
+                )
+            continue  # optional/custom stage block
         raise ValueError(
             f"Unsupported section '{section}' in {config_path}. Remove catalog/template blocks and keep only concrete stage definitions."
         )

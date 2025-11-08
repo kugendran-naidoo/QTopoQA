@@ -100,6 +100,7 @@ def test_load_config_structured(tmp_path: Path) -> None:
     assert cfg.builder.jobs == 3
     assert cfg.reuse_existing_graphs is True
     assert cfg.batch_size == 64
+    assert cfg.config_name == cfg_path.name
 
 
 def test_load_config_rejects_legacy_keys(tmp_path: Path) -> None:
@@ -207,3 +208,29 @@ def test_load_config_auto_select_checkpoint_failure(tmp_path: Path, monkeypatch:
     )
     with pytest.raises(RuntimeError, match="No eligible checkpoints"):
         inference_topoqa_cpu.load_config(cfg_path)
+
+
+def test_log_checkpoint_banner_formats(caplog, tmp_path: Path) -> None:
+    cfg = inference_topoqa_cpu.InferenceConfig(
+        data_dir=tmp_path / "data",
+        work_dir=tmp_path / "work",
+        checkpoint_path=tmp_path / "ckpt.ckpt",
+        output_file=tmp_path / "out.csv",
+        config_name="config.yaml.test",
+    )
+    caplog.set_level("INFO")
+    inference_topoqa_cpu._log_checkpoint_banner(cfg, surround_blank=True)
+    messages = [record.getMessage() for record in caplog.records]
+    assert messages == [
+        "",
+        f"Checkpoint file: {cfg.checkpoint_path}",
+        f"Inference config: {cfg.config_name}",
+        "",
+    ]
+    caplog.clear()
+    inference_topoqa_cpu._log_checkpoint_banner(cfg, surround_blank=False)
+    messages = [record.getMessage() for record in caplog.records]
+    assert messages == [
+        f"Checkpoint file: {cfg.checkpoint_path}",
+        f"Inference config: {cfg.config_name}",
+    ]

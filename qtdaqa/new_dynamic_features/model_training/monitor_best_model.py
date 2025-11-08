@@ -321,6 +321,30 @@ def _render_once(run_dir: Path, args: argparse.Namespace) -> None:
         _render_table(summary, metrics_limit)
 
 
+def _render_top_runs(root: Path, count: int) -> None:
+    limit = max(1, count)
+    ranked = train_cli.rank_runs(root)  # type: ignore[attr-defined]
+    if not ranked:
+        print(f"[monitor_best_model] No runs with selection/val metrics found under {root}")
+        return
+
+    visible = min(limit, len(ranked))
+    print(f"Top {visible} runs (primary metric ascending):")
+    for idx, (metric_name, metric_value, summary) in enumerate(ranked[:visible], start=1):
+        run_name = summary.get("run_name") or summary.get("run_dir") or "(unknown run)"
+        print(f"{idx}. {run_name}")
+        print(f"   primary_metric={metric_name} ({metric_value})")
+        sel_metric = summary.get("best_selection_metric")
+        if sel_metric is not None:
+            print(f"   selection_metric={sel_metric}")
+        val_loss = summary.get("best_val_loss")
+        if val_loss is not None:
+            print(f"   val_loss={val_loss}")
+        checkpoint = summary.get("best_checkpoint")
+        if checkpoint:
+            print(f"   checkpoint={_to_repo_relative(str(checkpoint))}")
+
+
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Report the current best checkpoint for a training run.")
     parser.add_argument("--run-id", type=str, help="Run identifier under training_runs/ (e.g., training_run_2025-01-01_12-00-00).")
@@ -340,7 +364,31 @@ def main(argv: Optional[list[str]] = None) -> int:
         default=0,
         help="Include the last N epochs of metrics in the output (0 disables the snippet).",
     )
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=train_cli.RUN_ROOT,
+        help="Training run root (used when --top is supplied).",
+    )
+    parser.add_argument(
+        "--top",
+        type=int,
+        help="Show the top N runs (by primary metric) instead of a single run summary.",
+    )
     args = parser.parse_args(argv)
+
+    if args.top is not None:
+        if args.top <= 0:
+            parser.error("--top must be >= 1")
+        if args.follow:
+            parser.error("--top cannot be combined with --follow")
+        if args.run_id or args.run_dir:
+            parser.error("--top cannot be combined with --run-id/--run-dir")
+        root = (args.root or train_cli.RUN_ROOT).resolve()
+        if not root.exists():
+            parser.error(f"Training root does not exist: {root}")
+        _render_top_runs(root, args.top)
+        return 0
 
     run_dir = _resolve_run_dir(args)
     if args.follow:

@@ -48,6 +48,7 @@ class InferenceConfig:
     edge_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     topology_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     training_root: Optional[Path] = None
+    config_name: Optional[str] = None
 
 
 @dataclasses.dataclass
@@ -129,6 +130,16 @@ def _auto_select_checkpoint(training_root: Path) -> Path:
     return resolved
 
 
+def _log_checkpoint_banner(cfg: InferenceConfig, surround_blank: bool = False) -> None:
+    if surround_blank:
+        logging.info("")
+    logging.info("Checkpoint file: %s", cfg.checkpoint_path)
+    if cfg.config_name:
+        logging.info("Inference config: %s", cfg.config_name)
+    if surround_blank:
+        logging.info("")
+
+
 def load_config(raw_path: Path) -> InferenceConfig:
     with raw_path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
@@ -200,6 +211,7 @@ def load_config(raw_path: Path) -> InferenceConfig:
         edge_schema={},
         topology_schema={},
         training_root=training_root,
+        config_name=raw_path.name,
     )
 
 
@@ -520,7 +532,10 @@ def run_inference(
     feature_metadata: Dict[str, object],
 ) -> None:
     cfg.work_dir.mkdir(parents=True, exist_ok=True)
+    _log_checkpoint_banner(cfg, surround_blank=True)
     graph_dir = ensure_graph_dir(cfg, final_schema, feature_metadata)
+    logging.info("Graph directory: %s", graph_dir)
+    _log_checkpoint_banner(cfg, surround_blank=False)
     metadata = validate_graph_metadata(graph_dir, final_schema)
     metadata_source = metadata.metadata_path or str(graph_dir / "graph_metadata.json")
     logging.info("Verified graph metadata compatibility (%s).", metadata_source)
@@ -709,6 +724,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             edge_schema={},
             topology_schema={},
             training_root=_default_training_root(),
+            config_name="(CLI parameters)",
         )
 
     checkpoint_meta = extract_feature_metadata(cfg.checkpoint_path)

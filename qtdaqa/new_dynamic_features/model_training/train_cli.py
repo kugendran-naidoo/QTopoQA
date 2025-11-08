@@ -54,6 +54,7 @@ TIMESTAMP_FMT = "%Y-%m-%d_%H-%M-%S"
 RUN_PREFIX = "training_run"
 PRIMARY_METRICS = ("val_loss", "selection_metric")
 DEFAULT_PRIMARY_METRIC = "val_loss"
+RankedRun = Tuple[str, float, Dict[str, Any]]
 
 
 def _normalise_primary_metric(value: Optional[str]) -> str:
@@ -78,6 +79,28 @@ def _resolve_primary_metric_value(summary: Dict[str, Any]) -> Tuple[str, Optiona
             requested = "selection_metric"
             value = summary.get("best_selection_metric")
     return requested, value
+
+
+def rank_runs(root: Path) -> List[RankedRun]:
+    """Return runs sorted by their resolved primary metric (ascending)."""
+    ranked: List[RankedRun] = []
+    for run_dir in sorted(root.iterdir()):
+        if run_dir.is_symlink():
+            continue
+        if not run_dir.is_dir() or not (run_dir / "run_metadata.json").exists():
+            continue
+        summary = _summarise_run(run_dir)
+        metric_name, metric_value = _resolve_primary_metric_value(summary)
+        if metric_value is None:
+            continue
+        ranked.append((metric_name, float(metric_value), summary))
+    ranked.sort(key=lambda item: item[1])
+    return ranked
+
+
+def _rank_runs(root: Path) -> List[RankedRun]:  # pragma: no cover - compatibility shim
+    """Backward compatible alias until external callers migrate to rank_runs."""
+    return rank_runs(root)
 
 
 class CLIError(RuntimeError):
@@ -1126,27 +1149,15 @@ def cmd_leaderboard(args: argparse.Namespace) -> None:
     if not root.exists():
         raise CLIError(f"Leaderboard root does not exist: {root}")
 
-    rows: List[Tuple[float, Dict[str, Any]]] = []
-    for run_dir in sorted(root.iterdir()):
-        if run_dir.is_symlink():
-            continue
-        if not run_dir.is_dir() or not (run_dir / "run_metadata.json").exists():
-            continue
-        summary = _summarise_run(run_dir)
-        sel_metric = summary.get("best_selection_metric")
-        val_loss = summary.get("best_val_loss")
-        if sel_metric is None and val_loss is None:
-            continue
-        metric_value = float(sel_metric if sel_metric is not None else val_loss)
-        rows.append((metric_value, summary))
+    ranked = rank_runs(root)
 
-    if not rows:
+    if not ranked:
         print("[train_cli][leaderboard] No runs with selection/val metrics found under", root)
         return
 
-    rows.sort(key=lambda item: item[0])
-    limit = max(1, args.limit)
-    for rank, (_, summary) in enumerate(rows[:limit], start=1):
+    count = args.top if args.top is not None else args.limit
+    limit = max(1, count)
+    for rank, (metric_name, metric_value, summary) in enumerate(ranked[:limit], start=1):
         sel_metric = summary.get("best_selection_metric")
         val_loss = summary.get("best_val_loss")
         checkpoint = summary.get("best_checkpoint")
@@ -1155,6 +1166,7 @@ def cmd_leaderboard(args: argparse.Namespace) -> None:
             print(f"   selection_metric={sel_metric}")
         if val_loss is not None:
             print(f"   val_loss={val_loss}")
+        print(f"   primary_metric={metric_name} ({metric_value})")
         if checkpoint:
             print(f"   checkpoint={_as_repo_relative(checkpoint)}")
 
@@ -1261,6 +1273,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     leaderboard_parser.add_argument("--root", type=Path, default=RUN_ROOT, help="Directory containing run folders.")
     leaderboard_parser.add_argument("--limit", type=int, default=5, help="Number of runs to display.")
+    leaderboard_parser.add_argument(
+        "--top",
+        type=int,
+        help="Alias for --limit (preferred). Shows the top N runs sorted strictly by the primary metric.",
+    )
     leaderboard_parser.set_defaults(func=cmd_leaderboard)
 
     return parser
