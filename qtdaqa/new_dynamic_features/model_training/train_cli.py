@@ -1157,18 +1157,42 @@ def cmd_leaderboard(args: argparse.Namespace) -> None:
 
     count = args.top if args.top is not None else args.limit
     limit = max(1, count)
+    alt_enabled = getattr(args, "show_alt_selection", False)
+    alt_summary = rank_runs(root) if alt_enabled else []
     for rank, (metric_name, metric_value, summary) in enumerate(ranked[:limit], start=1):
         sel_metric = summary.get("best_selection_metric")
         val_loss = summary.get("best_val_loss")
         checkpoint = summary.get("best_checkpoint")
+        secondary_enabled = bool(summary.get("selection_metric_enabled"))
+        secondary_value = summary.get("best_selection_val_spearman")
+        secondary_label = "val_spearman_corr" if secondary_enabled else "None"
         print(f"{rank}. {summary['run_name']}")
-        if sel_metric is not None:
-            print(f"   selection_metric={sel_metric}")
+        print(f"   primary_metric: {metric_name} = {metric_value}")
+        if secondary_enabled:
+            print(f"   secondary_metric: {secondary_label} = {secondary_value}")
+        else:
+            print("   secondary_metric: None")
         if val_loss is not None:
-            print(f"   val_loss={val_loss}")
-        print(f"   primary_metric={metric_name} ({metric_value})")
+            print(f"   val_loss: {val_loss}")
+        if sel_metric is not None:
+            print(f"   selection_metric: {sel_metric}")
+        if alt_enabled:
+            alternates = summary.get("selection_alternates") or []
+            if alternates:
+                alt_entry = alternates[0]
+                alt_val = alt_entry.get("selection_metric")
+                alt_epoch = alt_entry.get("epoch")
+                alt_line = "   alt_selection_rank: "
+                if alt_epoch is not None:
+                    alt_line += f"(epoch={alt_epoch}, selection_metric = {alt_val})"
+                else:
+                    alt_line += f"(selection_metric = {alt_val})"
+                print(alt_line)
+            else:
+                print("   alt_selection_rank: (selection metric ranks current run)")
         if checkpoint:
-            print(f"   checkpoint={_as_repo_relative(checkpoint)}")
+            print(f"   checkpoint: {_as_repo_relative(checkpoint)}")
+        print("")
 
 
 def cmd_summarise(args: argparse.Namespace) -> None:
@@ -1277,6 +1301,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--top",
         type=int,
         help="Alias for --limit (preferred). Shows the top N runs sorted strictly by the primary metric.",
+    )
+    leaderboard_parser.add_argument(
+        "--show-alt-selection",
+        action="store_true",
+        help="Also show which checkpoint would rank highest if selection_metric were primary.",
     )
     leaderboard_parser.set_defaults(func=cmd_leaderboard)
 

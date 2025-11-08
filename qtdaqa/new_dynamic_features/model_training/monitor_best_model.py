@@ -125,6 +125,44 @@ def _collect_warnings(
     return warnings
 
 
+def _format_metric_block(summary: Dict[str, Any], indent: str = "   ", include_alt: bool = False) -> list[str]:
+    primary_metric = summary.get("selection_primary_metric") or "val_loss"
+    primary_value = summary.get("best_val_loss")
+    if primary_metric == "selection_metric":
+        primary_value = summary.get("best_selection_metric") or primary_value
+    lines = [f"{indent}primary_metric: {primary_metric} = {primary_value}"]
+    secondary_enabled = bool(summary.get("selection_metric_enabled"))
+    if secondary_enabled:
+        secondary_value = summary.get("best_selection_val_spearman")
+        lines.append(f"{indent}secondary_metric: val_spearman_corr = {secondary_value}")
+    else:
+        lines.append(f"{indent}secondary_metric: None")
+    val_loss = summary.get("best_val_loss")
+    if val_loss is not None:
+        lines.append(f"{indent}val_loss: {val_loss}")
+    sel_metric = summary.get("best_selection_metric")
+    if sel_metric is not None:
+        lines.append(f"{indent}selection_metric: {sel_metric}")
+    checkpoint = summary.get("best_checkpoint_path") or summary.get("best_checkpoint")
+    if checkpoint:
+        lines.append(f"{indent}checkpoint: {checkpoint}")
+    if include_alt:
+        alternates = summary.get("selection_alternates") or []
+        if alternates:
+            alt_entry = alternates[0]
+            alt_val = alt_entry.get("selection_metric")
+            alt_epoch = alt_entry.get("epoch")
+            label = "   alt_selection_rank: "
+            if alt_epoch is not None:
+                label += f"(epoch={alt_epoch}, selection_metric = {alt_val})"
+            else:
+                label += f"(selection_metric = {alt_val})"
+            lines.append(label)
+        else:
+            lines.append(f"{indent}alt_selection_rank: (selection metric ranks current run)")
+    return lines
+
+
 def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Dict[str, Any]:
     payload = train_cli._summarise_run(run_dir)  # type: ignore[attr-defined]
     config = payload.get("config", {}) if isinstance(payload, dict) else {}
@@ -191,6 +229,7 @@ def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Di
         "run_name": run_dir.name,
         "best_val_loss": payload.get("best_val_loss") if isinstance(payload, dict) else None,
         "best_epoch": payload.get("best_epoch") if isinstance(payload, dict) else None,
+        "best_checkpoint": best_checkpoint,
         "best_checkpoint_path": _to_repo_relative(best_checkpoint),
         "best_checkpoint_name": checkpoint_name,
         "learning_parameters": _extract_learning_params(config, training_parameters),
@@ -200,10 +239,14 @@ def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Di
         "selection_metric_enabled": selection_enabled,
         "best_selection": selection_best,
         "selection_alternates": top_selection[1:] if top_selection else [],
+        "selection_primary_metric": payload.get("selection_primary_metric") if isinstance(payload, dict) else None,
         "runtime_estimate": runtime_estimate,
         "progress": progress,
         "best_summary_line": best_summary_line,
         "warnings": _collect_warnings(best_checkpoint, selection_enabled, payload.get("run_metadata", {}), progress),
+        "selection_primary_metric": payload.get("selection_primary_metric") if isinstance(payload, dict) else None,
+        "best_selection_metric": payload.get("best_selection_metric") if isinstance(payload, dict) else None,
+        "best_selection_val_spearman": payload.get("best_selection_val_spearman") if isinstance(payload, dict) else None,
     }
 
     def _normalise_metric(metric: Dict[str, Any]) -> Dict[str, Any]:
@@ -266,9 +309,9 @@ def _render_table(summary: Dict[str, Any], metrics_limit: Optional[int]) -> None
     else:
         checkpoint = summary.get("best_checkpoint_name") or "N/A"
         print(f"Best checkpoint: {checkpoint}")
-    checkpoint_path = summary.get("best_checkpoint_path")
-    if checkpoint_path:
-        print(f"Path: {checkpoint_path}")
+    alt_flag = summary.get("selection_metric_enabled", False)
+    for line in _format_metric_block(summary, include_alt=alt_flag):
+        print(line)
 
     learning = summary.get("learning_parameters") or {}
     if learning:
@@ -333,16 +376,15 @@ def _render_top_runs(root: Path, count: int) -> None:
     for idx, (metric_name, metric_value, summary) in enumerate(ranked[:visible], start=1):
         run_name = summary.get("run_name") or summary.get("run_dir") or "(unknown run)"
         print(f"{idx}. {run_name}")
-        print(f"   primary_metric={metric_name} ({metric_value})")
-        sel_metric = summary.get("best_selection_metric")
-        if sel_metric is not None:
-            print(f"   selection_metric={sel_metric}")
-        val_loss = summary.get("best_val_loss")
-        if val_loss is not None:
-            print(f"   val_loss={val_loss}")
-        checkpoint = summary.get("best_checkpoint")
-        if checkpoint:
-            print(f"   checkpoint={_to_repo_relative(str(checkpoint))}")
+        summary_copy = dict(summary)
+        checkpoint = summary_copy.get("best_checkpoint")
+        if checkpoint and "best_checkpoint_path" not in summary_copy:
+            summary_copy["best_checkpoint_path"] = _to_repo_relative(str(checkpoint))
+        summary_copy.setdefault("selection_primary_metric", summary.get("selection_primary_metric"))
+        summary_copy.setdefault("best_selection_val_spearman", summary.get("best_selection_val_spearman"))
+        for line in _format_metric_block(summary_copy, include_alt=True):
+            print(line)
+        print("")
 
 
 def main(argv: Optional[list[str]] = None) -> int:

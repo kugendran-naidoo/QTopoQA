@@ -133,6 +133,8 @@ also what inference uses to auto-select the best checkpoint later.
 
 ./run_model_training.sh summarise --run-dir training_runs/demo_run
 ./run_model_training.sh leaderboard --limit 5
+# Show alternate selection-metric ranking alongside the primary metric view
+./run_model_training.sh leaderboard --top 3 --show-alt-selection
 ```
 
 All commands ultimately call `python -m qtdaqa.new_dynamic_features.model_training.train_cli ...`.
@@ -143,6 +145,10 @@ Useful options:
 - `--fast-dev-run`, `--limit-train-batches`, `--limit-val-batches` – quick
   sanity checks.
 - `--notes` – stored alongside `run_metadata.json` for documentation.
+- `--show-alt-selection` (leaderboard only) – prints an extra line per entry
+  showing which checkpoint would have ranked highest if `selection_metric`
+  were the primary metric (useful for deciding whether to change the training
+  objective before rerunning a sweep).
 
 ---
 
@@ -158,6 +164,10 @@ Useful options:
    metadata JSON (best checkpoint, metrics history, coverage, etc.).
 5. `python monitor_best_model.py --run-dir training_runs/smoke_test --follow` –
    tail checkpoint progress in real time.
+   The table mirrors the leaderboard layout: each update prints the primary
+   metric line, the secondary metric status, raw `val_loss`/`selection_metric`,
+   and (when applicable) an `alt_selection_rank` line showing the checkpoint
+   that would win if `selection_metric` were primary.
 
 Keep the resulting `training_runs/` folders intact; inference relies on the
 feature metadata and best-checkpoint links stored there.
