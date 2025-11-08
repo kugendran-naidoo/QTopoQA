@@ -3,7 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from qtdaqa.new_dynamic_features.model_training.run_metadata import record_selection_metadata
+from qtdaqa.new_dynamic_features.model_training.run_metadata import (
+    record_checkpoint_paths,
+    record_selection_metadata,
+)
 
 
 def test_record_selection_metadata_updates_run_metadata(tmp_path: Path) -> None:
@@ -28,3 +31,24 @@ def test_record_selection_metadata_updates_run_metadata(tmp_path: Path) -> None:
     assert selection_block["use_val_spearman"] is False
     assert selection_block["spearman_weight"] == 0.5
     assert selection_block["spearman_min_delta"] == 0.01
+
+
+def test_record_checkpoint_paths_persists_primary_and_alternate(tmp_path: Path) -> None:
+    save_dir = tmp_path / "run"
+    save_dir.mkdir()
+
+    primary_path = save_dir / "model_checkpoints" / "best.chkpt"
+    alt_path = save_dir / "model_checkpoints" / "selection" / "sel.chkpt"
+
+    record_checkpoint_paths(
+        save_dir,
+        primary_metric="val_loss",
+        primary_path=primary_path,
+        alternates={"selection_metric": alt_path},
+    )
+
+    metadata = json.loads((save_dir / "run_metadata.json").read_text(encoding="utf-8"))
+    checkpoints = metadata["checkpoints"]
+    assert checkpoints["primary_metric"] == "val_loss"
+    assert checkpoints["primary_path"] == str(primary_path)
+    assert checkpoints["alternates"]["selection_metric"] == str(alt_path)

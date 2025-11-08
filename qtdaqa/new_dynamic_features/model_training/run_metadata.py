@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 
 
 def update_run_metadata(save_dir: Path, mutator: Callable[[Dict[str, object]], None]) -> None:
@@ -33,5 +33,25 @@ def record_selection_metadata(
         selection_section["spearman_weight"] = spearman_weight
         selection_section["spearman_min_delta"] = spearman_min_delta
         selection_section["secondary_metric"] = "val_spearman_corr" if use_val_spearman else None
+
+    update_run_metadata(save_dir, _mutate)
+
+
+def record_checkpoint_paths(
+    save_dir: Path,
+    *,
+    primary_metric: str,
+    primary_path: Optional[Path],
+    alternates: Optional[Dict[str, Optional[Path]]] = None,
+) -> None:
+    def _mutate(metadata: Dict[str, object]) -> None:
+        checkpoints = metadata.setdefault("checkpoints", {})
+        checkpoints["primary_metric"] = primary_metric
+        checkpoints["primary_path"] = str(primary_path) if primary_path else None
+        if alternates:
+            serialised: Dict[str, Optional[str]] = {}
+            for metric_name, path in alternates.items():
+                serialised[str(metric_name)] = str(path) if path else None
+            checkpoints["alternates"] = serialised
 
     update_run_metadata(save_dir, _mutate)

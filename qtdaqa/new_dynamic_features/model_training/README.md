@@ -118,6 +118,26 @@ These artifacts let you pause/resume runs (`train_cli resume`), inspect progress
 (`train_cli summarise`), or monitor training (`monitor_best_model.py`). They’re
 also what inference uses to auto-select the best checkpoint later.
 
+### Optional polish runs
+
+When you want an even lower learning rate pass over the winning checkpoint,
+use the new polish template:
+
+1. Copy or edit `configs/polish_template.yaml`, set `dataloader.seed` to the
+   seed/run you are polishing, and keep the slow-LR knobs (`lr=1e-3`,
+   `num_epochs=360`, `scheduler.patience=4`, `early_stopping.patience=20`,
+   `selection.primary_metric=val_loss`, Spearman secondary disabled).
+2. Launch it via the single-job manifest:
+   ```bash
+   GRAPH_DIR=/abs/path/to/graph_data \
+   SKIP_SWEEP=1 SKIP_FINE=1 \
+   ./run_full_pipeline.sh --manifest manifests/run_polish_template.yaml
+   ```
+   (Feel free to override `PIPELINE_MANIFEST` instead of passing `--manifest`.)
+3. After the run finishes, `train_cli leaderboard --output-format json --top 1`
+   will include the polished checkpoint so you can feed it straight into
+   inference.
+
 ---
 
 ## CLI Reference (Python layer)
@@ -135,6 +155,8 @@ also what inference uses to auto-select the best checkpoint later.
 ./run_model_training.sh leaderboard --limit 5
 # Show alternate selection-metric ranking alongside the primary metric view
 ./run_model_training.sh leaderboard --top 3 --show-alt-selection
+# JSON output for scripting
+./run_model_training.sh leaderboard --top 1 --output-format json > best_run.json
 ```
 
 All commands ultimately call `python -m qtdaqa.new_dynamic_features.model_training.train_cli ...`.
