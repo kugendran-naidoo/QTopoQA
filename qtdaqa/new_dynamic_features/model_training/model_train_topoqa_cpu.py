@@ -32,8 +32,6 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import platform
 
-import numpy as np
-import pandas as pd
 import torch
 import yaml
 from pytorch_lightning import Trainer, seed_everything
@@ -45,6 +43,14 @@ from pytorch_lightning.callbacks import (
     TQDMProgressBar,
 )
 from pytorch_lightning.loggers import CSVLogger
+
+try:  # Prefer absolute import so script execution still works
+    from qtdaqa.new_dynamic_features.model_training.run_metadata import (
+        record_selection_metadata,
+        update_run_metadata,
+    )
+except ImportError:  # pragma: no cover - fallback for ad-hoc launches
+    from run_metadata import record_selection_metadata, update_run_metadata
 
 try:  # Optional MLflow dependency
     from pytorch_lightning.loggers import MLFlowLogger  # type: ignore
@@ -77,17 +83,6 @@ try:
 except ImportError:  # pragma: no cover
     GraphTensorCache = None  # type: ignore
 
-
-def _update_run_metadata(save_dir: Path, mutator: Callable[[Dict[str, Any]], None]) -> None:
-    metadata_path = save_dir / "run_metadata.json"
-    if not metadata_path.exists():
-        return
-    try:
-        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return
-    mutator(metadata)
-    metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
 
 
 @dataclasses.dataclass
@@ -415,6 +410,9 @@ def load_config(path: Path) -> TrainingConfig:
 def load_label_map(csv_path: Path) -> Dict[str, float]:
     if not csv_path.exists():
         raise FileNotFoundError(f"Label CSV not found: {csv_path}")
+    import pandas as pd  # defer heavy imports until needed
+    import numpy as np
+
     df = pd.read_csv(csv_path)
     if "MODEL" not in df or "dockq" not in df:
         raise ValueError(f"Label CSV {csv_path} missing MODEL/dockq columns")
@@ -1339,6 +1337,13 @@ def main() -> int:
     cfg.log_lr = bool(args.log_lr)
 
     logger = _setup_logging(cfg.save_dir)
+    record_selection_metadata(
+        cfg.save_dir,
+        primary_metric=cfg.selection_primary_metric,
+        use_val_spearman=cfg.use_val_spearman_as_secondary,
+        spearman_weight=cfg.spearman_secondary_weight,
+        spearman_min_delta=cfg.spearman_secondary_min_delta,
+    )
 
     if args.trial_label:
         logger.info("trial = %s", args.trial_label)
@@ -1705,7 +1710,7 @@ def main() -> int:
             "max": float(max(epoch_durations)),
         }
     try:
-        _update_run_metadata(cfg.save_dir, lambda metadata: metadata.setdefault("runtime", {}).update(runtime_summary))
+        update_run_metadata(cfg.save_dir, lambda metadata: metadata.setdefault("runtime", {}).update(runtime_summary))
     except Exception as runtime_exc:  # pragma: no cover
         logger.warning("Unable to record runtime metadata: %s", runtime_exc)
 
@@ -1866,7 +1871,7 @@ def main() -> int:
                     if tracking_uri:
                         mlflow_section["tracking_uri"] = tracking_uri
 
-                _update_run_metadata(cfg.save_dir, _update_mlflow_metadata)
+                update_run_metadata(cfg.save_dir, _update_mlflow_metadata)
             except Exception as mlflow_meta_exc:  # pragma: no cover
                 logger.warning("Unable to record MLflow metadata: %s", mlflow_meta_exc)
         except Exception as exc:  # pragma: no cover - optional dependency

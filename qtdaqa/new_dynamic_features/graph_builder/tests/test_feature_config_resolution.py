@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from argparse import Namespace
+import logging
 from pathlib import Path
 
 import pytest
@@ -71,6 +72,14 @@ def test_optional_stage_allowed(tmp_path: Path) -> None:
     assert selection.edge["module"] == "edge/legacy_band/v11"
 
 
+def test_unknown_stage_emits_warning(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    config_path = tmp_path / "features.yaml"
+    _write_minimal_config(config_path, include_extra=True)
+    caplog.set_level(logging.WARNING)
+    load_feature_config(config_path)
+    assert any("custom stage 'mol'" in message for message in caplog.messages)
+
+
 def test_invalid_element_filters_fail_fast(tmp_path: Path) -> None:
     config_path = tmp_path / "features.yaml"
     _write_minimal_config(config_path)
@@ -79,3 +88,40 @@ def test_invalid_element_filters_fail_fast(tmp_path: Path) -> None:
     selection.topology["params"]["element_filters"] = "(('C',), ('N',))"
     with pytest.raises(ValueError):
         graph_builder._validate_feature_selection(selection)  # type: ignore[attr-defined]
+
+
+def test_interface_cutoff_must_be_positive(tmp_path: Path) -> None:
+    config_path = tmp_path / "features.yaml"
+    _write_minimal_config(config_path)
+    selection = load_feature_config(config_path)
+    selection.interface["params"]["cutoff"] = -2
+    with pytest.raises(ValueError):
+        graph_builder._validate_feature_selection(selection)  # type: ignore[attr-defined]
+
+
+def test_edge_histogram_bins_validated(tmp_path: Path) -> None:
+    config_path = tmp_path / "features.yaml"
+    _write_minimal_config(config_path)
+    selection = load_feature_config(config_path)
+    selection.edge["params"]["histogram_bins"] = [2, 1, 3]
+    with pytest.raises(ValueError):
+        graph_builder._validate_feature_selection(selection)  # type: ignore[attr-defined]
+
+def test_parse_args_requires_all_paths(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    config_path = tmp_path / "features.yaml"
+    _write_minimal_config(config_path)
+    with pytest.raises(SystemExit):
+        graph_builder.parse_args(  # type: ignore[attr-defined]
+            [
+                "--dataset-dir",
+                str(tmp_path),
+                "--work-dir",
+                str(tmp_path),
+                "--graph-dir",
+                str(tmp_path),
+                "--feature-config",
+                str(config_path),
+            ]
+        )
+    err = capsys.readouterr().err
+    assert "--log-dir" in err

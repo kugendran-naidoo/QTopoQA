@@ -23,36 +23,28 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 try:
     from .lib.features_config import FeatureSelection, load_feature_config
     from .lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
-    from .lib.edge_runner import run_edge_stage
     from .lib.log_dirs import LogDirectoryInfo, prepare_log_directory
     from .lib.stage_common import index_structures
 except ImportError:  # pragma: no cover - fallback for direct execution
     from lib.features_config import FeatureSelection, load_feature_config
     from lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
-    from lib.edge_runner import run_edge_stage
     from lib.log_dirs import LogDirectoryInfo, prepare_log_directory
     from lib.stage_common import index_structures
-try:
-    from .modules import instantiate_module, list_modules
+
+if TYPE_CHECKING:  # pragma: no cover
     from .modules.base import (
         EdgeFeatureModule,
         InterfaceFeatureModule,
         NodeFeatureModule,
         TopologyFeatureModule,
     )
-except ImportError:  # pragma: no cover - fallback for direct execution
-    from modules import instantiate_module, list_modules
-    from modules.base import (
-        EdgeFeatureModule,
-        InterfaceFeatureModule,
-        NodeFeatureModule,
-        TopologyFeatureModule,
-    )
+else:  # pragma: no cover - runtime placeholders
+    EdgeFeatureModule = InterfaceFeatureModule = NodeFeatureModule = TopologyFeatureModule = object
 
 
 LOG = logging.getLogger("graph_builder")
@@ -272,11 +264,16 @@ def _resolve_feature_config(args: argparse.Namespace) -> FeatureSelection:
 
 
 def _instantiate_modules(selection: FeatureSelection) -> Dict[str, object]:
+    try:
+        from .modules import instantiate_module as _instantiate_module  # type: ignore
+    except ImportError:  # pragma: no cover - fallback for direct execution
+        from modules import instantiate_module as _instantiate_module  # type: ignore
+
     modules = {
-        "interface": instantiate_module(selection.interface["module"], **selection.interface.get("params", {})),
-        "topology": instantiate_module(selection.topology["module"], **selection.topology.get("params", {})),
-        "node": instantiate_module(selection.node["module"], **selection.node.get("params", {})),
-        "edge": instantiate_module(selection.edge["module"], **selection.edge.get("params", {})),
+        "interface": _instantiate_module(selection.interface["module"], **selection.interface.get("params", {})),
+        "topology": _instantiate_module(selection.topology["module"], **selection.topology.get("params", {})),
+        "node": _instantiate_module(selection.node["module"], **selection.node.get("params", {})),
+        "edge": _instantiate_module(selection.edge["module"], **selection.edge.get("params", {})),
     }
     return modules
 
@@ -284,26 +281,61 @@ def _instantiate_modules(selection: FeatureSelection) -> Dict[str, object]:
 def _validate_feature_selection(selection: FeatureSelection) -> None:
     topo_params = selection.topology.get("params", {})
     filters = topo_params.get("element_filters")
-    if filters is None:
-        return
-    if isinstance(filters, str):
-        raise ValueError(
-            "topology.params.element_filters must be a YAML list (e.g., '- [C]' entries), "
-            "not a single string literal. See --create-feature-config template for examples."
-        )
-    if not isinstance(filters, (list, tuple)):
-        raise ValueError("topology.params.element_filters must be a list of element sequences.")
-    normalised = []
-    for item in filters:
-        if not isinstance(item, (list, tuple)):
-            raise ValueError("Each element_filters entry must be a list/tuple of element symbols.")
-        if not item:
-            raise ValueError("Element filter sequences must contain at least one symbol.")
-        for symbol in item:
-            if not isinstance(symbol, str) or not symbol.strip():
-                raise ValueError("Element filter symbols must be non-empty strings.")
-        normalised.append(tuple(symbol.strip() for symbol in item))
-    topo_params["element_filters"] = normalised
+    if filters is not None:
+        if isinstance(filters, str):
+            raise ValueError(
+                "topology.params.element_filters must be a YAML list (e.g., '- [C]' entries), "
+                "not a single string literal. See --create-feature-config template for examples."
+            )
+        if not isinstance(filters, (list, tuple)):
+            raise ValueError("topology.params.element_filters must be a list of element sequences.")
+        normalised = []
+        for item in filters:
+            if not isinstance(item, (list, tuple)):
+                raise ValueError("Each element_filters entry must be a list/tuple of element symbols.")
+            if not item:
+                raise ValueError("Element filter sequences must contain at least one symbol.")
+            for symbol in item:
+                if not isinstance(symbol, str) or not symbol.strip():
+                    raise ValueError("Element filter symbols must be non-empty strings.")
+            normalised.append(tuple(symbol.strip() for symbol in item))
+        topo_params["element_filters"] = normalised
+
+    interface_params = selection.interface.get("params", {})
+    cutoff = interface_params.get("cutoff")
+    if cutoff is not None:
+        try:
+            cutoff_value = float(cutoff)
+        except (TypeError, ValueError):
+            raise ValueError("interface.params.cutoff must be numeric.")
+        if cutoff_value <= 0:
+            raise ValueError("interface.params.cutoff must be > 0.")
+        interface_params["cutoff"] = cutoff_value
+
+    edge_params = selection.edge.get("params", {})
+    histogram_bins = edge_params.get("histogram_bins")
+    if histogram_bins is not None:
+        if not isinstance(histogram_bins, (list, tuple)) or len(histogram_bins) < 2:
+            raise ValueError("edge.params.histogram_bins must be a list of at least two numeric values.")
+        try:
+            numeric_bins = [float(value) for value in histogram_bins]
+        except (TypeError, ValueError):
+            raise ValueError("edge.params.histogram_bins must contain only numeric values.")
+        if any(b <= 0 for b in numeric_bins):
+            raise ValueError("edge.params.histogram_bins must contain positive values.")
+        if numeric_bins != sorted(numeric_bins):
+            raise ValueError("edge.params.histogram_bins must be sorted ascending.")
+        edge_params["histogram_bins"] = numeric_bins
+
+    contact_threshold = edge_params.get("contact_threshold")
+    if contact_threshold is not None:
+        try:
+            threshold_value = float(contact_threshold)
+        except (TypeError, ValueError):
+            raise ValueError("edge.params.contact_threshold must be numeric.")
+        if threshold_value <= 0:
+            raise ValueError("edge.params.contact_threshold must be > 0.")
+        edge_params["contact_threshold"] = threshold_value
 
 
 def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None:
@@ -315,13 +347,18 @@ def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None
 
 
 def _list_registered_modules() -> None:
+    try:
+        from .modules import list_modules as _list_modules  # type: ignore
+    except ImportError:  # pragma: no cover
+        from modules import list_modules as _list_modules  # type: ignore
+
     print("Select exactly one module per category (interface → topology → node → edge) when configuring features.\n")
     print("Need to blend or extend feature logic? Copy an existing module (interface/topology/node/edge), "
           "adapt or compose it, add @register_feature_module, and reference the new module ID in feature-config.yaml. "
           "Each run still selects exactly one interface, one topology, one node, and one edge module.\n")
     for kind in ("interface", "topology", "node", "edge"):
         print(f"{kind.upper()} modules")
-        for meta in sorted(list_modules(kind=kind), key=lambda m: m.module_id):
+        for meta in sorted(_list_modules(kind=kind), key=lambda m: m.module_id):
             print(f"  {meta.module_id}")
             print(f"    summary : {meta.summary}")
             if meta.parameters:
@@ -374,11 +411,13 @@ Final output: torch_geometric Data (.pt)
 
 def write_feature_config(output_path: Path) -> None:
     template = """# Minimal feature-config template
-# Fill in the module IDs you want to use for each required stage.
-# Run `./run_graph_builder.sh --list-modules` to discover all available IDs.
+# Pick exactly one module per REQUIRED stage below.
+# Run `./run_graph_builder.sh --list-modules` to discover valid module IDs.
+# Remove any blocks you do not use—do not paste the module catalog output here.
 defaults:
   jobs: 8  # Optional global worker override; remove if unused.
 
+# REQUIRED STAGES -------------------------------------------------------
 interface:
   module: interface/polar_cutoff/v1
   params:
@@ -403,7 +442,9 @@ edge:
     histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
     contact_threshold: 5.0
 
-# Optional additional stages. Rename the key (e.g., \"mol\") and provide module/params:
+# OPTIONAL / CUSTOM STAGES ----------------------------------------------
+# Rename the key (e.g., \"mol\") and provide module/params only if the builder
+# has logic to consume the stage. Otherwise leave this section out entirely.
 # mol:
 #   module: custom/mol_stage/v1
 #   params: {}
@@ -581,7 +622,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         edge_dump_dir = work_dir / "edge_features"
 
     LOG.info("Beginning graph assembly (.pt output) stage (jobs=%s)", edge_jobs)
-    edge_result = run_edge_stage(
+    try:
+        from .lib.edge_runner import run_edge_stage as _run_edge_stage  # type: ignore
+    except ImportError:  # pragma: no cover - fallback for direct execution
+        from lib.edge_runner import run_edge_stage as _run_edge_stage  # type: ignore
+
+    edge_result = _run_edge_stage(
         dataset_dir=dataset_dir,
         interface_dir=interface_result["output_dir"],
         topology_dir=topology_result["output_dir"],
