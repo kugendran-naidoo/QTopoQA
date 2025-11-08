@@ -46,11 +46,12 @@ from pytorch_lightning.loggers import CSVLogger
 
 try:  # Prefer absolute import so script execution still works
     from qtdaqa.new_dynamic_features.model_training.run_metadata import (
+        record_checkpoint_paths,
         record_selection_metadata,
         update_run_metadata,
     )
 except ImportError:  # pragma: no cover - fallback for ad-hoc launches
-from run_metadata import record_checkpoint_paths, record_selection_metadata, update_run_metadata
+    from run_metadata import record_checkpoint_paths, record_selection_metadata, update_run_metadata
 
 try:  # Optional MLflow dependency
     from pytorch_lightning.loggers import MLFlowLogger  # type: ignore
