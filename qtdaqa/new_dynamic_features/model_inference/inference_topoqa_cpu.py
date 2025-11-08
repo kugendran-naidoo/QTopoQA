@@ -85,6 +85,26 @@ def resolve_feature_schema(cfg: InferenceConfig, checkpoint_meta: Dict[str, obje
     return {"edge_schema": edge_schema, "topology_schema": topo_schema}
 
 
+def _guard_schema_overrides(cfg: InferenceConfig, checkpoint_meta: Dict[str, object]) -> None:
+    def _check(section: str, override: Dict[str, object], metadata: Dict[str, object]) -> None:
+        if not override:
+            return
+        for key, expected in override.items():
+            actual = metadata.get(key)
+            if actual != expected:
+                raise RuntimeError(
+                    f"{section}.{key} mismatch: config override {expected!r} does not match checkpoint metadata {actual!r}. "
+                    "Pick a checkpoint built with the same feature config or update the override."
+                )
+
+    edge_override = cfg.edge_schema or {}
+    topo_override = cfg.topology_schema or {}
+    edge_meta = checkpoint_meta.get("edge_schema") or {}
+    topo_meta = checkpoint_meta.get("topology_schema") or {}
+    _check("edge_schema", edge_override, edge_meta)
+    _check("topology_schema", topo_override, topo_meta)
+
+
 def _default_training_root() -> Path:
     return SCRIPT_DIR.parent / "model_training" / "training_runs"
 
@@ -195,6 +215,11 @@ def load_config(raw_path: Path) -> InferenceConfig:
     if checkpoint_raw:
         checkpoint_path = _resolve(checkpoint_raw, raw_path.parent)
     else:
+        if not training_root.exists():
+            raise FileNotFoundError(
+                f"Training root does not exist: {training_root}. "
+                "Set paths.training_root in your inference config or point at the correct training_runs directory."
+            )
         checkpoint_path = _auto_select_checkpoint(training_root)
 
     return InferenceConfig(
@@ -732,6 +757,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(json.dumps(checkpoint_meta, indent=2))
         return 0
 
+    _guard_schema_overrides(cfg, checkpoint_meta)
     final_schema = resolve_feature_schema(cfg, checkpoint_meta)
     logging.info("Resolved feature schema: %s", json.dumps(final_schema, indent=2))
 
