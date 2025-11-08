@@ -37,6 +37,7 @@ These metadata files are the contract with training/inference. Keep them next to
   - `./run_full_pipeline.sh` – orchestrates sweep → Phase 1 → Phase 2 seeds.  
   - `./run_model_training.sh` – wraps `train_cli.py` for custom invocations (`run`, `batch`, `resume`, `summarise`, `leaderboard`).  
   - `train_cli.py` – unified Python entry point that handles config overrides, metadata logging, deterministic env settings, and Lightning invocation.
+  - `./run_model_training.sh leaderboard --show-alt-selection` – optional flag that prints, for each entry, which checkpoint would win if `selection_metric` (val loss − Spearman bonus) were the primary metric, so you can compare objectives without rerunning training.
 - **Config highlights:**  
   - `paths.graph` (required) – point to the builder’s `graph_dir`; training automatically loads `graph_metadata.json` from here, so it knows the node/edge dims and column names.  
   - `selection.primary_metric` – controls how sweeps/fine-tunes rank runs (`val_loss` default, or `selection_metric` that blends val loss + Spearman corr). `run_full_pipeline.sh` reads this setting from each run’s metadata so you never have to edit the shell script when switching metrics.  

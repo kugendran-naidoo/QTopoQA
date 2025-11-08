@@ -82,6 +82,8 @@ def test_cmd_leaderboard_honours_top_count(tmp_path, monkeypatch, capsys):
                 "best_selection_metric": -0.70,
                 "best_val_loss": 0.050,
                 "best_checkpoint": tmp_path / "primary.ckpt",
+                "selection_metric_enabled": True,
+                "best_selection_val_spearman": -0.5,
             },
         ),
         (
@@ -92,6 +94,7 @@ def test_cmd_leaderboard_honours_top_count(tmp_path, monkeypatch, capsys):
                 "best_selection_metric": -0.60,
                 "best_val_loss": 0.045,
                 "best_checkpoint": tmp_path / "secondary.ckpt",
+                "selection_metric_enabled": False,
             },
         ),
         (
@@ -102,6 +105,7 @@ def test_cmd_leaderboard_honours_top_count(tmp_path, monkeypatch, capsys):
                 "best_selection_metric": -0.55,
                 "best_val_loss": 0.060,
                 "best_checkpoint": tmp_path / "tertiary.ckpt",
+                "selection_metric_enabled": False,
             },
         ),
     ]
@@ -113,4 +117,6 @@ def test_cmd_leaderboard_honours_top_count(tmp_path, monkeypatch, capsys):
     assert "1. primary" in output
     assert "2. secondary" in output
     assert "tertiary" not in output
-    assert "primary_metric=selection_metric (-0.7" in output
+    assert "primary_metric: selection_metric = -0.7" in output
+    assert "secondary_metric: val_spearman_corr = -0.5" in output
+    assert "secondary_metric: None" in output
