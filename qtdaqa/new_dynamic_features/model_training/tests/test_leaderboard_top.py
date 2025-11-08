@@ -1,4 +1,5 @@
 import argparse
+import json
 from pathlib import Path
 
 from qtdaqa.new_dynamic_features.model_training import train_cli
@@ -111,7 +112,7 @@ def test_cmd_leaderboard_honours_top_count(tmp_path, monkeypatch, capsys):
     ]
     monkeypatch.setattr(train_cli, "rank_runs", lambda root: entries)
 
-    args = argparse.Namespace(root=tmp_path, top=2, limit=5)
+    args = argparse.Namespace(root=tmp_path, top=2, limit=5, show_alt_selection=False, output_format="text")
     train_cli.cmd_leaderboard(args)
     output = capsys.readouterr().out
     assert "1. primary" in output
@@ -120,3 +121,79 @@ def test_cmd_leaderboard_honours_top_count(tmp_path, monkeypatch, capsys):
     assert "primary_metric: selection_metric = -0.7" in output
     assert "secondary_metric: val_spearman_corr = -0.5" in output
     assert "secondary_metric: None" in output
+
+
+def test_cmd_leaderboard_json_output(tmp_path, monkeypatch, capsys):
+    entries = [
+        (
+            "val_loss",
+            0.05,
+            {
+                "run_name": "alpha",
+                "best_selection_metric": -0.70,
+                "best_val_loss": 0.05,
+                "best_checkpoint": tmp_path / "alpha.ckpt",
+                "selection_metric_enabled": True,
+                "best_selection_val_spearman": -0.5,
+                "selection_alternates": [
+                    {
+                        "selection_metric": -0.6,
+                        "epoch": 42,
+                        "checkpoint": tmp_path / "alpha_selection.chkpt",
+                    }
+                ],
+            },
+        )
+    ]
+    monkeypatch.setattr(train_cli, "rank_runs", lambda root: entries)
+
+    args = argparse.Namespace(
+        root=tmp_path,
+        top=1,
+        limit=5,
+        show_alt_selection=False,
+        output_format="json",
+    )
+    train_cli.cmd_leaderboard(args)
+    data = capsys.readouterr().out.strip()
+    payload = json.loads(data)
+    assert payload[0]["run_name"] == "alpha"
+    assert payload[0]["primary_metric"] == "val_loss"
+    assert payload[0]["selection_alternates"][0]["selection_metric"] == -0.6
+    assert payload[0]["selection_alternates"][0]["checkpoint"].endswith("alpha_selection.chkpt")
+
+
+def test_cmd_leaderboard_show_alt_selection_displays_checkpoint(tmp_path, monkeypatch, capsys):
+    entries = [
+        (
+            "val_loss",
+            0.049,
+            {
+                "run_name": "alpha",
+                "best_selection_metric": -0.70,
+                "best_val_loss": 0.049,
+                "best_checkpoint": tmp_path / "alpha.ckpt",
+                "selection_metric_enabled": True,
+                "best_selection_val_spearman": -0.5,
+                "selection_alternates": [
+                    {
+                        "selection_metric": -0.65,
+                        "epoch": 88,
+                        "checkpoint": tmp_path / "alpha_selection.chkpt",
+                    }
+                ],
+            },
+        )
+    ]
+    monkeypatch.setattr(train_cli, "rank_runs", lambda root: entries)
+
+    args = argparse.Namespace(
+        root=tmp_path,
+        top=1,
+        limit=5,
+        show_alt_selection=True,
+        output_format="text",
+    )
+    train_cli.cmd_leaderboard(args)
+    output = capsys.readouterr().out
+    assert "alt_selection_rank: (epoch=88, selection_metric = -0.65), checkpoint =" in output

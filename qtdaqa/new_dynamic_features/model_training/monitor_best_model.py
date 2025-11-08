@@ -157,6 +157,9 @@ def _format_metric_block(summary: Dict[str, Any], indent: str = "   ", include_a
                 label += f"(epoch={alt_epoch}, selection_metric = {alt_val})"
             else:
                 label += f"(selection_metric = {alt_val})"
+            alt_ckpt = alt_entry.get("checkpoint")
+            if alt_ckpt:
+                label += f", checkpoint = {alt_ckpt}"
             lines.append(label)
         else:
             lines.append(f"{indent}alt_selection_rank: (selection metric ranks current run)")
@@ -224,6 +227,21 @@ def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Di
         else:
             recent_metrics = []
 
+    alternates_payload = payload.get("selection_alternates") if isinstance(payload, dict) else None
+    normalised_alternates: List[Dict[str, Any]] = []
+    if isinstance(alternates_payload, list):
+        for entry in alternates_payload:
+            if not isinstance(entry, dict):
+                continue
+            copied = dict(entry)
+            checkpoint_value = copied.get("checkpoint")
+            if checkpoint_value:
+                copied["checkpoint"] = _to_repo_relative(str(checkpoint_value))
+            source_value = copied.get("source")
+            if source_value:
+                copied["source"] = _to_repo_relative(str(source_value))
+            normalised_alternates.append(copied)
+
     summary: Dict[str, Any] = {
         "run_dir": _to_repo_relative(str(run_dir)),
         "run_name": run_dir.name,
@@ -238,13 +256,12 @@ def _summarise_best(run_dir: Path, *, metrics_limit: Optional[int] = None) -> Di
         "top_val_losses": top_val_losses,
         "selection_metric_enabled": selection_enabled,
         "best_selection": selection_best,
-        "selection_alternates": top_selection[1:] if top_selection else [],
+        "selection_alternates": normalised_alternates,
         "selection_primary_metric": payload.get("selection_primary_metric") if isinstance(payload, dict) else None,
         "runtime_estimate": runtime_estimate,
         "progress": progress,
         "best_summary_line": best_summary_line,
         "warnings": _collect_warnings(best_checkpoint, selection_enabled, payload.get("run_metadata", {}), progress),
-        "selection_primary_metric": payload.get("selection_primary_metric") if isinstance(payload, dict) else None,
         "best_selection_metric": payload.get("best_selection_metric") if isinstance(payload, dict) else None,
         "best_selection_val_spearman": payload.get("best_selection_val_spearman") if isinstance(payload, dict) else None,
     }

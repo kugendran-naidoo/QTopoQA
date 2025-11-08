@@ -50,7 +50,7 @@ try:  # Prefer absolute import so script execution still works
         update_run_metadata,
     )
 except ImportError:  # pragma: no cover - fallback for ad-hoc launches
-    from run_metadata import record_selection_metadata, update_run_metadata
+from run_metadata import record_checkpoint_paths, record_selection_metadata, update_run_metadata
 
 try:  # Optional MLflow dependency
     from pytorch_lightning.loggers import MLFlowLogger  # type: ignore
@@ -1005,6 +1005,32 @@ def _create_checkpoint_symlinks(
                 pass
 
 
+def _normalise_checkpoint_file(path: Path, logger: logging.Logger) -> Path:
+    if not path.exists():
+        return path
+    if path.suffix == ".chkpt":
+        return path
+    stem = _format_checkpoint_stem(path)
+    candidate = path.with_name(f"{stem}.chkpt")
+    counter = 1
+    while candidate.exists():
+        candidate = path.with_name(f"{stem}_dup{counter}.chkpt")
+        counter += 1
+    path.rename(candidate)
+    logger.info("Renamed checkpoint file: %s -> %s", path.name, candidate.name)
+    return candidate
+
+
+def _create_named_symlink(symlink_path: Path, target_path: Path, logger: logging.Logger) -> None:
+    try:
+        if symlink_path.exists() or symlink_path.is_symlink():
+            symlink_path.unlink()
+        symlink_path.symlink_to(target_path)
+        logger.info("Symlinked %s to %s", symlink_path.name, target_path.name)
+    except OSError as exc:
+        logger.warning("Unable to create %s symlink: %s", symlink_path.name, exc)
+
+
 def _safe_scalar(value: object) -> Optional[float]:
     if value is None:
         return None
@@ -1514,6 +1540,11 @@ def main() -> int:
         primary_metric = "val_loss"
 
     monitor_metric_name = "selection_metric" if primary_metric == "selection_metric" else "val_loss"
+    alternate_metric_name: Optional[str] = None
+    if primary_metric == "val_loss":
+        alternate_metric_name = "selection_metric"
+    elif primary_metric == "selection_metric":
+        alternate_metric_name = "val_loss"
 
     if monitor_metric_name == "selection_metric":
         checkpoint_filename = "checkpoint.sel-{selection_metric:.5f}_val-{val_loss:.5f}_epoch{epoch:03d}"
@@ -1529,6 +1560,25 @@ def main() -> int:
         save_top_k=3,
         save_last=False,
     )
+    alternate_checkpoint_cb: Optional[ModelCheckpoint] = None
+    alternate_symlink_name: Optional[str] = None
+    if alternate_metric_name is not None:
+        alt_dir = checkpoint_dir / f"{alternate_metric_name}_checkpoints"
+        alt_dir.mkdir(parents=True, exist_ok=True)
+        if alternate_metric_name == "selection_metric":
+            alt_filename = "alt_selection.sel-{selection_metric:.5f}_val-{val_loss:.5f}_epoch{epoch:03d}"
+        else:
+            alt_filename = "alt_val.val-{val_loss:.5f}_epoch{epoch:03d}"
+        alternate_checkpoint_cb = ModelCheckpoint(
+            dirpath=str(alt_dir),
+            filename=alt_filename,
+            auto_insert_metric_name=False,
+            monitor=alternate_metric_name,
+            mode="min",
+            save_top_k=1,
+            save_last=False,
+        )
+        alternate_symlink_name = f"{alternate_metric_name}_best.ckpt"
     early_stop_cb = EarlyStopping(
         monitor=monitor_metric_name,
         mode="min",
@@ -1552,6 +1602,8 @@ def main() -> int:
         progress_bar_cb = TQDMProgressBar(refresh_rate=cfg.progress_bar_refresh_rate)
 
     callback_list: List[Callback] = [selection_callback, checkpoint_cb, early_stop_cb, *lr_callbacks]
+    if alternate_checkpoint_cb is not None:
+        callback_list.append(alternate_checkpoint_cb)
     if progress_bar_cb is not None:
         callback_list.append(progress_bar_cb)
     callback_list.append(TrainingProgressLogger(logger))
@@ -1758,6 +1810,40 @@ def main() -> int:
             best_ckpt_path = str(ranked_checkpoints[0])
             checkpoint_cb.best_model_path = best_ckpt_path
         _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)
+
+    alternate_checkpoint_path: Optional[Path] = None
+    if alternate_checkpoint_cb is not None:
+        best_alt_path = alternate_checkpoint_cb.best_model_path
+        if best_alt_path:
+            alt_path_obj = Path(best_alt_path)
+            alt_path_obj = _normalise_checkpoint_file(alt_path_obj, logger)
+            alternate_checkpoint_cb.best_model_path = str(alt_path_obj)
+            try:
+                alternate_checkpoint_path = alt_path_obj.resolve()
+            except OSError:
+                alternate_checkpoint_path = alt_path_obj
+            if alternate_symlink_name:
+                _create_named_symlink(checkpoint_dir / alternate_symlink_name, alternate_checkpoint_path, logger)
+        elif alternate_symlink_name:
+            stale = checkpoint_dir / alternate_symlink_name
+            if stale.exists() or stale.is_symlink():
+                try:
+                    stale.unlink()
+                except OSError:
+                    pass
+
+    alternates_meta: Dict[str, Optional[Path]] = {}
+    if alternate_metric_name is not None:
+        alternates_meta[alternate_metric_name] = alternate_checkpoint_path
+    try:
+        record_checkpoint_paths(
+            cfg.save_dir,
+            primary_metric=primary_metric,
+            primary_path=best_path_obj,
+            alternates=alternates_meta if alternates_meta else None,
+        )
+    except Exception as exc:  # pragma: no cover - metadata recording best effort
+        logger.warning("Unable to record checkpoint metadata: %s", exc)
 
     if load_profiler.enabled:
         load_profile_summary = load_profiler.finalise(cfg.save_dir, logger)

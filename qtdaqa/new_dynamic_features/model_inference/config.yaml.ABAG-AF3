@@ -6,7 +6,7 @@ paths:
   label_file: ../../../datasets/evaluation/ABAG-AF3/label_info.csv
   work_dir: ./output/11d_topoqa_settings/ABAG-AF3/work
   output_file: ./output/11d_topoqa_settings/ABAG-AF3/results/inference_results.csv
-  checkpoint: null
+  checkpoint: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-08_12-56-39_phase2_seed101/model_checkpoints/checkpoint.val-0.04939_epoch091.chkpt 
 
 batch_size: 32
 num_workers: 0

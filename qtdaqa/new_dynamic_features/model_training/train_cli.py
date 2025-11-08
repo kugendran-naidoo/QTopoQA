@@ -972,6 +972,19 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     if metadata_path.exists():
         run_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
 
+    primary_checkpoint_meta: Optional[str] = None
+    alternate_checkpoint_meta: Dict[str, str] = {}
+    checkpoints_meta = run_metadata.get("checkpoints") if isinstance(run_metadata, dict) else None
+    if isinstance(checkpoints_meta, dict):
+        primary_candidate = checkpoints_meta.get("primary_path")
+        if primary_candidate:
+            primary_checkpoint_meta = str(primary_candidate)
+        raw_alternates = checkpoints_meta.get("alternates")
+        if isinstance(raw_alternates, dict):
+            for metric_name, path_value in raw_alternates.items():
+                if path_value:
+                    alternate_checkpoint_meta[str(metric_name)] = str(path_value)
+
     metrics_dir = run_dir / "metrics"
     metrics_dir.mkdir(exist_ok=True)
     metrics_files = sorted(metrics_dir.glob("*.csv"))
@@ -1032,6 +1045,15 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
             )
         selection_best = sorted_by_selection[0]
 
+    selection_alternates: List[Dict[str, Any]] = []
+    selection_alt_checkpoint = alternate_checkpoint_meta.get("selection_metric")
+    if selection_primary_metric != "selection_metric" and selection_best:
+        alternate_entry = dict(selection_best)
+        if selection_alt_checkpoint:
+            alternate_entry["checkpoint"] = selection_alt_checkpoint
+            alternate_entry["source"] = selection_alt_checkpoint
+        selection_alternates.append(alternate_entry)
+
     checkpoint_dir = run_dir / "model_checkpoints"
     best_checkpoint = None
     best_symlink = checkpoint_dir / "best.ckpt"
@@ -1041,6 +1063,8 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         candidates = sorted(checkpoint_dir.glob("*.chkpt"))
         if candidates:
             best_checkpoint = str(candidates[0])
+    if primary_checkpoint_meta:
+        best_checkpoint = primary_checkpoint_meta
 
     feature_metadata_path = run_dir / "feature_metadata.json"
     feature_info = {}
@@ -1088,12 +1112,17 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "top_val_losses": top_val_losses,
         "selection_metric_enabled": selection_enabled,
         "top_selection_metrics": selection_top,
+        "selection_alternates": selection_alternates,
         "best_selection_metric": selection_best.get("selection_metric") if selection_best else None,
         "best_selection_epoch": selection_best.get("epoch") if selection_best else None,
         "best_selection_val_loss": selection_best.get("val_loss") if selection_best else None,
         "best_selection_val_spearman": selection_best.get("val_spearman_corr") if selection_best else None,
         "selection_primary_metric": selection_primary_metric,
     }
+    if alternate_checkpoint_meta:
+        summary["alternate_checkpoints"] = alternate_checkpoint_meta
+    if selection_alt_checkpoint:
+        summary["selection_alternate_checkpoint"] = selection_alt_checkpoint
 
     if isinstance(training_parameters, dict):
         summary["training_parameters"] = training_parameters
@@ -1104,7 +1133,19 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     checkpoint_dir = run_dir / "model_checkpoints"
     selection_lookup = {entry.get("rank"): entry for entry in selection_top if isinstance(entry, dict)}
     symlink_entries: List[Dict[str, Any]] = []
-    for rank, name in enumerate(["best.ckpt", "second_best.ckpt", "third_best.ckpt"], start=1):
+    symlink_specs: List[Tuple[str, Optional[Dict[str, Any]]]] = [
+        ("best.ckpt", selection_lookup.get(1)),
+        ("second_best.ckpt", selection_lookup.get(2)),
+        ("third_best.ckpt", selection_lookup.get(3)),
+    ]
+    if (checkpoint_dir / "selection_metric_best.ckpt").exists():
+        symlink_specs.append(("selection_metric_best.ckpt", selection_best))
+    if (checkpoint_dir / "val_loss_best.ckpt").exists():
+        val_loss_entry: Optional[Dict[str, Any]] = top_val_losses[0] if top_val_losses else None
+        if val_loss_entry is None and sorted_by_loss:
+            val_loss_entry = sorted_by_loss[0]
+        symlink_specs.append(("val_loss_best.ckpt", val_loss_entry))
+    for name, entry in symlink_specs:
         symlink_path = checkpoint_dir / name
         if not symlink_path.exists():
             continue
@@ -1112,14 +1153,15 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
             target = symlink_path.resolve(strict=False)
         except OSError:
             target = symlink_path
-        entry = selection_lookup.get(rank, {})
+        entry_payload = entry or {}
         symlink_entries.append(
             {
                 "name": name,
                 "path": _as_repo_relative(target),
-                "selection_metric": entry.get("selection_metric"),
-                "val_loss": entry.get("val_loss"),
-                "epoch": entry.get("epoch"),
+                "selection_metric": entry_payload.get("selection_metric"),
+                "val_loss": entry_payload.get("val_loss"),
+                "epoch": entry_payload.get("epoch"),
+                "source": entry_payload.get("checkpoint") or entry_payload.get("source"),
             }
         )
     if symlink_entries:
@@ -1144,40 +1186,48 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     return summary
 
 
-def cmd_leaderboard(args: argparse.Namespace) -> None:
-    root = (args.root or RUN_ROOT).resolve()
-    if not root.exists():
-        raise CLIError(f"Leaderboard root does not exist: {root}")
+def _leaderboard_entries(root: Path) -> List[Dict[str, Any]]:
+    entries: List[Dict[str, Any]] = []
+    for metric_name, metric_value, summary in rank_runs(root):
+        alt_entries: List[Dict[str, Any]] = []
+        for alt in summary.get("selection_alternates") or []:
+            if not isinstance(alt, dict):
+                continue
+            payload = dict(alt)
+            checkpoint_path = payload.get("checkpoint")
+            if checkpoint_path:
+                payload["checkpoint"] = _as_repo_relative(checkpoint_path)
+            alt_entries.append(payload)
+        entry = {
+            "run_name": summary.get("run_name"),
+            "primary_metric": metric_name,
+            "primary_value": metric_value,
+            "secondary_metric": "val_spearman_corr" if summary.get("selection_metric_enabled") else None,
+            "secondary_value": summary.get("best_selection_val_spearman"),
+            "val_loss": summary.get("best_val_loss"),
+            "selection_metric": summary.get("best_selection_metric"),
+            "checkpoint": _as_repo_relative(summary.get("best_checkpoint")) if summary.get("best_checkpoint") else None,
+            "selection_alternates": alt_entries,
+            "metadata": summary,
+        }
+        entries.append(entry)
+    return entries
 
-    ranked = rank_runs(root)
 
-    if not ranked:
-        print("[train_cli][leaderboard] No runs with selection/val metrics found under", root)
-        return
-
-    count = args.top if args.top is not None else args.limit
-    limit = max(1, count)
-    alt_enabled = getattr(args, "show_alt_selection", False)
-    alt_summary = rank_runs(root) if alt_enabled else []
-    for rank, (metric_name, metric_value, summary) in enumerate(ranked[:limit], start=1):
-        sel_metric = summary.get("best_selection_metric")
-        val_loss = summary.get("best_val_loss")
-        checkpoint = summary.get("best_checkpoint")
-        secondary_enabled = bool(summary.get("selection_metric_enabled"))
-        secondary_value = summary.get("best_selection_val_spearman")
-        secondary_label = "val_spearman_corr" if secondary_enabled else "None"
-        print(f"{rank}. {summary['run_name']}")
-        print(f"   primary_metric: {metric_name} = {metric_value}")
-        if secondary_enabled:
-            print(f"   secondary_metric: {secondary_label} = {secondary_value}")
+def _print_leaderboard(entries: List[Dict[str, Any]], limit: int, show_alt: bool) -> None:
+    for idx, entry in enumerate(entries[:limit], start=1):
+        print(f"{idx}. {entry['run_name']}")
+        print(f"   primary_metric: {entry['primary_metric']} = {entry['primary_value']}")
+        if entry["secondary_metric"]:
+            print(f"   secondary_metric: {entry['secondary_metric']} = {entry['secondary_value']}")
         else:
             print("   secondary_metric: None")
-        if val_loss is not None:
-            print(f"   val_loss: {val_loss}")
-        if sel_metric is not None:
-            print(f"   selection_metric: {sel_metric}")
-        if alt_enabled:
-            alternates = summary.get("selection_alternates") or []
+        if entry["val_loss"] is not None:
+            print(f"   val_loss: {entry['val_loss']}")
+        if entry["selection_metric"] is not None:
+            print(f"   selection_metric: {entry['selection_metric']}")
+        if show_alt:
+            alternates = entry.get("selection_alternates") or []
             if alternates:
                 alt_entry = alternates[0]
                 alt_val = alt_entry.get("selection_metric")
@@ -1187,12 +1237,35 @@ def cmd_leaderboard(args: argparse.Namespace) -> None:
                     alt_line += f"(epoch={alt_epoch}, selection_metric = {alt_val})"
                 else:
                     alt_line += f"(selection_metric = {alt_val})"
+                alt_checkpoint = alt_entry.get("checkpoint")
+                if alt_checkpoint:
+                    alt_line += f", checkpoint = {alt_checkpoint}"
                 print(alt_line)
             else:
                 print("   alt_selection_rank: (selection metric ranks current run)")
-        if checkpoint:
-            print(f"   checkpoint: {_as_repo_relative(checkpoint)}")
+        if entry["checkpoint"]:
+            print(f"   checkpoint: {entry['checkpoint']}")
         print("")
+
+
+def cmd_leaderboard(args: argparse.Namespace) -> None:
+    root = (args.root or RUN_ROOT).resolve()
+    if not root.exists():
+        raise CLIError(f"Leaderboard root does not exist: {root}")
+
+    entries = _leaderboard_entries(root)
+    if not entries:
+        print("[train_cli][leaderboard] No runs with selection/val metrics found under", root)
+        return
+
+    count = args.top if args.top is not None else args.limit
+    limit = max(1, count)
+    if args.output_format == "json":
+        json.dump(entries[:limit], sys.stdout, indent=2, default=str)
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+    else:
+        _print_leaderboard(entries, limit, args.show_alt_selection)
 
 
 def cmd_summarise(args: argparse.Namespace) -> None:
@@ -1306,6 +1379,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--show-alt-selection",
         action="store_true",
         help="Also show which checkpoint would rank highest if selection_metric were primary.",
+    )
+    leaderboard_parser.add_argument(
+        "--output-format",
+        choices=("text", "json"),
+        default="text",
+        help="Select leaderboard output format.",
     )
     leaderboard_parser.set_defaults(func=cmd_leaderboard)
 

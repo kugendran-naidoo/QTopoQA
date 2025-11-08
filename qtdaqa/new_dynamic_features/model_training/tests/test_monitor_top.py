@@ -16,6 +16,7 @@ def test_monitor_top_lists_runs(tmp_path, monkeypatch, capsys):
                 "selection_metric_enabled": True,
                 "best_selection_val_spearman": -0.65,
                 "selection_primary_metric": "selection_metric",
+                "selection_alternates": [],
             },
         ),
         (
@@ -28,6 +29,7 @@ def test_monitor_top_lists_runs(tmp_path, monkeypatch, capsys):
                 "best_checkpoint": str(tmp_path / "beta.ckpt"),
                 "selection_metric_enabled": False,
                 "selection_primary_metric": "val_loss",
+                "selection_alternates": [],
             },
         ),
     ]
@@ -76,3 +78,24 @@ def test_render_table_includes_metric_block(tmp_path, capsys):
     assert "secondary_metric: val_spearman_corr = -0.62" in output
     assert "selection_metric: -0.6" in output
     assert "checkpoint: training_runs/alpha/checkpoint.ckpt" in output
+
+
+def test_format_metric_block_shows_alt_checkpoint():
+    summary = {
+        "selection_primary_metric": "val_loss",
+        "best_val_loss": 0.05,
+        "best_selection_metric": -0.6,
+        "selection_metric_enabled": True,
+        "best_selection_val_spearman": -0.62,
+        "best_checkpoint_path": "training_runs/demo/best.ckpt",
+        "selection_alternates": [
+            {
+                "selection_metric": -0.58,
+                "epoch": 90,
+                "checkpoint": "training_runs/demo/selection_metric_best.ckpt",
+            }
+        ],
+    }
+    lines = monitor_best_model._format_metric_block(summary, include_alt=True)
+    alt_lines = [line for line in lines if "alt_selection_rank" in line]
+    assert any("checkpoint = training_runs/demo/selection_metric_best.ckpt" in line for line in alt_lines)

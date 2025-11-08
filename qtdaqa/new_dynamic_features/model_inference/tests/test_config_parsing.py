@@ -210,6 +210,42 @@ def test_load_config_auto_select_checkpoint_failure(tmp_path: Path, monkeypatch:
         inference_topoqa_cpu.load_config(cfg_path)
 
 
+def test_load_config_requires_training_root_when_autoselect(tmp_path: Path) -> None:
+    cfg_path = _write_cfg(
+        tmp_path,
+        """
+        paths:
+          data_dir: ./data
+          work_dir: ./work
+          output_file: ./out.csv
+          training_root: ./missing_runs
+        builder:
+          jobs: 1
+        """,
+    )
+    with pytest.raises(FileNotFoundError, match="Training root does not exist"):
+        inference_topoqa_cpu.load_config(cfg_path)
+
+
+def test_guard_schema_overrides(tmp_path: Path) -> None:
+    cfg = inference_topoqa_cpu.InferenceConfig(
+        data_dir=tmp_path,
+        work_dir=tmp_path,
+        checkpoint_path=tmp_path / "ckpt.chkpt",
+        output_file=tmp_path / "out.csv",
+        edge_schema={"module": "edge/foo"},
+        training_root=tmp_path,
+    )
+    checkpoint_meta = {"edge_schema": {"module": "edge/bar"}}
+    with pytest.raises(RuntimeError, match="edge_schema.module mismatch"):
+        inference_topoqa_cpu._guard_schema_overrides(cfg, checkpoint_meta)
+
+    cfg.edge_schema = {"module": "edge/foo"}
+    checkpoint_meta = {"edge_schema": {"module": "edge/foo"}}
+    # Should not raise
+    inference_topoqa_cpu._guard_schema_overrides(cfg, checkpoint_meta)
+
+
 def test_log_checkpoint_banner_formats(caplog, tmp_path: Path) -> None:
     cfg = inference_topoqa_cpu.InferenceConfig(
         data_dir=tmp_path / "data",

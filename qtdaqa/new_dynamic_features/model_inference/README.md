@@ -41,6 +41,12 @@ batch_size: 32
 num_workers: 0
 ```
 
+If you omit `paths.training_root`, the CLI defaults to
+`../model_training/training_runs`. Before doing any heavy work, inference now
+verifies that this directory exists (and thus contains the training runs you
+expect). If you run inference from a different checkout, update
+`paths.training_root` so the guardrail doesn’t trigger.
+
 Flags you can override on the CLI:
 
 ```bash
@@ -110,7 +116,10 @@ to reuse the regenerated graphs later.
   `options.reuse_existing_graphs: false` to force regeneration.
 - **Selecting a specific checkpoint** – set `paths.checkpoint` to an absolute
   `.ckpt` path. You should also set `paths.training_root` to the folder
-  containing that run so logs resolve correctly.
+  containing that run so logs resolve correctly. If you add manual
+  `edge_schema`/`topology_schema` overrides, inference compares them against
+  the checkpoint’s embedded metadata and fails fast if they disagree, which
+  prevents long builder runs with mismatched configs.
 - **Inspecting metadata without running inference** – use
   `./run_model_inference.sh --config ... --dump-metadata` to print the checkpoint
   schema and exit.
