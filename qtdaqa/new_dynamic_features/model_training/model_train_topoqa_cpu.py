@@ -48,10 +48,16 @@ try:  # Prefer absolute import so script execution still works
     from qtdaqa.new_dynamic_features.model_training.run_metadata import (
         record_checkpoint_paths,
         record_selection_metadata,
+        resolve_checkpoint_path,
         update_run_metadata,
     )
 except ImportError:  # pragma: no cover - fallback for ad-hoc launches
-    from run_metadata import record_checkpoint_paths, record_selection_metadata, update_run_metadata
+    from run_metadata import (
+        record_checkpoint_paths,
+        record_selection_metadata,
+        resolve_checkpoint_path,
+        update_run_metadata,
+    )
 
 try:  # Optional MLflow dependency
     from pytorch_lightning.loggers import MLFlowLogger  # type: ignore
@@ -1741,9 +1747,7 @@ def main() -> int:
         logger.info("Training completed. No checkpoints were saved (likely fast_dev_run).")
 
     best_ckpt_path: Optional[str] = checkpoint_cb.best_model_path or None
-    best_path_obj: Optional[Path] = None
-    if best_ckpt_path:
-        best_path_obj = Path(best_ckpt_path).resolve(strict=False)
+    best_path_obj: Optional[Path] = resolve_checkpoint_path(best_ckpt_path)
 
     ranked_checkpoints: List[Path] = []
     val_metrics: List[Dict[str, object]] = []
@@ -1779,8 +1783,7 @@ def main() -> int:
         logger.info("Validation metrics: %s", val_metrics)
 
     best_ckpt_path = checkpoint_cb.best_model_path or best_ckpt_path
-    if best_ckpt_path:
-        best_path_obj = Path(best_ckpt_path).resolve(strict=False)
+    best_path_obj = resolve_checkpoint_path(best_ckpt_path)
 
     if checkpoint_dir.exists():
         ranked_checkpoints = _rank_checkpoints(
@@ -1810,6 +1813,7 @@ def main() -> int:
         if ranked_checkpoints:
             best_ckpt_path = str(ranked_checkpoints[0])
             checkpoint_cb.best_model_path = best_ckpt_path
+            best_path_obj = resolve_checkpoint_path(best_ckpt_path)
         _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)
 
     alternate_checkpoint_path: Optional[Path] = None
@@ -1819,10 +1823,7 @@ def main() -> int:
             alt_path_obj = Path(best_alt_path)
             alt_path_obj = _normalise_checkpoint_file(alt_path_obj, logger)
             alternate_checkpoint_cb.best_model_path = str(alt_path_obj)
-            try:
-                alternate_checkpoint_path = alt_path_obj.resolve()
-            except OSError:
-                alternate_checkpoint_path = alt_path_obj
+            alternate_checkpoint_path = resolve_checkpoint_path(str(alt_path_obj))
             if alternate_symlink_name:
                 _create_named_symlink(checkpoint_dir / alternate_symlink_name, alternate_checkpoint_path, logger)
         elif alternate_symlink_name:
