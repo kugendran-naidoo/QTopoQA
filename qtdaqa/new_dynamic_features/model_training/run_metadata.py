@@ -55,3 +55,22 @@ def record_checkpoint_paths(
             checkpoints["alternates"] = serialised
 
     update_run_metadata(save_dir, _mutate)
+
+
+def resolve_checkpoint_path(path_str: Optional[str]) -> Optional[Path]:
+    if not path_str:
+        return None
+    candidate = Path(path_str)
+    if candidate.exists():
+        try:
+            return candidate.resolve()
+        except OSError:
+            return candidate
+    if candidate.suffix == ".ckpt":
+        alt = candidate.with_suffix(".chkpt")
+        if alt.exists():
+            try:
+                return alt.resolve()
+            except OSError:
+                return alt
+    return candidate

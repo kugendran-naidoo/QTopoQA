@@ -12,7 +12,7 @@ model:
 dataloader:
   batch_size: 16
   num_workers: 0
-  seed: 1337              # TODO: set to the seed/run you want to polish.
+  seed: 777              # TODO: set to the seed/run you want to polish.
 selection:
   primary_metric: val_loss
 trainer:
