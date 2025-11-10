@@ -160,6 +160,54 @@ def _log_checkpoint_banner(cfg: InferenceConfig, surround_blank: bool = False) -
         logging.info("")
 
 
+def _write_inference_schema_summary(
+    cfg: InferenceConfig,
+    graph_metadata: "GraphFeatureMetadata",
+    final_schema: Dict[str, Dict[str, object]],
+    checkpoint_meta: Dict[str, object],
+) -> Path:
+    metadata_dict = graph_metadata.to_dict()
+    summary_payload = {
+        "checkpoint": str(cfg.checkpoint_path),
+        "config_name": cfg.config_name,
+        "data_dir": str(cfg.data_dir),
+        "work_dir": str(cfg.work_dir),
+        "output_file": str(cfg.output_file),
+        "label_file": str(cfg.label_file) if cfg.label_file else None,
+        "training_root": str(cfg.training_root) if cfg.training_root else None,
+        "use_checkpoint_schema": cfg.use_checkpoint_schema,
+        "overrides": {
+            "edge_schema": cfg.edge_schema,
+            "topology_schema": cfg.topology_schema,
+        },
+        "graph_metadata": metadata_dict,
+        "final_schema": final_schema,
+        "checkpoint_schema": {
+            "edge_schema": checkpoint_meta.get("edge_schema"),
+            "topology_schema": checkpoint_meta.get("topology_schema"),
+        },
+    }
+    summary = {
+        "checkpoint": summary_payload["checkpoint"],
+        "config_name": summary_payload["config_name"],
+        "data_dir": summary_payload["data_dir"],
+        "work_dir": summary_payload["work_dir"],
+        "output_file": summary_payload["output_file"],
+        "label_file": summary_payload["label_file"],
+        "training_root": summary_payload["training_root"],
+        "use_checkpoint_schema": summary_payload["use_checkpoint_schema"],
+        "overrides": summary_payload["overrides"],
+        "final_schema": summary_payload["final_schema"],
+        "checkpoint_schema": summary_payload["checkpoint_schema"],
+        "graph_metadata": summary_payload["graph_metadata"],
+    }
+    summary_path = cfg.work_dir / "schema_summary.json"
+    summary_path.parent.mkdir(parents=True, exist_ok=True)
+    with summary_path.open("w", encoding="utf-8") as handle:
+        json.dump(summary, handle, indent=2)
+    return summary_path
+
+
 def load_config(raw_path: Path) -> InferenceConfig:
     with raw_path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
@@ -564,6 +612,8 @@ def run_inference(
     metadata = validate_graph_metadata(graph_dir, final_schema)
     metadata_source = metadata.metadata_path or str(graph_dir / "graph_metadata.json")
     logging.info("Verified graph metadata compatibility (%s).", metadata_source)
+    summary_path = _write_inference_schema_summary(cfg, metadata, final_schema, checkpoint_meta)
+    logging.info("Inference schema summary written to %s", summary_path)
 
     logging.info("Loading graphs from %s", graph_dir)
     graph_entries = gather_graphs(graph_dir)

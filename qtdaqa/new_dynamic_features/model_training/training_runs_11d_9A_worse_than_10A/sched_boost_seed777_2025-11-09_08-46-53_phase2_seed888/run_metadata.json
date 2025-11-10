@@ -1,0 +1,138 @@
+{
+  "run_name": "sched_boost_seed777_2025-11-09_08-46-53_phase2_seed888",
+  "created": "2025-11-09T12:55:18.418878",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed888.yaml",
+  "overrides": {
+    "paths.graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.9A/graph_data"
+  },
+  "notes": null,
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-09_08-46-53_phase2_seed888/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-09_08-46-53_phase2_seed888",
+    "--git-commit",
+    "6b02eee69",
+    "--git-dirty",
+    "--resume-from",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-09_08-46-53_phase1/model_checkpoints/checkpoint.val-0.05801_epoch057.chkpt"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  },
+  "training_parameters": {
+    "trainer": {
+      "num_epochs": 320,
+      "accumulate_grad_batches": 16,
+      "precision": 32,
+      "accelerator": "cpu",
+      "devices": 1
+    },
+    "dataloader": {
+      "batch_size": 16,
+      "num_workers": 0,
+      "seed": 888
+    },
+    "fast_dev_run": false
+  },
+  "selection_primary_metric": "val_loss",
+  "selection": {
+    "primary_metric": "val_loss",
+    "use_val_spearman": true,
+    "spearman_weight": 1.0,
+    "spearman_min_delta": 0.0,
+    "secondary_metric": "val_spearman_corr"
+  },
+  "runtime": {
+    "training_seconds": 3029,
+    "epochs_completed": 54,
+    "epochs_total": 320,
+    "epoch_seconds": [
+      10,
+      10,
+      10,
+      10,
+      9,
+      10,
+      9,
+      10,
+      12,
+      11,
+      10,
+      10,
+      10,
+      10,
+      9,
+      9,
+      10,
+      9,
+      10,
+      10,
+      10,
+      9,
+      10,
+      10,
+      10,
+      9,
+      10,
+      21,
+      22,
+      24,
+      22,
+      22,
+      21,
+      23,
+      23,
+      22,
+      22,
+      22,
+      20,
+      19,
+      20,
+      19,
+      109,
+      171,
+      240,
+      180,
+      179,
+      205,
+      228,
+      226,
+      203,
+      210,
+      265,
+      228
+    ],
+    "epoch_seconds_stats": {
+      "mean": 56.09532597145341,
+      "median": 15.45055350032635,
+      "min": 8.993967624846846,
+      "max": 264.8716444578022
+    }
+  },
+  "checkpoints": {
+    "primary_metric": "val_loss",
+    "primary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-09_08-46-53_phase2_seed888/model_checkpoints/checkpoint.val-0.05796_epoch066.chkpt",
+    "alternates": {
+      "selection_metric": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-09_08-46-53_phase2_seed888/model_checkpoints/selection_metric_checkpoints/alt_selection.sel--0.64279_val-0.05798_epoch065.ckpt"
+    }
+  },
+  "mlflow": {
+    "run_id": "6ea0208c5a514c208624c770cae9cccb",
+    "experiment": "dynamic_topoqa",
+    "experiment_id": "278908513362295974",
+    "run_name": "sched_boost_seed777_2025-11-09_08-46-53_phase2_seed888",
+    "tracking_uri": "./qtdaqa/new_dynamic_features/model_training/ml_runs"
+  },
+  "completed": "2025-11-09T13:46:28.160879",
+  "artifacts": {
+    "logs_dir": "logs",
+    "metrics_dir": "metrics"
+  }
+}
