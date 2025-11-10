@@ -104,6 +104,18 @@ Rules:
 To switch to the legacy 11‑D edge features, change the `edge` block to
 `edge/legacy_band/v11` with the desired distance window.
 
+### Edge Modules
+
+- `edge/multi_scale/v24` – default 24‑D geometric features (distance, inverse, unit
+  vectors, chain/residue encodings, multi-band histograms, single contact count).
+- `edge/legacy_band/v11` – 11‑D histogram mirroring the historical TopoQA
+  training data (0–10 Å pairs, 1 Å histogram bins, MinMax scaling).
+- `edge/neo/v24` – hybrid module combining the proven 11‑D histogram window with
+  multi-scale geometry. It supports 0–10 Å truncated bins, multiple contact
+  thresholds, optional long-band masks, and lightweight feature scaling. Select it
+  when you want the geometric expressiveness of multi-scale edges without giving up
+  the DockQ-friendly histogram behavior.
+
 ---
 
 ## Outputs & Metadata
@@ -115,6 +127,9 @@ For each run you’ll find:
 - `graph_dir/graph_metadata.json` – canonical schema used by model training and
   inference to learn the node/edge layouts (dimensions, module IDs, node column
   names, sample graphs, etc.).
+- `graph_dir/schema_summary.json` – human-readable snapshot of the resolved
+  schema (module registry, node/edge dims, notes). Useful for quick inspection
+  or when debugging legacy checkpoints.
 - `log_dir/graph_builder_summary.json` – run summary (module selections, job
   counts, success/failure tallies) plus stage logs for debugging.
 

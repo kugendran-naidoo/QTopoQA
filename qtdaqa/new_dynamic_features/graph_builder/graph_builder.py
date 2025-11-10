@@ -337,6 +337,38 @@ def _validate_feature_selection(selection: FeatureSelection) -> None:
             raise ValueError("edge.params.contact_threshold must be > 0.")
         edge_params["contact_threshold"] = threshold_value
 
+    module_id = selection.edge.get("module")
+    if module_id == "edge/neo/v24":
+        contact_thresholds = edge_params.get("contact_thresholds")
+        if contact_thresholds is not None:
+            if not isinstance(contact_thresholds, (list, tuple)) or not contact_thresholds:
+                raise ValueError("edge.params.contact_thresholds must be a list of positive numbers.")
+            try:
+                numeric_thresholds = sorted(float(value) for value in contact_thresholds)
+            except (TypeError, ValueError):
+                raise ValueError("edge.params.contact_thresholds must contain only numeric values.")
+            if any(value <= 0 for value in numeric_thresholds):
+                raise ValueError("edge.params.contact_thresholds values must be > 0.")
+            edge_params["contact_thresholds"] = numeric_thresholds
+        elif contact_threshold is not None:
+            edge_params["contact_thresholds"] = [edge_params.pop("contact_threshold")]
+
+        histogram_mode = edge_params.get("histogram_mode")
+        if histogram_mode is not None and not isinstance(histogram_mode, str):
+            raise ValueError("edge.params.histogram_mode must be a string if specified.")
+
+        legacy_bins = edge_params.get("legacy_histogram_bins")
+        if legacy_bins is not None:
+            if not isinstance(legacy_bins, (list, tuple)) or len(legacy_bins) < 2:
+                raise ValueError("edge.params.legacy_histogram_bins must be a list of at least two numeric values.")
+            try:
+                numeric_legacy = [float(value) for value in legacy_bins]
+            except (TypeError, ValueError):
+                raise ValueError("edge.params.legacy_histogram_bins must contain only numeric values.")
+            if numeric_legacy != sorted(numeric_legacy):
+                raise ValueError("edge.params.legacy_histogram_bins must be sorted ascending.")
+            edge_params["legacy_histogram_bins"] = numeric_legacy
+
 
 def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None:
     for key in ("interface", "topology", "node"):
@@ -441,6 +473,17 @@ edge:
   params:
     histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
     contact_threshold: 5.0
+
+# Alternate hybrid edge module inspired by the legacy 11-D features.
+# Uncomment the block below to start from the neo/v24 defaults.
+# edge:
+#   module: edge/neo/v24
+#   params:
+#     histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0]
+#     histogram_mode: density_times_contact
+#     contact_thresholds: [5.0, 10.0]
+#     include_inverse_distance: true
+#     include_unit_vector: true
 
 # OPTIONAL / CUSTOM STAGES ----------------------------------------------
 # Rename the key (e.g., \"mol\") and provide module/params only if the builder

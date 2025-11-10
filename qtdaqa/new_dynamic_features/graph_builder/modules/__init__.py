@@ -22,6 +22,7 @@ from . import topology_persistence_v1  # noqa: F401
 from . import node_dssp_topo_v1  # noqa: F401
 from . import edge_multiscale_v24  # noqa: F401
 from . import edge_legacy_v11  # noqa: F401
+from . import edge_neo_v24  # noqa: F401
 
 __all__ = [
     "FeatureModule",

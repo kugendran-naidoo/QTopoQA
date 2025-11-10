@@ -21,11 +21,18 @@ from .stage_common import (
     index_structures,
 )
 from .edge_common import InterfaceResidue, StructureCache
+from .edge_dim_guard import ensure_edge_feature_dim
+from .schema_summary import write_schema_summary
 
 try:  # support execution as package or script
     from ..modules.base import EdgeFeatureModule, EdgeBuildResult
 except ImportError:  # pragma: no cover
     from modules.base import EdgeFeatureModule, EdgeBuildResult  # type: ignore
+
+try:  # availability depends on execution context
+    from ...common.feature_metadata import load_graph_feature_metadata
+except ImportError:  # pragma: no cover
+    from common.feature_metadata import load_graph_feature_metadata  # type: ignore
 
 LOG = logging.getLogger(__name__)
 
@@ -179,6 +186,7 @@ def run_edge_stage(
 
     metadata_path = output_dir / "graph_metadata.json"
     metadata_path.write_text(json.dumps(metadata_records, indent=2, sort_keys=True), encoding="utf-8")
+    write_schema_summary(output_dir)
 
     elapsed = time.perf_counter() - start
 
@@ -230,6 +238,15 @@ def _process_task(
             dump_path=dump_path,
         )
 
+        module_id = edge_module.metadata().module_id
+        edge_metadata = dict(edge_result.metadata)
+        feature_dim = ensure_edge_feature_dim(
+            module_id,
+            edge_result.edge_attr,
+            edge_metadata.get("feature_dim"),
+        )
+        edge_metadata["feature_dim"] = feature_dim
+
         x = node_df[feature_cols].to_numpy(dtype=np.float32)
         data = Data(
             x=torch.tensor(x, dtype=torch.float32),
@@ -237,17 +254,17 @@ def _process_task(
             edge_attr=torch.tensor(edge_result.edge_attr, dtype=torch.float32),
         )
         data.metadata = {
-            "edge_module": edge_module.metadata().module_id,
+            "edge_module": module_id,
             "edge_params": edge_module.params,
-            "edge_info": edge_result.metadata,
+            "edge_info": edge_metadata,
         }
         output_path = output_dir / Path(f"{task.model_key}.pt")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save(data, output_path)
         metadata_records[task.model_key] = {
-            "edge_module": edge_module.metadata().module_id,
+            "edge_module": module_id,
             "edge_params": edge_module.params,
-            "edge_metadata": edge_result.metadata,
+            "edge_metadata": edge_metadata,
             "node_feature_columns": feature_cols,
         }
         log_lines.extend(
@@ -259,12 +276,12 @@ def _process_task(
                 f"Topology: {task.topology_path}",
                 f"Node features: {task.node_path}",
                 f"Output pt: {output_path}",
-                f"Edge dim: {edge_result.edge_attr.shape[1] if edge_result.edge_attr.size else 0}",
+                f"Edge dim: {feature_dim}",
             ]
         )
         task.log_path.parent.mkdir(parents=True, exist_ok=True)
         task.log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
-        return {"error": None, "edge_dim": edge_result.edge_attr.shape[1] if edge_result.edge_attr.size else 0}
+        return {"error": None, "edge_dim": feature_dim}
     except Exception as exc:  # pragma: no cover
         log_lines.extend(
             [
