@@ -1,0 +1,82 @@
+# Auto-generated feature configuration template
+# Select one module per category and adjust parameter values as needed.
+
+Interface modules:
+  - module: interface/polar_cutoff/v1
+    alias: null
+    summary: "Polar interface detection using distance cutoff."
+    description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
+    params:
+      cutoff: 14.0
+      # Distance cutoff in Å for interface residue detection.
+      coordinate_decimals: 3
+      # Decimal places for coordinate rounding in output files.
+      jobs: 2
+      # Optional override for parallel worker count.
+
+Topology modules:
+  - module: topology/persistence_basic/v1
+    alias: null
+    summary: "Persistent homology features with configurable distance thresholds."
+    description: "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input."
+    params:
+      neighbor_distance: 8.0
+      # Neighbourhood radius in Å for complex filtration.
+      filtration_cutoff: 8.0
+      # Maximum filtration value in Å.
+      min_persistence: 0.01
+      # Minimum persistence threshold for features.
+      dedup_sort: False
+      # Enable deduplication & sorting of persistence pairs.
+      element_filters: (('C',), ('N',), ('O',), ('C', 'N'), ('C', 'O'), ('N', 'O'), ('C', 'N', 'O'))
+      # Sequence of element subsets considered for statistics.
+      jobs: 2
+      # Optional override for parallel worker count.
+
+Node modules:
+  - module: node/dssp_topo_merge/v1
+    alias: null
+    summary: "DSSP-derived node features merged with topology statistics."
+    description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
+    params:
+      drop_na: False
+      # Drop rows containing NA values after merging.
+      jobs: 2
+      # Optional override for thread worker count.
+
+Edge modules:
+  - module: edge/legacy_band/v11
+    alias: null
+    summary: "11-D legacy edge features (distance + atom distance histogram)."
+    description: "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1]."
+    params:
+      distance_min: 0.0
+      # Minimum interface Cα distance (Å) to include an edge.
+      distance_max: 10.0
+      # Maximum interface Cα distance (Å) to include an edge.
+      scale_features: True
+      # Apply MinMax scaling across edge features.
+  - module: edge/multi_scale/v24
+    alias: null
+    summary: "24-D multi-scale edge features with distance bands and histograms."
+    description: "Computes directed residue-residue edges with distance, inverse distance, unit vectors, chain/amino-acid encodings, band indicators, inter-residue distance histograms, and contact counts."
+    params:
+      bands: [{'label': 'short', 'min_distance': 0.0, 'max_distance': 6.0}, {'label': 'medium', 'min_distance': 6.0, 'max_distance': 10.0}, {'label': 'long', 'min_distance': 10.0, 'max_distance': 14.0}]
+      # Distance band definitions with labels, min, and max distances.
+      histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
+      # Histogram bin edges (Å) for inter-atomic distances.
+      contact_threshold: 5.0
+      # Distance threshold (Å) for counting contacts.
+      include_inverse_distance: True
+      # Include inverse distance feature.
+      include_unit_vector: True
+      # Include unit vector components.
+      unit_vector_epsilon: 1e-08
+      # Epsilon to avoid division by zero in unit vector calc.
+
+aliases:
+  edge/legacy_band/v11: null
+  edge/multi_scale/v24: null
+  interface/polar_cutoff/v1: null
+  node/dssp_topo_merge/v1: null
+  topology/persistence_basic/v1: null

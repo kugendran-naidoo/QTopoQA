@@ -15,23 +15,12 @@ from .base import EdgeBuildResult, EdgeFeatureModule, build_metadata
 from .registry import register_feature_module
 
 
-@dataclass
-class EdgeBand:
-    label: str
-    min_distance: float
-    max_distance: float
-
-
-def _compute_histogram(coords_a: np.ndarray, coords_b: np.ndarray, bins: np.ndarray) -> np.ndarray:
-    if coords_a.size == 0 or coords_b.size == 0:
-        return np.zeros(len(bins) - 1, dtype=float)
-    diffs = coords_a[:, None, :] - coords_b[None, :, :]
-    distances = np.sqrt(np.sum(diffs * diffs, axis=2)).reshape(-1)
-    hist, _ = np.histogram(distances, bins=bins)
-    total = hist.sum()
-    if total > 0:
-        return hist.astype(float) / float(total)
-    return hist.astype(float)
+def _atom_coordinates(residue) -> np.ndarray:
+    coords = []
+    for atom in residue.get_atoms():
+        coord = atom.get_coord()
+        coords.append([float(coord[0]), float(coord[1]), float(coord[2])])
+    return np.asarray(coords, dtype=float) if coords else np.empty((0, 3), dtype=float)
 
 
 def _encode_chain(chain_id: str) -> float:
@@ -72,7 +61,14 @@ def _encode_residue(res_name: str) -> float:
     return (idx + 1) / (len(amino_acids) + 1)
 
 
-class MultiscaleEdgeBuilder:
+@dataclass
+class EdgeBand:
+    label: str
+    min_distance: float
+    max_distance: float
+
+
+class NeoEdgeBuilder:
     def __init__(self, params: Dict[str, object]):
         self.params = params
         bands_cfg = params.get("bands") or [
@@ -84,12 +80,26 @@ class MultiscaleEdgeBuilder:
             EdgeBand(label=band["label"], min_distance=float(band["min_distance"]), max_distance=float(band["max_distance"]))
             for band in bands_cfg
         ]
-        hist_bins = params.get("histogram_bins") or [float(x) for x in range(0, 22, 2)]
-        self.hist_bins = np.asarray(hist_bins, dtype=float)
-        self.contact_threshold = float(params.get("contact_threshold", 5.0))
+        histogram_bins = params.get("histogram_bins") or [0.0, 2.0, 4.0, 6.0, 8.0, 10.0]
+        self.hist_bins = np.asarray(histogram_bins, dtype=float)
+        legacy_bins = params.get("legacy_histogram_bins") or [0.0] + [float(x) for x in range(1, 11)]
+        if legacy_bins[-1] <= legacy_bins[-2]:
+            legacy_bins.append(legacy_bins[-1] + 0.0001)
+        self.legacy_bins = np.asarray(legacy_bins, dtype=float)
+        self.histogram_mode = str(params.get("histogram_mode", "density_times_contact"))
+        thresholds = params.get("contact_thresholds") or [5.0, 10.0]
+        if isinstance(thresholds, (list, tuple)):
+            self.contact_thresholds = sorted(float(value) for value in thresholds)
+        else:
+            self.contact_thresholds = [float(thresholds)]
         self.include_inverse_distance = bool(params.get("include_inverse_distance", True))
         self.include_unit_vector = bool(params.get("include_unit_vector", True))
         self.unit_vector_epsilon = float(params.get("unit_vector_epsilon", 1e-8))
+        self.scale_features = bool(params.get("scale_features", True))
+        self.contact_normalizer = float(params.get("contact_normalizer", 50.0))
+        self.short_contact_max = float(params.get("short_contact_max", self.contact_thresholds[0]))
+        self.long_band_mask = bool(params.get("long_band_mask", True))
+        self.max_distance = max(band.max_distance for band in self.bands)
         self.feature_dim = self._calculate_feature_dim()
 
     def _calculate_feature_dim(self) -> int:
@@ -101,9 +111,16 @@ class MultiscaleEdgeBuilder:
         dim += 2  # chain encodings
         dim += 2  # residue encodings
         dim += 1  # band index
-        dim += len(self.bands)  # one-hot band indicator
-        dim += max(len(self.hist_bins) - 1, 0)  # histogram bins
-        dim += 1  # contact count
+        dim += len(self.bands)  # band one-hot
+        hist_len = len(self.legacy_bins) - 1
+        if self.histogram_mode == "density_and_count":
+            dim += hist_len * 2
+        else:
+            dim += hist_len
+        dim += len(self.contact_thresholds)
+        dim += 1  # short contact fraction
+        if self.long_band_mask:
+            dim += 1
         return dim
 
     def build(
@@ -138,17 +155,16 @@ class MultiscaleEdgeBuilder:
                 feature_rows.append(features_reverse)
                 edge_index.append([src_idx, dst_idx])
                 edge_index.append([dst_idx, src_idx])
-                if dump_path is not None:
-                    dump_rows.append(
-                        {
-                            "src_idx": src_idx,
-                            "dst_idx": dst_idx,
-                            "src_id": src.descriptor,
-                            "dst_id": dst.descriptor,
-                            "band": self.bands[band_idx].label,
-                            "distance": distance,
-                        }
-                    )
+                dump_rows.append(
+                    {
+                        "src_idx": src_idx,
+                        "dst_idx": dst_idx,
+                        "src_id": src.descriptor,
+                        "dst_id": dst.descriptor,
+                        "band": self.bands[band_idx].label,
+                        "distance": distance,
+                    }
+                )
 
         if not feature_rows:
             feature_matrix = np.empty((0, self.feature_dim), dtype=np.float32)
@@ -158,18 +174,24 @@ class MultiscaleEdgeBuilder:
             edge_array = np.asarray(edge_index, dtype=np.int64)
             if feature_matrix.shape[1] != self.feature_dim:
                 raise ValueError(
-                    f"Computed edge feature dimension {feature_matrix.shape[1]} "
-                    f"does not match expected {self.feature_dim}"
+                    f"Computed edge feature dimension {feature_matrix.shape[1]} does not match expected {self.feature_dim}"
                 )
 
-        if dump_path is not None and dump_rows:
+        if dump_rows:
+            path = dump_path or Path.cwd() / "edge_dumps" / "neo_edges.csv"
+            path.parent.mkdir(parents=True, exist_ok=True)
             dump_df = pd.DataFrame(dump_rows)
-            dump_df.to_csv(dump_path, index=False)
+            dump_df.to_csv(path, index=False)
 
         metadata = {
             "edge_count": int(edge_array.shape[0]),
             "feature_dim": int(self.feature_dim),
             "bands": [band.label for band in self.bands],
+            "histogram_bins": self.hist_bins.tolist(),
+            "legacy_histogram_bins": self.legacy_bins.tolist(),
+            "histogram_mode": self.histogram_mode,
+            "contact_thresholds": self.contact_thresholds,
+            "scale_features": self.scale_features,
         }
 
         return EdgeBuildResult(edge_index=edge_array, edge_attr=feature_matrix, metadata=metadata)
@@ -190,9 +212,14 @@ class MultiscaleEdgeBuilder:
         structure: StructureCache,
     ) -> List[float]:
         eps = self.unit_vector_epsilon
-        features: List[float] = [distance]
+        features: List[float] = []
+        dist_value = distance / max(self.max_distance, 1e-8) if self.scale_features else distance
+        features.append(dist_value)
         if self.include_inverse_distance:
-            features.append(1.0 / max(distance, eps))
+            inv = 1.0 / max(distance, eps)
+            if self.scale_features:
+                inv = min(inv, self.max_distance / max(eps, 1e-8))
+            features.append(inv)
         if self.include_unit_vector:
             if distance > eps:
                 unit_vec = vector / distance
@@ -213,50 +240,93 @@ class MultiscaleEdgeBuilder:
         residue_b = structure.get_residue(dst.chain_id, dst.residue_seq, dst.insertion_code)
         coords_a = _atom_coordinates(residue_a) if residue_a is not None else np.empty((0, 3))
         coords_b = _atom_coordinates(residue_b) if residue_b is not None else np.empty((0, 3))
-        hist = _compute_histogram(coords_a, coords_b, self.hist_bins)
-        features.extend(hist.tolist())
+        legacy_hist = self._histogram_from_bins(coords_a, coords_b, self.legacy_bins)
+        hist_vector = self._prepare_histogram_vector(legacy_hist)
+        features.extend(hist_vector.tolist())
 
-        if coords_a.size and coords_b.size:
-            diffs = coords_a[:, None, :] - coords_b[None, :, :]
-            distances = np.sqrt(np.sum(diffs * diffs, axis=2)).reshape(-1)
-            contact_count = np.count_nonzero(distances <= self.contact_threshold)
-            features.append(float(contact_count))
-        else:
-            features.append(0.0)
+        contact_counts = self._contact_counts(coords_a, coords_b)
+        if self.scale_features:
+            contact_counts = [count / max(self.contact_normalizer, 1e-8) for count in contact_counts]
+        features.extend(contact_counts)
 
+        coarse_hist = self._histogram_from_bins(coords_a, coords_b, self.hist_bins)
+        short_fraction = self._short_contact_fraction(coarse_hist)
+        features.append(short_fraction)
+        if self.long_band_mask:
+            long_only = 1.0 if (band_idx == len(self.bands) - 1 and short_fraction == 0.0) else 0.0
+            features.append(long_only)
         return features
 
+    def _histogram_from_bins(self, coords_a: np.ndarray, coords_b: np.ndarray, bins: np.ndarray) -> np.ndarray:
+        if coords_a.size == 0 or coords_b.size == 0:
+            return np.zeros(len(bins) - 1, dtype=float)
+        diffs = coords_a[:, None, :] - coords_b[None, :, :]
+        distances = np.sqrt(np.sum(diffs * diffs, axis=2)).reshape(-1)
+        hist, _ = np.histogram(distances, bins=bins)
+        return hist.astype(float)
 
-def _atom_coordinates(residue) -> np.ndarray:
-    coords = []
-    for atom in residue.get_atoms():
-        coord = atom.get_coord()
-        coords.append([float(coord[0]), float(coord[1]), float(coord[2])])
-    return np.asarray(coords, dtype=float) if coords else np.empty((0, 3), dtype=float)
+    def _prepare_histogram_vector(self, hist: np.ndarray) -> np.ndarray:
+        total = hist.sum()
+        if total == 0:
+            return np.zeros_like(hist)
+        if self.histogram_mode == "density":
+            return hist / float(total)
+        if self.histogram_mode == "density_and_count":
+            density = hist / float(total)
+            return np.concatenate([density, hist])
+        # density_times_contact -> emphasise magnitude via raw counts (hybrid approach)
+        return hist
+
+    def _short_contact_fraction(self, coarse_hist: np.ndarray) -> float:
+        if coarse_hist.size == 0:
+            return 0.0
+        total = coarse_hist.sum()
+        if total == 0:
+            return 0.0
+        upper_edges = self.hist_bins[1:]
+        mask = upper_edges <= self.short_contact_max
+        if not np.any(mask):
+            return 0.0
+        return float(coarse_hist[mask].sum() / total)
+
+    def _contact_counts(self, coords_a: np.ndarray, coords_b: np.ndarray) -> List[float]:
+        counts: List[float] = []
+        if coords_a.size == 0 or coords_b.size == 0:
+            return [0.0 for _ in self.contact_thresholds]
+        diffs = coords_a[:, None, :] - coords_b[None, :, :]
+        distances = np.sqrt(np.sum(diffs * diffs, axis=2)).reshape(-1)
+        for threshold in self.contact_thresholds:
+            counts.append(float(np.count_nonzero(distances <= threshold)))
+        return counts
 
 
 @register_feature_module
-class MultiscaleEdgeModuleV24(EdgeFeatureModule):
-    module_id = "edge/multi_scale/v24"
+class NeoEdgeModuleV24(EdgeFeatureModule):
+    module_id = "edge/neo/v24"
     module_kind = "edge"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
-        summary="24-D multi-scale edge features with distance bands and histograms.",
+        summary="27-D neo edge features (hybrid histogram + geometric cues).",
         description=(
-            "Computes directed residue-residue edges with distance, inverse distance, "
-            "unit vectors, chain/amino-acid encodings, band indicators, inter-residue "
-            "distance histograms, and contact counts."
+            "Extends the legacy 11-D histogram with multi-scale distance bands, unit vectors,"
+            " weighted histograms truncated to 10 Å, multiple contact thresholds, and optional long-band masks."
         ),
         inputs=("interface_residues", "node_features", "pdb_structure"),
         outputs=("edge_index", "edge_attr"),
         parameters={
             "bands": "Distance band definitions with labels, min, and max distances.",
-            "histogram_bins": "Histogram bin edges (Å) for inter-atomic distances.",
-            "contact_threshold": "Distance threshold (Å) for counting contacts.",
+            "histogram_bins": "Histogram bin edges (Å) truncated to 0–10 Å by default.",
+            "legacy_histogram_bins": "High-resolution bins used for hybrid weighting.",
+            "histogram_mode": "density | density_times_contact | density_and_count.",
+            "contact_thresholds": "List of Å thresholds for contact counts (default [5,10]).",
             "include_inverse_distance": "Include inverse distance feature.",
             "include_unit_vector": "Include unit vector components.",
             "unit_vector_epsilon": "Epsilon to avoid division by zero in unit vector calc.",
+            "scale_features": "Apply light feature scaling (distance/contact counts).",
+            "contact_normalizer": "Value used to scale contact counts into [0,1].",
+            "short_contact_max": "Upper Å bound for short-contact fraction feature.",
+            "long_band_mask": "Append a mask so long-band edges with zero short contacts can be ignored.",
         },
         defaults={
             "bands": [
@@ -264,17 +334,22 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
                 {"label": "medium", "min_distance": 6.0, "max_distance": 10.0},
                 {"label": "long", "min_distance": 10.0, "max_distance": 14.0},
             ],
-            "histogram_bins": [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0],
-            "contact_threshold": 5.0,
+            "histogram_bins": [0.0, 2.0, 4.0, 6.0, 8.0, 10.0],
+            "histogram_mode": "density_times_contact",
+            "contact_thresholds": [5.0, 10.0],
             "include_inverse_distance": True,
             "include_unit_vector": True,
             "unit_vector_epsilon": 1e-8,
+            "scale_features": True,
+            "contact_normalizer": 50.0,
+            "short_contact_max": 5.0,
+            "long_band_mask": True,
         },
     )
 
     def __init__(self, **params):
         super().__init__(**params)
-        self.builder = MultiscaleEdgeBuilder(self.params)
+        self.builder = NeoEdgeBuilder(self.params)
 
     def build_edges(
         self,
@@ -295,7 +370,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
         metadata.update(
             {
                 "model_key": model_key,
-                "edge_feature_variant": "multi_scale_v24",
+                "edge_feature_variant": "neo_v24",
             }
         )
         return EdgeBuildResult(

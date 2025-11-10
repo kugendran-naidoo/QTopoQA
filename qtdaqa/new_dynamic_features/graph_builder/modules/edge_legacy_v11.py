@@ -4,10 +4,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
 
+import csv
 import numpy as np
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-
 try:
     from ..lib.edge_common import InterfaceResidue, StructureCache
 except ImportError:  # pragma: no cover
@@ -113,27 +111,28 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
 
         if features:
             feature_matrix = np.asarray(features, dtype=np.float32)
-            if params.scale_features:
-                scaler = MinMaxScaler()
-                feature_matrix = scaler.fit_transform(feature_matrix)
+            if params.scale_features and feature_matrix.size:
+                col_min = feature_matrix.min(axis=0, keepdims=True)
+                col_max = feature_matrix.max(axis=0, keepdims=True)
+                denom = np.where(col_max - col_min == 0.0, 1.0, col_max - col_min)
+                feature_matrix = (feature_matrix - col_min) / denom
             edge_index = np.asarray(edges, dtype=np.int64)
         else:
             feature_matrix = np.empty((0, 11), dtype=np.float32)
             edge_index = np.empty((0, 2), dtype=np.int64)
 
         if dump_path is not None and edges:
-            dump_df = pd.DataFrame(
-                {
-                    "src_idx": [e[0] for e in edges],
-                    "dst_idx": [e[1] for e in edges],
-                    "distance": [row[0] for row in features],
-                }
-            )
-            dump_df.to_csv(dump_path, index=False)
+            dump_path.parent.mkdir(parents=True, exist_ok=True)
+            with dump_path.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.writer(handle)
+                writer.writerow(["src_idx", "dst_idx", "distance"])
+                for (src_idx, dst_idx), feature in zip(edges, features):
+                    writer.writerow([src_idx, dst_idx, feature[0]])
 
+        feature_dim = int(feature_matrix.shape[1]) if feature_matrix.ndim >= 2 else 0
         metadata = {
             "edge_count": int(edge_index.shape[0]),
-            "feature_dim": int(feature_matrix.shape[1] if feature_matrix.size else 0),
+            "feature_dim": feature_dim,
             "edge_feature_variant": "legacy_v11",
             "distance_window": [params.distance_min, params.distance_max],
         }
