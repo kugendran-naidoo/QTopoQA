@@ -89,6 +89,7 @@ try:
     from common.graph_cache import GraphTensorCache  # type: ignore  # noqa: E402
 except ImportError:  # pragma: no cover
     GraphTensorCache = None  # type: ignore
+from common.metadata_artifacts import write_feature_metadata_artifacts  # type: ignore  # noqa: E402
 
 
 
@@ -1461,6 +1462,10 @@ def main() -> int:
     feature_metadata_dict = feature_metadata.to_dict()
     feature_metadata_dict["topology_schema"] = cfg.topology_schema
 
+    metadata_path, schema_summary_path = write_feature_metadata_artifacts(
+        cfg.save_dir, feature_metadata, feature_metadata_dict, logger
+    )
+
     _log_feature_summary(logger, feature_metadata)
 
     if cfg.use_val_spearman_as_secondary:
@@ -1857,14 +1862,6 @@ def main() -> int:
             "to close the gap and potentially improve MSE."
         )
 
-    metadata_path = cfg.save_dir / "feature_metadata.json"
-    try:
-        with metadata_path.open("w", encoding="utf-8") as handle:
-            json.dump(feature_metadata_dict, handle, indent=2)
-        logger.info("Feature metadata written to %s", metadata_path)
-    except OSError as exc:
-        logger.warning("Unable to write feature metadata file: %s", exc)
-
     if mlflow_logger is not None:
         try:
             metrics_to_log: Dict[str, float] = {}
@@ -1905,6 +1902,8 @@ def main() -> int:
                     mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(coverage_path))
                 if metadata_path.exists():
                     mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(metadata_path))
+                if schema_summary_path and schema_summary_path.exists():
+                    mlflow_logger.experiment.log_artifact(mlflow_logger.run_id, str(schema_summary_path))
                 profile_path = load_profile_summary.get("output_path") if load_profile_summary else None
                 if profile_path:
                     try:

@@ -1,0 +1,16 @@
+paths:
+  data_dir: null
+  work_dir: null
+  output_file: null
+  label_file: null
+  checkpoint: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/topoqa/model/topoqa.ckpt
+  training_root: null
+builder:
+  jobs: 6
+  feature_config: null
+options:
+  reuse_existing_graphs: false
+  use_checkpoint_schema: false
+overrides:
+  edge_schema: {}
+  node_schema: {}
