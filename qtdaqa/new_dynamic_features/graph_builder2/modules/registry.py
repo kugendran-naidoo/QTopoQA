@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import os
+import warnings
 from typing import Any, Dict, Iterable, Mapping, Optional, Tuple, Type
 
 
@@ -41,6 +43,15 @@ def register_feature_module(module_cls: FeatureModuleFactory) -> FeatureModuleFa
     if not module_id:
         raise ValueError(f"Feature module {module_cls} does not define module_id.")
     if module_id in _REGISTRY:
+        if os.environ.get("QTOPO_ALLOW_MODULE_OVERRIDE") == "1":
+            warnings.warn(
+                f"Feature module '{module_id}' already registered; overriding because "
+                "QTOPO_ALLOW_MODULE_OVERRIDE=1.",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            _REGISTRY[module_id] = module_cls
+            return module_cls
         raise ValueError(f"Feature module '{module_id}' already registered.")
     _REGISTRY[module_id] = module_cls
     return module_cls
