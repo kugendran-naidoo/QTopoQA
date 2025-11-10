@@ -1,0 +1,58 @@
+defaults:
+  jobs: 6
+
+interface:
+  module: interface/polar_cutoff/v1
+  alias: "TopoQA default 10A cut-off"
+  summary: Polar interface detection using distance cutoff.
+  description: Identifies interface residues across chains using the polar interface
+    routine (new_calculate_interface.process_pdb_file) with configurable distance
+    cutoff and coordinate rounding.
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1 # skip rounding to keep raw coords
+    jobs: 6
+topology:
+  module: topology/persistence_basic/v1
+  alias: "TopoQA default"
+  summary: Persistent homology features with configurable distance thresholds.
+  description: Generates per-residue topological descriptors using the persistent
+    homology pipeline from new_topological_features. Interface residues are required
+    as input.
+  params:
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    dedup_sort: false
+    element_filters:
+    - ['C']
+    - ['N']
+    - ['O']
+    - ['C', 'N']
+    - ['C', 'O']
+    - ['N', 'O']
+    - ['C', 'N', 'O']
+    jobs: 6
+node:
+  module: node/dssp_topo_merge/v1
+  alias: "TopoQA default"
+  summary: DSSP-derived node features merged with topology statistics.
+  description: Runs the DSSP-based node feature extractor (node_fea) and merges results
+    with persistent homology statistics aligned by residue IDs.
+  params:
+    drop_na: true   # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 6
+edge:
+  module: edge/multi_scale/v24
+  alias: "Kugendran 24D Scalars"
+  summary: "24-D multi-scale edge features with distance bands and histograms."
+  description: "Computes directed residue-residue edges with distance, inverse distance, unit vectors, chain/amino-acid encodings, band indicators, inter-residue distance histograms, and contact counts."
+  params:
+    # Distance band definitions with labels, min, and max distances.
+    bands: [{'label': 'short', 'min_distance': 0.0, 'max_distance': 6.0}, {'label': 'medium', 'min_distance': 6.0, 'max_distance': 10.0}, {'label': 'long', 'min_distance': 10.0, 'max_distance': 14.0}]        
+    # Histogram bin edges (Å) for inter-atomic distances.
+    histogram_bins: [0.00001, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0] 
+    contact_threshold: 5.0         # Distance threshold (Å) for counting contacts.
+    include_inverse_distance: True # Include inverse distance feature.
+    include_unit_vector: True      # Include unit vector components.
+    unit_vector_epsilon: 1e-08     # Epsilon to avoid division by zero in unit vector calc.
