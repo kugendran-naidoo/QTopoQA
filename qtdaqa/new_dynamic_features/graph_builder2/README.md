@@ -46,6 +46,11 @@ Helpers:
   `--include-alternates` if you also want fully-detailed (commented) blocks for every
   registered module so you can copy/paste parameters.
 
+Edge CSV dumps are **enabled by default**. They land under `<work-dir>/edge_features`.
+Pass `--edge-dump-dir /abs/elsewhere` to redirect them, `--no-dump-edges` to skip
+generating them, or `--dump-edges` to force them back on even if the feature config
+disables dumping.
+
 ---
 
 ## Feature Configuration
@@ -120,6 +125,9 @@ Rules:
   the same `module`/`params` structure.
 - Common mistakes (like writing tuple literals for `element_filters`) are caught
   before the builder starts processing PDBs.
+- Edge dumps can also be toggled inside the YAML via `options.edge_dump: false` and
+  redirected with `options.edge_dump_dir: /abs/path`, but CLI flags (`--dump-edges`,
+  `--no-dump-edges`, `--edge-dump-dir`) take precedence when provided.
 
 To switch to the 24‑D multi-scale edges, change the `edge` block to
 `edge/multi_scale/v24` and configure its distance bands / histogram bins.

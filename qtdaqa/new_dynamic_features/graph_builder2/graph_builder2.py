@@ -90,6 +90,24 @@ def _resolve_jobs(module, fallback: Optional[int] = None) -> Optional[int]:
     return fallback
 
 
+def _resolve_edge_dump(cli_flag: Optional[bool], config_value: Optional[object]) -> bool:
+    if cli_flag is not None:
+        return bool(cli_flag)
+    if isinstance(config_value, bool):
+        return config_value
+    return True
+
+
+def _resolve_edge_dump_dir(work_dir: Path, cli_dir: Optional[Path], config_dir: Optional[object]) -> Path:
+    if cli_dir is not None:
+        candidate = cli_dir
+    elif isinstance(config_dir, str) and config_dir.strip():
+        candidate = Path(config_dir)
+    else:
+        candidate = work_dir / "edge_features"
+    return candidate.expanduser().resolve()
+
+
 def _write_text_summary(
     summary_path: Path,
     dataset_dir: Path,
@@ -109,6 +127,8 @@ def _write_text_summary(
     lines.append(f"Graph directory: {graph_dir}")
     if edge_dump_dir is not None:
         lines.append(f"Edge feature directory: {edge_dump_dir}")
+    else:
+        lines.append("Edge feature directory: (not written)")
 
     lines.append("")
     lines.append("Modules:")
@@ -200,7 +220,12 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--work-dir", type=Path, default=None, help="Working directory for intermediate files.")
     parser.add_argument("--graph-dir", type=Path, default=None, help="Destination directory for .pt graph files.")
     parser.add_argument("--log-dir", type=Path, default=None, help="Directory to store run logs.")
-    parser.add_argument("--jobs", type=int, default=4, help="Maximum worker count for parallel stages.")
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=None,
+        help="Maximum worker count for parallel stages. Overrides config defaults when provided.",
+    )
     parser.add_argument(
         "--feature-config",
         type=Path,
@@ -227,6 +252,22 @@ def _build_parser() -> argparse.ArgumentParser:
         "--include-alternates",
         action="store_true",
         help="When used with --create-feature-config, append fully-detailed commented blocks for alternate modules.",
+    )
+    edge_dump_group = parser.add_mutually_exclusive_group()
+    edge_dump_group.add_argument(
+        "--dump-edges",
+        dest="dump_edges",
+        action="store_const",
+        const=True,
+        default=None,
+        help="Force per-structure edge CSV dumps on (default behaviour).",
+    )
+    edge_dump_group.add_argument(
+        "--no-dump-edges",
+        dest="dump_edges",
+        action="store_const",
+        const=False,
+        help="Disable writing per-structure edge CSV dumps.",
     )
     return parser
 
@@ -332,6 +373,17 @@ def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None
         if module and isinstance(module.params, dict) and "jobs" in module.params:
             if module.params["jobs"] in (None, "auto"):
                 module.params["jobs"] = jobs
+
+
+def _determine_effective_jobs(
+    cli_jobs: Optional[int],
+    config_jobs: Optional[int],
+) -> Tuple[Optional[int], str]:
+    if cli_jobs is not None:
+        return max(1, int(cli_jobs)), "cli"
+    if isinstance(config_jobs, int) and config_jobs > 0:
+        return config_jobs, "config"
+    return None, "module"
 
 
 def _collect_module_templates() -> Dict[str, List[Dict[str, object]]]:
@@ -720,7 +772,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     work_dir = Path(args.work_dir).resolve()
     graph_dir = Path(args.graph_dir).resolve()
     log_root = Path(args.log_dir).resolve()
-    jobs = max(1, args.jobs)
+    cli_jobs = args.jobs if args.jobs is not None else None
 
     try:
         ensure_tree_readable(dataset_dir)
@@ -752,12 +804,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     LOG.info("Graph directory: %s", graph_dir)
 
     default_jobs_override = selection.options.get("default_jobs")
-    if isinstance(default_jobs_override, int) and default_jobs_override > 0:
-        effective_jobs = default_jobs_override
-        LOG.info("Jobs: %d (override from feature config)", effective_jobs)
+    effective_jobs, source = _determine_effective_jobs(cli_jobs, default_jobs_override)
+    if source == "cli":
+        LOG.info("Jobs: %s (from CLI)", effective_jobs)
+    elif source == "config":
+        LOG.info("Jobs: %s (override from feature config)", effective_jobs)
     else:
-        effective_jobs = jobs
-        LOG.info("Jobs: %d", effective_jobs)
+        LOG.info("Jobs: auto (fall back to per-module defaults)")
     modules = _instantiate_modules(selection)
     _apply_job_defaults(modules, effective_jobs)
 
@@ -829,6 +882,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         },
     }
 
+    options = selection.options
+    edge_dump_enabled = _resolve_edge_dump(getattr(args, "dump_edges", None), options.get("edge_dump"))
+    options["edge_dump"] = edge_dump_enabled
+    edge_dump_cli_dir = getattr(args, "edge_dump_dir", None)
+    edge_dump_config_dir = options.get("edge_dump_dir")
+    resolved_dump_dir = _resolve_edge_dump_dir(work_dir, edge_dump_cli_dir, edge_dump_config_dir)
+
     LOG.info("Beginning interface stage (jobs=%s)", interface_jobs)
     interface_result = interface_module.extract_interfaces(
         pdb_paths=pdb_files,
@@ -866,16 +926,35 @@ def main(argv: Optional[List[str]] = None) -> int:
     LOG.info("Node stage complete: %d success, %d failures", node_result["success"], len(node_result["failures"]))
     LOG.info("Node feature extraction elapsed time: %.2f s", node_result.get("elapsed", 0.0))
 
-    edge_dump_dir = None
-    options = selection.options
-    if options.get("edge_dump", False):
-        edge_dump_dir = work_dir / "edge_features"
+    edge_dump_dir: Optional[Path] = resolved_dump_dir if edge_dump_enabled else None
+    edge_dump_log_start = time.perf_counter() if edge_dump_enabled else None
+
+    summary["edge_dump"] = {
+        "enabled": edge_dump_enabled,
+        "directory": str(edge_dump_dir) if edge_dump_dir is not None else None,
+        "configured_directory": str(resolved_dump_dir) if resolved_dump_dir is not None else None,
+    }
+
+    if edge_dump_enabled:
+        LOG.info("Edge dumps enabled; writing CSVs to:")
+        LOG.info("  %s", edge_dump_dir)
+    else:
+        if edge_dump_cli_dir is not None or (
+            isinstance(edge_dump_config_dir, str) and edge_dump_config_dir.strip()
+        ):
+            LOG.info("Edge dumps disabled; configured dump directory %s will be ignored.", resolved_dump_dir)
+        else:
+            LOG.info("Edge dumps disabled (use --dump-edges to re-enable).")
+    if edge_dump_log_start is not None:
+        LOG.info("Edge dump preparation elapsed time: %.2f s", time.perf_counter() - edge_dump_log_start)
 
     LOG.info("Beginning graph assembly (.pt output) stage (jobs=%s)", edge_jobs)
     try:
         from .lib.edge_runner import run_edge_stage as _run_edge_stage  # type: ignore
     except ImportError:  # pragma: no cover - fallback for direct execution
         from lib.edge_runner import run_edge_stage as _run_edge_stage  # type: ignore
+
+    graph_stage_start = time.perf_counter()
 
     edge_result = _run_edge_stage(
         dataset_dir=dataset_dir,
@@ -889,8 +968,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         edge_dump_dir=edge_dump_dir,
     )
     summary["edge"] = edge_result
+    graph_stage_elapsed = time.perf_counter() - graph_stage_start
     LOG.info("Graph assembly (.pt output) complete: %d success, %d failures", edge_result["success"], len(edge_result["failures"]))
-    LOG.info("Graph (.pt) generation elapsed time: %.2f s", edge_result.get("elapsed", 0.0))
+    LOG.info(
+        "Graph (.pt) generation elapsed time: %.2f s (edge stage: %.2f s)",
+        edge_result.get("elapsed", 0.0),
+        graph_stage_elapsed,
+    )
+    summary["edge"]["graph_stage_elapsed"] = graph_stage_elapsed
 
     summary_log = run_info.run_dir / "graph_builder_summary.json"
     summary_log.write_text(json.dumps(summary, indent=2, sort_keys=True, default=_json_default), encoding="utf-8")
