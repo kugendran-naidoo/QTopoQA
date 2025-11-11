@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -38,13 +37,6 @@ def _distance_histogram(residue_a, residue_b) -> np.ndarray:
     bins = np.append(bins, np.inf)
     hist, _ = np.histogram(distances, bins=bins)
     return hist.astype(float)
-
-
-@dataclass
-class LegacyEdgeParams:
-    distance_min: float = 0.0
-    distance_max: float = 10.0
-    scale_features: bool = True
 
 
 @register_feature_module
@@ -85,7 +77,11 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
         pdb_path: Path,
         dump_path: Optional[Path] = None,
     ) -> EdgeBuildResult:
-        params = LegacyEdgeParams(**self.params)
+        params = self.params
+        distance_min = params.get("distance_min", 0.0)
+        distance_max = params.get("distance_max", 10.0)
+        scale_features = params.get("scale_features", True)
+        jobs = params.get("jobs")
         edges: List[List[int]] = []
         features: List[List[float]] = []
 
@@ -102,7 +98,7 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
                 if dst_idx is None:
                     continue
                 distance = float(np.linalg.norm(dst.coord - src.coord))
-                if distance <= params.distance_min or distance >= params.distance_max:
+                if distance <= distance_min or distance >= distance_max:
                     continue
                 residue_a = structure.get_residue(src.chain_id, src.residue_seq, src.insertion_code)
                 residue_b = structure.get_residue(dst.chain_id, dst.residue_seq, dst.insertion_code)
@@ -117,7 +113,7 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
 
         if features:
             feature_matrix = np.asarray(features, dtype=np.float32)
-            if params.scale_features and feature_matrix.size:
+            if scale_features and feature_matrix.size:
                 col_min = feature_matrix.min(axis=0, keepdims=True)
                 col_max = feature_matrix.max(axis=0, keepdims=True)
                 denom = np.where(col_max - col_min == 0.0, 1.0, col_max - col_min)
@@ -140,8 +136,10 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
             "edge_count": int(edge_index.shape[0]),
             "feature_dim": feature_dim,
             "edge_feature_variant": "legacy_v11",
-            "distance_window": [params.distance_min, params.distance_max],
+            "distance_window": [distance_min, distance_max],
         }
+        if jobs is not None:
+            metadata["requested_jobs"] = int(jobs)
 
         return EdgeBuildResult(edge_index=edge_index, edge_attr=feature_matrix, metadata=metadata)
 

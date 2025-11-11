@@ -11,6 +11,7 @@ import pytest
 
 from qtdaqa.new_dynamic_features.graph_builder.graph_builder import _validate_feature_selection  # type: ignore
 from qtdaqa.new_dynamic_features.graph_builder2 import graph_builder2 as graph_builder
+from types import SimpleNamespace
 from qtdaqa.new_dynamic_features.graph_builder2.lib.features_config import load_feature_config
 
 
@@ -131,3 +132,76 @@ def test_parse_args_requires_all_paths(tmp_path: Path, capsys: pytest.CaptureFix
         )
     err = capsys.readouterr().err
     assert "--log-dir" in err
+
+
+def test_determine_effective_jobs_prefers_cli() -> None:
+    jobs, source = graph_builder._determine_effective_jobs(cli_jobs=12, config_jobs=5)
+    assert jobs == 12
+    assert source == "cli"
+
+
+def test_determine_effective_jobs_falls_back_to_config() -> None:
+    jobs, source = graph_builder._determine_effective_jobs(cli_jobs=None, config_jobs=6)
+    assert jobs == 6
+    assert source == "config"
+
+
+def test_determine_effective_jobs_defaults_to_modules() -> None:
+    jobs, source = graph_builder._determine_effective_jobs(cli_jobs=None, config_jobs=None)
+    assert jobs is None
+    assert source == "module"
+
+
+def test_apply_job_defaults_updates_modules_when_jobs_missing() -> None:
+    modules = {
+        "edge": SimpleNamespace(params={"jobs": None}),
+        "node": SimpleNamespace(params={"jobs": "auto"}),
+    }
+    graph_builder._apply_job_defaults(modules, jobs=10)
+    assert modules["edge"].params["jobs"] == 10
+    assert modules["node"].params["jobs"] == 10
+
+
+def test_apply_job_defaults_leaves_modules_when_no_fallback() -> None:
+    modules = {
+        "edge": SimpleNamespace(params={"jobs": None}),
+    }
+    graph_builder._apply_job_defaults(modules, jobs=None)
+    assert modules["edge"].params["jobs"] is None
+
+
+def test_resolve_edge_dump_prefers_cli() -> None:
+    assert graph_builder._resolve_edge_dump(True, False) is True
+    assert graph_builder._resolve_edge_dump(False, True) is False
+
+
+def test_resolve_edge_dump_falls_back_to_config() -> None:
+    assert graph_builder._resolve_edge_dump(None, False) is False
+    assert graph_builder._resolve_edge_dump(None, True) is True
+
+
+def test_resolve_edge_dump_defaults_to_true() -> None:
+    assert graph_builder._resolve_edge_dump(None, None) is True
+
+
+def test_resolve_edge_dump_dir_prefers_cli(tmp_path: Path) -> None:
+    work_dir = tmp_path / "work"
+    work_dir.mkdir()
+    cli_dir = tmp_path / "cli-target"
+    resolved = graph_builder._resolve_edge_dump_dir(work_dir, cli_dir, "/ignored")
+    assert resolved == cli_dir.resolve()
+
+
+def test_resolve_edge_dump_dir_uses_config_when_cli_missing(tmp_path: Path) -> None:
+    work_dir = tmp_path / "work"
+    work_dir.mkdir()
+    config_dir = tmp_path / "config-target"
+    resolved = graph_builder._resolve_edge_dump_dir(work_dir, None, str(config_dir))
+    assert resolved == config_dir.resolve()
+
+
+def test_resolve_edge_dump_dir_defaults_to_work_subdir(tmp_path: Path) -> None:
+    work_dir = tmp_path / "work"
+    work_dir.mkdir()
+    resolved = graph_builder._resolve_edge_dump_dir(work_dir, None, None)
+    assert resolved == (work_dir / "edge_features").resolve()
