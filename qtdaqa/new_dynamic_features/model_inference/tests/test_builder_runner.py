@@ -31,6 +31,7 @@ REPO_ROOT = Path(__file__).resolve().parents[4]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from qtdaqa.new_dynamic_features.common.feature_metadata import GraphFeatureMetadata  # noqa: E402
 from qtdaqa.new_dynamic_features.model_inference.builder_runner import (  # noqa: E402
     BuilderConfig,
     parse_builder_config,
@@ -120,6 +121,14 @@ def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> No
     assert "--feature-config" in invoked_cmd
 
 
+def test_prepare_feature_config_writes_defaults_when_no_overrides(tmp_path: Path) -> None:
+    builder = BuilderConfig()
+    path = builder.prepare_feature_config(tmp_path)
+    assert path is not None
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert set(payload.keys()) >= {"interface", "topology", "node", "edge", "options"}
+
+
 def test_run_graph_builder_prefers_metadata_feature_config(tmp_path: Path) -> None:
     builder = BuilderConfig()
     cfg = _make_dummy_config(tmp_path, builder)
@@ -156,3 +165,44 @@ def test_write_metadata_feature_config_produces_expected_yaml(tmp_path: Path) ->
     assert payload["edge"]["params"]["contact_threshold"] == 6.0
     assert payload["interface"]["module"] == "interface/polar_cutoff/v1"
     assert "options" in payload
+
+
+def test_write_metadata_feature_config_accepts_metadata_object(tmp_path: Path) -> None:
+    feature_metadata = GraphFeatureMetadata(
+        module_registry={
+            "interface": {"id": "interface/polar_cutoff/v1", "params": {"cutoff": 12.0}},
+            "topology": {"id": "topology/persistence_basic/v1", "params": {"neighbor_distance": 9.0}},
+            "node": {"id": "node/dssp_topo_merge/v1", "params": {"drop_na": False}},
+            "edge": {"id": "edge/multi_scale/v24", "defaults": {"contact_threshold": 5.5}},
+        },
+        edge_schema={"module_params": {"contact_threshold": 4.5}},
+    )
+
+    path = _write_metadata_feature_config(feature_metadata, tmp_path)
+    assert path is not None
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload["edge"]["params"]["contact_threshold"] == 4.5
+    assert payload["topology"]["params"]["neighbor_distance"] == 9.0
+
+
+def test_write_metadata_feature_config_falls_back_to_metadata_file(tmp_path: Path) -> None:
+    metadata_path = tmp_path / "graph_metadata.json"
+    metadata_path.write_text(
+        json.dumps(
+            {
+                "module_registry": {
+                    "interface": {"id": "interface/polar_cutoff/v1"},
+                    "topology": {"id": "topology/persistence_basic/v1"},
+                    "node": {"id": "node/dssp_topo_merge/v1"},
+                    "edge": {"id": "edge/multi_scale/v24"},
+                },
+                "edge_schema": {"module_params": {"contact_threshold": 7.5}},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    path = _write_metadata_feature_config(None, tmp_path, fallback_metadata_path=metadata_path)
+    assert path is not None
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload["edge"]["params"]["contact_threshold"] == 7.5

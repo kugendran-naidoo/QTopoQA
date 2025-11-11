@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
+import json
 from pathlib import Path
 from typing import Dict, Optional, Tuple, Any
 
@@ -32,7 +33,7 @@ class BuilderConfig:
             return self.feature_config
         payload = self._compose_features_payload()
         if payload is None:
-            return None
+            payload = self._default_features()
         target_dir = work_dir / "builder_features"
         target_dir.mkdir(parents=True, exist_ok=True)
         output_path = target_dir / "features.generated.yaml"
@@ -44,8 +45,6 @@ class BuilderConfig:
         if self.features:
             payload = copy.deepcopy(self.features)
         else:
-            if self.dump_edges is None and self.topology_dedup_sort is None:
-                return None
             payload = self._default_features()
 
         if self.dump_edges is not None:
@@ -104,9 +103,18 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
 
 
 def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str, object]]:
-    if not isinstance(feature_metadata, dict):
+    edge_schema: Optional[Dict[str, object]] = None
+    if isinstance(feature_metadata, GraphFeatureMetadata):
+        modules = feature_metadata.module_registry
+        edge_schema = feature_metadata.edge_schema
+    elif isinstance(feature_metadata, dict):
+        modules = feature_metadata.get("module_registry")
+        raw_edge_schema = feature_metadata.get("edge_schema")
+        if isinstance(raw_edge_schema, dict):
+            edge_schema = raw_edge_schema
+    else:
         return None
-    modules = feature_metadata.get("module_registry")
+
     if not isinstance(modules, dict):
         return None
 
@@ -124,15 +132,27 @@ def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str,
         if alias:
             stage_block["alias"] = alias
 
-        params = None
+        params: Optional[Dict[str, object]] = None
+        entry_params = entry.get("params")
+        if isinstance(entry_params, dict):
+            params = copy.deepcopy(entry_params)
+        defaults = entry.get("defaults")
+        if isinstance(defaults, dict):
+            if params is None:
+                params = copy.deepcopy(defaults)
+            else:
+                params = {**copy.deepcopy(defaults), **params}
+
         if stage == "edge":
-            edge_schema = feature_metadata.get("edge_schema")
+            schema_params = None
             if isinstance(edge_schema, dict):
-                params = edge_schema.get("module_params")
-        if not isinstance(params, dict):
-            defaults = entry.get("defaults")
-            if isinstance(defaults, dict):
-                params = defaults
+                schema_params = edge_schema.get("module_params")
+            if isinstance(schema_params, dict):
+                if params is None:
+                    params = copy.deepcopy(schema_params)
+                else:
+                    params = {**params, **copy.deepcopy(schema_params)}
+
         if isinstance(params, dict) and params:
             stage_block["params"] = params
         payload[stage] = stage_block
@@ -141,8 +161,19 @@ def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str,
     return payload
 
 
-def _write_metadata_feature_config(feature_metadata: Any, work_dir: Path) -> Optional[Path]:
+def _write_metadata_feature_config(
+    feature_metadata: Any,
+    work_dir: Path,
+    fallback_metadata_path: Optional[Path] = None,
+) -> Optional[Path]:
     payload = _build_metadata_feature_payload(feature_metadata)
+    if payload is None and fallback_metadata_path is not None:
+        try:
+            raw = json.loads(fallback_metadata_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            logging.warning("Unable to read graph metadata from %s: %s", fallback_metadata_path, exc)
+        else:
+            payload = _build_metadata_feature_payload(raw)
     if not payload:
         return None
     target_dir = work_dir / "builder_features"
@@ -151,6 +182,18 @@ def _write_metadata_feature_config(feature_metadata: Any, work_dir: Path) -> Opt
     with output_path.open("w", encoding="utf-8") as handle:
         yaml.safe_dump(payload, handle, sort_keys=False)
     return output_path
+
+
+def _resolve_metadata_source(final_schema: Dict[str, Dict[str, object]]) -> Optional[Path]:
+    edge_schema = final_schema.get("edge_schema") or {}
+    source = edge_schema.get("source")
+    if not source:
+        return None
+    try:
+        metadata_path = Path(source).expanduser().resolve()
+    except OSError:
+        return None
+    return metadata_path if metadata_path.exists() else None
 
 
 def run_graph_builder(cfg, metadata_feature_config: Optional[Path] = None) -> Path:
@@ -260,9 +303,14 @@ def ensure_graph_dir(
     graph_dir = work_dir / "graph_data"
     reuse = bool(getattr(cfg, "reuse_existing_graphs", False))
 
+    metadata_source = _resolve_metadata_source(final_schema)
     metadata_feature_config = None
-    if feature_metadata:
-        metadata_feature_config = _write_metadata_feature_config(feature_metadata, work_dir)
+    if feature_metadata or metadata_source is not None:
+        metadata_feature_config = _write_metadata_feature_config(
+            feature_metadata,
+            work_dir,
+            fallback_metadata_path=metadata_source,
+        )
 
     if reuse and graph_dir.exists() and any(graph_dir.glob("*.pt")):
         matches, reason = _graph_metadata_matches(graph_dir, final_schema)
