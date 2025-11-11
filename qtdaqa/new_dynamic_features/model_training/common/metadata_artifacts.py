@@ -5,10 +5,13 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
-try:
-    from ...common.feature_metadata import GraphFeatureMetadata
-except ImportError:  # pragma: no cover
-    from common.feature_metadata import GraphFeatureMetadata  # type: ignore
+try:  # package import when executing via `python -m`
+    from qtdaqa.new_dynamic_features.common.feature_metadata import GraphFeatureMetadata
+except ImportError:  # pragma: no cover - support direct script execution
+    try:
+        from ...common.feature_metadata import GraphFeatureMetadata  # type: ignore
+    except ImportError:  # pragma: no cover
+        from feature_metadata import GraphFeatureMetadata  # type: ignore
 
 
 def write_feature_metadata_artifacts(
