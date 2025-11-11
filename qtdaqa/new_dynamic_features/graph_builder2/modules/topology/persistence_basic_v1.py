@@ -9,6 +9,7 @@ from ..base import (
     require_bool,
     require_float,
     require_positive_float,
+    require_positive_int,
 )
 from ..registry import register_feature_module
 from ...lib import topology_runner
@@ -18,6 +19,7 @@ from ...lib import topology_runner
 class PersistenceTopologyModule(TopologyFeatureModule):
     module_id = "topology/persistence_basic/v1"
     module_kind = "topology"
+    default_alias = "TopoQA default"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -51,7 +53,7 @@ class PersistenceTopologyModule(TopologyFeatureModule):
                 ("N", "O"),
                 ("C", "N", "O"),
             ),
-            "jobs": None,
+            "jobs": 8,
         },
     )
 
@@ -114,3 +116,6 @@ class PersistenceTopologyModule(TopologyFeatureModule):
                     symbols.append(symbol.strip())
                 normalised.append(tuple(symbols))
             params["element_filters"] = tuple(normalised)
+        jobs = params.get("jobs")
+        if jobs is not None:
+            params["jobs"] = require_positive_int(jobs, "topology.params.jobs")

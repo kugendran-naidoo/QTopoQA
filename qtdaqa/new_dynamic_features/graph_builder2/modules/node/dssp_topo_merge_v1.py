@@ -12,6 +12,7 @@ from ...lib import node_runner
 class DSSPTopologyNodeModule(NodeFeatureModule):
     module_id = "node/dssp_topo_merge/v1"
     module_kind = "node"
+    default_alias = "TopoQA default"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -26,7 +27,7 @@ class DSSPTopologyNodeModule(NodeFeatureModule):
             "drop_na": "Drop rows containing NA values after merging.",
             "jobs": "Optional override for thread worker count.",
         },
-        defaults={"drop_na": False, "jobs": None},
+        defaults={"drop_na": True, "jobs": 8},
     )
 
     def generate_nodes(
@@ -58,3 +59,14 @@ class DSSPTopologyNodeModule(NodeFeatureModule):
         jobs = params.get("jobs")
         if jobs is not None:
             params["jobs"] = require_positive_int(jobs, "node.params.jobs")
+
+    @classmethod
+    def config_template(cls) -> Dict[str, object]:
+        template = super().config_template()
+        comments = dict(template.get("param_comments", {}))
+        comments["drop_na"] = (
+            "matches fea_df_clean = fea_df.dropna() in both inference_model.py and "
+            "k_mac_inference_pca_tsne4.py"
+        )
+        template["param_comments"] = comments
+        return template

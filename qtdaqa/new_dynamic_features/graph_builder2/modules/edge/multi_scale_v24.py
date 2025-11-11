@@ -16,6 +16,7 @@ from ..base import (
     require_bool,
     require_float,
     require_positive_float,
+    require_positive_int,
 )
 from ..registry import register_feature_module
 
@@ -249,7 +250,7 @@ def _atom_coordinates(residue) -> np.ndarray:
 class MultiscaleEdgeModuleV24(EdgeFeatureModule):
     module_id = "edge/multi_scale/v24"
     module_kind = "edge"
-    default_alias = "TopoQA multi-scale default"
+    default_alias = "24D Scalars"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -268,6 +269,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             "include_inverse_distance": "Include inverse distance feature.",
             "include_unit_vector": "Include unit vector components.",
             "unit_vector_epsilon": "Epsilon to avoid division by zero in unit vector calc.",
+            "jobs": "Optional override for parallel worker count during edge assembly.",
         },
         defaults={
             "bands": [
@@ -280,6 +282,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             "include_inverse_distance": True,
             "include_unit_vector": True,
             "unit_vector_epsilon": 1e-8,
+            "jobs": 8,
         },
     )
 
@@ -369,3 +372,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             value = params.get(flag)
             if value is not None:
                 params[flag] = require_bool(value, f"edge.params.{flag}")
+
+        jobs = params.get("jobs")
+        if jobs is not None:
+            params["jobs"] = require_positive_int(jobs, "edge.params.jobs")

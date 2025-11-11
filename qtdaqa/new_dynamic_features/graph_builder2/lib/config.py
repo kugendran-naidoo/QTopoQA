@@ -33,8 +33,8 @@ class EdgeConfig:
 
 @dataclass
 class InterfaceConfig:
-    cutoff: float = 14.0
-    coordinate_decimals: int = 3
+    cutoff: float = 10.0
+    coordinate_decimals: int = -1
 
 
 @dataclass
@@ -72,8 +72,8 @@ def _dataclass_from_dict(cls, data: Dict[str, Any]):
 def load_config(config_path: Optional[Path]) -> BuilderConfig:
     default_dict: Dict[str, Any] = {
         "interface": {
-            "cutoff": 14.0,
-            "coordinate_decimals": 3,
+            "cutoff": 10.0,
+            "coordinate_decimals": -1,
         },
         "topology": {
             "neighbor_distance": 8.0,
@@ -156,4 +156,3 @@ def config_as_dict(config: BuilderConfig) -> Dict[str, Any]:
             "normalize": config.edge.normalize,
         },
     }
-
