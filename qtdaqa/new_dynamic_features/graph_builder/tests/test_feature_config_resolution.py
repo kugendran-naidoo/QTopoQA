@@ -125,3 +125,40 @@ def test_parse_args_requires_all_paths(tmp_path: Path, capsys: pytest.CaptureFix
         )
     err = capsys.readouterr().err
     assert "--log-dir" in err
+
+
+def test_resolve_edge_dump_prefers_cli() -> None:
+    assert graph_builder._resolve_edge_dump(True, False) is True  # type: ignore[attr-defined]
+    assert graph_builder._resolve_edge_dump(False, True) is False  # type: ignore[attr-defined]
+
+
+def test_resolve_edge_dump_falls_back_to_config() -> None:
+    assert graph_builder._resolve_edge_dump(None, False) is False  # type: ignore[attr-defined]
+    assert graph_builder._resolve_edge_dump(None, True) is True  # type: ignore[attr-defined]
+
+
+def test_resolve_edge_dump_defaults_true() -> None:
+    assert graph_builder._resolve_edge_dump(None, None) is True  # type: ignore[attr-defined]
+
+
+def test_resolve_edge_dump_dir_prefers_cli(tmp_path: Path) -> None:
+    work_dir = tmp_path / "work"
+    work_dir.mkdir()
+    cli_dir = tmp_path / "cli"
+    resolved = graph_builder._resolve_edge_dump_dir(work_dir, cli_dir, "/ignored")  # type: ignore[attr-defined]
+    assert resolved == cli_dir.resolve()
+
+
+def test_resolve_edge_dump_dir_uses_config(tmp_path: Path) -> None:
+    work_dir = tmp_path / "work"
+    work_dir.mkdir()
+    config_dir = tmp_path / "config"
+    resolved = graph_builder._resolve_edge_dump_dir(work_dir, None, str(config_dir))  # type: ignore[attr-defined]
+    assert resolved == config_dir.resolve()
+
+
+def test_resolve_edge_dump_dir_defaults_to_work(tmp_path: Path) -> None:
+    work_dir = tmp_path / "work"
+    work_dir.mkdir()
+    resolved = graph_builder._resolve_edge_dump_dir(work_dir, None, None)  # type: ignore[attr-defined]
+    assert resolved == (work_dir / "edge_features").resolve()
