@@ -2,7 +2,7 @@
 # Pick one module per required stage. Edit parameter values as needed.
 # Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.
 defaults:
-  jobs: 6  # Optional global worker override; remove if unused.
+  jobs: 8  # Optional global worker override; remove if unused.
 
 # REQUIRED stage: interface
 interface:
@@ -13,7 +13,7 @@ interface:
   params:
     cutoff: 10.0
     coordinate_decimals: -1  # skip rounding to keep raw coords
-    jobs: 6
+    jobs: 8
 
 # OPTIONAL stage: topology
 topology:
@@ -34,7 +34,7 @@ topology:
       - [C, O]
       - [N, O]
       - [C, N, O]
-    jobs: 6
+    jobs: 8
 
 # REQUIRED stage: node
 node:
@@ -44,7 +44,7 @@ node:
   description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
   params:
     drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
-    jobs: 6
+    jobs: 8
 
 # REQUIRED stage: edge
 edge:
@@ -56,7 +56,6 @@ edge:
     distance_min: 0.0
     distance_max: 10.0
     scale_features: true
-    jobs: 6
 
 # Alternate edge modules (uncomment to use):
 # edge:
@@ -108,7 +107,6 @@ edge:
 #     contact_normalizer: 50.0
 #     short_contact_max: 5.0
 #     long_band_mask: true
-#     missing   jobs: 6
 #
 
 # OPTIONAL custom stages ------------------------------------------------

@@ -16,6 +16,7 @@ from ..base import (
     require_bool,
     require_float,
     require_positive_float,
+    require_positive_int,
 )
 from ..registry import register_feature_module
 
@@ -338,6 +339,7 @@ class NeoEdgeModuleV24(EdgeFeatureModule):
             "contact_normalizer": "Value used to scale contact counts into [0,1].",
             "short_contact_max": "Upper Å bound for short-contact fraction feature.",
             "long_band_mask": "Append a mask so long-band edges with zero short contacts can be ignored.",
+            "jobs": "Optional override for edge assembly worker count.",
         },
         defaults={
             "bands": [
@@ -355,6 +357,7 @@ class NeoEdgeModuleV24(EdgeFeatureModule):
             "contact_normalizer": 50.0,
             "short_contact_max": 5.0,
             "long_band_mask": True,
+            "jobs": 8,
         },
     )
 
@@ -477,3 +480,7 @@ class NeoEdgeModuleV24(EdgeFeatureModule):
             params["short_contact_max"] = require_positive_float(
                 short_contact_max, "edge.params.short_contact_max", allow_zero=False
             )
+
+        jobs = params.get("jobs")
+        if jobs is not None:
+            params["jobs"] = require_positive_int(jobs, "edge.params.jobs")

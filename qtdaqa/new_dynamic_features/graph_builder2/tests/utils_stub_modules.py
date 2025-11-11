@@ -11,7 +11,7 @@ from qtdaqa.new_dynamic_features.graph_builder2.modules.base import (
     ensure_sorted_float_sequence,
     require_bool,
     require_float,
-    require_non_negative_int,
+    require_int,
     require_positive_float,
     require_positive_int,
 )
@@ -38,9 +38,10 @@ class _InterfaceStub(InterfaceFeatureModule):
             params["cutoff"] = require_positive_float(cutoff, "interface.params.cutoff")
         decimals = params.get("coordinate_decimals")
         if decimals is not None:
-            params["coordinate_decimals"] = require_non_negative_int(
-                decimals, "interface.params.coordinate_decimals"
-            )
+            value = require_int(decimals, "interface.params.coordinate_decimals")
+            if value < -1:
+                raise ValueError("interface.params.coordinate_decimals must be >= -1.")
+            params["coordinate_decimals"] = value
         jobs = params.get("jobs")
         if jobs is not None:
             params["jobs"] = require_positive_int(jobs, "interface.params.jobs")

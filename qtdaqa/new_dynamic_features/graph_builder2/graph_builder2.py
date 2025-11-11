@@ -23,7 +23,7 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple, TYPE_CHECKING, Type
+from typing import Dict, Iterable, List, Mapping, Optional, Tuple, TYPE_CHECKING, Type
 
 import yaml
 
@@ -57,7 +57,7 @@ _TEMPLATE_DEFAULTS = {
     "interface": "interface/polar_cutoff/v1",
     "topology": "topology/persistence_basic/v1",
     "node": "node/dssp_topo_merge/v1",
-    "edge": "edge/multi_scale/v24",
+    "edge": "edge/legacy_band/v11",
 }
 
 def _json_default(obj):
@@ -223,6 +223,11 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Generate a feature-config.yaml enumerating all modules and exit.",
     )
+    parser.add_argument(
+        "--include-alternates",
+        action="store_true",
+        help="When used with --create-feature-config, append fully-detailed commented blocks for alternate modules.",
+    )
     return parser
 
 
@@ -322,7 +327,7 @@ def _validate_feature_selection(selection: FeatureSelection) -> None:
 
 
 def _apply_job_defaults(modules: Dict[str, object], jobs: Optional[int]) -> None:
-    for key in ("interface", "topology", "node"):
+    for key in ("interface", "topology", "node", "edge"):
         module = modules.get(key)
         if module and isinstance(module.params, dict) and "jobs" in module.params:
             if module.params["jobs"] in (None, "auto"):
@@ -349,7 +354,9 @@ def _collect_module_templates() -> Dict[str, List[Dict[str, object]]]:
             "module_id": snippet.get("module", meta.module_id),
             "alias": snippet.get("alias") or getattr(module_cls, "default_alias", None),
             "params": params,
-            "summary": meta.summary or meta.description or "",
+            "param_comments": dict(snippet.get("param_comments", {})),
+            "summary": meta.summary or "",
+            "description": meta.description or "",
         }
         templates.setdefault(meta.module_kind, []).append(entry)
 
@@ -367,15 +374,125 @@ def _select_default_template(kind: str, entries: List[Dict[str, object]]) -> Dic
     return entries[0]
 
 
-def _format_params_block(params: Dict[str, object], indent: int = 2) -> List[str]:
+def _format_params_block(
+    params: Dict[str, object],
+    comments: Optional[Dict[str, str]] = None,
+    indent: int = 2,
+) -> List[str]:
     pad = " " * indent
     if not params:
         return [f"{pad}params: {{}}"]
     lines = [f"{pad}params:"]
-    dumped = yaml.safe_dump(params, sort_keys=False).strip()
-    if dumped:
-        for line in dumped.splitlines():
-            lines.append(" " * (indent + 2) + line)
+    for key, value in params.items():
+        lines.extend(_format_param_entry(key, value, comments or {}, indent + 2))
+    return lines
+
+
+def _format_param_entry(
+    key: str,
+    value: object,
+    comments: Mapping[str, str],
+    indent: int,
+) -> List[str]:
+    indent_str = " " * indent
+    comment = f"  # {comments[key]}" if key in comments else ""
+
+    if key == "element_filters" and _is_list_of_sequences(value):
+        lines = [f"{indent_str}{key}:"]
+        for entry in value:  # type: ignore[assignment]
+            entry_dump = _format_flow_sequence(entry)  # type: ignore[arg-type]
+            lines.append(f"{indent_str}  - {entry_dump}")
+        return lines
+
+    if isinstance(value, (list, tuple)) and _is_scalar_sequence(value):
+        seq_dump = _format_flow_sequence(value)
+        return [f"{indent_str}{key}: {seq_dump}{comment}"]
+
+    if isinstance(value, Mapping):
+        lines = [f"{indent_str}{key}:"]
+        dumped = yaml.safe_dump(value, sort_keys=False).strip()
+        if dumped:
+            for line in dumped.splitlines():
+                lines.append(" " * (indent + 2) + line)
+        return lines
+
+    if isinstance(value, (list, tuple)):
+        lines = [f"{indent_str}{key}:"]
+        dumped = yaml.safe_dump(value, sort_keys=False).strip()
+        if dumped:
+            for line in dumped.splitlines():
+                lines.append(" " * (indent + 2) + line)
+        return lines
+
+    scalar = _dump_scalar(value)
+    return [f"{indent_str}{key}: {scalar}{comment}"]
+
+
+def _is_list_of_sequences(value: object) -> bool:
+    return isinstance(value, (list, tuple)) and all(isinstance(entry, (list, tuple)) for entry in value)
+
+
+def _is_scalar_sequence(value: Sequence[object]) -> bool:
+    return all(not isinstance(entry, (list, tuple, Mapping)) for entry in value)
+
+
+def _format_flow_sequence(value: Sequence[object]) -> str:
+    dumped = yaml.safe_dump(list(value), default_flow_style=True)
+    return dumped.splitlines()[0] if dumped else "[]"
+
+
+def _dump_scalar(value: object) -> str:
+    dumped = yaml.safe_dump(value, default_flow_style=False)
+    return dumped.splitlines()[0] if dumped else "null"
+
+
+def _format_string_line(
+    key: str,
+    value: object,
+    indent: int = 2,
+    allow_empty: bool = False,
+) -> Optional[str]:
+    if value is None or value == "":
+        if not allow_empty:
+            return None
+        encoded = json.dumps("")
+    else:
+        encoded = json.dumps(str(value))
+    return f"{' ' * indent}{key}: {encoded}"
+
+
+def _render_stage_block(
+    stage: str,
+    entry: Dict[str, object],
+    *,
+    comment_prefix: str = "",
+) -> List[str]:
+    lines: List[str] = []
+
+    def wrap(text: str) -> str:
+        return f"{comment_prefix}{text}" if comment_prefix else text
+
+    alias_hint = entry.get("alias")
+    module_value = f"  module: {entry.get('module_id')}"
+    if alias_hint:
+        module_value += f"  # alias: {alias_hint}"
+
+    lines.append(wrap(f"{stage}:"))
+    lines.append(wrap(module_value))
+
+    for meta_key in ("alias", "summary", "description"):
+        meta_line = _format_string_line(meta_key, entry.get(meta_key), allow_empty=True)
+        if meta_line:
+            lines.append(wrap(meta_line))
+
+    param_lines = _format_params_block(
+        entry.get("params", {}),
+        comments=entry.get("param_comments"),
+        indent=2,
+    )
+    for param_line in param_lines:
+        lines.append(wrap(param_line))
+
     return lines
 
 
@@ -387,7 +504,11 @@ def _ordered_kinds(module_kinds: Iterable[str]) -> List[str]:
     return ordered
 
 
-def _render_feature_config_template(modules_by_kind: Dict[str, List[Dict[str, object]]]) -> str:
+def _render_feature_config_template(
+    modules_by_kind: Dict[str, List[Dict[str, object]]],
+    *,
+    include_alternates: bool = False,
+) -> str:
     lines: List[str] = []
     lines.append("# Auto-generated feature-config template")
     lines.append("# Pick one module per required stage. Edit parameter values as needed.")
@@ -407,23 +528,22 @@ def _render_feature_config_template(modules_by_kind: Dict[str, List[Dict[str, ob
             continue
 
         default_entry = _select_default_template(stage, options)
-        alias = default_entry.get("alias")
-        module_line = f"{stage}:"
-        lines.append(module_line)
-        module_value = f"  module: {default_entry['module_id']}"
-        if alias:
-            module_value += f"  # alias: {alias}"
-        lines.append(module_value)
-        lines.extend(_format_params_block(default_entry.get("params", {}), indent=2))
+        lines.extend(_render_stage_block(stage, default_entry))
 
         alternates = [entry for entry in options if entry is not default_entry]
         if alternates:
             lines.append("")
-            lines.append(f"# Alternate {stage} modules:")
-            for alt in alternates:
-                alias_note = f" (alias: {alt.get('alias')})" if alt.get("alias") else ""
-                summary = alt.get("summary") or "No summary provided."
-                lines.append(f"#   - {alt['module_id']}{alias_note}: {summary}")
+            if include_alternates:
+                lines.append(f"# Alternate {stage} modules (uncomment to use):")
+                for alt in alternates:
+                    lines.extend(_render_stage_block(stage, alt, comment_prefix="# "))
+                    lines.append("#")
+            else:
+                lines.append(f"# Alternate {stage} modules:")
+                for alt in alternates:
+                    alias_note = f" (alias: {alt.get('alias')})" if alt.get("alias") else ""
+                    summary = alt.get("summary") or "No summary provided."
+                    lines.append(f"#   - {alt['module_id']}{alias_note}: {summary}")
 
     lines.append("")
     lines.append("# OPTIONAL custom stages ------------------------------------------------")
@@ -566,8 +686,8 @@ Input: PDB structures
 +------------------------------------------------------------------------+
 | Edge module                                                            |
 |   e.g.                                                                 |
-|     - edge/multi_scale/v24 (24-D default)                              |
-|     - edge/legacy_band/v11  (11-D legacy)                              |
+|     - edge/legacy_band/v11  (11-D default)                             |
+|     - edge/multi_scale/v24 (24-D multi-scale)                          |
 +------------------------------------------------------------------------+
         │  combines interface + node + PDB
         ▼
@@ -576,9 +696,9 @@ Final output: torch_geometric Data (.pt)
     print(diagram.strip())
 
 
-def write_feature_config(output_path: Path) -> None:
+def write_feature_config(output_path: Path, include_alternates: bool = False) -> None:
     templates = _collect_module_templates()
-    template_text = _render_feature_config_template(templates)
+    template_text = _render_feature_config_template(templates, include_alternates=include_alternates)
     output_path.write_text(template_text, encoding="utf-8")
 
 
@@ -592,7 +712,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if getattr(args, "create_feature_config", False):
         work_dir = Path(args.work_dir or ".").resolve() if args.work_dir else Path.cwd()
         output_path = work_dir / "example.feature-config.yaml"
-        write_feature_config(output_path)
+        write_feature_config(output_path, include_alternates=getattr(args, "include_alternates", False))
         print("Feature configuration template written to ./example.feature-config.yaml")
         return 0
 

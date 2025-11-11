@@ -14,6 +14,7 @@ from ..base import (
     build_metadata,
     require_bool,
     require_float,
+    require_positive_int,
 )
 from ..registry import register_feature_module
 
@@ -65,8 +66,9 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
             "distance_min": "Minimum interface Cα distance (Å) to include an edge.",
             "distance_max": "Maximum interface Cα distance (Å) to include an edge.",
             "scale_features": "Apply MinMax scaling across edge features.",
+            "jobs": "Optional override for edge assembly worker count.",
         },
-        defaults={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True},
+        defaults={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True, "jobs": 8},
     )
 
     def build_edges(
@@ -157,3 +159,6 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
         scale_features = params.get("scale_features")
         if scale_features is not None:
             params["scale_features"] = require_bool(scale_features, "edge.params.scale_features")
+        jobs = params.get("jobs")
+        if jobs is not None:
+            params["jobs"] = require_positive_int(jobs, "edge.params.jobs")
