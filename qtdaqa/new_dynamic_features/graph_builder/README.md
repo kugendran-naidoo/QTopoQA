@@ -43,6 +43,11 @@ Helpers:
 - `./run_graph_builder.sh --create-feature-config` – write a minimal template
   with inline instructions (no giant catalog to edit by hand).
 
+Edge CSV dumps are **enabled by default**; files land under `<work-dir>/edge_features`.
+Use `--edge-dump-dir /abs/path` to redirect them, `--no-dump-edges` to skip
+generating them, or `--dump-edges` to force them back on even if the feature config
+disables dumping.
+
 ---
 
 ## Feature Configuration
@@ -100,6 +105,8 @@ Rules:
   the same `module`/`params` structure.
 - Common mistakes (like writing tuple literals for `element_filters`) are caught
   before the builder starts processing PDBs.
+- Edge dumps can also be controlled from the YAML via `options.edge_dump` or redirected
+  with `options.edge_dump_dir`, but CLI flags take precedence when provided.
 
 To switch to the legacy 11‑D edge features, change the `edge` block to
 `edge/legacy_band/v11` with the desired distance window.

@@ -80,6 +80,24 @@ def _resolve_jobs(module, fallback: Optional[int] = None) -> Optional[int]:
     return fallback
 
 
+def _resolve_edge_dump(cli_flag: Optional[bool], config_value: Optional[object]) -> bool:
+    if cli_flag is not None:
+        return bool(cli_flag)
+    if isinstance(config_value, bool):
+        return config_value
+    return True
+
+
+def _resolve_edge_dump_dir(work_dir: Path, cli_dir: Optional[Path], config_dir: Optional[object]) -> Path:
+    if cli_dir is not None:
+        candidate = cli_dir
+    elif isinstance(config_dir, str) and config_dir.strip():
+        candidate = Path(config_dir)
+    else:
+        candidate = work_dir / "edge_features"
+    return candidate.expanduser().resolve()
+
+
 def _write_text_summary(
     summary_path: Path,
     dataset_dir: Path,
@@ -99,6 +117,8 @@ def _write_text_summary(
     lines.append(f"Graph directory: {graph_dir}")
     if edge_dump_dir is not None:
         lines.append(f"Edge feature directory: {edge_dump_dir}")
+    else:
+        lines.append("Edge feature directory: (not written)")
 
     lines.append("")
     lines.append("Modules:")
@@ -196,6 +216,28 @@ def _build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help="Optional path to features.yaml; defaults to <work-dir>/features.yaml if available.",
+    )
+    parser.add_argument(
+        "--edge-dump-dir",
+        type=Path,
+        default=None,
+        help="Optional output directory for edge CSV dumps (default: <work-dir>/edge_features).",
+    )
+    edge_dump_group = parser.add_mutually_exclusive_group()
+    edge_dump_group.add_argument(
+        "--dump-edges",
+        dest="dump_edges",
+        action="store_const",
+        const=True,
+        default=None,
+        help="Force per-structure edge CSV dumps on (default behaviour).",
+    )
+    edge_dump_group.add_argument(
+        "--no-dump-edges",
+        dest="dump_edges",
+        action="store_const",
+        const=False,
+        help="Disable writing per-structure edge CSV dumps.",
     )
     parser.add_argument(
         "--list-modules",
@@ -622,6 +664,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         },
     }
 
+    options = selection.options
+    edge_dump_enabled = _resolve_edge_dump(getattr(args, "dump_edges", None), options.get("edge_dump"))
+    options["edge_dump"] = edge_dump_enabled
+    edge_dump_cli_dir = getattr(args, "edge_dump_dir", None)
+    edge_dump_config_dir = options.get("edge_dump_dir")
+    resolved_edge_dump_dir = _resolve_edge_dump_dir(work_dir, edge_dump_cli_dir, edge_dump_config_dir)
+
     LOG.info("Beginning interface stage (jobs=%s)", interface_jobs)
     interface_result = interface_module.extract_interfaces(
         pdb_paths=pdb_files,
@@ -659,16 +708,34 @@ def main(argv: Optional[List[str]] = None) -> int:
     LOG.info("Node stage complete: %d success, %d failures", node_result["success"], len(node_result["failures"]))
     LOG.info("Node feature extraction elapsed time: %.2f s", node_result.get("elapsed", 0.0))
 
-    edge_dump_dir = None
-    options = selection.options
-    if options.get("edge_dump", False):
-        edge_dump_dir = work_dir / "edge_features"
+    edge_dump_dir: Optional[Path] = resolved_edge_dump_dir if edge_dump_enabled else None
+    summary["edge_dump"] = {
+        "enabled": edge_dump_enabled,
+        "directory": str(edge_dump_dir) if edge_dump_dir is not None else None,
+        "configured_directory": str(resolved_edge_dump_dir),
+    }
+
+    edge_dump_log_start = time.perf_counter() if edge_dump_enabled else None
+    if edge_dump_enabled:
+        LOG.info("Edge dumps enabled; writing CSVs to:")
+        LOG.info("  %s", edge_dump_dir)
+    else:
+        if edge_dump_cli_dir is not None or (
+            isinstance(edge_dump_config_dir, str) and edge_dump_config_dir.strip()
+        ):
+            LOG.info("Edge dumps disabled; configured dump directory %s will be ignored.", resolved_edge_dump_dir)
+        else:
+            LOG.info("Edge dumps disabled (use --dump-edges to re-enable).")
+    if edge_dump_log_start is not None:
+        LOG.info("Edge dump preparation elapsed time: %.2f s", time.perf_counter() - edge_dump_log_start)
 
     LOG.info("Beginning graph assembly (.pt output) stage (jobs=%s)", edge_jobs)
     try:
         from .lib.edge_runner import run_edge_stage as _run_edge_stage  # type: ignore
     except ImportError:  # pragma: no cover - fallback for direct execution
         from lib.edge_runner import run_edge_stage as _run_edge_stage  # type: ignore
+
+    graph_stage_start = time.perf_counter()
 
     edge_result = _run_edge_stage(
         dataset_dir=dataset_dir,
@@ -682,8 +749,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         edge_dump_dir=edge_dump_dir,
     )
     summary["edge"] = edge_result
+    graph_stage_elapsed = time.perf_counter() - graph_stage_start
+    summary["edge"]["graph_stage_elapsed"] = graph_stage_elapsed
     LOG.info("Graph assembly (.pt output) complete: %d success, %d failures", edge_result["success"], len(edge_result["failures"]))
-    LOG.info("Graph (.pt) generation elapsed time: %.2f s", edge_result.get("elapsed", 0.0))
+    LOG.info(
+        "Graph (.pt) generation elapsed time: %.2f s (edge stage: %.2f s)",
+        edge_result.get("elapsed", 0.0),
+        graph_stage_elapsed,
+    )
 
     summary_log = run_info.run_dir / "graph_builder_summary.json"
     summary_log.write_text(json.dumps(summary, indent=2, sort_keys=True, default=_json_default), encoding="utf-8")
