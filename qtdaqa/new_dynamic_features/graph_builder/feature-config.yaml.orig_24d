@@ -43,16 +43,24 @@ node:
     drop_na: true   # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
     jobs: 6
 edge:
-  module: edge/multi_scale/v24
-  alias: "Kugendran 24D Scalars"
+  module: edge/multi_scale/v24  # alias: 24D Scalars
+  alias: "24D Scalars"
   summary: "24-D multi-scale edge features with distance bands and histograms."
   description: "Computes directed residue-residue edges with distance, inverse distance, unit vectors, chain/amino-acid encodings, band indicators, inter-residue distance histograms, and contact counts."
   params:
-    # Distance band definitions with labels, min, and max distances.
-    bands: [{'label': 'short', 'min_distance': 0.0, 'max_distance': 6.0}, {'label': 'medium', 'min_distance': 6.0, 'max_distance': 10.0}, {'label': 'long', 'min_distance': 10.0, 'max_distance': 14.0}]        
-    # Histogram bin edges (Å) for inter-atomic distances.
-    histogram_bins: [0.00001, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0] 
-    contact_threshold: 5.0         # Distance threshold (Å) for counting contacts.
-    include_inverse_distance: True # Include inverse distance feature.
-    include_unit_vector: True      # Include unit vector components.
-    unit_vector_epsilon: 1e-08     # Epsilon to avoid division by zero in unit vector calc.
+    bands:
+      - label: short
+        min_distance: 0.0
+        max_distance: 6.0
+      - label: medium
+        min_distance: 6.0
+        max_distance: 10.0
+      - label: long
+        min_distance: 10.0
+        max_distance: 14.0
+    histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
+    contact_threshold: 5.0
+    include_inverse_distance: true
+    include_unit_vector: true
+    unit_vector_epsilon: 1.0e-08
+    jobs: 8
