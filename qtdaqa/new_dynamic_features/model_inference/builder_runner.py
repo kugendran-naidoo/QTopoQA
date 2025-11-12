@@ -161,24 +161,10 @@ def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str,
     return payload
 
 
-def _write_metadata_feature_config(
-    feature_metadata: Any,
-    work_dir: Path,
-    fallback_metadata_path: Optional[Path] = None,
-) -> Optional[Path]:
-    payload = _build_metadata_feature_payload(feature_metadata)
-    if payload is None and fallback_metadata_path is not None:
-        try:
-            raw = json.loads(fallback_metadata_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            logging.warning("Unable to read graph metadata from %s: %s", fallback_metadata_path, exc)
-        else:
-            payload = _build_metadata_feature_payload(raw)
-    if not payload:
-        return None
+def _write_feature_config_payload(work_dir: Path, payload: Dict[str, object], filename: str) -> Path:
     target_dir = work_dir / "builder_features"
     target_dir.mkdir(parents=True, exist_ok=True)
-    output_path = target_dir / "features.from_metadata.yaml"
+    output_path = target_dir / filename
     with output_path.open("w", encoding="utf-8") as handle:
         yaml.safe_dump(payload, handle, sort_keys=False)
     return output_path
@@ -194,6 +180,46 @@ def _resolve_metadata_source(final_schema: Dict[str, Dict[str, object]]) -> Opti
     except OSError:
         return None
     return metadata_path if metadata_path.exists() else None
+
+
+def _write_metadata_feature_config(
+    feature_metadata: Any,
+    work_dir: Path,
+    fallback_metadata_path: Optional[Path] = None,
+) -> Optional[Path]:
+    payload = _build_metadata_feature_payload(feature_metadata)
+    if payload is None and fallback_metadata_path is not None:
+        try:
+            raw = json.loads(fallback_metadata_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            logging.warning("Unable to read graph metadata from %s: %s", fallback_metadata_path, exc)
+        else:
+            payload = _build_metadata_feature_payload(raw)
+    if not payload:
+        return None
+    return _write_feature_config_payload(work_dir, payload, "features.from_metadata.yaml")
+
+
+def _build_schema_feature_payload(final_schema: Dict[str, Dict[str, object]]) -> Optional[Dict[str, object]]:
+    edge_schema = final_schema.get("edge_schema")
+    if not isinstance(edge_schema, dict):
+        return None
+    payload: Dict[str, object] = {}
+    for key, entry in DEFAULT_FEATURES.items():
+        payload[key] = {
+            "module": entry.get("module"),
+            "params": copy.deepcopy(entry.get("params", {})),
+        }
+    payload["options"] = {}
+
+    edge_block = payload.get("edge", {})
+    module_id = edge_schema.get("module")
+    if module_id:
+        edge_block["module"] = module_id
+    module_params = edge_schema.get("module_params")
+    if isinstance(module_params, dict):
+        edge_block["params"] = copy.deepcopy(module_params)
+    return payload
 
 
 def run_graph_builder(cfg, metadata_feature_config: Optional[Path] = None) -> Path:
@@ -311,6 +337,12 @@ def ensure_graph_dir(
             work_dir,
             fallback_metadata_path=metadata_source,
         )
+    if metadata_feature_config is None:
+        schema_payload = _build_schema_feature_payload(final_schema)
+        if schema_payload:
+            metadata_feature_config = _write_feature_config_payload(
+                work_dir, schema_payload, "features.from_schema.yaml"
+            )
 
     if reuse and graph_dir.exists() and any(graph_dir.glob("*.pt")):
         matches, reason = _graph_metadata_matches(graph_dir, final_schema)

@@ -612,7 +612,7 @@ def run_inference(
     metadata = validate_graph_metadata(graph_dir, final_schema)
     metadata_source = metadata.metadata_path or str(graph_dir / "graph_metadata.json")
     logging.info("Verified graph metadata compatibility (%s).", metadata_source)
-    summary_path = _write_inference_schema_summary(cfg, metadata, final_schema, checkpoint_meta)
+    summary_path = _write_inference_schema_summary(cfg, metadata, final_schema, feature_metadata)
     logging.info("Inference schema summary written to %s", summary_path)
 
     logging.info("Loading graphs from %s", graph_dir)

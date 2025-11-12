@@ -37,6 +37,7 @@ from qtdaqa.new_dynamic_features.model_inference.builder_runner import (  # noqa
     parse_builder_config,
     run_graph_builder,
     _write_metadata_feature_config,
+    _build_schema_feature_payload,
 )
 
 
@@ -206,3 +207,17 @@ def test_write_metadata_feature_config_falls_back_to_metadata_file(tmp_path: Pat
     assert path is not None
     payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     assert payload["edge"]["params"]["contact_threshold"] == 7.5
+
+
+def test_build_schema_feature_payload_overrides_edge_params() -> None:
+    payload = _build_schema_feature_payload(
+        {
+            "edge_schema": {
+                "module": "edge/legacy_band/v11",
+                "module_params": {"distance_max": 9.0},
+            }
+        }
+    )
+    assert payload is not None
+    assert payload["edge"]["module"] == "edge/legacy_band/v11"
+    assert payload["edge"]["params"]["distance_max"] == 9.0
