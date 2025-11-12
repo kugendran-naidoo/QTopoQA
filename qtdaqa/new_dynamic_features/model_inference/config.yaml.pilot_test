@@ -1,4 +1,4 @@
-# Inference configuration for the 24-D edge TopoQA model.
+# Inference configuration for dynamic features
 
 # Input/output paths resolved relative to this YAML
 paths:

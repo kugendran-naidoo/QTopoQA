@@ -1,11 +1,11 @@
-# Inference configuration for the 24-D edge TopoQA model.
+# Inference configuration for dynamic features
 
 # Input/output paths resolved relative to this YAML
 paths:
   data_dir: ../../../datasets/evaluation/BM55-AF2/decoy
   label_file: ../../../datasets/evaluation/BM55-AF2/label_info.csv
-  work_dir: ./output/24d_topoqa/BM55-AF2/work
-  output_file: ./output/24d_topoqa/BM55-AF2/results/inference_results.csv
+  work_dir: ./output/11d_topoqa/BM55-AF2/work
+  output_file: ./output/11d_topoqa/BM55-AF2/results/inference_results.csv
   checkpoint: null
 
 batch_size: 32
