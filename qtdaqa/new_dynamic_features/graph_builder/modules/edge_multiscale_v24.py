@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,16 @@ try:
     from ..lib.edge_common import InterfaceResidue, StructureCache
 except ImportError:  # pragma: no cover
     from lib.edge_common import InterfaceResidue, StructureCache  # type: ignore
-from .base import EdgeBuildResult, EdgeFeatureModule, build_metadata
+from .base import (
+    EdgeBuildResult,
+    EdgeFeatureModule,
+    build_metadata,
+    ensure_sorted_float_sequence,
+    require_bool,
+    require_float,
+    require_positive_float,
+    require_positive_int,
+)
 from .registry import register_feature_module
 
 
@@ -170,6 +179,11 @@ class MultiscaleEdgeBuilder:
             "edge_count": int(edge_array.shape[0]),
             "feature_dim": int(self.feature_dim),
             "bands": [band.label for band in self.bands],
+            "histogram_bins": self.hist_bins.tolist(),
+            "contact_threshold": self.contact_threshold,
+            "include_inverse_distance": self.include_inverse_distance,
+            "include_unit_vector": self.include_unit_vector,
+            "unit_vector_epsilon": self.unit_vector_epsilon,
         }
 
         return EdgeBuildResult(edge_index=edge_array, edge_attr=feature_matrix, metadata=metadata)
@@ -239,6 +253,7 @@ def _atom_coordinates(residue) -> np.ndarray:
 class MultiscaleEdgeModuleV24(EdgeFeatureModule):
     module_id = "edge/multi_scale/v24"
     module_kind = "edge"
+    default_alias = "24D Scalars"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -257,6 +272,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             "include_inverse_distance": "Include inverse distance feature.",
             "include_unit_vector": "Include unit vector components.",
             "unit_vector_epsilon": "Epsilon to avoid division by zero in unit vector calc.",
+            "jobs": "Optional override for parallel worker count during edge assembly.",
         },
         defaults={
             "bands": [
@@ -269,6 +285,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             "include_inverse_distance": True,
             "include_unit_vector": True,
             "unit_vector_epsilon": 1e-8,
+            "jobs": 8,
         },
     )
 
@@ -303,3 +320,62 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             edge_attr=result.edge_attr,
             metadata=metadata,
         )
+
+    @classmethod
+    def validate_params(cls, params: Dict[str, Any]) -> None:
+        bands = params.get("bands")
+        if bands is not None:
+            if not isinstance(bands, (list, tuple)) or not bands:
+                raise ValueError("edge.params.bands must be a non-empty list of band definitions.")
+            normalised: List[Dict[str, Any]] = []
+            for idx, band in enumerate(bands):
+                if not isinstance(band, dict):
+                    raise ValueError("Each entry in edge.params.bands must be a mapping.")
+                label = band.get("label")
+                if not isinstance(label, str) or not label.strip():
+                    raise ValueError("Each band definition must include a non-empty 'label'.")
+                min_distance = require_float(
+                    band.get("min_distance"),
+                    f"edge.params.bands[{idx}].min_distance",
+                )
+                max_distance = require_float(
+                    band.get("max_distance"),
+                    f"edge.params.bands[{idx}].max_distance",
+                )
+                if min_distance >= max_distance:
+                    raise ValueError("Each band must satisfy min_distance < max_distance.")
+                normalised.append(
+                    {
+                        "label": label.strip(),
+                        "min_distance": min_distance,
+                        "max_distance": max_distance,
+                    }
+                )
+            params["bands"] = normalised
+
+        histogram_bins = params.get("histogram_bins")
+        if histogram_bins is not None:
+            params["histogram_bins"] = list(
+                ensure_sorted_float_sequence(histogram_bins, "edge.params.histogram_bins")
+            )
+
+        contact_threshold = params.get("contact_threshold")
+        if contact_threshold is not None:
+            params["contact_threshold"] = require_positive_float(
+                contact_threshold, "edge.params.contact_threshold"
+            )
+
+        unit_vector_epsilon = params.get("unit_vector_epsilon")
+        if unit_vector_epsilon is not None:
+            params["unit_vector_epsilon"] = require_positive_float(
+                unit_vector_epsilon, "edge.params.unit_vector_epsilon"
+            )
+
+        for flag in ("include_inverse_distance", "include_unit_vector"):
+            value = params.get(flag)
+            if value is not None:
+                params[flag] = require_bool(value, f"edge.params.{flag}")
+
+        jobs = params.get("jobs")
+        if jobs is not None:
+            params["jobs"] = require_positive_int(jobs, "edge.params.jobs")

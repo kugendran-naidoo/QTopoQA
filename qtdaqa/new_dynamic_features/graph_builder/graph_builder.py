@@ -363,8 +363,8 @@ def _validate_feature_selection(selection: FeatureSelection) -> None:
             numeric_bins = [float(value) for value in histogram_bins]
         except (TypeError, ValueError):
             raise ValueError("edge.params.histogram_bins must contain only numeric values.")
-        if any(b <= 0 for b in numeric_bins):
-            raise ValueError("edge.params.histogram_bins must contain positive values.")
+        if any(b < 0 for b in numeric_bins):
+            raise ValueError("edge.params.histogram_bins must be non-negative.")
         if numeric_bins != sorted(numeric_bins):
             raise ValueError("edge.params.histogram_bins must be sorted ascending.")
         edge_params["histogram_bins"] = numeric_bins
