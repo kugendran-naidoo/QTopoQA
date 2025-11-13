@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import torch
 
@@ -19,6 +19,7 @@ class GraphFeatureMetadata:
     sample_graph: Optional[str] = None
     sample_edge_count: Optional[int] = None
     sample_node_count: Optional[int] = None
+    builder: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -31,7 +32,53 @@ class GraphFeatureMetadata:
             "sample_graph": self.sample_graph,
             "sample_edge_count": self.sample_edge_count,
             "sample_node_count": self.sample_node_count,
+            "builder": self.builder,
         }
+
+    def builder_id(self) -> Optional[str]:
+        builder = self.builder
+        if isinstance(builder, dict):
+            identifier = builder.get("id") or builder.get("module")
+            return str(identifier) if identifier else None
+        return None
+
+    def builder_version(self) -> Optional[str]:
+        builder = self.builder
+        if isinstance(builder, dict) and builder.get("version"):
+            return str(builder["version"])
+        return None
+
+    def builder_feature_config(self) -> Optional[Dict[str, object]]:
+        builder = self.builder
+        if isinstance(builder, dict):
+            snapshot = builder.get("feature_config")
+            if isinstance(snapshot, dict):
+                return snapshot
+        return None
+
+    def builder_feature_config_path(self) -> Optional[str]:
+        snapshot = self.builder_feature_config()
+        if snapshot:
+            path = snapshot.get("path")
+            if path:
+                return str(path)
+        return None
+
+    def builder_feature_config_digest(self) -> Optional[str]:
+        snapshot = self.builder_feature_config()
+        if snapshot:
+            digest = snapshot.get("sha256")
+            if digest:
+                return str(digest)
+        return None
+
+    def builder_edge_dumps(self) -> Optional[Dict[str, object]]:
+        builder = self.builder
+        if isinstance(builder, dict):
+            edge_dumps = builder.get("edge_dumps")
+            if isinstance(edge_dumps, dict):
+                return edge_dumps
+        return None
 
     def feature_stage_summary(self) -> Dict[str, str]:
         """Produce a compact summary for interface/topology/node/edge stages."""
@@ -196,6 +243,40 @@ def _discover_summary_path(graph_dir: Path, explicit: Optional[Path]) -> Optiona
     return None
 
 
+def _extract_builder_info(payload: Dict[str, object]) -> Optional[Dict[str, object]]:
+    builder_entry = payload.get("_builder")
+    if isinstance(builder_entry, dict):
+        return builder_entry
+    for entry in payload.values():
+        if isinstance(entry, dict):
+            candidate = entry.get("builder")
+            if isinstance(candidate, dict):
+                return candidate
+    return None
+
+
+def _should_update_builder(
+    current: Optional[Dict[str, object]],
+    candidate: Optional[Dict[str, object]],
+) -> bool:
+    if not isinstance(candidate, dict):
+        return False
+    if current is None:
+        return True
+
+    def _has_inline_text(entry: Dict[str, object]) -> bool:
+        feature_config = entry.get("feature_config")
+        if isinstance(feature_config, dict):
+            text = feature_config.get("text")
+            return isinstance(text, str) and bool(text.strip())
+        return False
+
+    # Prefer snapshots that still contain inline feature config text.
+    if not _has_inline_text(current) and _has_inline_text(candidate):
+        return True
+    return False
+
+
 def load_graph_feature_metadata(
     graph_dir: Path,
     *,
@@ -212,15 +293,26 @@ def load_graph_feature_metadata(
 
     selected_models = _ensure_list(sample_models)
     metadata_file = metadata_path.resolve() if metadata_path else (graph_dir / "graph_metadata.json")
+    raw_entries: Dict[str, Dict[str, object]] = {}
     if metadata_file.exists():
         try:
-            raw_entries = _load_json(metadata_file)
+            payload = _load_json(metadata_file)
         except (OSError, json.JSONDecodeError) as exc:
             metadata.notes.append(f"Failed to parse graph metadata at {metadata_file}: {exc}")
-            raw_entries = {}
+            payload = {}
         metadata.metadata_path = str(metadata_file)
+        if isinstance(payload, dict):
+            builder_block = _extract_builder_info(payload)
+            if _should_update_builder(metadata.builder, builder_block):
+                metadata.builder = builder_block
+            raw_entries = {
+                key: value
+                for key, value in payload.items()
+                if isinstance(value, dict) and not key.startswith("_")
+            }
+        else:
+            metadata.notes.append(f"Unexpected graph metadata structure at {metadata_file}: {type(payload).__name__}")
     else:
-        raw_entries = {}
         metadata.notes.append(f"graph_metadata.json not found at {metadata_file}")
 
     entries: List[Dict[str, object]] = []
@@ -379,6 +471,9 @@ def load_graph_feature_metadata(
         graph_meta = getattr(data, "metadata", None)
         if isinstance(graph_meta, dict):
             metadata_dicts.append(graph_meta)
+            builder_candidate = graph_meta.get("builder")
+            if _should_update_builder(metadata.builder, builder_candidate):
+                metadata.builder = builder_candidate
 
     def _resolve_dim(primary: Optional[int], derived: Sequence[int], label: str) -> Optional[int]:
         unique_dims = sorted({dim for dim in derived if dim is not None})

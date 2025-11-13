@@ -64,8 +64,9 @@ if [[ "${MANIFEST}" != /* ]]; then
 fi
 
 RUN_ROOT="${SCRIPT_DIR}/training_runs"
-PHASE1_CONFIG="configs/sched_boost_finetune.yaml"
+PHASE1_CONFIG="${PHASE1_CONFIG:-configs/sched_boost_finetune.yaml}"
 PHASE2_SEEDS=(101 555 888)
+PHASE2_CONFIG_BASENAME="${PHASE2_CONFIG_BASENAME:-sched_boost_finetune}"
 
 export PYTHONPATH="${REPO_ROOT}:${PYTHONPATH:-}"
 
@@ -337,7 +338,7 @@ fi
 echo "[run_full_pipeline] Phase 1 best checkpoint: ${PHASE1_BEST_CKPT} (${PHASE1_BEST_METRIC}=${PHASE1_BEST_SCORE})"
 
 for seed in "${PHASE2_SEEDS[@]}"; do
-  PHASE2_CONFIG="${SCRIPT_DIR}/configs/sched_boost_finetune_seed${seed}.yaml"
+  PHASE2_CONFIG="${SCRIPT_DIR}/configs/${PHASE2_CONFIG_BASENAME}_seed${seed}.yaml"
   if [[ ! -f "${PHASE2_CONFIG}" ]]; then
     echo "[run_full_pipeline] Skipping seed ${seed} (config not found: ${PHASE2_CONFIG})" >&2
     continue

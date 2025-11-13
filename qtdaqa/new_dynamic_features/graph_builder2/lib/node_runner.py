@@ -12,6 +12,7 @@ from typing import Dict, Iterable, List, Optional, Tuple
 import pandas as pd
 
 from .node_features import node_fea
+from .node_utils import canonical_id_order
 from .stage_common import (
     gather_files,
     normalise_interface_name,
@@ -98,6 +99,7 @@ def _process_task(task: NodeTask, drop_na: bool) -> Tuple[str, Optional[str]]:
             pd.set_option("future.no_silent_downcasting", True)
             fea_df.replace("NA", pd.NA, inplace=True)
             fea_df = fea_df.dropna()
+        fea_df = _canonicalise_node_df(fea_df)
         fea_df.to_csv(task.output_path, index=False)
         if captured:
             log_lines.append("Warnings:")
@@ -188,3 +190,12 @@ def run_node_stage(
         "elapsed": elapsed,
         "processed": len(node_tasks),
     }
+
+
+def _canonicalise_node_df(fea_df: pd.DataFrame) -> pd.DataFrame:
+    if "ID" not in fea_df.columns:
+        return fea_df.reset_index(drop=True)
+    order = canonical_id_order(list(fea_df["ID"]))
+    if order == list(range(len(order))):
+        return fea_df.reset_index(drop=True)
+    return fea_df.iloc[order].reset_index(drop=True)

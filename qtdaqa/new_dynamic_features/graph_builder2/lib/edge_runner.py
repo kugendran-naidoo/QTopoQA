@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
@@ -33,6 +34,11 @@ try:  # availability depends on execution context
     from ...common.feature_metadata import load_graph_feature_metadata
 except ImportError:  # pragma: no cover
     from common.feature_metadata import load_graph_feature_metadata  # type: ignore
+
+try:
+    from ..builder_info import sanitize_builder_info
+except ImportError:  # pragma: no cover
+    from builder_info import sanitize_builder_info  # type: ignore
 
 LOG = logging.getLogger(__name__)
 
@@ -137,6 +143,7 @@ def run_edge_stage(
     edge_module: EdgeFeatureModule,
     jobs: Optional[int] = None,
     edge_dump_dir: Optional[Path] = None,
+    builder_info: Optional[Dict[str, object]] = None,
 ) -> Dict[str, object]:
     log_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -160,11 +167,24 @@ def run_edge_stage(
 
     worker_count = max(1, int(jobs)) if jobs else 1
 
+    builder_metadata_for_graphs: Optional[Dict[str, object]] = None
+    builder_metadata_full: Optional[Dict[str, object]] = None
+    if builder_info:
+        builder_metadata_full = copy.deepcopy(builder_info)
+        builder_metadata_for_graphs = sanitize_builder_info(builder_info, include_feature_text=False)
+
     start = time.perf_counter()
 
     if worker_count <= 1:
         for task in tasks:
-            result = _process_task(task, edge_module, output_dir, edge_dump_dir, metadata_records)
+            result = _process_task(
+                task,
+                edge_module,
+                output_dir,
+                edge_dump_dir,
+                metadata_records,
+                builder_metadata_for_graphs,
+            )
             if result["error"]:
                 failures.append((task.model_key, result["error"], task.log_path))
             else:
@@ -173,7 +193,15 @@ def run_edge_stage(
     else:
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             future_map = {
-                executor.submit(_process_task, task, edge_module, output_dir, edge_dump_dir, metadata_records): task
+                executor.submit(
+                    _process_task,
+                    task,
+                    edge_module,
+                    output_dir,
+                    edge_dump_dir,
+                    metadata_records,
+                    builder_metadata_for_graphs,
+                ): task
                 for task in tasks
             }
             for future, task in future_map.items():
@@ -183,6 +211,9 @@ def run_edge_stage(
                 else:
                     success += 1
                     edge_dim = result["edge_dim"]
+
+    if builder_metadata_full:
+        metadata_records["_builder"] = builder_metadata_full
 
     metadata_path = output_dir / "graph_metadata.json"
     metadata_path.write_text(json.dumps(metadata_records, indent=2, sort_keys=True), encoding="utf-8")
@@ -210,6 +241,7 @@ def _process_task(
     output_dir: Path,
     edge_dump_dir: Optional[Path],
     metadata_records: Dict[str, Dict[str, object]],
+    builder_metadata: Optional[Dict[str, object]],
 ) -> Dict[str, object]:
     log_lines: List[str] = []
     try:
@@ -258,15 +290,20 @@ def _process_task(
             "edge_params": edge_module.params,
             "edge_info": edge_metadata,
         }
+        if builder_metadata:
+            data.metadata["builder"] = builder_metadata
         output_path = output_dir / Path(f"{task.model_key}.pt")
         output_path.parent.mkdir(parents=True, exist_ok=True)
         torch.save(data, output_path)
-        metadata_records[task.model_key] = {
+        entry = {
             "edge_module": module_id,
             "edge_params": edge_module.params,
             "edge_metadata": edge_metadata,
             "node_feature_columns": feature_cols,
         }
+        if builder_metadata:
+            entry["builder"] = builder_metadata
+        metadata_records[task.model_key] = entry
         log_lines.extend(
             [
                 f"Model key: {task.model_key}",

@@ -1,102 +1,1311 @@
-SAME: 1EXB
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1EXB/1EXB.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/1EXB/1EXB.pt
-SAME: 1LB2
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1LB2/1LB2.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/1LB2/1LB2.pt
-SAME: 1QSD
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1QSD/1QSD.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/1QSD/1QSD.pt
-SAME: 1ZQ1
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ZQ1/1ZQ1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/1ZQ1/1ZQ1.pt
-SAME: 2FMM
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2FMM/2FMM.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/2FMM/2FMM.pt
-SAME: 2GHJ
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2GHJ/2GHJ.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/2GHJ/2GHJ.pt
-SAME: 2PMY
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2PMY/2PMY.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/2PMY/2PMY.pt
-SAME: 2QSF
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2QSF/2QSF.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/2QSF/2QSF.pt
-SAME: 2V5P
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2V5P/2V5P.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/2V5P/2V5P.pt
-SAME: 2XWX
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2XWX/2XWX.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/2XWX/2XWX.pt
-SAME: 3IKM
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3IKM/3IKM.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3IKM/3IKM.pt
-SAME: 3KXA
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3KXA/3KXA.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3KXA/3KXA.pt
-SAME: 3LTM
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3LTM/3LTM.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3LTM/3LTM.pt
-SAME: 3NE5
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3NE5/3NE5.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3NE5/3NE5.pt
-SAME: 3TQ7
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3TQ7/3TQ7.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3TQ7/3TQ7.pt
-SAME: 3UTM
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3UTM/3UTM.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3UTM/3UTM.pt
-SAME: 3VA2
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3VA2/3VA2.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3VA2/3VA2.pt
-SAME: 3WWT
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3WWT/3WWT.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3WWT/3WWT.pt
-SAME: 3WXM
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3WXM/3WXM.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3WXM/3WXM.pt
-SAME: 3WYG
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3WYG/3WYG.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/3WYG/3WYG.pt
-SAME: 4BV4
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/4BV4/4BV4.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/4BV4/4BV4.pt
-SAME: 4CVW
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/4CVW/4CVW.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/4CVW/4CVW.pt
-SAME: 4IUM
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/4IUM/4IUM.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/4IUM/4IUM.pt
-SAME: 4MSP
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/4MSP/4MSP.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/4MSP/4MSP.pt
-SAME: 4UAF
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/4UAF/4UAF.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/4UAF/4UAF.pt
-SAME: 4WD4
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/4WD4/4WD4.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/4WD4/4WD4.pt
-SAME: 5CQV
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5CQV/5CQV.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5CQV/5CQV.pt
-SAME: 5D3A
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5D3A/5D3A.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5D3A/5D3A.pt
-SAME: 5FIR
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5FIR/5FIR.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5FIR/5FIR.pt
-SAME: 5H6Q
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5H6Q/5H6Q.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5H6Q/5H6Q.pt
-SAME: 5LXN
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5LXN/5LXN.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5LXN/5LXN.pt
-SAME: 5UF5
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5UF5/5UF5.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5UF5/5UF5.pt
-SAME: 5YKZ
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/5YKZ/5YKZ.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/5YKZ/5YKZ.pt
-SAME: 6OIB
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/6OIB/6OIB.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/11d_topoqa_settings.10A/graph_data/6OIB/6OIB.pt
+SAME: 1A9X_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1A9X/1A9X_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1A9X/1A9X_af2m.pt
+SAME: 1AVW
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1AVW.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1AVW.pt
+SAME: 1AVW_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1AVW_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1AVW_af2m.pt
+SAME: 1a2k_1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_1.pt
+SAME: 1a2k_10
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_10.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_10.pt
+SAME: 1a2k_100
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_100.pt
+SAME: 1a2k_11
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_11.pt
+SAME: 1a2k_12
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_12.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_12.pt
+SAME: 1a2k_13
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_13.pt
+SAME: 1a2k_14
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_14.pt
+SAME: 1a2k_15
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_15.pt
+SAME: 1a2k_16
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_16.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_16.pt
+SAME: 1a2k_17
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_17.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_17.pt
+SAME: 1a2k_18
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_18.pt
+SAME: 1a2k_19
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_19.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_19.pt
+SAME: 1a2k_2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_2.pt
+SAME: 1a2k_20
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_20.pt
+SAME: 1a2k_21
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_21.pt
+SAME: 1a2k_22
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_22.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_22.pt
+SAME: 1a2k_23
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_23.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_23.pt
+SAME: 1a2k_24
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_24.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_24.pt
+SAME: 1a2k_25
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_25.pt
+SAME: 1a2k_26
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_26.pt
+SAME: 1a2k_27
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_27.pt
+SAME: 1a2k_28
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_28.pt
+SAME: 1a2k_29
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_29.pt
+SAME: 1a2k_3
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_3.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_3.pt
+SAME: 1a2k_30
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_30.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_30.pt
+SAME: 1a2k_31
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_31.pt
+SAME: 1a2k_32
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_32.pt
+SAME: 1a2k_33
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_33.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_33.pt
+SAME: 1a2k_34
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_34.pt
+SAME: 1a2k_35
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_35.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_35.pt
+SAME: 1a2k_36
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_36.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_36.pt
+SAME: 1a2k_365130
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_365130.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_365130.pt
+SAME: 1a2k_37
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_37.pt
+SAME: 1a2k_38
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_38.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_38.pt
+SAME: 1a2k_39
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_39.pt
+SAME: 1a2k_4
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_4.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_4.pt
+SAME: 1a2k_40
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_40.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_40.pt
+SAME: 1a2k_41
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_41.pt
+SAME: 1a2k_42
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_42.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_42.pt
+SAME: 1a2k_43
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_43.pt
+SAME: 1a2k_44
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_44.pt
+SAME: 1a2k_443512
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_443512.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_443512.pt
+SAME: 1a2k_45
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_45.pt
+SAME: 1a2k_46
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_46.pt
+SAME: 1a2k_47
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_47.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_47.pt
+SAME: 1a2k_48
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_48.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_48.pt
+SAME: 1a2k_49
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_49.pt
+SAME: 1a2k_5
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_5.pt
+SAME: 1a2k_50
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_50.pt
+SAME: 1a2k_51
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_51.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_51.pt
+SAME: 1a2k_52
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_52.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_52.pt
+SAME: 1a2k_53
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_53.pt
+SAME: 1a2k_54
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_54.pt
+SAME: 1a2k_55
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_55.pt
+SAME: 1a2k_56
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_56.pt
+SAME: 1a2k_57
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_57.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_57.pt
+SAME: 1a2k_58
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_58.pt
+SAME: 1a2k_59
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_59.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_59.pt
+SAME: 1a2k_6
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_6.pt
+SAME: 1a2k_60
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_60.pt
+SAME: 1a2k_61
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_61.pt
+SAME: 1a2k_62
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_62.pt
+SAME: 1a2k_63
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_63.pt
+SAME: 1a2k_64
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_64.pt
+SAME: 1a2k_65
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_65.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_65.pt
+SAME: 1a2k_66
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_66.pt
+SAME: 1a2k_67
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_67.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_67.pt
+SAME: 1a2k_68
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_68.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_68.pt
+SAME: 1a2k_69
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_69.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_69.pt
+SAME: 1a2k_7
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_7.pt
+SAME: 1a2k_70
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_70.pt
+SAME: 1a2k_71
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_71.pt
+SAME: 1a2k_72
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_72.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_72.pt
+SAME: 1a2k_73
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_73.pt
+SAME: 1a2k_74
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_74.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_74.pt
+SAME: 1a2k_75
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_75.pt
+SAME: 1a2k_76
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_76.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_76.pt
+SAME: 1a2k_77
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_77.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_77.pt
+SAME: 1a2k_78
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_78.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_78.pt
+SAME: 1a2k_79
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_79.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_79.pt
+SAME: 1a2k_8
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_8.pt
+SAME: 1a2k_80
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_80.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_80.pt
+SAME: 1a2k_81
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_81.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_81.pt
+SAME: 1a2k_82
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_82.pt
+SAME: 1a2k_83
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_83.pt
+SAME: 1a2k_84
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_84.pt
+SAME: 1a2k_85
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_85.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_85.pt
+SAME: 1a2k_86
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_86.pt
+SAME: 1a2k_87
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_87.pt
+SAME: 1a2k_88
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_88.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_88.pt
+SAME: 1a2k_89
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_89.pt
+SAME: 1a2k_9
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_9.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_9.pt
+SAME: 1a2k_90
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_90.pt
+SAME: 1a2k_91
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_91.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_91.pt
+SAME: 1a2k_92
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_92.pt
+SAME: 1a2k_93
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_93.pt
+SAME: 1a2k_94
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_94.pt
+SAME: 1a2k_95
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_95.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_95.pt
+SAME: 1a2k_96
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_96.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_96.pt
+SAME: 1a2k_97
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_97.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_97.pt
+SAME: 1a2k_98
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_98.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_98.pt
+SAME: 1a2k_99
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_99.pt
+SAME: 1a2k_p1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_p1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_p1.pt
+SAME: 1a2k_u1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1a2k/1a2k_u1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1a2k/1a2k_u1.pt
+SAME: 1avw_1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_1.pt
+SAME: 1avw_10
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_10.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_10.pt
+SAME: 1avw_100
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_100.pt
+SAME: 1avw_11
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_11.pt
+SAME: 1avw_12
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_12.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_12.pt
+SAME: 1avw_13
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_13.pt
+SAME: 1avw_14
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_14.pt
+SAME: 1avw_15
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_15.pt
+SAME: 1avw_16
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_16.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_16.pt
+SAME: 1avw_17
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_17.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_17.pt
+SAME: 1avw_1779
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_1779.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_1779.pt
+SAME: 1avw_18
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_18.pt
+SAME: 1avw_19
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_19.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_19.pt
+SAME: 1avw_2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_2.pt
+SAME: 1avw_20
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_20.pt
+SAME: 1avw_2044
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_2044.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_2044.pt
+SAME: 1avw_21
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_21.pt
+SAME: 1avw_22
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_22.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_22.pt
+SAME: 1avw_2245
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_2245.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_2245.pt
+SAME: 1avw_23
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_23.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_23.pt
+SAME: 1avw_24
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_24.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_24.pt
+SAME: 1avw_25
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_25.pt
+SAME: 1avw_26
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_26.pt
+SAME: 1avw_27
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_27.pt
+SAME: 1avw_28
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_28.pt
+SAME: 1avw_29
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_29.pt
+SAME: 1avw_3
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_3.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_3.pt
+SAME: 1avw_30
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_30.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_30.pt
+SAME: 1avw_31
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_31.pt
+SAME: 1avw_313
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_313.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_313.pt
+SAME: 1avw_32
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_32.pt
+SAME: 1avw_3246
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_3246.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_3246.pt
+SAME: 1avw_33
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_33.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_33.pt
+SAME: 1avw_34
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_34.pt
+SAME: 1avw_35
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_35.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_35.pt
+SAME: 1avw_36
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_36.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_36.pt
+SAME: 1avw_37
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_37.pt
+SAME: 1avw_38
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_38.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_38.pt
+SAME: 1avw_39
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_39.pt
+SAME: 1avw_4
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_4.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_4.pt
+SAME: 1avw_40
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_40.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_40.pt
+SAME: 1avw_41
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_41.pt
+SAME: 1avw_42
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_42.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_42.pt
+SAME: 1avw_43
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_43.pt
+SAME: 1avw_44
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_44.pt
+SAME: 1avw_4471
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_4471.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_4471.pt
+SAME: 1avw_4488
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_4488.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_4488.pt
+SAME: 1avw_45
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_45.pt
+SAME: 1avw_46
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_46.pt
+SAME: 1avw_47
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_47.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_47.pt
+SAME: 1avw_48
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_48.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_48.pt
+SAME: 1avw_49
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_49.pt
+SAME: 1avw_5
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_5.pt
+SAME: 1avw_50
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_50.pt
+SAME: 1avw_51
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_51.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_51.pt
+SAME: 1avw_52
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_52.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_52.pt
+SAME: 1avw_53
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_53.pt
+SAME: 1avw_54
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_54.pt
+SAME: 1avw_55
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_55.pt
+SAME: 1avw_56
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_56.pt
+SAME: 1avw_57
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_57.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_57.pt
+SAME: 1avw_58
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_58.pt
+SAME: 1avw_5816
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_5816.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_5816.pt
+SAME: 1avw_59
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_59.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_59.pt
+SAME: 1avw_6
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_6.pt
+SAME: 1avw_60
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_60.pt
+SAME: 1avw_61
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_61.pt
+SAME: 1avw_62
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_62.pt
+SAME: 1avw_63
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_63.pt
+SAME: 1avw_64
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_64.pt
+SAME: 1avw_65
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_65.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_65.pt
+SAME: 1avw_66
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_66.pt
+SAME: 1avw_67
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_67.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_67.pt
+SAME: 1avw_68
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_68.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_68.pt
+SAME: 1avw_69
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_69.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_69.pt
+SAME: 1avw_6928
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_6928.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_6928.pt
+SAME: 1avw_7
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_7.pt
+SAME: 1avw_70
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_70.pt
+SAME: 1avw_71
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_71.pt
+SAME: 1avw_72
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_72.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_72.pt
+SAME: 1avw_73
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_73.pt
+SAME: 1avw_74
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_74.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_74.pt
+SAME: 1avw_75
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_75.pt
+SAME: 1avw_76
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_76.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_76.pt
+SAME: 1avw_77
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_77.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_77.pt
+SAME: 1avw_78
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_78.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_78.pt
+SAME: 1avw_7869
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_7869.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_7869.pt
+SAME: 1avw_79
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_79.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_79.pt
+SAME: 1avw_8
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_8.pt
+SAME: 1avw_80
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_80.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_80.pt
+SAME: 1avw_81
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_81.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_81.pt
+SAME: 1avw_82
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_82.pt
+SAME: 1avw_83
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_83.pt
+SAME: 1avw_84
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_84.pt
+SAME: 1avw_85
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_85.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_85.pt
+SAME: 1avw_86
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_86.pt
+SAME: 1avw_87
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_87.pt
+SAME: 1avw_88
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_88.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_88.pt
+SAME: 1avw_89
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_89.pt
+SAME: 1avw_9
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_9.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_9.pt
+SAME: 1avw_90
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_90.pt
+SAME: 1avw_91
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_91.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_91.pt
+SAME: 1avw_92
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_92.pt
+SAME: 1avw_93
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_93.pt
+SAME: 1avw_94
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_94.pt
+SAME: 1avw_95
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_95.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_95.pt
+SAME: 1avw_96
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_96.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_96.pt
+SAME: 1avw_97
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_97.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_97.pt
+SAME: 1avw_98
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_98.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_98.pt
+SAME: 1avw_99
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1AVW/1avw_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1AVW/1avw_99.pt
+SAME: 1nbf_1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_1.pt
+SAME: 1nbf_10
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_10.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_10.pt
+SAME: 1nbf_100
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_100.pt
+SAME: 1nbf_10063
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_10063.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_10063.pt
+SAME: 1nbf_11
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_11.pt
+SAME: 1nbf_12
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_12.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_12.pt
+SAME: 1nbf_13
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_13.pt
+SAME: 1nbf_14
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_14.pt
+SAME: 1nbf_15
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_15.pt
+SAME: 1nbf_15213
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_15213.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_15213.pt
+SAME: 1nbf_16
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_16.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_16.pt
+SAME: 1nbf_16733
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_16733.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_16733.pt
+SAME: 1nbf_17
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_17.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_17.pt
+SAME: 1nbf_18
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_18.pt
+SAME: 1nbf_18892
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_18892.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_18892.pt
+SAME: 1nbf_19
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_19.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_19.pt
+SAME: 1nbf_2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_2.pt
+SAME: 1nbf_20
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_20.pt
+SAME: 1nbf_21
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_21.pt
+SAME: 1nbf_21083
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_21083.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_21083.pt
+SAME: 1nbf_22
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_22.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_22.pt
+SAME: 1nbf_22465
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_22465.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_22465.pt
+SAME: 1nbf_23
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_23.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_23.pt
+SAME: 1nbf_24
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_24.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_24.pt
+SAME: 1nbf_25
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_25.pt
+SAME: 1nbf_26
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_26.pt
+SAME: 1nbf_27
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_27.pt
+SAME: 1nbf_28
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_28.pt
+SAME: 1nbf_29
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_29.pt
+SAME: 1nbf_3
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_3.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_3.pt
+SAME: 1nbf_30
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_30.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_30.pt
+SAME: 1nbf_31
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_31.pt
+SAME: 1nbf_32
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_32.pt
+SAME: 1nbf_32528
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_32528.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_32528.pt
+SAME: 1nbf_33
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_33.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_33.pt
+SAME: 1nbf_33508
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_33508.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_33508.pt
+SAME: 1nbf_34
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_34.pt
+SAME: 1nbf_35
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_35.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_35.pt
+SAME: 1nbf_35669
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_35669.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_35669.pt
+SAME: 1nbf_35971
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_35971.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_35971.pt
+SAME: 1nbf_36
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_36.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_36.pt
+SAME: 1nbf_37
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_37.pt
+SAME: 1nbf_38
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_38.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_38.pt
+SAME: 1nbf_39
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_39.pt
+SAME: 1nbf_4
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_4.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_4.pt
+SAME: 1nbf_40
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_40.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_40.pt
+SAME: 1nbf_41
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_41.pt
+SAME: 1nbf_42
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_42.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_42.pt
+SAME: 1nbf_43
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_43.pt
+SAME: 1nbf_44
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_44.pt
+SAME: 1nbf_45
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_45.pt
+SAME: 1nbf_46
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_46.pt
+SAME: 1nbf_47
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_47.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_47.pt
+SAME: 1nbf_48
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_48.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_48.pt
+SAME: 1nbf_49
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_49.pt
+SAME: 1nbf_5
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_5.pt
+SAME: 1nbf_50
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_50.pt
+SAME: 1nbf_51
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_51.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_51.pt
+SAME: 1nbf_52
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_52.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_52.pt
+SAME: 1nbf_53
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_53.pt
+SAME: 1nbf_54
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_54.pt
+SAME: 1nbf_55
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_55.pt
+SAME: 1nbf_56
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_56.pt
+SAME: 1nbf_57
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_57.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_57.pt
+SAME: 1nbf_58
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_58.pt
+SAME: 1nbf_59
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_59.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_59.pt
+SAME: 1nbf_6
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_6.pt
+SAME: 1nbf_60
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_60.pt
+SAME: 1nbf_61
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_61.pt
+SAME: 1nbf_62
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_62.pt
+SAME: 1nbf_63
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_63.pt
+SAME: 1nbf_64
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_64.pt
+SAME: 1nbf_65
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_65.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_65.pt
+SAME: 1nbf_66
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_66.pt
+SAME: 1nbf_67
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_67.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_67.pt
+SAME: 1nbf_68
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_68.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_68.pt
+SAME: 1nbf_69
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_69.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_69.pt
+SAME: 1nbf_7
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_7.pt
+SAME: 1nbf_70
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_70.pt
+SAME: 1nbf_71
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_71.pt
+SAME: 1nbf_72
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_72.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_72.pt
+SAME: 1nbf_73
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_73.pt
+SAME: 1nbf_74
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_74.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_74.pt
+SAME: 1nbf_75
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_75.pt
+SAME: 1nbf_76
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_76.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_76.pt
+SAME: 1nbf_77
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_77.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_77.pt
+SAME: 1nbf_78
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_78.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_78.pt
+SAME: 1nbf_79
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_79.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_79.pt
+SAME: 1nbf_8
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_8.pt
+SAME: 1nbf_80
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_80.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_80.pt
+SAME: 1nbf_81
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_81.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_81.pt
+SAME: 1nbf_82
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_82.pt
+SAME: 1nbf_83
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_83.pt
+SAME: 1nbf_84
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_84.pt
+SAME: 1nbf_85
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_85.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_85.pt
+SAME: 1nbf_86
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_86.pt
+SAME: 1nbf_87
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_87.pt
+SAME: 1nbf_88
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_88.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_88.pt
+SAME: 1nbf_89
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_89.pt
+SAME: 1nbf_9
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_9.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_9.pt
+SAME: 1nbf_90
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_90.pt
+SAME: 1nbf_91
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_91.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_91.pt
+SAME: 1nbf_92
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_92.pt
+SAME: 1nbf_93
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_93.pt
+SAME: 1nbf_94
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_94.pt
+SAME: 1nbf_95
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_95.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_95.pt
+SAME: 1nbf_96
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_96.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_96.pt
+SAME: 1nbf_97
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_97.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_97.pt
+SAME: 1nbf_98
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_98.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_98.pt
+SAME: 1nbf_99
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/1nbf/1nbf_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/1nbf/1nbf_99.pt
+SAME: 2IID
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2IID/2IID.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2IID/2IID.pt
+SAME: 2IID_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2IID/2IID_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2IID/2IID_af2m.pt
+SAME: 2bnq_1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_1.pt
+SAME: 2bnq_10
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_10.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_10.pt
+SAME: 2bnq_100
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_100.pt
+SAME: 2bnq_11
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_11.pt
+SAME: 2bnq_12
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_12.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_12.pt
+SAME: 2bnq_13
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_13.pt
+SAME: 2bnq_14
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_14.pt
+SAME: 2bnq_15
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_15.pt
+SAME: 2bnq_16
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_16.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_16.pt
+SAME: 2bnq_17
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_17.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_17.pt
+SAME: 2bnq_18
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_18.pt
+SAME: 2bnq_19
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_19.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_19.pt
+SAME: 2bnq_2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_2.pt
+SAME: 2bnq_20
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_20.pt
+SAME: 2bnq_21
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_21.pt
+SAME: 2bnq_217584
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_217584.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_217584.pt
+SAME: 2bnq_22
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_22.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_22.pt
+SAME: 2bnq_23
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_23.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_23.pt
+SAME: 2bnq_24
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_24.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_24.pt
+SAME: 2bnq_25
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_25.pt
+SAME: 2bnq_26
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_26.pt
+SAME: 2bnq_27
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_27.pt
+SAME: 2bnq_28
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_28.pt
+SAME: 2bnq_29
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_29.pt
+SAME: 2bnq_3
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_3.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_3.pt
+SAME: 2bnq_30
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_30.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_30.pt
+SAME: 2bnq_31
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_31.pt
+SAME: 2bnq_32
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_32.pt
+SAME: 2bnq_33
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_33.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_33.pt
+SAME: 2bnq_34
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_34.pt
+SAME: 2bnq_35
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_35.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_35.pt
+SAME: 2bnq_36
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_36.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_36.pt
+SAME: 2bnq_37
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_37.pt
+SAME: 2bnq_38
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_38.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_38.pt
+SAME: 2bnq_39
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_39.pt
+SAME: 2bnq_4
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_4.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_4.pt
+SAME: 2bnq_40
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_40.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_40.pt
+SAME: 2bnq_41
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_41.pt
+SAME: 2bnq_42
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_42.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_42.pt
+SAME: 2bnq_43
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_43.pt
+SAME: 2bnq_44
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_44.pt
+SAME: 2bnq_45
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_45.pt
+SAME: 2bnq_46
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_46.pt
+SAME: 2bnq_47
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_47.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_47.pt
+SAME: 2bnq_48
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_48.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_48.pt
+SAME: 2bnq_49
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_49.pt
+SAME: 2bnq_5
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_5.pt
+SAME: 2bnq_50
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_50.pt
+SAME: 2bnq_51
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_51.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_51.pt
+SAME: 2bnq_52
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_52.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_52.pt
+SAME: 2bnq_53
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_53.pt
+SAME: 2bnq_54
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_54.pt
+SAME: 2bnq_55
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_55.pt
+SAME: 2bnq_56
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_56.pt
+SAME: 2bnq_57
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_57.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_57.pt
+SAME: 2bnq_58
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_58.pt
+SAME: 2bnq_59
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_59.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_59.pt
+SAME: 2bnq_6
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_6.pt
+SAME: 2bnq_60
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_60.pt
+SAME: 2bnq_61
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_61.pt
+SAME: 2bnq_62
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_62.pt
+SAME: 2bnq_63
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_63.pt
+SAME: 2bnq_64
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_64.pt
+SAME: 2bnq_65
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_65.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_65.pt
+SAME: 2bnq_66
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_66.pt
+SAME: 2bnq_67
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_67.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_67.pt
+SAME: 2bnq_68
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_68.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_68.pt
+SAME: 2bnq_69
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_69.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_69.pt
+SAME: 2bnq_7
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_7.pt
+SAME: 2bnq_70
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_70.pt
+SAME: 2bnq_71
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_71.pt
+SAME: 2bnq_72
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_72.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_72.pt
+SAME: 2bnq_73
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_73.pt
+SAME: 2bnq_74
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_74.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_74.pt
+SAME: 2bnq_75
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_75.pt
+SAME: 2bnq_76
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_76.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_76.pt
+SAME: 2bnq_77
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_77.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_77.pt
+SAME: 2bnq_78
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_78.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_78.pt
+SAME: 2bnq_79
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_79.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_79.pt
+SAME: 2bnq_8
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_8.pt
+SAME: 2bnq_80
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_80.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_80.pt
+SAME: 2bnq_81
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_81.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_81.pt
+SAME: 2bnq_82
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_82.pt
+SAME: 2bnq_83
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_83.pt
+SAME: 2bnq_84
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_84.pt
+SAME: 2bnq_85
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_85.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_85.pt
+SAME: 2bnq_86
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_86.pt
+SAME: 2bnq_87
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_87.pt
+SAME: 2bnq_88
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_88.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_88.pt
+SAME: 2bnq_89
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_89.pt
+SAME: 2bnq_9
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_9.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_9.pt
+SAME: 2bnq_90
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_90.pt
+SAME: 2bnq_91
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_91.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_91.pt
+SAME: 2bnq_92
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_92.pt
+SAME: 2bnq_93
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_93.pt
+SAME: 2bnq_94
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_94.pt
+SAME: 2bnq_95
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_95.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_95.pt
+SAME: 2bnq_96
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_96.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_96.pt
+SAME: 2bnq_97
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_97.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_97.pt
+SAME: 2bnq_98
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_98.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_98.pt
+SAME: 2bnq_99
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_99.pt
+SAME: 2bnq_p1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_p1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_p1.pt
+SAME: 2bnq_p2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_p2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_p2.pt
+SAME: 2bnq_u1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_u1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_u1.pt
+SAME: 2bnq_u2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/2bnq/2bnq_u2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/2bnq/2bnq_u2.pt
+SAME: 3TG0
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/3TG0/3TG0.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/3TG0/3TG0.pt
+SAME: 3TG0_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/3TG0/3TG0_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/3TG0/3TG0_af2m.pt
+SAME: 5I2D_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/pilot_test2/graph_data/5I2D/5I2D_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/pilot_test/graph_data/5I2D/5I2D_af2m.pt

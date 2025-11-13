@@ -122,6 +122,20 @@ def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> No
     assert "--feature-config" in invoked_cmd
 
 
+def test_run_graph_builder_respects_custom_module(tmp_path: Path) -> None:
+    builder = BuilderConfig()
+    cfg = _make_dummy_config(tmp_path, builder)
+
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.subprocess.run"
+    ) as mocked_run:
+        mocked_run.return_value = SimpleNamespace(returncode=0)
+        run_graph_builder(cfg, builder_module="custom.module")
+
+    invoked_cmd = mocked_run.call_args[0][0]
+    assert invoked_cmd[1:3] == ["-m", "custom.module"]
+
+
 def test_prepare_feature_config_writes_defaults_when_no_overrides(tmp_path: Path) -> None:
     builder = BuilderConfig()
     path = builder.prepare_feature_config(tmp_path)
@@ -207,6 +221,38 @@ def test_write_metadata_feature_config_falls_back_to_metadata_file(tmp_path: Pat
     assert path is not None
     payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     assert payload["edge"]["params"]["contact_threshold"] == 7.5
+
+
+def test_write_metadata_feature_config_uses_builder_snapshot_text(tmp_path: Path) -> None:
+    feature_metadata = {
+        "builder": {
+            "feature_config": {
+                "text": "interface:\n  module: interface/polar_cutoff/v1\noptions: {}\n",
+            }
+        }
+    }
+
+    path = _write_metadata_feature_config(feature_metadata, tmp_path)
+    assert path is not None
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload["interface"]["module"] == "interface/polar_cutoff/v1"
+
+
+def test_write_metadata_feature_config_uses_builder_snapshot_path(tmp_path: Path) -> None:
+    snapshot_path = tmp_path / "snapshot.yaml"
+    snapshot_path.write_text("options: {}\ninterface: {module: interface/polar_cutoff/v1}\n", encoding="utf-8")
+    feature_metadata = {
+        "builder": {
+            "feature_config": {
+                "path": str(snapshot_path),
+            }
+        }
+    }
+
+    path = _write_metadata_feature_config(feature_metadata, tmp_path)
+    assert path is not None
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload["interface"]["module"] == "interface/polar_cutoff/v1"
 
 
 def test_build_schema_feature_payload_overrides_edge_params() -> None:

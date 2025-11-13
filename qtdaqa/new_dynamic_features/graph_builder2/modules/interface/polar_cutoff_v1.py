@@ -40,7 +40,7 @@ class DefaultInterfaceModule(InterfaceFeatureModule):
         defaults={
             "cutoff": 10.0,
             "coordinate_decimals": -1,
-            "jobs": 8,
+            "jobs": 4,
         },
     )
 

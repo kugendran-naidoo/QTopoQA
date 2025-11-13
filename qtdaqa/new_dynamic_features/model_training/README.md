@@ -1,3 +1,5 @@
+time GRAPH_DIR=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder/output/24d_topoqa_settings.10A/graph_data ./run_full_pipeline.sh --manifest manifests/run_exhaustive.yaml | tee 24d_topoqa_10A_run_exhaustive_$(date +%Y%m%d_%H%M%S).log
+
 # Dynamic Model Training Pipeline
 
 This directory contains the orchestration layer for training dynamic TopoQA

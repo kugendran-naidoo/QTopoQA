@@ -90,6 +90,13 @@ try:
 except ImportError:  # pragma: no cover
     GraphTensorCache = None  # type: ignore
 from common.metadata_artifacts import write_feature_metadata_artifacts  # type: ignore  # noqa: E402
+try:
+    from builder_metadata import load_builder_info_from_metadata, log_builder_provenance  # type: ignore  # noqa: E402
+except ImportError:  # pragma: no cover
+    from qtdaqa.new_dynamic_features.model_training.builder_metadata import (  # type: ignore  # noqa: E402
+        load_builder_info_from_metadata,
+        log_builder_provenance,
+    )
 
 
 
@@ -713,6 +720,7 @@ def _write_coverage_report(save_dir: Path, coverage: Dict[str, Dict[str, object]
     return path
 
 
+
 def _evaluate_coverage(
     cfg: TrainingConfig,
     coverage: Dict[str, Dict[str, object]],
@@ -769,6 +777,8 @@ def _log_feature_summary(logger: logging.Logger, metadata: GraphFeatureMetadata)
     edge_dim = metadata.edge_schema.get("dim")
     sample_nodes = metadata.sample_node_count
     sample_edges = metadata.sample_edge_count
+    if metadata.builder:
+        log_builder_provenance(logger, metadata.builder)
 
     if metadata.metadata_path and metadata.module_registry:
         logger.info("Feature metadata source: %s", metadata.metadata_path)
@@ -1459,6 +1469,10 @@ def main() -> int:
 
     cfg.edge_schema = resolved_edge_schema
     feature_metadata.edge_schema = dict(resolved_edge_schema)
+    builder_info = feature_metadata.builder or load_builder_info_from_metadata(feature_metadata.metadata_path)
+    if builder_info:
+        feature_metadata.builder = builder_info
+
     feature_metadata_dict = feature_metadata.to_dict()
     feature_metadata_dict["topology_schema"] = cfg.topology_schema
 

@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import copy
+import json
 import logging
+import os
 import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
-import json
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Any
+from typing import Any, Dict, Optional, Tuple
 
 import yaml
 
@@ -18,6 +19,13 @@ from qtdaqa.new_dynamic_features.common.feature_metadata import (
 )
 from qtdaqa.new_dynamic_features.graph_builder.lib.features_config import DEFAULT_FEATURES
 
+LEGACY_BUILDER_MODULE = "qtdaqa.new_dynamic_features.graph_builder.graph_builder"
+GRAPH_BUILDER2_MODULE = "qtdaqa.new_dynamic_features.graph_builder2.graph_builder2"
+_BUILDER_MODULES = {
+    "graph_builder": LEGACY_BUILDER_MODULE,
+    "graph_builder2": GRAPH_BUILDER2_MODULE,
+}
+
 
 @dataclass
 class BuilderConfig:
@@ -26,6 +34,7 @@ class BuilderConfig:
     dump_edges: Optional[bool] = None
     feature_config: Optional[Path] = None
     features: Dict[str, object] = field(default_factory=dict)
+    builder_name: Optional[str] = None
 
     def prepare_feature_config(self, work_dir: Path) -> Optional[Path]:
         """Return a features.yaml path, creating one when overrides are supplied."""
@@ -97,8 +106,12 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
         raise ValueError("builder.jobs must be an integer.") from exc
     jobs_int = max(1, jobs_int)
 
+    builder_name_raw = raw.get("id") or raw.get("name") or raw.get("builder")
+    builder_name = str(builder_name_raw).strip() if builder_name_raw else None
+
     return BuilderConfig(
         jobs=jobs_int,
+        builder_name=builder_name or None,
     )
 
 
@@ -170,6 +183,94 @@ def _write_feature_config_payload(work_dir: Path, payload: Dict[str, object], fi
     return output_path
 
 
+def _extract_builder_block(source: Any) -> Optional[Dict[str, object]]:
+    if isinstance(source, GraphFeatureMetadata):
+        return source.builder
+    if isinstance(source, dict):
+        block = source.get("builder")
+        if isinstance(block, dict):
+            return block
+    return None
+
+
+def _infer_builder_id(builder_block: Optional[Dict[str, object]]) -> Optional[str]:
+    if not isinstance(builder_block, dict):
+        return None
+    builder_id = builder_block.get("id")
+    if isinstance(builder_id, str) and builder_id.strip():
+        return builder_id.strip()
+    module_name = builder_block.get("module")
+    if isinstance(module_name, str):
+        if "graph_builder2" in module_name:
+            return "graph_builder2"
+        if "graph_builder" in module_name:
+            return "graph_builder"
+    return None
+
+
+def _resolve_builder_module(identifier: Optional[str]) -> Optional[str]:
+    if identifier is None:
+        return None
+    token = identifier.strip()
+    key = token.lower()
+    if key in _BUILDER_MODULES:
+        return _BUILDER_MODULES[key]
+    if token.startswith("qtdaqa."):
+        return token
+    return None
+
+
+def _determine_builder_choice(cfg, feature_metadata: Any) -> Tuple[str, str]:
+    candidates = [
+        ("environment variable", os.environ.get("QTOPO_FORCE_BUILDER")),
+        ("config", getattr(cfg.builder, "builder_name", None)),
+        ("checkpoint", _infer_builder_id(_extract_builder_block(feature_metadata))),
+    ]
+    for source, value in candidates:
+        module = _resolve_builder_module(value)
+        if module:
+            return module, source
+        if value:
+            logging.warning("Unknown builder override '%s' from %s; falling back to defaults.", value, source)
+    return LEGACY_BUILDER_MODULE, "default"
+
+
+def _write_builder_snapshot_config(
+    builder_block: Optional[Dict[str, object]],
+    work_dir: Path,
+) -> Optional[Path]:
+    if not isinstance(builder_block, dict):
+        return None
+    snapshot = builder_block.get("feature_config")
+    if not isinstance(snapshot, dict):
+        return None
+
+    payload: Optional[Dict[str, object]] = None
+    text = snapshot.get("text")
+    if isinstance(text, str) and text.strip():
+        try:
+            payload = yaml.safe_load(text)
+        except yaml.YAMLError as exc:
+            logging.warning("Unable to parse inline feature-config snapshot: %s", exc)
+            payload = None
+
+    if payload is None:
+        path_value = snapshot.get("path")
+        if isinstance(path_value, str):
+            snapshot_path = Path(path_value).expanduser()
+            if snapshot_path.exists():
+                try:
+                    payload = yaml.safe_load(snapshot_path.read_text(encoding="utf-8"))
+                except (OSError, yaml.YAMLError) as exc:
+                    logging.warning("Unable to load feature-config snapshot from %s: %s", snapshot_path, exc)
+            else:
+                logging.warning("Feature-config snapshot path %s not found.", snapshot_path)
+
+    if not isinstance(payload, dict):
+        return None
+    return _write_feature_config_payload(work_dir, payload, "features.from_checkpoint.yaml")
+
+
 def _resolve_metadata_source(final_schema: Dict[str, Dict[str, object]]) -> Optional[Path]:
     edge_schema = final_schema.get("edge_schema") or {}
     source = edge_schema.get("source")
@@ -188,16 +289,32 @@ def _write_metadata_feature_config(
     fallback_metadata_path: Optional[Path] = None,
 ) -> Optional[Path]:
     payload = _build_metadata_feature_payload(feature_metadata)
-    if payload is None and fallback_metadata_path is not None:
+    if payload:
+        return _write_feature_config_payload(work_dir, payload, "features.from_metadata.yaml")
+
+    snapshot_path = _write_builder_snapshot_config(_extract_builder_block(feature_metadata), work_dir)
+    if snapshot_path:
+        return snapshot_path
+
+    fallback_payload: Optional[Dict[str, object]] = None
+    fallback_builder: Optional[Dict[str, object]] = None
+    if fallback_metadata_path is not None:
         try:
             raw = json.loads(fallback_metadata_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
             logging.warning("Unable to read graph metadata from %s: %s", fallback_metadata_path, exc)
         else:
-            payload = _build_metadata_feature_payload(raw)
-    if not payload:
-        return None
-    return _write_feature_config_payload(work_dir, payload, "features.from_metadata.yaml")
+            fallback_payload = _build_metadata_feature_payload(raw)
+            fallback_builder = _extract_builder_block(raw)
+
+    if fallback_payload:
+        return _write_feature_config_payload(work_dir, fallback_payload, "features.from_metadata.yaml")
+
+    snapshot_path = _write_builder_snapshot_config(fallback_builder, work_dir)
+    if snapshot_path:
+        return snapshot_path
+
+    return None
 
 
 def _build_schema_feature_payload(final_schema: Dict[str, Dict[str, object]]) -> Optional[Dict[str, object]]:
@@ -222,7 +339,11 @@ def _build_schema_feature_payload(final_schema: Dict[str, Dict[str, object]]) ->
     return payload
 
 
-def run_graph_builder(cfg, metadata_feature_config: Optional[Path] = None) -> Path:
+def run_graph_builder(
+    cfg,
+    metadata_feature_config: Optional[Path] = None,
+    builder_module: Optional[str] = None,
+) -> Path:
     if not cfg.data_dir.exists():
         raise FileNotFoundError(f"Data directory not found: {cfg.data_dir}")
     graph_dir = cfg.work_dir / "graph_data"
@@ -236,10 +357,12 @@ def run_graph_builder(cfg, metadata_feature_config: Optional[Path] = None) -> Pa
 
     feature_config_path = metadata_feature_config or cfg.builder.prepare_feature_config(cfg.work_dir)
 
+    module_path = builder_module or LEGACY_BUILDER_MODULE
+
     cmd = [
         sys.executable,
         "-m",
-        "qtdaqa.new_dynamic_features.graph_builder.graph_builder",
+        module_path,
         "--dataset-dir",
         str(cfg.data_dir),
         "--work-dir",
@@ -253,7 +376,7 @@ def run_graph_builder(cfg, metadata_feature_config: Optional[Path] = None) -> Pa
     ]
     if feature_config_path is not None:
         cmd.extend(["--feature-config", str(feature_config_path)])
-    logging.info("Running graph builder: %s", " ".join(cmd))
+    logging.info("Running graph builder (%s): %s", module_path, " ".join(cmd))
     subprocess.run(cmd, check=True)
     return graph_dir
 
@@ -328,6 +451,7 @@ def ensure_graph_dir(
     work_dir = Path(cfg.work_dir)
     graph_dir = work_dir / "graph_data"
     reuse = bool(getattr(cfg, "reuse_existing_graphs", False))
+    builder_module, builder_source = _determine_builder_choice(cfg, feature_metadata)
 
     metadata_source = _resolve_metadata_source(final_schema)
     metadata_feature_config = None
@@ -352,4 +476,9 @@ def ensure_graph_dir(
         logging.warning(
             "Existing graphs at %s are incompatible with checkpoint metadata (%s); rebuilding.", graph_dir, reason
         )
-    return run_graph_builder(cfg, metadata_feature_config=metadata_feature_config)
+    logging.info("Building graphs using %s (selection source: %s).", builder_module, builder_source)
+    return run_graph_builder(
+        cfg,
+        metadata_feature_config=metadata_feature_config,
+        builder_module=builder_module,
+    )
