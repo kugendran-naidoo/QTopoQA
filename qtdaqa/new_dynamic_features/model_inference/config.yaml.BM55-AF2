@@ -4,8 +4,8 @@
 paths:
   data_dir: ../../../datasets/evaluation/BM55-AF2/decoy
   label_file: ../../../datasets/evaluation/BM55-AF2/label_info.csv
-  work_dir: ./output/11d_topoqa/BM55-AF2/work
-  output_file: ./output/11d_topoqa/BM55-AF2/results/inference_results.csv
+  work_dir: ./output/27d_10.5A/BM55-AF2/work
+  output_file: ./output/27d_10.5A/BM55-AF2/results/inference_results.csv
   checkpoint: null
 
 batch_size: 32

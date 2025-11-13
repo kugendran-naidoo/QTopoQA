@@ -33,9 +33,9 @@ class DefaultInterfaceModule(InterfaceFeatureModule):
             "jobs": "Optional override for parallel worker count.",
         },
         defaults={
-            "cutoff": 14.0,
-            "coordinate_decimals": 3,
-            "jobs": None,
+            "cutoff": 10.0,
+            "coordinate_decimals": -1,
+            "jobs": 4,
         },
     )
 

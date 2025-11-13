@@ -117,7 +117,11 @@ def test_ensure_graph_dir_rebuilds_when_metadata_mismatch(tmp_path: Path) -> Non
 
     assert chosen_dir == rebuilt_dir
     matches_mock.assert_called_once()
-    run_mock.assert_called_once_with(cfg, metadata_feature_config=None)
+    run_mock.assert_called_once()
+    _args, kwargs = run_mock.call_args
+    schema_yaml = Path(cfg.work_dir) / "builder_features" / "features.from_schema.yaml"
+    assert kwargs["metadata_feature_config"] == schema_yaml
+    assert kwargs["builder_module"] == builder_runner.LEGACY_BUILDER_MODULE
 
 
 def test_ensure_graph_dir_builds_when_no_cached_graphs(tmp_path: Path) -> None:
@@ -130,6 +134,12 @@ def test_ensure_graph_dir_builds_when_no_cached_graphs(tmp_path: Path) -> None:
         return_value=rebuilt_dir,
     ) as run_mock:
         chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, None)
+    assert chosen_dir == rebuilt_dir
+    run_mock.assert_called_once()
+    _args, kwargs = run_mock.call_args
+    schema_yaml = Path(cfg.work_dir) / "builder_features" / "features.from_schema.yaml"
+    assert kwargs["metadata_feature_config"] == schema_yaml
+    assert kwargs["builder_module"] == builder_runner.LEGACY_BUILDER_MODULE
 
 
 def test_ensure_graph_dir_writes_metadata_feature_config(tmp_path: Path) -> None:
@@ -147,4 +157,42 @@ def test_ensure_graph_dir_writes_metadata_feature_config(tmp_path: Path) -> None
     run_mock.assert_called_once()
     metadata_yaml = Path(cfg.work_dir) / "builder_features" / "features.from_metadata.yaml"
     assert metadata_yaml.exists()
-    run_mock.assert_called_once_with(cfg, metadata_feature_config=metadata_yaml)
+    _args, kwargs = run_mock.call_args
+    assert kwargs["metadata_feature_config"] == metadata_yaml
+    assert kwargs["builder_module"] == builder_runner.LEGACY_BUILDER_MODULE
+
+
+def test_ensure_graph_dir_selects_builder_from_checkpoint_metadata(tmp_path: Path) -> None:
+    cfg = _make_config(tmp_path, reuse=False)
+    final_schema = {"edge_schema": {"module": "edge/multi_scale/v24"}}
+    feature_meta = {"builder": {"id": "graph_builder2"}}
+    rebuilt_dir = Path(cfg.work_dir) / "rebuilt_graphs"
+
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.run_graph_builder",
+        return_value=rebuilt_dir,
+    ) as run_mock:
+        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, feature_meta)
+
+    assert chosen_dir == rebuilt_dir
+    run_mock.assert_called_once()
+    _args, kwargs = run_mock.call_args
+    assert kwargs["builder_module"] == builder_runner.GRAPH_BUILDER2_MODULE
+
+
+def test_ensure_graph_dir_respects_env_override(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = _make_config(tmp_path, reuse=False)
+    final_schema = {"edge_schema": {"module": "edge/multi_scale/v24"}}
+    rebuilt_dir = Path(cfg.work_dir) / "rebuilt_graphs"
+    monkeypatch.setenv("QTOPO_FORCE_BUILDER", "graph_builder2")
+
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.run_graph_builder",
+        return_value=rebuilt_dir,
+    ) as run_mock:
+        chosen_dir = builder_runner.ensure_graph_dir(cfg, final_schema, None)
+
+    assert chosen_dir == rebuilt_dir
+    run_mock.assert_called_once()
+    _args, kwargs = run_mock.call_args
+    assert kwargs["builder_module"] == builder_runner.GRAPH_BUILDER2_MODULE

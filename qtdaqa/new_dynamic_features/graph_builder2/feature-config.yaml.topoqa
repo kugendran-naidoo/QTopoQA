@@ -7,7 +7,7 @@ defaults:
 # REQUIRED stage: interface
 interface:
   module: interface/polar_cutoff/v1  # alias: TopoQA default 10A cut-off
-  alias: "TopoQA default 10A cut-off"
+  alias: "n x 3D TopoQA default 10A cut-off"
   summary: "Polar interface detection using distance cutoff."
   description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
   params:
@@ -18,7 +18,7 @@ interface:
 # OPTIONAL stage: topology
 topology:
   module: topology/persistence_basic/v1  # alias: TopoQA default
-  alias: "TopoQA default"
+  alias: "140D TopoQA default"
   summary: "Persistent homology features with configurable distance thresholds."
   description: "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input."
   params:
@@ -39,7 +39,7 @@ topology:
 # REQUIRED stage: node
 node:
   module: node/dssp_topo_merge/v1  # alias: TopoQA default
-  alias: "TopoQA default"
+  alias: "172D (140D + 32D) TopoQA default"
   summary: "DSSP-derived node features merged with topology statistics."
   description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
   params:
@@ -49,8 +49,8 @@ node:
 # REQUIRED stage: edge
 edge:
   module: edge/legacy_band/v11
-  alias: ""
-  summary: "11-D legacy edge features (distance + atom distance histogram)."
+  alias: "TopoQA default 10A cutoff"
+  summary: "11D legacy edge features (distance + atom distance histogram)."
   description: "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1]."
   params:
     distance_min: 0.0

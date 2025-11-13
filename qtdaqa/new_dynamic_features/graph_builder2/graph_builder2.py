@@ -32,11 +32,13 @@ try:
     from .lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
     from .lib.log_dirs import LogDirectoryInfo, prepare_log_directory
     from .lib.stage_common import index_structures
+    from .builder_info import build_builder_info
 except ImportError:  # pragma: no cover - fallback for direct execution
     from lib.features_config import FeatureSelection, load_feature_config
     from lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
     from lib.log_dirs import LogDirectoryInfo, prepare_log_directory
     from lib.stage_common import index_structures
+    from builder_info import build_builder_info
 
 if TYPE_CHECKING:  # pragma: no cover
     from .modules.base import (
@@ -772,6 +774,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     work_dir = Path(args.work_dir).resolve()
     graph_dir = Path(args.graph_dir).resolve()
     log_root = Path(args.log_dir).resolve()
+    feature_config_path = Path(args.feature_config).expanduser().resolve()
+    args.feature_config = str(feature_config_path)
     cli_jobs = args.jobs if args.jobs is not None else None
 
     try:
@@ -934,6 +938,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         "directory": str(edge_dump_dir) if edge_dump_dir is not None else None,
         "configured_directory": str(resolved_dump_dir) if resolved_dump_dir is not None else None,
     }
+    builder_info = build_builder_info(
+        feature_config_path=feature_config_path,
+        edge_dump_enabled=edge_dump_enabled,
+        edge_dump_dir=edge_dump_dir,
+        configured_edge_dump_dir=resolved_dump_dir,
+        selection_options=selection.options,
+    )
+    summary["builder"] = builder_info
 
     if edge_dump_enabled:
         LOG.info("Edge dumps enabled; writing CSVs to:")
@@ -966,6 +978,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         edge_module=edge_module,
         jobs=edge_jobs,
         edge_dump_dir=edge_dump_dir,
+        builder_info=builder_info,
     )
     summary["edge"] = edge_result
     graph_stage_elapsed = time.perf_counter() - graph_stage_start
