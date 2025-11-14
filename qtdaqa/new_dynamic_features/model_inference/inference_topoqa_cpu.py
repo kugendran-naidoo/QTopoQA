@@ -36,10 +36,11 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclasses.dataclass
 class InferenceConfig:
-    data_dir: Path
-    work_dir: Path
+    data_dir: Optional[Path]
+    work_dir: Optional[Path]
     checkpoint_path: Path
-    output_file: Path
+    results_dir: Optional[Path]
+    output_file: Optional[Path]
     label_file: Optional[Path] = None
     batch_size: int = 32
     num_workers: int = 0
@@ -52,6 +53,9 @@ class InferenceConfig:
     edge_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     training_root: Optional[Path] = None
     config_name: Optional[str] = None
+    dataset_name: Optional[str] = None
+    work_dir_base: Optional[Path] = None
+    results_dir_base: Optional[Path] = None
 
 
 @dataclasses.dataclass
@@ -223,10 +227,12 @@ def _write_inference_schema_summary(
         "config_name": cfg.config_name,
         "data_dir": str(cfg.data_dir),
         "work_dir": str(cfg.work_dir),
+        "results_dir": str(cfg.results_dir),
         "output_file": str(cfg.output_file),
         "label_file": str(cfg.label_file) if cfg.label_file else None,
         "training_root": str(cfg.training_root) if cfg.training_root else None,
         "use_checkpoint_schema": cfg.use_checkpoint_schema,
+        "dataset_name": cfg.dataset_name,
         "overrides": {
             "interface_schema": cfg.interface_schema,
             "node_schema": cfg.node_schema,
@@ -245,10 +251,12 @@ def _write_inference_schema_summary(
         "config_name": summary_payload["config_name"],
         "data_dir": summary_payload["data_dir"],
         "work_dir": summary_payload["work_dir"],
+        "results_dir": summary_payload["results_dir"],
         "output_file": summary_payload["output_file"],
         "label_file": summary_payload["label_file"],
         "training_root": summary_payload["training_root"],
         "use_checkpoint_schema": summary_payload["use_checkpoint_schema"],
+        "dataset_name": summary_payload["dataset_name"],
         "overrides": summary_payload["overrides"],
         "final_schema": summary_payload["final_schema"],
         "checkpoint_schema": summary_payload["checkpoint_schema"],
@@ -271,6 +279,8 @@ def load_config(raw_path: Path) -> InferenceConfig:
         "data_dir",
         "work_dir",
         "output_file",
+        "results_dir",
+        "dataset_name",
         "checkpoint_path",
         "label_file",
         "reuse_existing_graphs",
@@ -292,12 +302,13 @@ def load_config(raw_path: Path) -> InferenceConfig:
 
     data_dir_raw = _require_or_none("data_dir")
     work_dir_raw = _require_or_none("work_dir")
+    results_dir_raw = _require_or_none("results_dir")
+    dataset_name_raw = paths_cfg.get("dataset_name")
     checkpoint_raw = paths_cfg.get("checkpoint")
     training_root_raw = paths_cfg.get("training_root")
-    output_file_raw = _require_or_none("output_file")
     data_dir = _resolve(data_dir_raw, raw_path.parent) if data_dir_raw else None
     work_dir = _resolve(work_dir_raw, raw_path.parent) if work_dir_raw else None
-    output_file = _resolve(output_file_raw, raw_path.parent) if output_file_raw else None
+    results_dir = _resolve(results_dir_raw, raw_path.parent) if results_dir_raw else None
     label_file_raw = paths_cfg.get("label_file")
     label_file = _resolve(label_file_raw, raw_path.parent) if label_file_raw else None
     training_root = (
@@ -337,11 +348,14 @@ def load_config(raw_path: Path) -> InferenceConfig:
             )
         checkpoint_path = _auto_select_checkpoint(training_root)
 
+    dataset_name = str(dataset_name_raw).strip() if dataset_name_raw else None
+
     return InferenceConfig(
         data_dir=data_dir,
-        work_dir=work_dir,
+        work_dir=None,
         checkpoint_path=checkpoint_path,
-        output_file=output_file,
+        results_dir=None,
+        output_file=None,
         label_file=label_file,
         batch_size=int(data.get("batch_size", 32)),
         num_workers=int(data.get("num_workers", 0)),
@@ -354,6 +368,9 @@ def load_config(raw_path: Path) -> InferenceConfig:
         edge_schema=edge_schema_cfg,
         training_root=training_root,
         config_name=raw_path.name,
+        dataset_name=dataset_name,
+        work_dir_base=work_dir,
+        results_dir_base=results_dir,
     )
 
 
@@ -710,7 +727,10 @@ def run_inference(
     final_schema: Dict[str, Dict[str, object]],
     feature_metadata: Dict[str, object],
 ) -> None:
+    if cfg.work_dir is None or cfg.results_dir is None or cfg.output_file is None:
+        raise RuntimeError("Inference configuration missing required directories; ensure work_dir/results_dir/dataset_name are set.")
     cfg.work_dir.mkdir(parents=True, exist_ok=True)
+    cfg.results_dir.mkdir(parents=True, exist_ok=True)
     _log_checkpoint_banner(cfg, surround_blank=True)
     graph_dir = ensure_graph_dir(cfg, final_schema, feature_metadata)
     logging.info("Graph directory: %s", graph_dir)
@@ -844,8 +864,8 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
             "Examples:\n"
             "  ./run_model_inference.sh --config config.yaml.BM55-AF2\n"
             "  ./run_model_inference.sh --config config.yaml --dump-metadata\n"
-            "  ./run_model_inference.sh --data-dir data --work-dir work --checkpoint-path best.ckpt "
-            "--output-file results.csv\n"
+            "  ./run_model_inference.sh --data-dir data --work-dir work --results-dir results "
+            "--checkpoint-path best.ckpt --dataset-name HAF2\n"
             "\n"
             "Direct module invocation:\n"
             "  python -m qtdaqa.new_dynamic_features.model_inference.inference_topoqa_cpu --config config.yaml\n"
@@ -855,10 +875,11 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--log-level", default="INFO", help="Logging level")
     parser.add_argument("--dump-metadata", action="store_true", help="Print checkpoint feature metadata and exit")
     parser.add_argument("--data-dir", type=str, help="Evaluation dataset directory (required if --config omitted)")
-    parser.add_argument("--work-dir", type=str, help="Working directory for builder outputs")
+    parser.add_argument("--work-dir", type=str, help="Working directory root (dataset subfolder auto-created)")
     parser.add_argument("--checkpoint-path", type=str, help="Checkpoint (.ckpt/.chkpt) path")
-    parser.add_argument("--output-file", type=str, help="CSV path for predictions")
+    parser.add_argument("--results-dir", type=str, help="Directory root for inference results")
     parser.add_argument("--label-file", type=str, help="Optional label CSV")
+    parser.add_argument("--dataset-name", type=str, help="Dataset identifier used for subdirectories", default=None)
     parser.add_argument("--batch-size", type=int, default=None)
     parser.add_argument("--num-workers", type=int, default=None)
     parser.add_argument(
@@ -874,30 +895,52 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
 
 def _merge_cli_overrides(config: InferenceConfig, args: argparse.Namespace) -> InferenceConfig:
     data_dir = config.data_dir
-    work_dir = config.work_dir
-    checkpoint_path = config.checkpoint_path
-    output_file = config.output_file
-
     if args.data_dir:
         data_dir = _resolve(args.data_dir, Path.cwd())
-    if args.work_dir:
-        work_dir = _resolve(args.work_dir, Path.cwd())
+
+    checkpoint_path = config.checkpoint_path
     if args.checkpoint_path:
         checkpoint_path = _resolve(args.checkpoint_path, Path.cwd())
-    if args.output_file:
-        output_file = _resolve(args.output_file, Path.cwd())
 
-    missing = []
+    work_base = config.work_dir_base
+    if args.work_dir:
+        work_base = _resolve(args.work_dir, Path.cwd())
+
+    results_base = config.results_dir_base
+    if args.results_dir:
+        results_base = _resolve(args.results_dir, Path.cwd())
+
+    dataset_name = args.dataset_name
+    if not dataset_name:
+        raise SystemExit("--dataset-name is required.")
+
+    def _maybe_strip_dataset(path: Optional[Path]) -> Optional[Path]:
+        if path is None:
+            return None
+        if path.name == dataset_name:
+            return path.parent
+        return path
+
+    if work_base is None:
+        work_base = _maybe_strip_dataset(config.work_dir)
+    if results_base is None:
+        results_base = _maybe_strip_dataset(config.results_dir)
+
+    missing: List[str] = []
     if data_dir is None:
         missing.append("data_dir")
-    if work_dir is None:
+    if work_base is None:
         missing.append("work_dir")
+    if results_base is None:
+        missing.append("results_dir")
     if checkpoint_path is None:
         missing.append("checkpoint_path")
-    if output_file is None:
-        missing.append("output_file")
     if missing:
         raise SystemExit(f"Missing required inference paths (config + CLI): {', '.join(missing)}")
+
+    work_dir = (work_base / dataset_name).resolve()
+    results_dir = (results_base / dataset_name).resolve()
+    output_file = results_dir / "inference_results.csv"
 
     builder_cfg = config.builder or BuilderConfig()
     if args.builder_jobs is not None:
@@ -914,18 +957,24 @@ def _merge_cli_overrides(config: InferenceConfig, args: argparse.Namespace) -> I
         data_dir=data_dir,
         work_dir=work_dir,
         checkpoint_path=checkpoint_path,
+        results_dir=results_dir,
         output_file=output_file,
         label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else config.label_file,
         batch_size=args.batch_size if args.batch_size is not None else config.batch_size,
         num_workers=args.num_workers if args.num_workers is not None else config.num_workers,
         builder=builder_cfg,
         reuse_existing_graphs=args.reuse_existing_graphs or config.reuse_existing_graphs,
+        dataset_name=dataset_name,
+        work_dir_base=work_base,
+        results_dir_base=results_base,
     )
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
     logging.basicConfig(level=getattr(logging, args.log_level.upper(), logging.INFO), format="%(asctime)s %(levelname)s %(message)s")
+    if not args.dataset_name:
+        raise SystemExit("--dataset-name is required.")
     if args.config:
         config_path = Path(args.config).resolve()
         cfg = load_config(config_path)
@@ -934,7 +983,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "data_dir": args.data_dir,
             "work_dir": args.work_dir,
             "checkpoint_path": args.checkpoint_path,
-            "output_file": args.output_file,
+            "results_dir": args.results_dir,
+            "dataset_name": args.dataset_name,
         }
         missing = [name for name, value in required.items() if not value]
         if missing:
@@ -944,11 +994,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             jobs=args.builder_jobs if args.builder_jobs is not None else 4,
         )
 
+        dataset_name = args.dataset_name.strip()
+        work_base = _resolve(args.work_dir, Path.cwd())
+        results_base = _resolve(args.results_dir, Path.cwd())
+        work_dir = (work_base / dataset_name).resolve()
+        results_dir = (results_base / dataset_name).resolve()
         cfg = InferenceConfig(
             data_dir=_resolve(args.data_dir, Path.cwd()),
-            work_dir=_resolve(args.work_dir, Path.cwd()),
+            work_dir=work_dir,
             checkpoint_path=_resolve(args.checkpoint_path, Path.cwd()),
-            output_file=_resolve(args.output_file, Path.cwd()),
+            results_dir=results_dir,
+            output_file=results_dir / "inference_results.csv",
             label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else None,
             batch_size=args.batch_size if args.batch_size is not None else 32,
             num_workers=args.num_workers if args.num_workers is not None else 0,
@@ -961,6 +1017,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             edge_schema={},
             training_root=_default_training_root(),
             config_name="(CLI parameters)",
+            dataset_name=dataset_name,
+            work_dir_base=work_base,
+            results_dir_base=results_base,
         )
 
     cfg = _merge_cli_overrides(cfg, args)

@@ -80,7 +80,8 @@ def test_load_config_structured(tmp_path: Path) -> None:
           data_dir: ./data
           label_file: null
           work_dir: ./work
-          output_file: ./out.csv
+          results_dir: ./results
+          dataset_name: demo
           checkpoint: ./model.ckpt
 
         batch_size: 64
@@ -96,7 +97,11 @@ def test_load_config_structured(tmp_path: Path) -> None:
     cfg = inference_topoqa_cpu.load_config(cfg_path)
     assert cfg.data_dir == cfg_path.parent / "data"
     assert cfg.label_file is None
-    assert cfg.output_file == cfg_path.parent / "out.csv"
+    assert cfg.work_dir is None
+    assert cfg.results_dir is None
+    assert cfg.work_dir_base == cfg_path.parent / "work"
+    assert cfg.results_dir_base == cfg_path.parent / "results"
+    assert cfg.dataset_name == "demo"
     assert cfg.builder.jobs == 3
     assert cfg.reuse_existing_graphs is True
     assert cfg.batch_size == 64
@@ -131,7 +136,7 @@ def test_load_config_missing_required_path(tmp_path: Path) -> None:
         """,
     )
     cfg = inference_topoqa_cpu.load_config(cfg_path)
-    assert cfg.output_file is None
+    assert cfg.results_dir is None
 
 
 def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
@@ -141,7 +146,8 @@ def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
         paths:
           data_dir: ./data
           work_dir: ./work
-          output_file: ./out.csv
+          results_dir: ./results
+          dataset_name: override_demo
           checkpoint: ./model.ckpt
 
         builder:
@@ -166,6 +172,7 @@ def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
         """,
     )
     cfg = inference_topoqa_cpu.load_config(cfg_path)
+    assert cfg.dataset_name == "override_demo"
     assert cfg.interface_schema["module"] == "interface/polar_cutoff/v1"
     assert cfg.interface_schema["jobs"] == 4
     assert cfg.edge_schema["module"] == "edge/legacy_band/v11"
@@ -214,7 +221,8 @@ def test_load_config_auto_selects_checkpoint(tmp_path: Path, monkeypatch: pytest
         paths:
           data_dir: ./data
           work_dir: ./work
-          output_file: ./out.csv
+          results_dir: ./results
+          dataset_name: auto_demo
           training_root: {training_root}
 
         builder:
@@ -242,7 +250,8 @@ def test_load_config_auto_select_checkpoint_failure(tmp_path: Path, monkeypatch:
         paths:
           data_dir: ./data
           work_dir: ./work
-          output_file: ./out.csv
+          results_dir: ./results
+          dataset_name: auto_demo
           training_root: {training_root}
 
         builder:
@@ -260,7 +269,8 @@ def test_load_config_requires_training_root_when_autoselect(tmp_path: Path) -> N
         paths:
           data_dir: ./data
           work_dir: ./work
-          output_file: ./out.csv
+          results_dir: ./results
+          dataset_name: auto_demo
           training_root: ./missing_runs
         builder:
           jobs: 1
@@ -273,11 +283,15 @@ def test_load_config_requires_training_root_when_autoselect(tmp_path: Path) -> N
 def test_guard_schema_overrides(tmp_path: Path) -> None:
     cfg = inference_topoqa_cpu.InferenceConfig(
         data_dir=tmp_path,
-        work_dir=tmp_path,
+        work_dir=tmp_path / "work/demo",
         checkpoint_path=tmp_path / "ckpt.chkpt",
-        output_file=tmp_path / "out.csv",
+        results_dir=tmp_path / "results/demo",
+        output_file=tmp_path / "results/demo/inference_results.csv",
         edge_schema={"module": "edge/foo"},
         training_root=tmp_path,
+        dataset_name="demo",
+        work_dir_base=tmp_path / "work",
+        results_dir_base=tmp_path / "results",
     )
     checkpoint_meta = {"edge_schema": {"module": "edge/bar"}}
     with pytest.raises(RuntimeError, match="edge_schema.module mismatch"):
@@ -292,10 +306,14 @@ def test_guard_schema_overrides(tmp_path: Path) -> None:
 def test_log_checkpoint_banner_formats(caplog, tmp_path: Path) -> None:
     cfg = inference_topoqa_cpu.InferenceConfig(
         data_dir=tmp_path / "data",
-        work_dir=tmp_path / "work",
+        work_dir=tmp_path / "work/demo",
         checkpoint_path=tmp_path / "ckpt.ckpt",
-        output_file=tmp_path / "out.csv",
+        results_dir=tmp_path / "results/demo",
+        output_file=tmp_path / "results/demo/inference_results.csv",
         config_name="config.yaml.test",
+        dataset_name="demo",
+        work_dir_base=tmp_path / "work",
+        results_dir_base=tmp_path / "results",
     )
     caplog.set_level("INFO")
     inference_topoqa_cpu._log_checkpoint_banner(cfg, surround_blank=True)
@@ -334,7 +352,8 @@ def test_cli_overrides_preserve_builder_identifier(tmp_path: Path) -> None:
         paths:
           data_dir: ./data
           work_dir: ./work
-          output_file: ./out.csv
+          results_dir: ./results
+          dataset_name: cli_demo
           checkpoint: ./model.ckpt
 
         builder:
@@ -347,13 +366,14 @@ def test_cli_overrides_preserve_builder_identifier(tmp_path: Path) -> None:
     args = SimpleNamespace(
         data_dir=None,
         work_dir=str(tmp_path / "cli_work"),
+        results_dir=str(tmp_path / "cli_results"),
         checkpoint_path=None,
-        output_file=str(tmp_path / "cli_out.csv"),
         label_file=None,
         batch_size=None,
         num_workers=None,
         builder_jobs=7,
         reuse_existing_graphs=False,
+        dataset_name="cli_override",
     )
     merged = inference_topoqa_cpu._merge_cli_overrides(cfg, args)
     assert merged.builder.builder_name == "graph_builder2"

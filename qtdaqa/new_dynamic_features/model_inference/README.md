@@ -1,6 +1,11 @@
+export DATASET=BM55-AF2
+export WORK_DIR=edge_pairing_topoqa_10.5A 
 time ./run_model_inference.sh \
---config qtdaqa/new_dynamic_features/model_inference/config.yaml.BM55-AF2 \
---log-level INFO 2>&1 | tee BM55-AF2_11d_topoqa_10.5A_$(date +%Y%m%d_%H%M%S).log
+--dataset-name ${DATASET} \
+--config qtdaqa/new_dynamic_features/model_inference/config.yaml.${DATASET} \
+--work-dir qtdaqa/new_dynamic_features/model_inference/output/${WORK_DIR}/work \
+--results-dir qtdaqa/new_dynamic_features/model_inference/output/${WORK_DIR}/results \
+--log-level INFO 2>&1 | tee ${DATASET}_${WORK_DIR}_$(date +%Y%m%d_%H%M%S).log
 
 # Dynamic Inference Pipeline
 
@@ -20,7 +25,7 @@ evaluation dataset and, optionally, a specific checkpoint.
 
 ```bash
 cd qtdaqa/new_dynamic_features/model_inference
-./run_model_inference.sh --config config.yaml.HAF2
+./run_model_inference.sh --config config.yaml.HAF2 --dataset-name HAF2
 ```
 
 `config.yaml.*` files live alongside the script; copy one and adjust paths as
@@ -29,8 +34,9 @@ needed. Every config follows the same structure:
 ```yaml
 paths:
   data_dir: ./datasets/evaluation/HAF2/decoy
-  work_dir: ./output/HAF2/work
-  output_file: ./output/HAF2/results/inference_results.csv
+  work_dir: ./output/work
+  results_dir: ./output/results
+  dataset_name: null            # override per run or via --dataset-name
   label_file: ./datasets/evaluation/HAF2/label_info.csv   # optional
   checkpoint: null                                       # auto-select best run
   training_root: ../model_training/training_runs
@@ -45,6 +51,11 @@ batch_size: 32
 num_workers: 0
 ```
 
+At runtime you must provide `--dataset-name` (or set `paths.dataset_name` in the
+config). `--results-dir` now points to a directory root; inference automatically
+creates a `<results_dir>/<dataset_name>/` subdirectory (and the same for
+`work_dir`) so concurrent runs for different datasets never collide.
+
 If you omit `paths.training_root`, the CLI defaults to
 `../model_training/training_runs`. Before doing any heavy work, inference now
 verifies that this directory exists (and thus contains the training runs you
@@ -56,6 +67,7 @@ Flags you can override on the CLI:
 ```bash
 ./run_model_inference.sh \
   --config config.yaml.HAF2 \
+  --dataset-name HAF2 \
   --log-level DEBUG \
   --dump-metadata
 ```
@@ -89,22 +101,23 @@ for debugging). Otherwise the command runs the full pipeline.
    Geometric `DataLoader`, feeds batches to the checkpointed model, and writes
    predictions plus various reports.
 
-Throughout the process the wrapper writes detailed logs under `paths.work_dir`
-(`feature_metadata.json`, builder logs, inference logs, and per-target reports).
+Throughout the process the wrapper writes detailed logs under
+`<work_dir>/<dataset_name>` (`feature_metadata.json`, builder logs, inference logs,
+and per-target reports).
 
 ---
 
 ## Outputs
 
-- `paths.output_file` – CSV listing each decoy, predicted DockQ, and (if
-  `label_file` was supplied) the true DockQ for reference.
-- `paths.work_dir/output/<target>/` – per-target ranking summaries:
+- `<results_dir>/<dataset_name>/inference_results.csv` – CSV listing each decoy,
+  predicted DockQ, and (if `label_file` was supplied) the true DockQ for reference.
+- `<results_dir>/<dataset_name>/<target>/` – per-target ranking summaries:
   - `result.csv` (model vs. predicted DockQ) sorted descending.
   - `hit.rate_result.csv` (hit counts above DockQ 0.23/0.49/0.80).
   - `ranking_loss_result.csv` (m*, m^, ranking loss) plus TOP-10 listings.
-- `paths.work_dir/feature_metadata.json` – the schema recovered from the
+- `<work_dir>/<dataset_name>/feature_metadata.json` – the schema recovered from the
   checkpoint (handy for auditing and reproducing builder runs).
-- `paths.work_dir/graph_load_profile.json` (if enabled via builder options) –
+- `<work_dir>/<dataset_name>/graph_load_profile.json` (if enabled via builder options) –
   profile of slowest graph loads.
 
 Keep these alongside `builder_features/features.from_metadata.yaml` if you plan

@@ -23,4 +23,10 @@ fi
 
 cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}:${PYTHONPATH:-}"
+
+if [[ $# -eq 0 ]]; then
+  "${PYTHON_BIN}" -m qtdaqa.new_dynamic_features.model_inference.inference_topoqa_cpu --help
+  exit 0
+fi
+
 exec "${PYTHON_BIN}" -m qtdaqa.new_dynamic_features.model_inference.inference_topoqa_cpu "$@"

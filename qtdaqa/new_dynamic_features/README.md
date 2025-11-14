@@ -62,7 +62,7 @@ If you plan to run inference later, don’t delete these run directories—they 
 - **Config highlights:**  
   - `paths.data_dir` – evaluation structures.  
   - `paths.work_dir` – scratch folder for regenerated graphs and metadata.  
-  - `paths.output_file` – final CSV location.  
+  - `paths.results_dir` – root directory for per-dataset results (`<results_dir>/<dataset>/…`).  
   - `paths.checkpoint` – optional; if omitted, inference scans `paths.training_root` and auto-selects the best checkpoint using each run’s recorded `selection.primary_metric`.  
   - `builder.jobs` / `options.reuse_existing_graphs` – control how the helper interacts with the graph builder when graphs must be regenerated.  
   - `paths.training_root` – where to look for training runs (`../model_training/training_runs` by default).
@@ -71,7 +71,7 @@ If you plan to run inference later, don’t delete these run directories—they 
   - `ensure_graph_dir` compares any cached graphs in `work_dir` against this metadata. If they mismatch, it reruns the builder using the generated config so the new graphs match training exactly.  
   - This means you can switch to new feature configs, retrain, and inference will adapt automatically—no manual edits.
 - **Outputs:**  
-  - Prediction CSV (`paths.output_file`) plus per-target ranking-loss/hit-rate summaries under `output/<target>/`.  
+  - Prediction CSV (`<results_dir>/<dataset>/inference_results.csv`) plus per-target ranking-loss/hit-rate summaries under `<results_dir>/<dataset>/<target>/`.  
   - Work directory contains `feature_metadata.json`, regenerated graphs (if needed), logs, and the auto-generated builder config for reproducibility.
 
 ---
