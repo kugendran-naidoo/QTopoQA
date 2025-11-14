@@ -344,13 +344,25 @@ def _build_schema_feature_payload(final_schema: Dict[str, Dict[str, object]]) ->
         }
     payload["options"] = {}
 
-    edge_block = payload.get("edge", {})
-    module_id = edge_schema.get("module")
-    if module_id:
-        edge_block["module"] = module_id
-    module_params = edge_schema.get("module_params")
-    if isinstance(module_params, dict):
-        edge_block["params"] = copy.deepcopy(module_params)
+    def _apply(stage_key: str, schema_key: str) -> None:
+        schema = final_schema.get(schema_key)
+        if not isinstance(schema, dict) or not schema:
+            return
+        block = payload.get(stage_key, {})
+        module_id = schema.get("module")
+        if module_id:
+            block["module"] = module_id
+        module_params = schema.get("module_params")
+        if isinstance(module_params, dict):
+            block["params"] = copy.deepcopy(module_params)
+        if "jobs" in schema:
+            block["jobs"] = schema.get("jobs")
+        payload[stage_key] = block
+
+    _apply("interface", "interface_schema")
+    _apply("topology", "topology_schema")
+    _apply("node", "node_schema")
+    _apply("edge", "edge_schema")
     return payload
 
 
