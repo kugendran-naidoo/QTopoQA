@@ -72,6 +72,47 @@ def extract_feature_metadata(checkpoint_path: Path) -> Dict[str, object]:
     return checkpoint.get("feature_metadata", {})
 
 
+def _adapt_legacy_edge_embed_weights(
+    state_dict: Dict[str, torch.Tensor], target_state: Dict[str, torch.Tensor]
+) -> Dict[str, torch.Tensor]:
+    legacy_indices: List[str] = []
+    for key in state_dict.keys():
+        parts = key.split(".")
+        if len(parts) == 3 and parts[0] == "edge_embed" and parts[1].isdigit() and parts[2] in {"weight", "bias"}:
+            legacy_indices.append(parts[1])
+    if not legacy_indices:
+        return state_dict
+    adapted = dict(state_dict)
+    moved = False
+    for idx in set(legacy_indices):
+        for name in ("weight", "bias"):
+            legacy_key = f"edge_embed.{idx}.{name}"
+            new_key = f"edge_embed.{idx}.0.{name}"
+            if legacy_key in adapted and new_key in target_state:
+                adapted[new_key] = adapted.pop(legacy_key)
+                moved = True
+    if moved:
+        logging.info(
+            "Detected legacy edge_embed weights; remapped %d module(s) to the new encoder structure.", len(set(legacy_indices))
+        )
+    return adapted
+
+
+def _uses_legacy_edge_encoder(state_dict: Dict[str, torch.Tensor]) -> bool:
+    has_modern = False
+    has_flat_linear = False
+    for key in state_dict.keys():
+        if not key.startswith("edge_embed."):
+            continue
+        parts = key.split(".")
+        if len(parts) >= 4 and parts[1].isdigit() and parts[2].isdigit():
+            has_modern = True
+            break
+        if len(parts) == 3 and parts[1].isdigit() and parts[2] in {"weight", "bias"}:
+            has_flat_linear = True
+    return has_flat_linear and not has_modern
+
+
 def resolve_feature_schema(cfg: InferenceConfig, checkpoint_meta: Dict[str, object]) -> Dict[str, Dict[str, object]]:
     edge_schema: Dict[str, object] = {}
     topo_schema: Dict[str, object] = {}
@@ -86,6 +127,8 @@ def resolve_feature_schema(cfg: InferenceConfig, checkpoint_meta: Dict[str, obje
 
 
 def _guard_schema_overrides(cfg: InferenceConfig, checkpoint_meta: Dict[str, object]) -> None:
+    if not cfg.use_checkpoint_schema:
+        return
     def _check(section: str, override: Dict[str, object], metadata: Dict[str, object]) -> None:
         if not override:
             return
@@ -222,8 +265,6 @@ def load_config(raw_path: Path) -> InferenceConfig:
         "label_file",
         "reuse_existing_graphs",
         "use_checkpoint_schema",
-        "edge_schema",
-        "topology_schema",
     }
     legacy_present = sorted(legacy_keys.intersection(data))
     if legacy_present:
@@ -260,6 +301,15 @@ def load_config(raw_path: Path) -> InferenceConfig:
     if options_cfg and not isinstance(options_cfg, dict):
         raise ValueError("options section must be a mapping when provided.")
     reuse_existing = bool(options_cfg.get("reuse_existing_graphs", False)) if options_cfg else False
+    use_checkpoint_schema = options_cfg.get("use_checkpoint_schema", True)
+    use_checkpoint_schema = bool(use_checkpoint_schema)
+
+    edge_schema_cfg = data.get("edge_schema") or {}
+    if edge_schema_cfg and not isinstance(edge_schema_cfg, dict):
+        raise ValueError("edge_schema section must be a mapping when provided.")
+    topology_schema_cfg = data.get("topology_schema") or {}
+    if topology_schema_cfg and not isinstance(topology_schema_cfg, dict):
+        raise ValueError("topology_schema section must be a mapping when provided.")
 
     if checkpoint_raw:
         checkpoint_path = _resolve(checkpoint_raw, raw_path.parent)
@@ -281,9 +331,9 @@ def load_config(raw_path: Path) -> InferenceConfig:
         num_workers=int(data.get("num_workers", 0)),
         builder=builder_cfg,
         reuse_existing_graphs=reuse_existing,
-        use_checkpoint_schema=True,
-        edge_schema={},
-        topology_schema={},
+        use_checkpoint_schema=use_checkpoint_schema,
+        edge_schema=edge_schema_cfg,
+        topology_schema=topology_schema_cfg,
         training_root=training_root,
         config_name=raw_path.name,
     )
@@ -577,6 +627,12 @@ def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]):
     )
 
     edge_dim = int(edge_schema.get("dim", 24))
+    checkpoint = torch.load(cfg.checkpoint_path, map_location="cpu")
+    state_dict = checkpoint.get("state_dict", checkpoint)
+    edge_encoder_variant = edge_schema.get("encoder_variant")
+    if not edge_encoder_variant:
+        edge_encoder_variant = "legacy_linear" if _uses_legacy_edge_encoder(state_dict) else "modern"
+
     model = GNN_edge1_edgepooling(
         init_lr=1.0,
         pooling_type="mean",
@@ -588,9 +644,10 @@ def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]):
         n_output=1,
         heads=8,
         edge_schema=edge_schema,
+        edge_encoder_variant=edge_encoder_variant,
     )
-    checkpoint = torch.load(cfg.checkpoint_path, map_location="cpu")
-    state_dict = checkpoint.get("state_dict", checkpoint)
+    if edge_encoder_variant != "legacy_linear":
+        state_dict = _adapt_legacy_edge_embed_weights(state_dict, model.state_dict())
     missing, unexpected = model.load_state_dict(state_dict, strict=False)
     if missing:
         logging.warning("Missing keys when loading checkpoint: %s", missing)
@@ -767,6 +824,57 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _merge_cli_overrides(config: InferenceConfig, args: argparse.Namespace) -> InferenceConfig:
+    data_dir = config.data_dir
+    work_dir = config.work_dir
+    checkpoint_path = config.checkpoint_path
+    output_file = config.output_file
+
+    if args.data_dir:
+        data_dir = _resolve(args.data_dir, Path.cwd())
+    if args.work_dir:
+        work_dir = _resolve(args.work_dir, Path.cwd())
+    if args.checkpoint_path:
+        checkpoint_path = _resolve(args.checkpoint_path, Path.cwd())
+    if args.output_file:
+        output_file = _resolve(args.output_file, Path.cwd())
+
+    missing = []
+    if data_dir is None:
+        missing.append("data_dir")
+    if work_dir is None:
+        missing.append("work_dir")
+    if checkpoint_path is None:
+        missing.append("checkpoint_path")
+    if output_file is None:
+        missing.append("output_file")
+    if missing:
+        raise SystemExit(f"Missing required inference paths (config + CLI): {', '.join(missing)}")
+
+    builder_cfg = config.builder or BuilderConfig()
+    if args.builder_jobs is not None:
+        try:
+            jobs_override = int(args.builder_jobs)
+        except (TypeError, ValueError) as exc:
+            raise SystemExit("--builder-jobs must be an integer.") from exc
+        if jobs_override <= 0:
+            raise SystemExit("--builder-jobs must be greater than zero.")
+        builder_cfg = dataclasses.replace(builder_cfg, jobs=jobs_override)
+
+    return dataclasses.replace(
+        config,
+        data_dir=data_dir,
+        work_dir=work_dir,
+        checkpoint_path=checkpoint_path,
+        output_file=output_file,
+        label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else config.label_file,
+        batch_size=args.batch_size if args.batch_size is not None else config.batch_size,
+        num_workers=args.num_workers if args.num_workers is not None else config.num_workers,
+        builder=builder_cfg,
+        reuse_existing_graphs=args.reuse_existing_graphs or config.reuse_existing_graphs,
+    )
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parse_args(argv)
     logging.basicConfig(level=getattr(logging, args.log_level.upper(), logging.INFO), format="%(asctime)s %(levelname)s %(message)s")
@@ -805,49 +913,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             config_name="(CLI parameters)",
         )
 
-    def _merge_cli_overrides(config: InferenceConfig) -> InferenceConfig:
-        data_dir = config.data_dir
-        work_dir = config.work_dir
-        checkpoint_path = config.checkpoint_path
-        output_file = config.output_file
-
-        if args.data_dir:
-            data_dir = _resolve(args.data_dir, Path.cwd())
-        if args.work_dir:
-            work_dir = _resolve(args.work_dir, Path.cwd())
-        if args.checkpoint_path:
-            checkpoint_path = _resolve(args.checkpoint_path, Path.cwd())
-        if args.output_file:
-            output_file = _resolve(args.output_file, Path.cwd())
-
-        missing = []
-        if data_dir is None:
-            missing.append("data_dir")
-        if work_dir is None:
-            missing.append("work_dir")
-        if checkpoint_path is None:
-            missing.append("checkpoint_path")
-        if output_file is None:
-            missing.append("output_file")
-        if missing:
-            raise SystemExit(f"Missing required inference paths (config + CLI): {', '.join(missing)}")
-
-        return dataclasses.replace(
-            config,
-            data_dir=data_dir,
-            work_dir=work_dir,
-            checkpoint_path=checkpoint_path,
-            output_file=output_file,
-            label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else config.label_file,
-            batch_size=args.batch_size if args.batch_size is not None else config.batch_size,
-            num_workers=args.num_workers if args.num_workers is not None else config.num_workers,
-            builder=BuilderConfig(
-                jobs=args.builder_jobs if args.builder_jobs is not None else config.builder.jobs
-            ),
-            reuse_existing_graphs=args.reuse_existing_graphs or config.reuse_existing_graphs,
-        )
-
-    cfg = _merge_cli_overrides(cfg)
+    cfg = _merge_cli_overrides(cfg, args)
 
     checkpoint_meta = extract_feature_metadata(cfg.checkpoint_path)
     if args.dump_metadata:

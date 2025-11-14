@@ -75,7 +75,21 @@ def _spearman_safe(a: np.ndarray, b: np.ndarray) -> float:
 
 
 class GNN_edge1_edgepooling(pl.LightningModule):
-    def __init__(self,init_lr,pooling_type,mode,num_net=5,hidden_dim=32,edge_dim=1,output_dim=64,n_output=1,heads=8,edge_schema=None,node_dim: Optional[int]=None):
+    def __init__(
+        self,
+        init_lr,
+        pooling_type,
+        mode,
+        num_net=5,
+        hidden_dim=32,
+        edge_dim=1,
+        output_dim=64,
+        n_output=1,
+        heads=8,
+        edge_schema=None,
+        node_dim: Optional[int] = None,
+        edge_encoder_variant: str = "modern",
+    ):
         super().__init__()
         self.mode=mode
         self.init_lr=init_lr
@@ -105,9 +119,16 @@ class GNN_edge1_edgepooling(pl.LightningModule):
 
         schema = edge_schema or {}
         self.edge_dim = edge_dim
-        self.use_edge_layer_norm = bool(schema.get("use_layer_norm", True))
+        variant = (edge_encoder_variant or "modern").strip().lower()
+        legacy_aliases = {"legacy", "legacy_linear", "linear"}
+        self.is_legacy_edge_encoder = variant in legacy_aliases
+        self.edge_encoder_variant = "legacy_linear" if self.is_legacy_edge_encoder else "modern"
+        # Legacy checkpoints never trained layer norm / extra linear layers, so skip them when using that path.
+        self.use_edge_layer_norm = bool(schema.get("use_layer_norm", True)) and not self.is_legacy_edge_encoder
 
         def _edge_encoder():
+            if self.is_legacy_edge_encoder:
+                return nn.Linear(edge_dim, hidden_dim)
             layers = [nn.Linear(edge_dim, hidden_dim)]
             if self.use_edge_layer_norm:
                 layers.append(nn.LayerNorm(hidden_dim))

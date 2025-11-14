@@ -1,0 +1,70 @@
+# Inference configuration for original checkpoint
+
+# config.yaml.BM55-AF2-legacy
+
+paths:
+  data_dir: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy
+  label_file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv
+  checkpoint: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/topoqa/model/topoqa.ckpt
+  # You can leave work_dir/output_file as null and override via CLI,
+  # or fill them in here:
+  work_dir: null
+  output_file: null
+  training_root: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+
+builder:
+  id: graph_builder2
+  # reuse the same feature config the test graphs were built with
+  feature_config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature-config.yaml.topoqa
+  jobs: 12
+
+options:
+  reuse_existing_graphs: false
+  use_checkpoint_schema: false
+
+interface_schema:
+  module: interface/polar_cutoff/v1
+  alias: "n x 3D TopoQA default 10A cut-off"
+  variant: legacy_v1
+  module_params:
+    cutoff: 10.0
+    coordinate_decimals: -1
+    jobs: 12
+
+topology_schema:
+  module: topology/persistence_basic/v1
+  alias: "140D TopoQA default"
+  variant: legacy_v1
+  module_params:
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    dedup_sort: false
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    jobs: 12
+
+node_schema:
+  module: node/dssp_topo_merge/v1
+  alias: "172D (140D + 32D) TopoQA default"
+  variant: legacy_v11
+  module_params:
+    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 12
+
+edge_schema:
+  module: edge/legacy_band/v11
+  alias: "TopoQA default 10A cutoff"
+  variant: legacy_v11
+  dim: 11
+  module_params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_features: true
+    jobs: 12

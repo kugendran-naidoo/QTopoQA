@@ -134,6 +134,37 @@ def test_load_config_missing_required_path(tmp_path: Path) -> None:
     assert cfg.output_file is None
 
 
+def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
+    cfg_path = _write_cfg(
+        tmp_path,
+        """
+        paths:
+          data_dir: ./data
+          work_dir: ./work
+          output_file: ./out.csv
+          checkpoint: ./model.ckpt
+
+        builder:
+          jobs: 2
+
+        options:
+          reuse_existing_graphs: true
+          use_checkpoint_schema: false
+
+        edge_schema:
+          module: edge/legacy_band/v11
+          dim: 11
+        topology_schema:
+          summary: {}
+        """,
+    )
+    cfg = inference_topoqa_cpu.load_config(cfg_path)
+    assert cfg.edge_schema["module"] == "edge/legacy_band/v11"
+    assert cfg.edge_schema["dim"] == 11
+    assert cfg.topology_schema == {"summary": {}}
+    assert cfg.use_checkpoint_schema is False
+
+
 def test_load_config_auto_selects_checkpoint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     training_root = tmp_path / "training_runs"
     run_one = training_root / "run_one"
@@ -270,3 +301,49 @@ def test_log_checkpoint_banner_formats(caplog, tmp_path: Path) -> None:
         f"Checkpoint file: {cfg.checkpoint_path}",
         f"Inference config: {cfg.config_name}",
     ]
+
+
+def test_cli_overrides_preserve_builder_identifier(tmp_path: Path) -> None:
+    feature_cfg = tmp_path / "features.yaml"
+    feature_cfg.write_text(
+        """
+        interface:
+          module: interface/default
+        node:
+          module: node/default
+        edge:
+          module: edge/default
+        """,
+        encoding="utf-8",
+    )
+    cfg_path = _write_cfg(
+        tmp_path,
+        """
+        paths:
+          data_dir: ./data
+          work_dir: ./work
+          output_file: ./out.csv
+          checkpoint: ./model.ckpt
+
+        builder:
+          id: graph_builder2
+          feature_config: ./features.yaml
+          jobs: 2
+        """,
+    )
+    cfg = inference_topoqa_cpu.load_config(cfg_path)
+    args = SimpleNamespace(
+        data_dir=None,
+        work_dir=str(tmp_path / "cli_work"),
+        checkpoint_path=None,
+        output_file=str(tmp_path / "cli_out.csv"),
+        label_file=None,
+        batch_size=None,
+        num_workers=None,
+        builder_jobs=7,
+        reuse_existing_graphs=False,
+    )
+    merged = inference_topoqa_cpu._merge_cli_overrides(cfg, args)
+    assert merged.builder.builder_name == "graph_builder2"
+    assert merged.builder.feature_config == cfg.builder.feature_config
+    assert merged.builder.jobs == 7
