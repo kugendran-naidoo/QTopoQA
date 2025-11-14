@@ -85,13 +85,23 @@ class BuilderConfig:
         return payload
 
 
+def _resolve_optional_path(path_raw: Optional[object], base_dir: Path) -> Optional[Path]:
+    if path_raw is None:
+        return None
+    if isinstance(path_raw, Path):
+        candidate = path_raw
+    else:
+        candidate = Path(str(path_raw))
+    return candidate if candidate.is_absolute() else (base_dir / candidate).resolve()
+
+
 def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
     if raw is None:
         return BuilderConfig()
     if not isinstance(raw, dict):
         raise ValueError("builder section must be a mapping when provided.")
 
-    legacy_keys = {"topology_dedup_sort", "dump_edges", "features", "feature_config"}
+    legacy_keys = {"topology_dedup_sort", "dump_edges", "features"}
     disallowed = sorted(legacy_keys.intersection(raw.keys()))
     if disallowed:
         raise ValueError(
@@ -109,9 +119,14 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
     builder_name_raw = raw.get("id") or raw.get("name") or raw.get("builder")
     builder_name = str(builder_name_raw).strip() if builder_name_raw else None
 
+    feature_config_path = _resolve_optional_path(raw.get("feature_config"), base_dir)
+    if feature_config_path is not None and not feature_config_path.exists():
+        raise FileNotFoundError(f"builder.feature_config not found: {feature_config_path}")
+
     return BuilderConfig(
         jobs=jobs_int,
         builder_name=builder_name or None,
+        feature_config=feature_config_path,
     )
 
 

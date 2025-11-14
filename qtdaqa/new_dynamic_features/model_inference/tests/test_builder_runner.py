@@ -99,8 +99,17 @@ def test_parse_builder_config_rejects_legacy_overrides(tmp_path: Path) -> None:
         parse_builder_config({"topology_dedup_sort": True}, tmp_path)
     with pytest.raises(ValueError):
         parse_builder_config({"features": {"edge": {}}}, tmp_path)
-    with pytest.raises(ValueError):
-        parse_builder_config({"feature_config": "features.yaml"}, tmp_path)
+    with pytest.raises(FileNotFoundError):
+        parse_builder_config({"feature_config": "features.dummy"}, tmp_path)
+
+
+def test_parse_builder_config_accepts_explicit_feature_config(tmp_path: Path) -> None:
+    features = tmp_path / "features.yaml"
+    features.write_text("edge: {}", encoding="utf-8")
+    config = parse_builder_config({"feature_config": str(features)}, tmp_path)
+    assert config.feature_config == features.resolve()
+    rel_config = parse_builder_config({"feature_config": features.name}, tmp_path)
+    assert rel_config.feature_config == features.resolve()
 
 
 def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> None:
