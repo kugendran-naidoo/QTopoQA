@@ -7,8 +7,8 @@ exactly the way the downstream stack does (edge/node/topology), then emits a con
 with `use_checkpoint_schema=false` and a populated overrides block so you don’t have
 to hand-enter feature definitions. If the metadata truly isn’t present, the script
 adds a note reminding you to fill the schema manually. You still need to edit the
-placeholder paths under `paths.*` (data_dir, work_dir, output_file, label_file) before
-running `run_model_inference.sh`.
+placeholder paths under `paths.*` (data_dir, work_dir, results_dir, dataset_name, label_file)
+before running `run_model_inference.sh`.
 """
 from __future__ import annotations
 
@@ -59,7 +59,8 @@ def build_config(graph_dir: Path, checkpoint: Path) -> Dict[str, Any]:
         "paths": {
             "data_dir": None,
             "work_dir": None,
-            "output_file": None,
+            "results_dir": None,
+            "dataset_name": None,
             "label_file": None,
             "checkpoint": str(checkpoint.resolve()),
             "training_root": None,
@@ -124,7 +125,7 @@ def main(argv: list[str] | None = None) -> int:
     yaml_dump = yaml.safe_dump(config, sort_keys=False)
     args.output.write_text(yaml_dump)
     print(f"Wrote legacy inference config to {args.output}")
-    print("Edit the placeholder paths (data_dir/work_dir/output_file/label_file) before running run_model_inference.sh.")
+    print("Edit the placeholder paths (data_dir/work_dir/results_dir/dataset_name/label_file) before running run_model_inference.sh.")
     return 0
 
 

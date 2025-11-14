@@ -5,7 +5,8 @@ paths:
   data_dir: ../../../datasets/training/adjusted/pilot_batch_Dockground_MAF2
   label_file: ../../../datasets/training/adjusted/pilot_batch_Dockground_MAF2/label_info_Dockground_MAF2.csv
   work_dir: ./output/pilot_batch/work
-  output_file: ./output/pilot_batch/results/inference_results.csv
+  results_dir: ./output/pilot_batch/results
+  dataset_name: pilot_batch_Dockground_MAF2
   checkpoint: null
 
 batch_size: 32

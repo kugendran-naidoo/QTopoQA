@@ -4,10 +4,11 @@
 paths:
   data_dir: ../../../datasets/evaluation/BM55-AF2/decoy
   label_file: ../../../datasets/evaluation/BM55-AF2/label_info.csv
-  # set at cli
+  # set at cli (root directory; dataset-name subdir is auto-created)
   work_dir: null
-  # set at cli
-  output_file: null
+  # set at cli (root directory; dataset-name subdir is auto-created)
+  results_dir: null
+  dataset_name: BM55-AF2
   # set at cli - use metadata from model_training to choose
   checkpoint: null
 

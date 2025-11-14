@@ -40,13 +40,17 @@ from qtdaqa.new_dynamic_features.model_inference import inference_topoqa_cpu as 
 def test_inference_schema_summary_written(tmp_path: Path) -> None:
     cfg = infer.InferenceConfig(
         data_dir=tmp_path / "data",
-        work_dir=tmp_path / "work",
+        work_dir=tmp_path / "work/demo",
         checkpoint_path=tmp_path / "legacy.ckpt",
-        output_file=tmp_path / "out.csv",
+        results_dir=tmp_path / "results/demo",
+        output_file=tmp_path / "results/demo/inference_results.csv",
         label_file=None,
         batch_size=1,
         num_workers=0,
         builder=infer.BuilderConfig(),
+        dataset_name="demo",
+        work_dir_base=tmp_path / "work",
+        results_dir_base=tmp_path / "results",
     )
     cfg.work_dir.mkdir(parents=True)
     final_schema = {

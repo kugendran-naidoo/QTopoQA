@@ -22,22 +22,30 @@ from qtdaqa.new_dynamic_features.model_inference.builder_runner import BuilderCo
 
 def _make_config(tmp_path: Path, reuse: bool = True):
     data_dir = tmp_path / "data"
-    work_dir = tmp_path / "work"
-    output_file = tmp_path / "preds.csv"
+    work_base = tmp_path / "work"
+    results_base = tmp_path / "results"
+    dataset_name = "demo"
+    work_dir = work_base / dataset_name
+    results_dir = results_base / dataset_name
+    output_file = results_dir / "inference_results.csv"
     checkpoint = tmp_path / "model.ckpt"
-    for directory in (data_dir, work_dir):
+    for directory in (data_dir, work_dir, results_dir):
         directory.mkdir(parents=True, exist_ok=True)
     checkpoint.write_text("ckpt", encoding="utf-8")
     return SimpleNamespace(
         data_dir=data_dir,
         work_dir=work_dir,
         checkpoint_path=checkpoint,
+        results_dir=results_dir,
         output_file=output_file,
         label_file=None,
         batch_size=4,
         num_workers=0,
         builder=BuilderConfig(jobs=2),
         reuse_existing_graphs=reuse,
+        dataset_name=dataset_name,
+        work_dir_base=work_base,
+        results_dir_base=results_base,
     )
 
 

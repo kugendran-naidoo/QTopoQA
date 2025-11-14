@@ -1,7 +1,8 @@
 paths:
   data_dir: null
   work_dir: null
-  output_file: null
+  results_dir: null
+  dataset_name: null
   label_file: null
   checkpoint: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/topoqa/model/topoqa.ckpt
   training_root: null
