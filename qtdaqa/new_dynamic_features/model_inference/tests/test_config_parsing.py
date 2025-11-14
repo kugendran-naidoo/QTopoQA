@@ -130,8 +130,8 @@ def test_load_config_missing_required_path(tmp_path: Path) -> None:
           jobs: 1
         """,
     )
-    with pytest.raises(KeyError, match="paths.output_file"):
-        inference_topoqa_cpu.load_config(cfg_path)
+    cfg = inference_topoqa_cpu.load_config(cfg_path)
+    assert cfg.output_file is None
 
 
 def test_load_config_auto_selects_checkpoint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

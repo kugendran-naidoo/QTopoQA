@@ -4,8 +4,11 @@
 paths:
   data_dir: ../../../datasets/evaluation/BM55-AF2/decoy
   label_file: ../../../datasets/evaluation/BM55-AF2/label_info.csv
-  work_dir: ./output/11d_topoqa_10.5A/BM55-AF2/work
-  output_file: ./output/11d_topoqa_10.5A/BM55-AF2/results/inference_results.csv
+  # set at cli
+  work_dir: null
+  # set at cli
+  output_file: null
+  # set at cli - use metadata from model_training to choose
   checkpoint: null
 
 batch_size: 32
