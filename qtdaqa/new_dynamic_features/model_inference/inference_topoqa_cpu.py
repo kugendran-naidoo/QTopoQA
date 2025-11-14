@@ -9,6 +9,7 @@ import logging
 import math
 import sys
 from pathlib import Path
+from collections import defaultdict
 from typing import TYPE_CHECKING, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import torch
@@ -45,8 +46,10 @@ class InferenceConfig:
     builder: BuilderConfig = dataclasses.field(default_factory=BuilderConfig)
     reuse_existing_graphs: bool = False
     use_checkpoint_schema: bool = True
-    edge_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
+    interface_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     topology_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
+    node_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
+    edge_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     training_root: Optional[Path] = None
     config_name: Optional[str] = None
 
@@ -123,7 +126,12 @@ def resolve_feature_schema(cfg: InferenceConfig, checkpoint_meta: Dict[str, obje
     topo_schema.update(cfg.topology_schema or {})
     if not edge_schema:
         raise ValueError("Edge schema unavailable. Provide one in the checkpoint or config.yaml")
-    return {"edge_schema": edge_schema, "topology_schema": topo_schema}
+    final: Dict[str, Dict[str, object]] = {"edge_schema": edge_schema, "topology_schema": topo_schema}
+    if cfg.interface_schema:
+        final["interface_schema"] = cfg.interface_schema
+    if cfg.node_schema:
+        final["node_schema"] = cfg.node_schema
+    return final
 
 
 def _guard_schema_overrides(cfg: InferenceConfig, checkpoint_meta: Dict[str, object]) -> None:
@@ -220,6 +228,8 @@ def _write_inference_schema_summary(
         "training_root": str(cfg.training_root) if cfg.training_root else None,
         "use_checkpoint_schema": cfg.use_checkpoint_schema,
         "overrides": {
+            "interface_schema": cfg.interface_schema,
+            "node_schema": cfg.node_schema,
             "edge_schema": cfg.edge_schema,
             "topology_schema": cfg.topology_schema,
         },
@@ -304,12 +314,18 @@ def load_config(raw_path: Path) -> InferenceConfig:
     use_checkpoint_schema = options_cfg.get("use_checkpoint_schema", True)
     use_checkpoint_schema = bool(use_checkpoint_schema)
 
-    edge_schema_cfg = data.get("edge_schema") or {}
-    if edge_schema_cfg and not isinstance(edge_schema_cfg, dict):
-        raise ValueError("edge_schema section must be a mapping when provided.")
+    interface_schema_cfg = data.get("interface_schema") or {}
+    if interface_schema_cfg and not isinstance(interface_schema_cfg, dict):
+        raise ValueError("interface_schema section must be a mapping when provided.")
     topology_schema_cfg = data.get("topology_schema") or {}
     if topology_schema_cfg and not isinstance(topology_schema_cfg, dict):
         raise ValueError("topology_schema section must be a mapping when provided.")
+    node_schema_cfg = data.get("node_schema") or {}
+    if node_schema_cfg and not isinstance(node_schema_cfg, dict):
+        raise ValueError("node_schema section must be a mapping when provided.")
+    edge_schema_cfg = data.get("edge_schema") or {}
+    if edge_schema_cfg and not isinstance(edge_schema_cfg, dict):
+        raise ValueError("edge_schema section must be a mapping when provided.")
 
     if checkpoint_raw:
         checkpoint_path = _resolve(checkpoint_raw, raw_path.parent)
@@ -332,8 +348,10 @@ def load_config(raw_path: Path) -> InferenceConfig:
         builder=builder_cfg,
         reuse_existing_graphs=reuse_existing,
         use_checkpoint_schema=use_checkpoint_schema,
+        interface_schema=interface_schema_cfg or {},
+        topology_schema=topology_schema_cfg or {},
+        node_schema=node_schema_cfg or {},
         edge_schema=edge_schema_cfg,
-        topology_schema=topology_schema_cfg,
         training_root=training_root,
         config_name=raw_path.name,
     )
@@ -367,16 +385,25 @@ class GraphInferenceDataset(Dataset):
         data.name = base_name
         data.model_key = model_key
 
-        # Resolve target using composite and fallback keys
-        candidate_keys = [model_key, base_name, normalised_name]
-        if "/" in model_key:
-            prefix, _, suffix = model_key.partition("/")
-            candidate_keys.extend(
-                [
-                    f"{prefix}/{base_name}",
-                    f"{prefix}/{normalised_name}",
-                ]
-            )
+        def _ordered_candidates() -> List[str]:
+            ordered: List[str] = []
+            seen = set()
+
+            def _add(entry: Optional[str]) -> None:
+                if entry and entry not in seen:
+                    ordered.append(entry)
+                    seen.add(entry)
+
+            _add(model_key)
+            if "/" in model_key:
+                prefix, _, _ = model_key.partition("/")
+                _add(f"{prefix}/{normalised_name}")
+                _add(f"{prefix}/{base_name}")
+            _add(base_name)
+            _add(normalised_name)
+            return ordered
+
+        candidate_keys = _ordered_candidates()
 
         target_value = None
         for candidate in candidate_keys:
@@ -441,6 +468,15 @@ def load_label_map(label_path: Path) -> LabelInfo:
 
     target_series = df[target_col] if target_col else None
 
+    conflict_targets: Dict[str, set] = defaultdict(set)
+
+    def _record_score(key: str, value: float, target: Optional[str]) -> None:
+        if "/" not in key:
+            existing = scores.get(key)
+            if existing is not None and not math.isclose(existing, value, rel_tol=1e-9, abs_tol=1e-9):
+                conflict_targets[key].add(target or "<unknown>")
+        scores[key] = value
+
     for idx, model_value in enumerate(model_series):
         raw_name = model_value.strip()
         norm_name = _normalise_model_name(raw_name)
@@ -464,13 +500,25 @@ def load_label_map(label_path: Path) -> LabelInfo:
             value = float(dockq_value)
             for key in composite_keys | base_keys:
                 if key:
-                    scores[key] = value
+                    _record_score(key, value, target_value)
 
         if target_value:
             for key in composite_keys:
                 targets[key] = target_value
             for key in base_keys:
                 targets.setdefault(key, target_value)
+
+    if conflict_targets:
+        preview = ", ".join(
+            f"{key} -> {', '.join(sorted(values))}"
+            for key, values in list(conflict_targets.items())[:5]
+        )
+        logging.warning(
+            "Label CSV %s contains duplicate unqualified model names mapped to multiple targets (examples: %s). "
+            "Ensure per-target names remain unique or rely on target-qualified keys.",
+            label_path,
+            preview,
+        )
 
     return LabelInfo(scores=scores, targets=targets)
 
@@ -907,8 +955,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             builder=builder_cfg,
             reuse_existing_graphs=args.reuse_existing_graphs,
             use_checkpoint_schema=True,
-            edge_schema={},
+            interface_schema={},
             topology_schema={},
+            node_schema={},
+            edge_schema={},
             training_root=_default_training_root(),
             config_name="(CLI parameters)",
         )

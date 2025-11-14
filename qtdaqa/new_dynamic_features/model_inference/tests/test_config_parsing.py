@@ -151,17 +151,29 @@ def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
           reuse_existing_graphs: true
           use_checkpoint_schema: false
 
+        interface_schema:
+          module: interface/polar_cutoff/v1
+          jobs: 4
         edge_schema:
           module: edge/legacy_band/v11
           dim: 11
         topology_schema:
           summary: {}
+          jobs: 5
+        node_schema:
+          module: node/dssp_topo_merge/v1
+          jobs: 6
         """,
     )
     cfg = inference_topoqa_cpu.load_config(cfg_path)
+    assert cfg.interface_schema["module"] == "interface/polar_cutoff/v1"
+    assert cfg.interface_schema["jobs"] == 4
     assert cfg.edge_schema["module"] == "edge/legacy_band/v11"
     assert cfg.edge_schema["dim"] == 11
-    assert cfg.topology_schema == {"summary": {}}
+    assert cfg.topology_schema["summary"] == {}
+    assert cfg.topology_schema["jobs"] == 5
+    assert cfg.node_schema["module"] == "node/dssp_topo_merge/v1"
+    assert cfg.node_schema["jobs"] == 6
     assert cfg.use_checkpoint_schema is False
 
 

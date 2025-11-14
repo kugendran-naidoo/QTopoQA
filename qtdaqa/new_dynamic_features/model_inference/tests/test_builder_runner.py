@@ -276,3 +276,23 @@ def test_build_schema_feature_payload_overrides_edge_params() -> None:
     assert payload is not None
     assert payload["edge"]["module"] == "edge/legacy_band/v11"
     assert payload["edge"]["params"]["distance_max"] == 9.0
+
+
+def test_build_schema_feature_payload_copies_stage_jobs() -> None:
+    payload = _build_schema_feature_payload(
+        {
+            "interface_schema": {"module": "interface/custom", "jobs": 5},
+            "topology_schema": {"module": "topology/persistence_basic/v1", "jobs": 6},
+            "node_schema": {"module": "node/dssp_topo_merge/v1", "jobs": 7},
+            "edge_schema": {
+                "module": "edge/legacy_band/v11",
+                "module_params": {"distance_max": 9.0},
+                "jobs": 8,
+            },
+        }
+    )
+    assert payload is not None
+    assert payload["interface"]["jobs"] == 5
+    assert payload["topology"]["jobs"] == 6
+    assert payload["node"]["jobs"] == 7
+    assert payload["edge"]["jobs"] == 8
