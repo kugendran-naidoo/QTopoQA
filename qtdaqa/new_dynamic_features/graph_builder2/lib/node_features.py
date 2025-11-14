@@ -3,9 +3,13 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from Bio.PDB import PDBParser
 from Bio.PDB.DSSP import DSSP
 from sklearn.preprocessing import MinMaxScaler
+
+try:  # pragma: no cover - fallback for standalone execution
+    from .pdb_utils import create_pdb_parser
+except ImportError:  # pragma: no cover
+    from pdb_utils import create_pdb_parser  # type: ignore
 
 warnings.filterwarnings(
     "ignore",
@@ -75,7 +79,7 @@ class node_fea:
         return one_hot_array
 
     def run_dssp(self, pdb_file) -> pd.DataFrame:
-        parser = PDBParser(QUIET=True)
+        parser = create_pdb_parser()
         structure = parser.get_structure(self.model_name, pdb_file)
         model = structure[0]
         try:

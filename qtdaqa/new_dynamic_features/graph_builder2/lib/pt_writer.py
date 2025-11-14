@@ -16,8 +16,12 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 import numpy as np
 import pandas as pd
 import torch
-from Bio.PDB import PDBParser
 from torch_geometric.data import Data
+
+try:  # pragma: no cover - support running as a script
+    from .pdb_utils import create_pdb_parser
+except ImportError:  # pragma: no cover
+    from pdb_utils import create_pdb_parser  # type: ignore
 
 try:  # when imported via package
     from .config import BuilderConfig, EdgeBand
@@ -99,7 +103,7 @@ class InterfaceResidue:
 
 class StructureCache:
     def __init__(self, pdb_path: Path):
-        parser = PDBParser(QUIET=True)
+        parser = create_pdb_parser()
         self.structure = parser.get_structure("protein", str(pdb_path))
 
     def get_residue(self, chain_id: str, residue_seq: int, insertion_code: str):

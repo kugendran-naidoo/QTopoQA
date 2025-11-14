@@ -1,3 +1,11 @@
+time ./run_graph_builder2.sh --pdb-warnings \
+  --dataset-dir datasets/training/adjusted/Dockground_MAF2 \
+  --work-dir qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10.5A/work \
+  --graph-dir qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10.5A/graph_data \
+  --log-dir qtdaqa/new_dynamic_features/graph_builder2/logs_edge_pairing_topoqa_10.5A \
+  --jobs 6 \
+  --feature-config qtdaqa/new_dynamic_features/graph_builder2/feature-config.yaml.edge_pairing_topoqa_10.5A
+
 # Dynamic Graph Builder
 
 This directory contains the feature-extraction engine for the dynamic TopoQA
@@ -143,6 +151,12 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
   thresholds, optional long-band masks, and lightweight feature scaling. Select it
   when you want the geometric expressiveness of multi-scale edges without giving up
   the DockQ-friendly histogram behavior.
+- `edge/legacy_plus_topo_pair` – builds on the 11‑D legacy module and appends
+  20 persistent-homology statistics per edge. By default it considers the two
+  residues forming the edge plus neighbors within 4 Å, runs a small Rips complex,
+  and concatenates the topology summary to the histogram vector. Tune
+  `neighbor_distance`, `include_neighbors`, `filtration_cutoff`, and
+  `min_persistence` to control the geometric context captured for each pair.
 
 ---
 

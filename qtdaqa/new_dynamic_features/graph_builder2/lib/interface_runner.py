@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from .new_calculate_interface import process_pdb_file
+from .progress import StageProgress
 from .stage_common import structure_model_key
 
 
@@ -80,6 +81,8 @@ def run_interface_stage(
     failures: List[Tuple[Path, Path, str]] = []
     elapsed = 0.0
 
+    progress = StageProgress("Interface", len(tasks))
+
     if tasks:
         start = time.perf_counter()
         if worker_count <= 1:
@@ -92,6 +95,8 @@ def run_interface_stage(
                 except Exception as exc:  # pragma: no cover
                     failures.append((pdb_path, log_path, str(exc)))
                     log_path.write_text(f"Failure: {exc}\n", encoding="utf-8")
+                finally:
+                    progress.increment()
         else:
             with ProcessPoolExecutor(max_workers=worker_count) as executor:
                 future_to_task = {
@@ -108,6 +113,8 @@ def run_interface_stage(
                     except Exception as exc:  # pragma: no cover
                         failures.append((pdb_path, log_path, str(exc)))
                         log_path.write_text(f"Failure: {exc}\n", encoding="utf-8")
+                    finally:
+                        progress.increment()
         elapsed = time.perf_counter() - start
 
     return {

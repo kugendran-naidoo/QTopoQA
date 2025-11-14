@@ -5,7 +5,11 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
-from Bio.PDB import PDBParser
+
+try:  # pragma: no cover - support direct execution
+    from .pdb_utils import create_pdb_parser
+except ImportError:  # pragma: no cover
+    from pdb_utils import create_pdb_parser  # type: ignore
 
 
 @dataclass
@@ -20,7 +24,7 @@ class InterfaceResidue:
 
 class StructureCache:
     def __init__(self, pdb_path: Path):
-        parser = PDBParser(QUIET=True)
+        parser = create_pdb_parser()
         self.structure = parser.get_structure("protein", str(pdb_path))
 
     def get_residue(self, chain_id: str, residue_seq: int, insertion_code: str):
