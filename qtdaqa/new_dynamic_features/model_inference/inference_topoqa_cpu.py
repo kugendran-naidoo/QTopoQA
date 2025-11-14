@@ -236,16 +236,17 @@ def load_config(raw_path: Path) -> InferenceConfig:
     if not isinstance(paths_cfg, dict):
         raise ValueError("Inference configuration must contain a 'paths' mapping.")
 
-    def _require(key: str) -> object:
-        if key not in paths_cfg:
-            raise KeyError(f"paths.{key} is required in inference configuration.")
-        return paths_cfg[key]
+    def _require_or_none(key: str) -> Optional[object]:
+        return paths_cfg.get(key)
 
-    data_dir = _resolve(_require("data_dir"), raw_path.parent)
-    work_dir = _resolve(_require("work_dir"), raw_path.parent)
+    data_dir_raw = _require_or_none("data_dir")
+    work_dir_raw = _require_or_none("work_dir")
     checkpoint_raw = paths_cfg.get("checkpoint")
     training_root_raw = paths_cfg.get("training_root")
-    output_file = _resolve(_require("output_file"), raw_path.parent)
+    output_file_raw = _require_or_none("output_file")
+    data_dir = _resolve(data_dir_raw, raw_path.parent) if data_dir_raw else None
+    work_dir = _resolve(work_dir_raw, raw_path.parent) if work_dir_raw else None
+    output_file = _resolve(output_file_raw, raw_path.parent) if output_file_raw else None
     label_file_raw = paths_cfg.get("label_file")
     label_file = _resolve(label_file_raw, raw_path.parent) if label_file_raw else None
     training_root = (
@@ -753,9 +754,11 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--checkpoint-path", type=str, help="Checkpoint (.ckpt/.chkpt) path")
     parser.add_argument("--output-file", type=str, help="CSV path for predictions")
     parser.add_argument("--label-file", type=str, help="Optional label CSV")
-    parser.add_argument("--batch-size", type=int, default=32)
-    parser.add_argument("--num-workers", type=int, default=0)
-    parser.add_argument("--builder-jobs", type=int, default=4, help="Worker count for graph builder stages.")
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--num-workers", type=int, default=None)
+    parser.add_argument(
+        "--builder-jobs", type=int, default=None, help="Worker count for graph builder stages."
+    )
     parser.add_argument(
         "--reuse-existing-graphs",
         action="store_true",
@@ -782,7 +785,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             raise SystemExit(f"Missing required arguments without --config: {', '.join(missing)}")
 
         builder_cfg = BuilderConfig(
-            jobs=args.builder_jobs,
+            jobs=args.builder_jobs if args.builder_jobs is not None else 4,
         )
 
         cfg = InferenceConfig(
@@ -791,8 +794,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             checkpoint_path=_resolve(args.checkpoint_path, Path.cwd()),
             output_file=_resolve(args.output_file, Path.cwd()),
             label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else None,
-            batch_size=args.batch_size,
-            num_workers=args.num_workers,
+            batch_size=args.batch_size if args.batch_size is not None else 32,
+            num_workers=args.num_workers if args.num_workers is not None else 0,
             builder=builder_cfg,
             reuse_existing_graphs=args.reuse_existing_graphs,
             use_checkpoint_schema=True,
@@ -801,6 +804,50 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             training_root=_default_training_root(),
             config_name="(CLI parameters)",
         )
+
+    def _merge_cli_overrides(config: InferenceConfig) -> InferenceConfig:
+        data_dir = config.data_dir
+        work_dir = config.work_dir
+        checkpoint_path = config.checkpoint_path
+        output_file = config.output_file
+
+        if args.data_dir:
+            data_dir = _resolve(args.data_dir, Path.cwd())
+        if args.work_dir:
+            work_dir = _resolve(args.work_dir, Path.cwd())
+        if args.checkpoint_path:
+            checkpoint_path = _resolve(args.checkpoint_path, Path.cwd())
+        if args.output_file:
+            output_file = _resolve(args.output_file, Path.cwd())
+
+        missing = []
+        if data_dir is None:
+            missing.append("data_dir")
+        if work_dir is None:
+            missing.append("work_dir")
+        if checkpoint_path is None:
+            missing.append("checkpoint_path")
+        if output_file is None:
+            missing.append("output_file")
+        if missing:
+            raise SystemExit(f"Missing required inference paths (config + CLI): {', '.join(missing)}")
+
+        return dataclasses.replace(
+            config,
+            data_dir=data_dir,
+            work_dir=work_dir,
+            checkpoint_path=checkpoint_path,
+            output_file=output_file,
+            label_file=_resolve(args.label_file, Path.cwd()) if args.label_file else config.label_file,
+            batch_size=args.batch_size if args.batch_size is not None else config.batch_size,
+            num_workers=args.num_workers if args.num_workers is not None else config.num_workers,
+            builder=BuilderConfig(
+                jobs=args.builder_jobs if args.builder_jobs is not None else config.builder.jobs
+            ),
+            reuse_existing_graphs=args.reuse_existing_graphs or config.reuse_existing_graphs,
+        )
+
+    cfg = _merge_cli_overrides(cfg)
 
     checkpoint_meta = extract_feature_metadata(cfg.checkpoint_path)
     if args.dump_metadata:
