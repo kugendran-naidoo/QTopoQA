@@ -220,26 +220,37 @@ def _discover_summary_path(graph_dir: Path, explicit: Optional[Path]) -> Optiona
         path = explicit.resolve()
         return path if path.exists() else None
 
+    def _candidate_logs_dirs(parent: Path) -> List[Path]:
+        candidates: List[Path] = []
+        default_logs = parent / "logs"
+        if default_logs.is_dir():
+            candidates.append(default_logs)
+        try:
+            for entry in parent.iterdir():
+                if entry.is_dir() and entry.name.startswith("logs") and entry not in candidates:
+                    candidates.append(entry)
+        except OSError:
+            pass
+        return candidates
+
     target_dir = graph_dir.resolve()
     for parent in graph_dir.parents:
-        logs_dir = parent / "logs"
-        if not logs_dir.is_dir():
-            continue
-        for summary in sorted(logs_dir.rglob("graph_builder_summary.json"), reverse=True):
-            try:
-                data = _load_json(summary)
-            except (OSError, json.JSONDecodeError):
-                continue
-            edge_info = data.get("edge", {})
-            output_dir = edge_info.get("output_dir")
-            if not output_dir:
-                continue
-            try:
-                output_path = Path(output_dir).resolve()
-            except OSError:
-                continue
-            if output_path == target_dir:
-                return summary.resolve()
+        for logs_dir in _candidate_logs_dirs(parent):
+            for summary in sorted(logs_dir.rglob("graph_builder_summary.json"), reverse=True):
+                try:
+                    data = _load_json(summary)
+                except (OSError, json.JSONDecodeError):
+                    continue
+                edge_info = data.get("edge", {})
+                output_dir = edge_info.get("output_dir")
+                if not output_dir:
+                    continue
+                try:
+                    output_path = Path(output_dir).resolve()
+                except OSError:
+                    continue
+                if output_path == target_dir:
+                    return summary.resolve()
     return None
 
 

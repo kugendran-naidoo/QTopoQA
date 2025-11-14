@@ -100,3 +100,17 @@ def test_load_graph_feature_metadata_uses_per_graph_builder_when_missing(tmp_pat
     metadata = fm.load_graph_feature_metadata(graph_dir, max_pt_samples=1)
     assert metadata.builder_id() == "graph_builder"
     assert metadata.builder_feature_config_path() == "/tmp/legacy.yaml"
+
+
+def test_discover_summary_path_supports_prefixed_logs(tmp_path: Path) -> None:
+    graph_dir = tmp_path / "gb2" / "output" / "graph_data"
+    graph_dir.mkdir(parents=True, exist_ok=True)
+
+    logs_dir = tmp_path / "gb2" / "logs_11d_topoqa"
+    summary = logs_dir / "graph_builder_summary.json"
+    summary.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"edge": {"output_dir": str(graph_dir)}}
+    summary.write_text(json.dumps(payload), encoding="utf-8")
+
+    discovered = fm._discover_summary_path(graph_dir, explicit=None)
+    assert discovered == summary.resolve()

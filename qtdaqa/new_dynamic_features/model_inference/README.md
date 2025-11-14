@@ -1,3 +1,7 @@
+time ./run_model_inference.sh \
+--config qtdaqa/new_dynamic_features/model_inference/config.yaml.BM55-AF2 \
+--log-level INFO 2>&1 | tee BM55-AF2_11d_topoqa_10.5A_$(date +%Y%m%d_%H%M%S).log
+
 # Dynamic Inference Pipeline
 
 This directory contains the inference stack for dynamic TopoQA models. It takes

@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import shutil
 import sys
 import time
 from pathlib import Path
@@ -32,12 +33,14 @@ try:
     from .lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
     from .lib.log_dirs import LogDirectoryInfo, prepare_log_directory
     from .lib.stage_common import index_structures
+    from .lib.pdb_utils import configure_pdb_parser
     from .builder_info import build_builder_info
 except ImportError:  # pragma: no cover - fallback for direct execution
     from lib.features_config import FeatureSelection, load_feature_config
     from lib.directory_permissions import ensure_tree_readable, ensure_tree_readwrite
     from lib.log_dirs import LogDirectoryInfo, prepare_log_directory
     from lib.stage_common import index_structures
+    from lib.pdb_utils import configure_pdb_parser  # type: ignore
     from builder_info import build_builder_info
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -270,6 +273,11 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_const",
         const=False,
         help="Disable writing per-structure edge CSV dumps.",
+    )
+    parser.add_argument(
+        "--pdb-warnings",
+        action="store_true",
+        help="Emit Bio.PDB structure parsing warnings instead of suppressing them.",
     )
     return parser
 
@@ -792,6 +800,7 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     run_info = prepare_log_directory(log_root, run_prefix="graph_builder")
     _setup_logging(run_info)
+    configure_pdb_parser(bool(getattr(args, "pdb_warnings", False)))
 
     try:
         selection = _resolve_feature_config(args)
@@ -1015,6 +1024,18 @@ def main(argv: Optional[List[str]] = None) -> int:
         edge_result,
     )
     LOG.info("Summary log written to %s", _relative_path(text_summary_path, run_info.root_dir))
+
+    def _copy_metadata_into_graph_dir(source: Path, destination: Path, label: str) -> None:
+        try:
+            shutil.copy2(source, destination)
+            LOG.info("Copied %s to %s", label, _relative_path(destination, run_info.root_dir))
+        except OSError as exc:
+            LOG.warning("Unable to copy %s to %s: %s", label, destination, exc)
+
+    graph_summary_json = graph_dir / "graph_builder_summary.json"
+    graph_summary_log = graph_dir / "graph_builder_summary.log"
+    _copy_metadata_into_graph_dir(summary_log, graph_summary_json, "graph builder summary")
+    _copy_metadata_into_graph_dir(text_summary_path, graph_summary_log, "graph builder text summary")
 
     if edge_result["success"] == 0:
         LOG.error("No graphs produced. See logs for details.")

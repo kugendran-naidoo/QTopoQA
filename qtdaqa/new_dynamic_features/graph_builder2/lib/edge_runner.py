@@ -23,6 +23,7 @@ from .stage_common import (
 )
 from .edge_common import InterfaceResidue, StructureCache
 from .edge_dim_guard import ensure_edge_feature_dim
+from .progress import StageProgress
 from .schema_summary import write_schema_summary
 
 try:  # support execution as package or script
@@ -175,6 +176,8 @@ def run_edge_stage(
 
     start = time.perf_counter()
 
+    progress = StageProgress("Graph assembly", len(tasks))
+
     if worker_count <= 1:
         for task in tasks:
             result = _process_task(
@@ -190,6 +193,7 @@ def run_edge_stage(
             else:
                 success += 1
                 edge_dim = result["edge_dim"]
+            progress.increment()
     else:
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             future_map = {
@@ -211,6 +215,7 @@ def run_edge_stage(
                 else:
                     success += 1
                     edge_dim = result["edge_dim"]
+                progress.increment()
 
     if builder_metadata_full:
         metadata_records["_builder"] = builder_metadata_full

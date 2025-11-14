@@ -1,0 +1,63 @@
+{
+  "train": {
+    "total": 8723,
+    "usable": 8694,
+    "coverage": 0.9966754556918491,
+    "missing": [
+      "1A9X",
+      "1HT9",
+      "1OAO",
+      "1R0R",
+      "1SBW",
+      "2BTV",
+      "2F6A",
+      "2OPO",
+      "2W6A",
+      "3FRY",
+      "3I84",
+      "3N6R",
+      "3NMD",
+      "3TRT",
+      "3U6X",
+      "3V89",
+      "3VM9",
+      "4BJQ",
+      "4BK0",
+      "4E6K",
+      "4FBW",
+      "4LL8",
+      "4PKF",
+      "4YFD",
+      "5FIY",
+      "5VR2",
+      "6HCZ",
+      "6J52",
+      "6LH6"
+    ]
+  },
+  "val": {
+    "total": 3397,
+    "usable": 3379,
+    "coverage": 0.9947012069473065,
+    "missing": [
+      "1H59",
+      "2B5L",
+      "2C7M",
+      "2GZH",
+      "2W19",
+      "2WJV",
+      "3HXJ",
+      "3IAX",
+      "3M0D",
+      "3QDR",
+      "4HOB",
+      "4Q2O",
+      "4XLR",
+      "5F5P",
+      "5L6N",
+      "6DBP",
+      "6FV5",
+      "6VUD"
+    ]
+  }
+}

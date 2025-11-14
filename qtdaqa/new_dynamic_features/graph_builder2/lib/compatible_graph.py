@@ -19,6 +19,11 @@ from Bio import PDB
 from sklearn.preprocessing import MinMaxScaler
 from torch_geometric import data as DATA
 
+try:  # pragma: no cover
+    from .pdb_utils import create_pdb_parser
+except ImportError:  # pragma: no cover
+    from pdb_utils import create_pdb_parser  # type: ignore
+
 
 def get_topo_col() -> List[str]:
     e_set = [["C"], ["N"], ["O"], ["C", "N"], ["C", "O"], ["N", "O"], ["C", "N", "O"]]
@@ -172,7 +177,7 @@ def create_graph_compat(model_name: str, node_dir: str, vertice_dir: str, List_c
         vertice_df_filter = pd.merge(fea_df, vertice_df, how="left", on="ID")[["ID", "co_1", "co_2", "co_3"]]
         fea_col = get_all_col()
 
-        parser = PDB.PDBParser(QUIET=True)
+        parser = create_pdb_parser()
         structure = parser.get_structure("protein", pdb_file)
         model = structure[0]
 
@@ -192,4 +197,3 @@ def create_graph_compat(model_name: str, node_dir: str, vertice_dir: str, List_c
             torch.save(GCNData, graph_path)
     except Exception as e:
         print(f"error in protein {model_name}: {e}")
-

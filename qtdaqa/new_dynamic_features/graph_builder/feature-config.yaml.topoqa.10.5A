@@ -44,12 +44,12 @@ node:
     jobs: 4
 edge:
   module: edge/legacy_band/v11
-  alias: "11D TopoQA default 10A cut-off"
+  alias: "11D TopoQA non-default 10.5A cut-off"
   summary: 11D legacy edge features (distance + atom distance histogram).
   description: Reproduces the original 11-dimensional edge attributes consisting of
     residue pair distance and a 10-bin histogram of inter-atomic distances, scaled
     to [0, 1].
   params:
     distance_min: 0.0
-    distance_max: 10.0
+    distance_max: 10.5
     scale_features: true

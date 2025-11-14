@@ -1,0 +1,132 @@
+{
+  "run_name": "sched_boost_seed1337_2025-11-13_23-22-18_phase2_seed888",
+  "created": "2025-11-14T06:25:45.372374",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed888.yaml",
+  "overrides": {
+    "paths.graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10.5A/graph_data"
+  },
+  "notes": null,
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed1337_2025-11-13_23-22-18_phase2_seed888/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed1337_2025-11-13_23-22-18_phase2_seed888",
+    "--git-commit",
+    "fa65eaa33",
+    "--git-dirty",
+    "--resume-from",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed1337_2025-11-13_23-22-18_phase1/model_checkpoints/checkpoint.val-0.03826_epoch097.chkpt"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  },
+  "training_parameters": {
+    "trainer": {
+      "num_epochs": 320,
+      "accumulate_grad_batches": 16,
+      "precision": 32,
+      "accelerator": "cpu",
+      "devices": 1
+    },
+    "dataloader": {
+      "batch_size": 16,
+      "num_workers": 0,
+      "seed": 888
+    },
+    "fast_dev_run": false
+  },
+  "selection_primary_metric": "val_loss",
+  "selection": {
+    "primary_metric": "val_loss",
+    "use_val_spearman": true,
+    "spearman_weight": 1.0,
+    "spearman_min_delta": 0.0,
+    "secondary_metric": "val_spearman_corr"
+  },
+  "runtime": {
+    "training_seconds": 1716,
+    "epochs_completed": 48,
+    "epochs_total": 320,
+    "epoch_seconds": [
+      25,
+      17,
+      18,
+      24,
+      24,
+      27,
+      25,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      26,
+      27,
+      27,
+      27,
+      29,
+      28,
+      29,
+      28,
+      28,
+      31,
+      27,
+      27,
+      47,
+      101,
+      174,
+      157,
+      75,
+      34,
+      32,
+      32,
+      37,
+      35,
+      33,
+      36,
+      35,
+      33,
+      27,
+      20,
+      19,
+      19,
+      20,
+      20
+    ],
+    "epoch_seconds_stats": {
+      "mean": 35.73719952521302,
+      "median": 26.786993311950937,
+      "min": 17.275570458266884,
+      "max": 173.7454184172675
+    }
+  },
+  "checkpoints": {
+    "primary_metric": "val_loss",
+    "primary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed1337_2025-11-13_23-22-18_phase2_seed888/model_checkpoints/checkpoint.val-0.03823_epoch100.chkpt",
+    "alternates": {
+      "selection_metric": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed1337_2025-11-13_23-22-18_phase2_seed888/model_checkpoints/selection_metric_checkpoints/alt_selection.sel--0.74133_val-0.03856_epoch099.ckpt"
+    }
+  },
+  "mlflow": {
+    "run_id": "0393317a589247fa9a4782247fd8c244",
+    "experiment": "dynamic_topoqa",
+    "experiment_id": "195331767355654522",
+    "run_name": "sched_boost_seed1337_2025-11-13_23-22-18_phase2_seed888",
+    "tracking_uri": "./qtdaqa/new_dynamic_features/model_training/ml_runs"
+  },
+  "completed": "2025-11-14T06:54:32.671247",
+  "artifacts": {
+    "logs_dir": "logs",
+    "metrics_dir": "metrics"
+  }
+}

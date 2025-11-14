@@ -1,0 +1,75 @@
+# Auto-generated feature-config template
+# Pick one module per required stage. Edit parameter values as needed.
+# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.
+defaults:
+  jobs: 6  # Optional global worker override; remove if unused.
+
+# REQUIRED stage: interface
+interface:
+  module: interface/polar_cutoff/v1  # alias: TopoQA default 10A cut-off
+  alias: "n x 3D TopoQA non-default 10.5A cut-off"
+  summary: "Polar interface detection using distance cutoff."
+  description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
+  params:
+    cutoff: 10.5
+    coordinate_decimals: -1  # skip rounding to keep raw coords
+    jobs: 6
+
+# OPTIONAL stage: topology
+topology:
+  module: topology/persistence_basic/v1  # alias: TopoQA default
+  alias: "140D TopoQA default"
+  summary: "Persistent homology features with configurable distance thresholds."
+  description: "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input."
+  params:
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    dedup_sort: false
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    jobs: 6
+
+# REQUIRED stage: node
+node:
+  module: node/dssp_topo_merge/v1  # alias: TopoQA default
+  alias: "172D (140D + 32D) TopoQA default"
+  summary: "DSSP-derived node features merged with topology statistics."
+  description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
+  params:
+    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 6
+
+# REQUIRED stage: edge
+edge:
+  module: edge/legacy_band/v11
+  alias: "TopoQA non-default 10.5A cutoff"
+  summary: "11D legacy edge features (distance + atom distance histogram)."
+  description: "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1]."
+  params:
+    distance_min: 0.0
+    distance_max: 10.5
+    scale_features: true
+    jobs: 6
+
+# Alternate edge module (legacy histogram + pair-wise topology augment):
+# edge:
+#   module: edge/legacy_plus_topo_pair
+#   alias: "Legacy histogram + pair topology"
+#   summary: "11D legacy edges augmented with pair-wise topological summaries."
+#   description: "Extends the legacy histogram features by computing persistent homology summaries over the two residues (optionally including nearby residues) before concatenating them to the edge vector."
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.5
+#     scale_features: true
+#     neighbor_distance: 4.0
+#     include_neighbors: true
+#     filtration_cutoff: 8.0
+#     min_persistence: 0.01
+#     jobs: 6

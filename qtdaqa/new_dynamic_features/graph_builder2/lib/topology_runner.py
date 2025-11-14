@@ -11,6 +11,7 @@ from .new_topological_features import (
     TopologicalConfig,
     compute_features_for_residues,
 )
+from .progress import StageProgress
 
 _INTERFACE_DESCRIPTOR_RE = re.compile(
     r"^c<(?P<chain>[^>]+)>r<(?P<res>-?\d+)>(?:i<(?P<ins>[^>]+)>)?R<(?P<resname>[^>]+)>$"
@@ -97,6 +98,8 @@ def run_topology_stage(
         dedup_sort=dedup_sort,
     )
 
+    progress = StageProgress("Topology", len(tasks))
+
     if tasks:
         start = time.perf_counter()
         if worker_count <= 1:
@@ -104,6 +107,7 @@ def run_topology_stage(
                 success += _process_single_topology_task(
                     pdb_path, interface_path, output_path, log_path, config, failures
                 )
+                progress.increment()
         else:
             with ProcessPoolExecutor(max_workers=worker_count) as executor:
                 future_to_meta = {
@@ -144,6 +148,8 @@ def run_topology_stage(
                                 + "\n",
                                 encoding="utf-8",
                             )
+                    finally:
+                        progress.increment()
         elapsed = time.perf_counter() - start
 
     return {

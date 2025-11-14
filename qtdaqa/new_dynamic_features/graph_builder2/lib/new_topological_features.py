@@ -44,10 +44,15 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 import gudhi
 import numpy as np
 import pandas as pd
-from Bio.PDB import NeighborSearch, PDBParser
+from Bio.PDB import NeighborSearch
 from Bio.PDB.Atom import Atom
 from Bio.PDB.Residue import Residue
 from Bio.PDB.Structure import Structure
+
+try:  # pragma: no cover
+    from .pdb_utils import create_pdb_parser
+except ImportError:  # pragma: no cover
+    from pdb_utils import create_pdb_parser  # type: ignore
 
 LOGGER = logging.getLogger(__name__)
 
@@ -172,7 +177,7 @@ class TopologicalConfig:
 
 @lru_cache(maxsize=16)
 def _load_structure_cached(path_str: str) -> Structure:
-    parser = PDBParser(QUIET=True)
+    parser = create_pdb_parser()
     return parser.get_structure("structure", path_str)
 
 

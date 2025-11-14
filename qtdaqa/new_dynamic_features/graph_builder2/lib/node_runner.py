@@ -13,6 +13,7 @@ import pandas as pd
 
 from .node_features import node_fea
 from .node_utils import canonical_id_order
+from .progress import StageProgress
 from .stage_common import (
     gather_files,
     normalise_interface_name,
@@ -161,6 +162,8 @@ def run_node_stage(
     elapsed = 0.0
     task_map = {task.model_key: task for task in node_tasks}
 
+    progress = StageProgress("Node", len(node_tasks))
+
     if node_tasks:
         start = time.perf_counter()
         worker_count = max(1, int(jobs)) if jobs else 1
@@ -171,6 +174,7 @@ def run_node_stage(
                     failures.append((model_key, task.log_path, error))
                 else:
                     success += 1
+                progress.increment()
         else:
             with ThreadPoolExecutor(max_workers=worker_count) as executor:
                 future_map = {executor.submit(_process_task, task, drop_na): task.model_key for task in node_tasks}
@@ -180,6 +184,7 @@ def run_node_stage(
                         failures.append((model_key, task_map[model_key].log_path, error))
                     else:
                         success += 1
+                    progress.increment()
         elapsed = time.perf_counter() - start
 
     return {
