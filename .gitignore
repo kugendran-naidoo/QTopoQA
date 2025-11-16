@@ -8,6 +8,10 @@ __pycache__/
 
 # Mac
 .DS_Store
+
+# keep empty directories although ignored
+temp/*
+
 # keep empty directories although ignored
 datasets/evaluation/*
 !datasets/evaluation/.gitkeep
