@@ -1,10 +1,17 @@
+OUTPUT="output/11d_topoqa_10A"
+FEATURE_FILE="feature-config.yaml.topoqa.10A"
+
+# mk dirs
+mkdir -p ${OUTPUT}/work
+mkdir -p ${OUTPUT}/graph_data
+
 time ./run_graph_builder2.sh --pdb-warnings \
   --dataset-dir datasets/training/adjusted/Dockground_MAF2 \
-  --work-dir qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10.5A/work \
-  --graph-dir qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10.5A/graph_data \
-  --log-dir qtdaqa/new_dynamic_features/graph_builder2/logs_edge_pairing_topoqa_10.5A \
-  --jobs 6 \
-  --feature-config qtdaqa/new_dynamic_features/graph_builder2/feature-config.yaml.edge_pairing_topoqa_10.5A
+  --work-dir qtdaqa/new_dynamic_features/graph_builder2/output/${OUTPUT}/work \
+  --graph-dir qtdaqa/new_dynamic_features/graph_builder2/output/${OUTPUT}/graph_data \
+  --log-dir qtdaqa/new_dynamic_features/graph_builder2/logs_${OUTPUT} \
+  --jobs 16 \
+  --feature-config qtdaqa/new_dynamic_features/graph_builder2/${FEATURE_FILE}
 
 # Dynamic Graph Builder
 

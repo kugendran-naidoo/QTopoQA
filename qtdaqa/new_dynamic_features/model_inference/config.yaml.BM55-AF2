@@ -21,4 +21,4 @@ builder:
 
 # Optional run-time behaviour toggles
 options:
-  reuse_existing_graphs: false
+  reuse_existing_graphs: true
