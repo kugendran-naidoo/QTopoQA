@@ -17,12 +17,10 @@ from qtdaqa.new_dynamic_features.common.feature_metadata import (
     GraphFeatureMetadata,
     load_graph_feature_metadata,
 )
-from qtdaqa.new_dynamic_features.graph_builder.lib.features_config import DEFAULT_FEATURES
+from qtdaqa.new_dynamic_features.graph_builder2.lib.features_config import DEFAULT_FEATURES
 
-LEGACY_BUILDER_MODULE = "qtdaqa.new_dynamic_features.graph_builder.graph_builder"
 GRAPH_BUILDER2_MODULE = "qtdaqa.new_dynamic_features.graph_builder2.graph_builder2"
 _BUILDER_MODULES = {
-    "graph_builder": LEGACY_BUILDER_MODULE,
     "graph_builder2": GRAPH_BUILDER2_MODULE,
 }
 
@@ -247,7 +245,7 @@ def _determine_builder_choice(cfg, feature_metadata: Any) -> Tuple[str, str]:
             return module, source
         if value:
             logging.warning("Unknown builder override '%s' from %s; falling back to defaults.", value, source)
-    return LEGACY_BUILDER_MODULE, "default"
+    return GRAPH_BUILDER2_MODULE, "default"
 
 
 def _write_builder_snapshot_config(
@@ -384,7 +382,7 @@ def run_graph_builder(
 
     feature_config_path = metadata_feature_config or cfg.builder.prepare_feature_config(cfg.work_dir)
 
-    module_path = builder_module or LEGACY_BUILDER_MODULE
+    module_path = builder_module or GRAPH_BUILDER2_MODULE
 
     cmd = [
         sys.executable,
