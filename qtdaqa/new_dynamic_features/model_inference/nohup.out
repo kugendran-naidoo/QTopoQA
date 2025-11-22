@@ -1,0 +1,570 @@
+Running Inference on BM55-AF2 in edge_pairing_topoqa_10A
+Running Inference on HAF2 in edge_pairing_topoqa_10A
+Running Inference on ABAG-AF3 in edge_pairing_topoqa_10A
+2025-11-16 13:41:09,718 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt (score=0.048617444932460785, run=sched_boost_lr035_seed1337_2025-11-16_10-26-21) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-16 13:41:09,719 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt (score=0.048617444932460785, run=sched_boost_lr035_seed1337_2025-11-16_10-26-21) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-16 13:41:09,719 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt (score=0.048617444932460785, run=sched_boost_lr035_seed1337_2025-11-16_10-26-21) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-16 13:41:09,724 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 31,
+    "module": "edge/legacy_plus_topo_pair",
+    "variant": "legacy_plus_topo_pair",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "filtration_cutoff": 8.0,
+      "include_neighbors": true,
+      "jobs": 12,
+      "min_persistence": 0.01,
+      "neighbor_distance": 4.0,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10A/graph_data/graph_metadata.json",
+    "alias": "Legacy 11D + pair topology 10A",
+    "jobs": 12,
+    "summary": "11-D legacy edges augmented with pair-wise topological summaries."
+  },
+  "topology_schema": {}
+}
+2025-11-16 13:41:09,724 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 31,
+    "module": "edge/legacy_plus_topo_pair",
+    "variant": "legacy_plus_topo_pair",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "filtration_cutoff": 8.0,
+      "include_neighbors": true,
+      "jobs": 12,
+      "min_persistence": 0.01,
+      "neighbor_distance": 4.0,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10A/graph_data/graph_metadata.json",
+    "alias": "Legacy 11D + pair topology 10A",
+    "jobs": 12,
+    "summary": "11-D legacy edges augmented with pair-wise topological summaries."
+  },
+  "topology_schema": {}
+}
+2025-11-16 13:41:09,724 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 31,
+    "module": "edge/legacy_plus_topo_pair",
+    "variant": "legacy_plus_topo_pair",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "filtration_cutoff": 8.0,
+      "include_neighbors": true,
+      "jobs": 12,
+      "min_persistence": 0.01,
+      "neighbor_distance": 4.0,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pairing_topoqa_10A/graph_data/graph_metadata.json",
+    "alias": "Legacy 11D + pair topology 10A",
+    "jobs": 12,
+    "summary": "11-D legacy edges augmented with pair-wise topological summaries."
+  },
+  "topology_schema": {}
+}
+2025-11-16 13:41:09,724 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results"
+}
+2025-11-16 13:41:09,724 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results"
+}
+2025-11-16 13:41:09,724 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 6,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results"
+}
+2025-11-16 13:41:09,724 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/feature_metadata.json
+2025-11-16 13:41:09,724 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/feature_metadata.json
+2025-11-16 13:41:09,724 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/feature_metadata.json
+2025-11-16 13:41:09,725 INFO 
+2025-11-16 13:41:09,725 INFO 
+2025-11-16 13:41:09,725 INFO 
+2025-11-16 13:41:09,725 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt
+2025-11-16 13:41:09,725 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt
+2025-11-16 13:41:09,725 INFO Inference config: config.yaml.HAF2
+2025-11-16 13:41:09,725 INFO 
+2025-11-16 13:41:09,725 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt
+2025-11-16 13:41:09,725 INFO Inference config: config.yaml.BM55-AF2
+2025-11-16 13:41:09,725 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-16 13:41:09,725 INFO 
+2025-11-16 13:41:09,725 INFO 
+2025-11-16 13:41:09,727 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2025-11-16 13:41:09,727 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2025-11-16 13:41:09,727 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2025-11-16 13:41:09,727 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_logs --jobs 6 --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_features/features.from_metadata.yaml
+2025-11-16 13:41:09,727 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_logs --jobs 12 --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_features/features.from_metadata.yaml
+2025-11-16 13:41:09,727 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_logs --jobs 8 --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_features/features.from_metadata.yaml
+2025-11-16 13:41:10 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2025-11-16 13:41:10 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_features/features.from_metadata.yaml
+2025-11-16 13:41:10 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2025-11-16 13:41:10 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_features/features.from_metadata.yaml
+2025-11-16 13:41:10 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2025-11-16 13:41:10 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_features/features.from_metadata.yaml
+2025-11-16 13:41:11 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_logs/graph_builder.2025-11-16_13-41-10
+2025-11-16 13:41:11 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_logs/graph_builder.2025-11-16_13-41-10
+2025-11-16 13:41:11 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_logs/graph_builder.2025-11-16_13-41-10
+2025-11-16 13:41:11 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy
+2025-11-16 13:41:11 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy
+2025-11-16 13:41:11 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_work
+2025-11-16 13:41:11 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures
+2025-11-16 13:41:11 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_work
+2025-11-16 13:41:11 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data
+2025-11-16 13:41:11 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data
+2025-11-16 13:41:11 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_work
+2025-11-16 13:41:11 INFO Jobs: 6 (from CLI)
+2025-11-16 13:41:11 INFO Jobs: 8 (from CLI)
+2025-11-16 13:41:11 INFO Interface module: interface/polar_cutoff/v1 [alias: n x 3D TopoQA default 10A cut-off] (jobs=4)
+2025-11-16 13:41:11 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data
+2025-11-16 13:41:11 INFO Jobs: 12 (from CLI)
+2025-11-16 13:41:11 INFO Interface module: interface/polar_cutoff/v1 [alias: n x 3D TopoQA default 10A cut-off] (jobs=4)
+2025-11-16 13:41:11 INFO Topology module : topology/persistence_basic/v1 [alias: 140D TopoQA default] (jobs=8)
+2025-11-16 13:41:11 INFO Interface module: interface/polar_cutoff/v1 [alias: n x 3D TopoQA default 10A cut-off] (jobs=4)
+2025-11-16 13:41:11 INFO Topology module : topology/persistence_basic/v1 [alias: 140D TopoQA default] (jobs=8)
+2025-11-16 13:41:11 INFO Node module     : node/dssp_topo_merge/v1 [alias: 172D (140D + 32D) TopoQA default] (jobs=8)
+2025-11-16 13:41:11 INFO Node module     : node/dssp_topo_merge/v1 [alias: 172D (140D + 32D) TopoQA default] (jobs=8)
+2025-11-16 13:41:11 INFO Edge module     : edge/legacy_plus_topo_pair [alias: Legacy 11D + pair topology 10A] (jobs=12)
+2025-11-16 13:41:11 INFO Edge module     : edge/legacy_plus_topo_pair [alias: Legacy 11D + pair topology 10A] (jobs=12)
+2025-11-16 13:41:11 INFO Topology module : topology/persistence_basic/v1 [alias: 140D TopoQA default] (jobs=8)
+2025-11-16 13:41:11 INFO Node module     : node/dssp_topo_merge/v1 [alias: 172D (140D + 32D) TopoQA default] (jobs=8)
+2025-11-16 13:41:11 INFO Edge module     : edge/legacy_plus_topo_pair [alias: Legacy 11D + pair topology 10A] (jobs=12)
+2025-11-16 13:41:11 INFO Identified 449 PDB files for processing.
+2025-11-16 13:41:11 INFO Beginning interface stage (jobs=4)
+2025-11-16 13:41:11 INFO Identified 875 PDB files for processing.
+2025-11-16 13:41:11 INFO Beginning interface stage (jobs=4)
+2025-11-16 13:41:11 INFO Identified 1370 PDB files for processing.
+2025-11-16 13:41:11 INFO Beginning interface stage (jobs=4)
+2025-11-16 13:41:15 INFO [Interface] 5.0% complete (68/1370)
+2025-11-16 13:41:20 INFO [Interface] 4.9% complete (22/449)
+2025-11-16 13:41:26 INFO [Interface] 9.8% complete (44/449)
+2025-11-16 13:41:34 INFO [Interface] 14.7% complete (66/449)
+2025-11-16 13:41:42 INFO [Interface] 19.6% complete (88/449)
+2025-11-16 13:41:46 INFO [Interface] 9.9% complete (136/1370)
+2025-11-16 13:41:48 INFO [Interface] 24.5% complete (110/449)
+2025-11-16 13:41:53 INFO [Interface] 4.9% complete (43/875)
+2025-11-16 13:41:53 INFO [Interface] 29.4% complete (132/449)
+2025-11-16 13:41:57 INFO [Interface] 34.3% complete (154/449)
+2025-11-16 13:41:58 INFO [Interface] 39.2% complete (176/449)
+2025-11-16 13:42:00 INFO [Interface] 44.1% complete (198/449)
+2025-11-16 13:42:01 INFO [Interface] 49.0% complete (220/449)
+2025-11-16 13:42:03 INFO [Interface] 53.9% complete (242/449)
+2025-11-16 13:42:08 INFO [Interface] 58.8% complete (264/449)
+2025-11-16 13:42:11 INFO [Interface] 63.7% complete (286/449)
+2025-11-16 13:42:16 INFO [Interface] 68.6% complete (308/449)
+2025-11-16 13:42:23 INFO [Interface] 73.5% complete (330/449)
+2025-11-16 13:42:28 INFO [Interface] 78.4% complete (352/449)
+2025-11-16 13:42:31 INFO [Interface] 83.3% complete (374/449)
+2025-11-16 13:42:34 INFO [Interface] 88.2% complete (396/449)
+2025-11-16 13:42:38 INFO [Interface] 93.1% complete (418/449)
+2025-11-16 13:42:39 INFO [Interface] 9.8% complete (86/875)
+2025-11-16 13:42:41 INFO [Interface] 98.0% complete (440/449)
+2025-11-16 13:42:42 INFO [Interface] 14.9% complete (204/1370)
+2025-11-16 13:42:42 INFO [Interface] 100.0% complete (449/449)
+2025-11-16 13:42:42 INFO Interface stage complete: 449 success, 0 failures
+2025-11-16 13:42:42 INFO Interface feature extraction elapsed time: 90.43 s
+2025-11-16 13:42:42 INFO Beginning topology stage (jobs=8)
+2025-11-16 13:43:02 INFO [Topology] 4.9% complete (22/449)
+2025-11-16 13:43:08 INFO [Interface] 14.7% complete (129/875)
+2025-11-16 13:43:23 INFO [Topology] 9.8% complete (44/449)
+2025-11-16 13:43:28 INFO [Interface] 19.7% complete (172/875)
+2025-11-16 13:43:36 INFO [Interface] 24.6% complete (215/875)
+2025-11-16 13:43:44 INFO [Interface] 19.9% complete (272/1370)
+2025-11-16 13:43:46 INFO [Interface] 29.5% complete (258/875)
+2025-11-16 13:43:50 INFO [Topology] 14.7% complete (66/449)
+2025-11-16 13:43:51 INFO [Interface] 24.8% complete (340/1370)
+2025-11-16 13:43:56 INFO [Interface] 34.4% complete (301/875)
+2025-11-16 13:44:15 INFO [Interface] 29.8% complete (408/1370)
+2025-11-16 13:44:18 INFO [Interface] 39.3% complete (344/875)
+2025-11-16 13:44:31 INFO [Topology] 19.6% complete (88/449)
+2025-11-16 13:44:46 INFO [Topology] 24.5% complete (110/449)
+2025-11-16 13:44:48 INFO [Interface] 34.7% complete (476/1370)
+2025-11-16 13:45:03 INFO [Topology] 29.4% complete (132/449)
+2025-11-16 13:45:07 INFO [Interface] 39.7% complete (544/1370)
+2025-11-16 13:45:15 INFO [Interface] 44.2% complete (387/875)
+2025-11-16 13:45:17 INFO [Topology] 34.3% complete (154/449)
+2025-11-16 13:45:22 INFO [Interface] 44.7% complete (612/1370)
+2025-11-16 13:45:26 INFO [Topology] 39.2% complete (176/449)
+2025-11-16 13:45:30 INFO [Interface] 49.6% complete (680/1370)
+2025-11-16 13:45:37 INFO [Topology] 44.1% complete (198/449)
+2025-11-16 13:45:44 INFO [Topology] 49.0% complete (220/449)
+2025-11-16 13:45:57 INFO [Topology] 53.9% complete (242/449)
+2025-11-16 13:46:09 INFO [Interface] 49.1% complete (430/875)
+2025-11-16 13:46:23 INFO [Topology] 58.8% complete (264/449)
+2025-11-16 13:46:27 INFO [Interface] 54.1% complete (473/875)
+2025-11-16 13:46:37 INFO [Topology] 63.7% complete (286/449)
+2025-11-16 13:46:38 INFO [Interface] 59.0% complete (516/875)
+2025-11-16 13:46:54 INFO [Interface] 54.6% complete (748/1370)
+2025-11-16 13:47:12 INFO [Topology] 68.6% complete (308/449)
+2025-11-16 13:47:37 INFO [Interface] 63.9% complete (559/875)
+2025-11-16 13:47:49 INFO [Topology] 73.5% complete (330/449)
+2025-11-16 13:48:07 INFO [Topology] 78.4% complete (352/449)
+2025-11-16 13:48:21 INFO [Topology] 83.3% complete (374/449)
+2025-11-16 13:48:34 INFO [Topology] 88.2% complete (396/449)
+2025-11-16 13:48:43 INFO [Interface] 59.6% complete (816/1370)
+2025-11-16 13:48:46 INFO [Interface] 68.8% complete (602/875)
+2025-11-16 13:48:48 INFO [Topology] 93.1% complete (418/449)
+2025-11-16 13:49:02 INFO [Topology] 98.0% complete (440/449)
+2025-11-16 13:49:06 INFO [Topology] 100.0% complete (449/449)
+2025-11-16 13:49:07 INFO [Interface] 64.5% complete (884/1370)
+2025-11-16 13:49:07 INFO Topology stage complete: 449 success, 0 failures
+2025-11-16 13:49:07 INFO Topology feature extraction elapsed time: 385.05 s
+2025-11-16 13:49:07 INFO Beginning node stage (jobs=8)
+2025-11-16 13:49:21 INFO [Node] 4.9% complete (22/449)
+2025-11-16 13:49:22 INFO [Interface] 69.5% complete (952/1370)
+2025-11-16 13:49:31 INFO [Interface] 74.5% complete (1020/1370)
+2025-11-16 13:49:33 INFO [Node] 9.8% complete (44/449)
+2025-11-16 13:49:40 INFO [Interface] 79.4% complete (1088/1370)
+2025-11-16 13:49:45 INFO [Node] 14.7% complete (66/449)
+2025-11-16 13:49:48 INFO [Interface] 84.4% complete (1156/1370)
+2025-11-16 13:49:57 INFO [Interface] 89.3% complete (1224/1370)
+2025-11-16 13:49:57 INFO [Node] 19.6% complete (88/449)
+2025-11-16 13:50:03 INFO [Interface] 94.3% complete (1292/1370)
+2025-11-16 13:50:06 INFO [Interface] 99.3% complete (1360/1370)
+2025-11-16 13:50:06 INFO [Interface] 100.0% complete (1370/1370)
+2025-11-16 13:50:06 INFO Interface stage complete: 1370 success, 0 failures
+2025-11-16 13:50:06 INFO Interface feature extraction elapsed time: 534.97 s
+2025-11-16 13:50:06 INFO Beginning topology stage (jobs=8)
+2025-11-16 13:50:09 INFO [Node] 24.5% complete (110/449)
+2025-11-16 13:50:22 INFO [Node] 29.4% complete (132/449)
+2025-11-16 13:50:34 INFO [Topology] 5.0% complete (68/1370)
+2025-11-16 13:50:36 INFO [Node] 34.3% complete (154/449)
+2025-11-16 13:50:46 INFO [Node] 39.2% complete (176/449)
+2025-11-16 13:50:59 INFO [Node] 44.1% complete (198/449)
+2025-11-16 13:51:11 INFO [Node] 49.0% complete (220/449)
+2025-11-16 13:51:14 INFO [Topology] 9.9% complete (136/1370)
+2025-11-16 13:51:25 INFO [Node] 53.9% complete (242/449)
+2025-11-16 13:51:37 INFO [Node] 58.8% complete (264/449)
+2025-11-16 13:51:50 INFO [Node] 63.7% complete (286/449)
+2025-11-16 13:51:58 INFO [Topology] 14.9% complete (204/1370)
+2025-11-16 13:52:05 INFO [Node] 68.6% complete (308/449)
+2025-11-16 13:52:18 INFO [Node] 73.5% complete (330/449)
+2025-11-16 13:52:32 INFO [Node] 78.4% complete (352/449)
+2025-11-16 13:52:32 INFO [Topology] 19.9% complete (272/1370)
+2025-11-16 13:52:45 INFO [Node] 83.3% complete (374/449)
+2025-11-16 13:52:57 INFO [Node] 88.2% complete (396/449)
+2025-11-16 13:53:07 INFO [Topology] 24.8% complete (340/1370)
+2025-11-16 13:53:10 INFO [Node] 93.1% complete (418/449)
+2025-11-16 13:53:23 INFO [Node] 98.0% complete (440/449)
+2025-11-16 13:53:27 INFO [Node] 100.0% complete (449/449)
+2025-11-16 13:53:27 INFO Node stage complete: 449 success, 0 failures
+2025-11-16 13:53:27 INFO Node feature extraction elapsed time: 260.20 s
+2025-11-16 13:53:27 INFO Edge dumps enabled; writing CSVs to:
+2025-11-16 13:53:27 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/builder_work/edge_features
+2025-11-16 13:53:27 INFO Edge dump preparation elapsed time: 0.00 s
+2025-11-16 13:53:27 INFO Beginning graph assembly (.pt output) stage (jobs=12)
+2025-11-16 13:53:49 INFO [Topology] 29.8% complete (408/1370)
+2025-11-16 13:54:29 INFO [Topology] 34.7% complete (476/1370)
+2025-11-16 13:54:52 INFO [Graph assembly] 4.9% complete (22/449)
+2025-11-16 13:55:11 INFO [Topology] 39.7% complete (544/1370)
+2025-11-16 13:55:48 INFO [Topology] 44.7% complete (612/1370)
+2025-11-16 13:56:07 INFO [Topology] 49.6% complete (680/1370)
+2025-11-16 13:56:19 INFO [Interface] 73.7% complete (645/875)
+2025-11-16 13:56:38 INFO [Interface] 78.6% complete (688/875)
+2025-11-16 13:56:47 INFO [Graph assembly] 9.8% complete (44/449)
+2025-11-16 13:57:00 INFO [Interface] 83.5% complete (731/875)
+2025-11-16 13:57:18 INFO [Interface] 88.5% complete (774/875)
+2025-11-16 13:57:26 INFO [Interface] 93.4% complete (817/875)
+2025-11-16 13:57:34 INFO [Interface] 98.3% complete (860/875)
+2025-11-16 13:57:35 INFO [Interface] 100.0% complete (875/875)
+2025-11-16 13:57:35 INFO Interface stage complete: 875 success, 0 failures
+2025-11-16 13:57:35 INFO Interface feature extraction elapsed time: 983.94 s
+2025-11-16 13:57:35 INFO Beginning topology stage (jobs=8)
+2025-11-16 13:58:14 INFO [Topology] 4.9% complete (43/875)
+2025-11-16 13:58:49 INFO [Topology] 54.6% complete (748/1370)
+2025-11-16 13:58:52 INFO [Topology] 9.8% complete (86/875)
+2025-11-16 13:59:33 INFO [Topology] 14.7% complete (129/875)
+2025-11-16 14:00:21 INFO [Topology] 19.7% complete (172/875)
+2025-11-16 14:00:44 INFO [Topology] 24.6% complete (215/875)
+2025-11-16 14:00:49 INFO [Topology] 59.6% complete (816/1370)
+2025-11-16 14:00:50 INFO [Graph assembly] 14.7% complete (66/449)
+2025-11-16 14:01:20 INFO [Topology] 29.5% complete (258/875)
+2025-11-16 14:01:35 INFO [Topology] 64.5% complete (884/1370)
+2025-11-16 14:01:54 INFO [Topology] 34.4% complete (301/875)
+2025-11-16 14:02:08 INFO [Topology] 69.5% complete (952/1370)
+2025-11-16 14:02:35 INFO [Topology] 74.5% complete (1020/1370)
+2025-11-16 14:02:48 INFO [Topology] 39.3% complete (344/875)
+2025-11-16 14:03:01 INFO [Topology] 79.4% complete (1088/1370)
+2025-11-16 14:03:29 INFO [Topology] 84.4% complete (1156/1370)
+2025-11-16 14:03:55 INFO [Topology] 89.3% complete (1224/1370)
+2025-11-16 14:04:00 INFO [Topology] 44.2% complete (387/875)
+2025-11-16 14:04:20 INFO [Topology] 94.3% complete (1292/1370)
+2025-11-16 14:04:38 INFO [Topology] 99.3% complete (1360/1370)
+2025-11-16 14:04:40 INFO [Topology] 100.0% complete (1370/1370)
+2025-11-16 14:04:40 INFO Topology stage complete: 1370 success, 0 failures
+2025-11-16 14:04:40 INFO Topology feature extraction elapsed time: 873.67 s
+2025-11-16 14:04:40 INFO Beginning node stage (jobs=8)
+2025-11-16 14:05:13 INFO [Topology] 49.1% complete (430/875)
+2025-11-16 14:05:15 INFO [Node] 5.0% complete (68/1370)
+2025-11-16 14:05:46 INFO [Graph assembly] 19.6% complete (88/449)
+2025-11-16 14:05:58 INFO [Topology] 54.1% complete (473/875)
+2025-11-16 14:06:01 INFO [Node] 9.9% complete (136/1370)
+2025-11-16 14:06:32 INFO [Graph assembly] 24.5% complete (110/449)
+2025-11-16 14:06:36 INFO [Topology] 59.0% complete (516/875)
+2025-11-16 14:06:58 INFO [Node] 14.9% complete (204/1370)
+2025-11-16 14:07:11 INFO [Topology] 63.9% complete (559/875)
+2025-11-16 14:07:43 INFO [Graph assembly] 29.4% complete (132/449)
+2025-11-16 14:07:49 INFO [Node] 19.9% complete (272/1370)
+2025-11-16 14:08:14 INFO [Graph assembly] 34.3% complete (154/449)
+2025-11-16 14:08:24 INFO [Node] 24.8% complete (340/1370)
+2025-11-16 14:08:31 INFO [Topology] 68.8% complete (602/875)
+2025-11-16 14:08:42 INFO [Graph assembly] 39.2% complete (176/449)
+2025-11-16 14:09:04 INFO [Node] 29.8% complete (408/1370)
+2025-11-16 14:09:25 INFO [Graph assembly] 44.1% complete (198/449)
+2025-11-16 14:09:31 INFO [Graph assembly] 49.0% complete (220/449)
+2025-11-16 14:09:47 INFO [Node] 34.7% complete (476/1370)
+2025-11-16 14:10:29 INFO [Node] 39.7% complete (544/1370)
+2025-11-16 14:11:04 INFO [Graph assembly] 53.9% complete (242/449)
+2025-11-16 14:11:07 INFO [Node] 44.7% complete (612/1370)
+2025-11-16 14:11:41 INFO [Node] 49.6% complete (680/1370)
+2025-11-16 14:12:39 INFO [Node] 54.6% complete (748/1370)
+2025-11-16 14:12:56 INFO [Topology] 73.7% complete (645/875)
+2025-11-16 14:13:34 INFO [Graph assembly] 58.8% complete (264/449)
+2025-11-16 14:13:42 INFO [Topology] 78.6% complete (688/875)
+2025-11-16 14:13:44 INFO [Node] 59.6% complete (816/1370)
+2025-11-16 14:14:13 INFO [Topology] 83.5% complete (731/875)
+2025-11-16 14:14:25 INFO [Topology] 88.5% complete (774/875)
+2025-11-16 14:14:32 INFO [Node] 64.5% complete (884/1370)
+2025-11-16 14:14:37 INFO [Graph assembly] 63.7% complete (286/449)
+2025-11-16 14:14:51 INFO [Topology] 93.4% complete (817/875)
+2025-11-16 14:15:14 INFO [Node] 69.5% complete (952/1370)
+2025-11-16 14:15:26 INFO [Topology] 98.3% complete (860/875)
+2025-11-16 14:15:29 INFO [Topology] 100.0% complete (875/875)
+2025-11-16 14:15:31 INFO Topology stage complete: 875 success, 0 failures
+2025-11-16 14:15:31 INFO Topology feature extraction elapsed time: 1075.25 s
+2025-11-16 14:15:31 INFO Beginning node stage (jobs=8)
+2025-11-16 14:15:49 INFO [Node] 74.5% complete (1020/1370)
+2025-11-16 14:16:13 INFO [Node] 4.9% complete (43/875)
+2025-11-16 14:16:26 INFO [Node] 79.4% complete (1088/1370)
+2025-11-16 14:16:56 INFO [Node] 9.8% complete (86/875)
+2025-11-16 14:17:03 INFO [Node] 84.4% complete (1156/1370)
+2025-11-16 14:17:27 INFO [Node] 14.7% complete (129/875)
+2025-11-16 14:17:41 INFO [Node] 89.3% complete (1224/1370)
+2025-11-16 14:17:55 INFO [Node] 19.7% complete (172/875)
+2025-11-16 14:18:18 INFO [Node] 94.3% complete (1292/1370)
+2025-11-16 14:18:19 INFO [Node] 24.6% complete (215/875)
+2025-11-16 14:18:45 INFO [Node] 29.5% complete (258/875)
+2025-11-16 14:18:53 INFO [Node] 99.3% complete (1360/1370)
+2025-11-16 14:18:57 INFO [Node] 100.0% complete (1370/1370)
+2025-11-16 14:18:57 INFO Node stage complete: 1370 success, 0 failures
+2025-11-16 14:18:57 INFO Node feature extraction elapsed time: 856.18 s
+2025-11-16 14:18:57 INFO Edge dumps enabled; writing CSVs to:
+2025-11-16 14:18:57 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/builder_work/edge_features
+2025-11-16 14:18:57 INFO Edge dump preparation elapsed time: 0.00 s
+2025-11-16 14:18:57 INFO Beginning graph assembly (.pt output) stage (jobs=12)
+2025-11-16 14:19:05 INFO [Node] 34.4% complete (301/875)
+2025-11-16 14:19:25 INFO [Node] 39.3% complete (344/875)
+2025-11-16 14:19:48 INFO [Node] 44.2% complete (387/875)
+2025-11-16 14:20:01 INFO [Graph assembly] 68.6% complete (308/449)
+2025-11-16 14:20:09 INFO [Node] 49.1% complete (430/875)
+2025-11-16 14:20:18 INFO [Graph assembly] 5.0% complete (68/1370)
+2025-11-16 14:20:27 INFO [Node] 54.1% complete (473/875)
+2025-11-16 14:20:42 INFO [Node] 59.0% complete (516/875)
+2025-11-16 14:21:05 INFO [Node] 63.9% complete (559/875)
+2025-11-16 14:21:32 INFO [Node] 68.8% complete (602/875)
+2025-11-16 14:22:05 INFO [Graph assembly] 9.9% complete (136/1370)
+2025-11-16 14:22:29 INFO [Node] 73.7% complete (645/875)
+2025-11-16 14:22:47 INFO [Node] 78.6% complete (688/875)
+2025-11-16 14:23:04 INFO [Node] 83.5% complete (731/875)
+2025-11-16 14:23:20 INFO [Node] 88.5% complete (774/875)
+2025-11-16 14:23:34 INFO [Node] 93.4% complete (817/875)
+2025-11-16 14:23:49 INFO [Node] 98.3% complete (860/875)
+2025-11-16 14:23:53 INFO [Node] 100.0% complete (875/875)
+2025-11-16 14:23:53 INFO Node stage complete: 875 success, 0 failures
+2025-11-16 14:23:53 INFO Node feature extraction elapsed time: 501.92 s
+2025-11-16 14:23:53 INFO Edge dumps enabled; writing CSVs to:
+2025-11-16 14:23:53 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/builder_work/edge_features
+2025-11-16 14:23:53 INFO Edge dump preparation elapsed time: 0.00 s
+2025-11-16 14:23:53 INFO Beginning graph assembly (.pt output) stage (jobs=12)
+2025-11-16 14:23:58 INFO [Graph assembly] 14.9% complete (204/1370)
+2025-11-16 14:26:31 INFO [Graph assembly] 19.9% complete (272/1370)
+2025-11-16 14:26:44 INFO [Graph assembly] 4.9% complete (43/875)
+2025-11-16 14:27:41 INFO [Graph assembly] 24.8% complete (340/1370)
+2025-11-16 14:30:18 INFO [Graph assembly] 9.8% complete (86/875)
+2025-11-16 14:31:10 INFO [Graph assembly] 73.5% complete (330/449)
+2025-11-16 14:31:10 INFO [Graph assembly] 78.4% complete (352/449)
+2025-11-16 14:31:10 INFO [Graph assembly] 83.3% complete (374/449)
+2025-11-16 14:31:10 INFO [Graph assembly] 88.2% complete (396/449)
+2025-11-16 14:31:34 INFO [Graph assembly] 93.1% complete (418/449)
+2025-11-16 14:31:56 INFO [Graph assembly] 29.8% complete (408/1370)
+2025-11-16 14:32:52 INFO [Graph assembly] 98.0% complete (440/449)
+2025-11-16 14:33:04 INFO [Graph assembly] 100.0% complete (449/449)
+2025-11-16 14:33:04 INFO Graph assembly (.pt output) complete: 449 success, 0 failures
+2025-11-16 14:33:04 INFO Graph (.pt) generation elapsed time: 2375.33 s (edge stage: 2375.45 s)
+2025-11-16 14:33:04 INFO Summary written to graph_builder.2025-11-16_13-41-10/graph_builder_summary.json
+2025-11-16 14:33:04 INFO Summary log written to graph_builder.2025-11-16_13-41-10/graph_builder_summary.log
+2025-11-16 14:33:04 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data/graph_builder_summary.json
+2025-11-16 14:33:04 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data/graph_builder_summary.log
+2025-11-16 14:33:04 INFO Dynamic graph builder completed successfully.
+2025-11-16 14:33:05,119 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data
+2025-11-16 14:33:05,119 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt
+2025-11-16 14:33:05,119 INFO Inference config: config.yaml.BM55-AF2
+2025-11-16 14:33:05,138 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data/graph_metadata.json).
+2025-11-16 14:33:05,138 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/schema_summary.json
+2025-11-16 14:33:05,138 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/BM55-AF2/graph_data
+2025-11-16 14:33:05,482 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: ranked_3 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_0 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_4 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_1 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_2 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-16 14:33:10,522 INFO Wrote 449 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/BM55-AF2/inference_results.csv
+
+real	52m3.927s
+user	86m27.766s
+sys	24m21.910s
+2025-11-16 14:35:15 INFO [Graph assembly] 14.7% complete (129/875)
+2025-11-16 14:36:04 INFO [Graph assembly] 34.7% complete (476/1370)
+2025-11-16 14:40:24 INFO [Graph assembly] 19.7% complete (172/875)
+2025-11-16 14:40:51 INFO [Graph assembly] 24.6% complete (215/875)
+2025-11-16 14:41:38 INFO [Graph assembly] 39.7% complete (544/1370)
+2025-11-16 14:43:17 INFO [Graph assembly] 29.5% complete (258/875)
+2025-11-16 14:45:41 INFO [Graph assembly] 34.4% complete (301/875)
+2025-11-16 14:45:45 INFO [Graph assembly] 44.7% complete (612/1370)
+2025-11-16 14:47:13 INFO [Graph assembly] 49.6% complete (680/1370)
+2025-11-16 14:53:19 INFO [Graph assembly] 39.3% complete (344/875)
+2025-11-16 15:04:29 INFO [Graph assembly] 44.2% complete (387/875)
+2025-11-16 15:16:54 INFO [Graph assembly] 49.1% complete (430/875)
+2025-11-16 15:21:42 INFO [Graph assembly] 54.1% complete (473/875)
+2025-11-16 15:24:46 INFO [Graph assembly] 59.0% complete (516/875)
+2025-11-16 15:27:30 INFO [Graph assembly] 63.9% complete (559/875)
+2025-11-16 16:21:06 INFO [Graph assembly] 54.6% complete (748/1370)
+2025-11-16 16:21:39 INFO [Graph assembly] 68.8% complete (602/875)
+2025-11-16 16:29:20 INFO [Graph assembly] 59.6% complete (816/1370)
+2025-11-16 16:29:20 INFO [Graph assembly] 64.5% complete (884/1370)
+2025-11-16 16:29:20 INFO [Graph assembly] 69.5% complete (952/1370)
+2025-11-16 16:29:20 INFO [Graph assembly] 74.5% complete (1020/1370)
+2025-11-16 16:29:20 INFO [Graph assembly] 79.4% complete (1088/1370)
+2025-11-16 16:29:20 INFO [Graph assembly] 84.4% complete (1156/1370)
+2025-11-16 16:29:20 INFO [Graph assembly] 89.3% complete (1224/1370)
+2025-11-16 16:29:59 INFO [Graph assembly] 94.3% complete (1292/1370)
+2025-11-16 16:30:32 INFO [Graph assembly] 99.3% complete (1360/1370)
+2025-11-16 16:30:32 INFO [Graph assembly] 100.0% complete (1370/1370)
+2025-11-16 16:30:32 INFO Graph assembly (.pt output) complete: 1370 success, 0 failures
+2025-11-16 16:30:32 INFO Graph (.pt) generation elapsed time: 7893.65 s (edge stage: 7894.04 s)
+2025-11-16 16:30:32 INFO Summary written to graph_builder.2025-11-16_13-41-10/graph_builder_summary.json
+2025-11-16 16:30:32 INFO Summary log written to graph_builder.2025-11-16_13-41-10/graph_builder_summary.log
+2025-11-16 16:30:32 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data/graph_builder_summary.json
+2025-11-16 16:30:32 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data/graph_builder_summary.log
+2025-11-16 16:30:32 INFO Dynamic graph builder completed successfully.
+2025-11-16 16:30:33,324 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data
+2025-11-16 16:30:33,325 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt
+2025-11-16 16:30:33,325 INFO Inference config: config.yaml.HAF2
+2025-11-16 16:30:33,381 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-11-16 16:30:33,381 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/schema_summary.json
+2025-11-16 16:30:33,381 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/HAF2/graph_data
+2025-11-16 16:30:33,784 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-16 16:30:41,548 INFO Wrote 1370 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/HAF2/inference_results.csv
+
+real	169m34.929s
+user	258m23.009s
+sys	239m34.467s
+2025-11-16 18:06:33 INFO [Graph assembly] 73.7% complete (645/875)
+2025-11-16 18:07:10 INFO [Graph assembly] 78.6% complete (688/875)
+2025-11-16 18:07:10 INFO [Graph assembly] 83.5% complete (731/875)
+2025-11-16 18:07:10 INFO [Graph assembly] 88.5% complete (774/875)
+2025-11-16 18:07:10 INFO [Graph assembly] 93.4% complete (817/875)
+2025-11-16 18:07:10 INFO [Graph assembly] 98.3% complete (860/875)
+2025-11-16 18:07:10 INFO [Graph assembly] 100.0% complete (875/875)
+2025-11-16 18:07:10 INFO Graph assembly (.pt output) complete: 875 success, 0 failures
+2025-11-16 18:07:10 INFO Graph (.pt) generation elapsed time: 13395.72 s (edge stage: 13395.92 s)
+2025-11-16 18:07:10 INFO Summary written to graph_builder.2025-11-16_13-41-10/graph_builder_summary.json
+2025-11-16 18:07:10 INFO Summary log written to graph_builder.2025-11-16_13-41-10/graph_builder_summary.log
+2025-11-16 18:07:10 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data/graph_builder_summary.json
+2025-11-16 18:07:10 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data/graph_builder_summary.log
+2025-11-16 18:07:10 INFO Dynamic graph builder completed successfully.
+2025-11-16 18:07:11,474 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data
+2025-11-16 18:07:11,474 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed1337_2025-11-16_10-26-21/model_checkpoints/checkpoint.val-0.04862_epoch065.chkpt
+2025-11-16 18:07:11,474 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-16 18:07:11,505 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-11-16 18:07:11,506 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/schema_summary.json
+2025-11-16 18:07:11,506 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/work/ABAG-AF3/graph_data
+2025-11-16 18:07:20,059 INFO Wrote 875 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/ABAG-AF3/inference_results.csv
+
+real	266m13.526s
+user	287m26.994s
+sys	417m28.067s
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/BM55-AF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/BM55-AF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/HAF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/HAF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/ABAG-AF3/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pairing_topoqa_10A/results/ABAG-AF3/final_results_hit_rate.csv
+    15973,69 real     37937,85 user     40884,49 sys
