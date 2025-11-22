@@ -39,7 +39,7 @@ topology:
 # REQUIRED stage: node
 node:
   module: node/dssp_topo_merge/v1  # alias: TopoQA default
-  alias: "172D (140D + 32D) TopoQA default"
+  alias: "172D (140D Topological consumes Interface + 32D) TopoQA default"
   summary: "DSSP-derived node features merged with topology statistics."
   description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
   params:
