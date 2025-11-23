@@ -1,1512 +1,1590 @@
 === Tensor differences ===
 DIFFERENT: 1bth_1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_10
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_10.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_10.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_10.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_100
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_100.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_100.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_11
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_11.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_11.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_12
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_12.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_12.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_12.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_125384
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_125384.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_125384.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_125384.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_13
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_13.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_13.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_14
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_14.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_14.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_15
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_15.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_15.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_16
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_16.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_16.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_16.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_17
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_17.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_17.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_17.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_18
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_18.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_19
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_19.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_19.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_19.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_2
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_2.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_2.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_20
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_20.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_20.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_21
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_21.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_21.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_22
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_22.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_22.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_22.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_23
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_23.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_23.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_23.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_24
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_24.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_24.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_24.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_25
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_25.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_25.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_26
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_26.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_26.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_27
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_27.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_27.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_28
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_28.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_28.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_29
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_29.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_29.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_3
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_3.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_3.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_30
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_30.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_30.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_30.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_31
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_31.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_31.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_32
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_32.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_32.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_33
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_33.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_33.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1bth_34
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_34.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_33.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_35
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_35.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_35.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1bth_36
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_36.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_36.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_35.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_37
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_37.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_37.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_38
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_38.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_38.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_38.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_39
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_39.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_39.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_4
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_4.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_4.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_4.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_40
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_40.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_40.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_40.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_41
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_41.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_41.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_42
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_42.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_42.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_42.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_43
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_43.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_43.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_44
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_44.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_44.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_45
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_45.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_45.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_46
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_46.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_46.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_47
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_47.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_47.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_47.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_48
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_48.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_48.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_48.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_49
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_49.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_49.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_5
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_5.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_5.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_50
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_50.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_50.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_51
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_51.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_51.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1bth_52
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_52.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_52.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_51.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_53
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_53.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_53.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_54
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_54.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_54.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_55
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_55.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_55.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_56
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_56.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_57
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_57.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_57.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_57.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_58
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_58.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_58.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_59
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_59.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_59.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_59.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_6
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_6.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_6.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_60
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_60.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_60.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_61
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_61.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_61.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_62
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_62.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_62.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_63
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_63.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_64
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_64.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_64.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_65
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_65.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_65.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_65.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_66
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_66.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_66.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_67
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_67.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_67.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_67.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_68
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_68.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_68.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_69
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_69.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_69.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_69.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_7
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_7.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_7.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_70
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_70.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_70.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_71
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_71.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_71.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_72
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_72.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_72.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_72.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_73
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_73.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_73.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_74
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_74.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_74.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_75
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_75.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_75.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_76
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_76.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_76.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_76.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_77
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_77.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_77.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_77.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1bth_78
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_78.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_78.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_79
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_79.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_79.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_79.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_8
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_8.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_8.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_80
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_80.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_80.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_80.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_81
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_81.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_81.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_81.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_82
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_82.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_82.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1bth_83
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_83.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_82.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_84
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_84.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_84.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_85
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_85.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_85.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_85.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_86
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_86.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_86.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_87
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_87.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_87.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_88
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_88.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_88.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_88.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 1bth_9
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_9.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_9.pt
+DIFFERENT: 1bth_89
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_89.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_90
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_90.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_90.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_91
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_91.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_91.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_91.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_92
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_92.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_92.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_93
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_93.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_93.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_94
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_94.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_94.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_95
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_95.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_95.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_95.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_96
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_96.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_96.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_96.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_97
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_97.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_97.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_97.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_98
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_98.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_98.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_98.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_99
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_99.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_99.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_p1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_p1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_p1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_p1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1bth_u1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1bth/1bth_u1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1bth/1bth_u1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1bth/1bth_u1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_10
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_10.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_10.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_10.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_100
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_100.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_100.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_11
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_11.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_11.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_12
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_12.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_12.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_12.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_13
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_13.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_13.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_14
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_14.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_14.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_15
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_15.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_15.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_16
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_16.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_16.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_16.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_17
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_17.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_17.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_17.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_18
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_18.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_18.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_19
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_19.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_19.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_19.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_2
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_2.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_2.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_20
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_20.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_20.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ook_21
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_21.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_22
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_22.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_22.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_22.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_23
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_23.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_23.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_23.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_24
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_24.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_24.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1ook_25
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_25.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_24.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_26
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_26.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_26.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_27
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_27.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_27.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_28
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_28.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_28.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_29
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_29.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_29.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_3
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_3.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_3.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_3.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_30
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_30.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_30.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_30.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_31
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_31.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_31.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_32
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_32.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_32.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_33
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_33.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_33.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_33.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_34
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_34.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_34.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_35
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_35.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_35.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_35.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_350936
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_350936.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_350936.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_350936.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_36
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_36.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_36.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_36.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_37
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_37.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_37.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_38
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_38.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_38.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_38.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_39
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_39.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_39.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_4
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_4.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_4.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_4.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_40
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_40.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_40.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_40.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_41
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_41.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_41.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_42
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_42.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_42.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_42.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_43
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_43.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_43.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_434878
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_434878.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_434878.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_434878.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_44
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_44.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_44.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_45
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_45.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_45.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_451934
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_451934.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_451934.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_451934.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_46
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_46.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_46.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_47
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_47.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_47.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_47.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_48
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_48.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_48.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_48.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ook_49
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_49.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_5
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_5.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_5.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_50
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_50.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_50.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_51
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_51.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_51.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_51.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_52
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_52.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_52.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_52.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_53
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_53.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_53.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_54
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_54.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_54.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_55
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_55.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_55.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_56
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_56.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_56.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_57
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_57.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_57.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1ook_58
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_58.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_57.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_59
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_59.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_59.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_59.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_6
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_6.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_6.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_60
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_60.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_60.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_61
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_61.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_61.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_62
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_62.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_62.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_63
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_63.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_63.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_64
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_64.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_64.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_65
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_65.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_65.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_65.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_66
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_66.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_66.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_67
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_67.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_67.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_67.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_68
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_68.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_68.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_68.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_69
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_69.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_69.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_69.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_7
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_7.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_7.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_70
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_70.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_70.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_71
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_71.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_71.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_72
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_72.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_72.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_72.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_73
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_73.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_73.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ook_74
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_74.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_74.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_75
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_75.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_75.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_76
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_76.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_76.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_76.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_77
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_77.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_77.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_77.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_78
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_78.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_78.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_78.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_79
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_79.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_79.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_79.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_8
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_8.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_8.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_80
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_80.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_80.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_80.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_81
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_81.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_81.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_81.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_82
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_82.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_82.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_83
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_83.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_83.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_84
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_84.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_84.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_85
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_85.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_85.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_85.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_86
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_86.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_86.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_87
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_87.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_87.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_88
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_88.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_88.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_88.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ook_89
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_89.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_89198
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_89198.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_89198.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_89198.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_9
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_9.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_9.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_9.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_90
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_90.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_90.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_91
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_91.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_91.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_91.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_92
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_92.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_92.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_93
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_93.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_93.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_94
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_94.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_94.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_95
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_95.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_95.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_95.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_96
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_96.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_96.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_96.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_97
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_97.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_97.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_97.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_98
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_98.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_98.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_98.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_99
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_99.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_99.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_p1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_p1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_p1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_p1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ook_u1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ook/1ook_u1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ook/1ook_u1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ook/1ook_u1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 1ppf_19
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_19.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_19.pt
+DIFFERENT: 1ppf_18
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_18.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_18.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ppf_26
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_26.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_26.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ppf_28
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_28.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ppf_34
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_34.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_34.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_34.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 1ppf_36
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_36.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_36.pt
+DIFFERENT: 1ppf_35
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_35.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_35.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 1ppf_52
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_52.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_52.pt
+DIFFERENT: 1ppf_44
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_44.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 1ppf_45
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_45.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ppf_60
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_60.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_60.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_60.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 1ppf_73
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_73.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_73.pt
+DIFFERENT: 1ppf_8
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_8.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_8.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 1ppf_77
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_77.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_77.pt
+DIFFERENT: 1ppf_82
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_82.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ppf_86
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_86.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_86.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 1ppf_91
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_91.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_91.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1ppf_97
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_97.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_97.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 1ppf_99
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/1ppf/1ppf_99.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/1ppf/1ppf_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/1ppf/1ppf_91.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 2kai_11308
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_11308.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_11308.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_11308.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 2kai_16741
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_16741.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_16741.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 2kai_21
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_21.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_21.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 2kai_37
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_37.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_37.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_37.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_4
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_4.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_4.pt
+DIFFERENT: 2kai_45
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_45.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_45.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 2kai_49
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_49.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_49.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_55
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_55.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_55.pt
+DIFFERENT: 2kai_54
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_54.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 2kai_61
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_61.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_61.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 2kai_63
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_63.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_63.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_63.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 2kai_66
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_66.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_66.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_66.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_67
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_67.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_67.pt
+DIFFERENT: 2kai_7
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_7.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_73
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_73.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_73.pt
+DIFFERENT: 2kai_71
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_71.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_8
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_8.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_8.pt
+DIFFERENT: 2kai_84
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_84.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_84.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_88
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_88.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_88.pt
+DIFFERENT: 2kai_86
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_86.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_91
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_91.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_91.pt
+DIFFERENT: 2kai_90
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_90.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 2kai_9310
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_9310.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/2kai/2kai_9310.pt
+DIFFERENT: 2kai_9786
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/2kai/2kai_9786.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/2kai/2kai_9786.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_1
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_1.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_1.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 3pro_100
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_100.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_100.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_1.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_11
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_11.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_11.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_11.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_14
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_14.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_14.pt
+DIFFERENT: 3pro_13
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_13.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_13.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_15
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_15.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_15.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_2
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_2.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_2.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 3pro_24
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_24.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_24.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 3pro_27
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_27.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_27.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_2.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_28
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_28.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_28.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_28.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_31
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_31.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_31.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_31.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_32
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_32.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_32.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_32.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_40
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_40.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_40.pt
+DIFFERENT: 3pro_41
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_41.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_43
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_43.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_43.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_43.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_44
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_44.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_44.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_44.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_46
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_46.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_46.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_49
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_49.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_49.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_5
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_5.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_50
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_50.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_50.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_50.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_52
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_52.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_52.pt
+DIFFERENT: 3pro_51
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_51.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_51.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_53
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_53.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_53.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_53.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_54
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_54.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_54.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_55
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_55.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_55.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_55.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_56
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_56.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_56.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_56.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_59
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_59.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_59.pt
-  tensor 'edge_attr' differs
-  tensor 'edge_index' differs
-
-DIFFERENT: 3pro_60
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_60.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_60.pt
+DIFFERENT: 3pro_62
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_62.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_62.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_64
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_64.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_64.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_64.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_70
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_70.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_70.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_71
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_71.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_71.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_71.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_8
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_8.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_8.pt
+DIFFERENT: 3pro_73
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_73.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_73.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_80
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_80.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_80.pt
+DIFFERENT: 3pro_75
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_75.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_75.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_84
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_84.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_84.pt
+DIFFERENT: 3pro_82
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_82.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_82.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_83
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_83.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_83.pt
+  tensor 'edge_attr' differs
+  tensor 'edge_index' differs
+
+DIFFERENT: 3pro_86
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_86.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_86.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_87
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_87.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_87.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_89
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_89.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_89.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_89.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
-DIFFERENT: 3pro_91
-  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_91.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_91.pt
+DIFFERENT: 3pro_90
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_90.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_90.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_93
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_93.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_93.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_93.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_94
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_94.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_94.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_94.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
 
 DIFFERENT: 3pro_99
   baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A/graph_data/3pro/3pro_99.pt
-  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/original/11d_topoqa_10A/graph_data/3pro/3pro_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/11d_topoqa_10A_2/graph_data/3pro/3pro_99.pt
   tensor 'edge_attr' differs
   tensor 'edge_index' differs
