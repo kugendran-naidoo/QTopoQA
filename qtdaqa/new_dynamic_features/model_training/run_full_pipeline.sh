@@ -86,6 +86,22 @@ if [[ ! -d "${GRAPH_DIR}" ]]; then
   exit 1
 fi
 
+# Optional graph validation preflight
+if [[ "${VALIDATE_GRAPHS:-0}" != "0" ]]; then
+  VALIDATOR_CMD=(python -m qtdaqa.new_dynamic_features.model_training.tools.validate_graphs --graph-dir "${GRAPH_DIR}")
+  if [[ -n "${VALIDATE_GRAPHS_MANIFEST:-}" ]]; then
+    VALIDATOR_CMD+=(--manifest "${VALIDATE_GRAPHS_MANIFEST}")
+    if [[ "${VALIDATE_GRAPHS_CREATE_MANIFEST:-0}" != "0" && ! -f "${VALIDATE_GRAPHS_MANIFEST}" ]]; then
+      VALIDATOR_CMD+=(--write-manifest)
+    fi
+  fi
+  echo "[run_full_pipeline] Validating graphs before training..."
+  if ! "${VALIDATOR_CMD[@]}"; then
+    echo "[run_full_pipeline] Graph validation failed; aborting." >&2
+    exit 1
+  fi
+fi
+
 if [[ -n "${RESUME_FROM}" && -z "${SKIP_SWEEP}" ]]; then
   echo "[run_full_pipeline][warning] RESUME_FROM is set without SKIP_SWEEP=1; the sweep will run again before fine-tuning." >&2
 fi

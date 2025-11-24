@@ -42,7 +42,20 @@ class cal_interface():
                 interface_index.add((chain_id1, res_id1, res_name1, ins_code1, tuple(coords1)))
                 interface_index.add((chain_id2, res_id2, res_name2, ins_code2, tuple(coords2)))
         
-        return sorted(interface_index, key=lambda x: (x[0], int(x[1]), x[2]))  # Sort by chain_id, res_id (as int), and ins_code
+        def sort_key(entry):
+            chain_id, res_id, res_name, ins_code, coord = entry
+            # Total ordering: chain, residue number, insertion code, residue name, then raw coordinates.
+            return (
+                chain_id,
+                int(res_id),
+                ins_code or "",
+                res_name,
+                float(coord[0]),
+                float(coord[1]),
+                float(coord[2]),
+            )
+
+        return sorted(interface_index, key=sort_key)
 
     def write_interface_info(self, ca_atoms_info, outfile):
         interface_info = self.calculate_interface_index(ca_atoms_info)
@@ -63,5 +76,4 @@ def interface_batch(pdb_dir,ca_dir,n):
     Parallel(n_jobs=n)(
             delayed(lambda model: cal_interface(os.path.join(pdb_dir, f"{model}.pdb"), cut=10).find_and_write(os.path.join(ca_dir, f"{model}.txt")))(model) for model in model_list
         )    
-
 

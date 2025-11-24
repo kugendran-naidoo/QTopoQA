@@ -149,6 +149,7 @@ class TrainingConfig:
     graph_load_top_k: int = 5
     enable_graph_cache: bool = True
     graph_cache_size: int = 256
+    canonicalize_on_load: bool = False
     mlflow: MlflowConfig = dataclasses.field(default_factory=MlflowConfig)
     edge_schema: dict = dataclasses.field(default_factory=dict)
     topology_schema: dict = dataclasses.field(default_factory=dict)
@@ -237,6 +238,7 @@ def load_config(path: Path) -> TrainingConfig:
             graph_load_top_k = 5
         graph_load_top_k = max(1, graph_load_top_k)
         graph_load_profiling = bool(profiling_cfg.get("graph_load", False))
+        canonicalize_on_load = bool(_get("canonicalize_on_load", False))
 
         cfg = TrainingConfig(
             graph_dir=graph_dir,
@@ -272,6 +274,7 @@ def load_config(path: Path) -> TrainingConfig:
             mlflow=MlflowConfig(),
             edge_schema=dict(_get("edge_schema", {})),
             topology_schema=dict(_get("topology_schema", {})),
+            canonicalize_on_load=canonicalize_on_load,
         )
         return cfg
 
@@ -313,6 +316,7 @@ def load_config(path: Path) -> TrainingConfig:
     batch_size = int(dataloader_cfg.get("batch_size", 16))
     num_workers = int(dataloader_cfg.get("num_workers", 0))
     seed = int(dataloader_cfg.get("seed", 222))
+    canonicalize_on_load = bool(dataloader_cfg.get("canonicalize_on_load", False))
 
     trainer_cfg = _section("trainer")
     accelerator = str(trainer_cfg.get("accelerator", "cpu"))
@@ -418,6 +422,7 @@ def load_config(path: Path) -> TrainingConfig:
         mlflow=mlflow_config,
         edge_schema=dict(data.get("edge_schema", {})),
         topology_schema=dict(data.get("topology_schema", {})),
+        canonicalize_on_load=canonicalize_on_load,
     )
     return cfg
 
@@ -552,10 +557,12 @@ class GraphRegressionDataset(Dataset):
         samples: Sequence[Tuple[str, Path, torch.Tensor]],
         profiler: Optional[GraphLoadProfiler] = None,
         cache: Optional[GraphTensorCache] = None,
+        canonicalize_on_load: bool = False,
     ):
         self.samples = list(samples)
         self.profiler = profiler
         self.cache = cache
+        self.canonicalize_on_load = canonicalize_on_load
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -573,6 +580,9 @@ class GraphRegressionDataset(Dataset):
             data = self.cache.get(path, _load_tensor)
         else:
             data = _load_tensor(path)
+
+        if self.canonicalize_on_load:
+            data = canonicalize_graph(data)
 
         if self.profiler and self.profiler.enabled and start is not None:
             duration = time.perf_counter() - start
@@ -592,6 +602,92 @@ def collate_graphs(batch: List[Data]) -> List[Batch]:
         raise ValueError("Received empty batch")
     merged = Batch.from_data_list(batch)
     return [merged]
+
+
+def _node_permutation(x: torch.Tensor) -> torch.Tensor:
+    x_cpu = x.detach().cpu()
+    n = x_cpu.size(0)
+    if n == 0:
+        return torch.arange(0, device=x.device, dtype=torch.long)
+
+    keys = [np.arange(n)]
+    x_np = x_cpu.numpy()
+    if x_np.ndim == 1:
+        keys.append(x_np)
+    else:
+        for col in x_np.T[::-1]:
+            keys.append(col)
+    order = np.lexsort(tuple(keys))
+    return torch.from_numpy(order).to(x.device, dtype=torch.long)
+
+
+def _edge_permutation(edge_index: torch.Tensor, edge_attr: Optional[torch.Tensor] = None) -> torch.Tensor:
+    if edge_index.numel() == 0:
+        return torch.arange(0, device=edge_index.device, dtype=torch.long)
+
+    edge_cpu = edge_index.detach().cpu()
+    src = edge_cpu[0].numpy()
+    dst = edge_cpu[1].numpy()
+    e = src.shape[0]
+
+    keys = [np.arange(e)]
+    if edge_attr is not None and torch.is_tensor(edge_attr) and edge_attr.numel() > 0:
+        attr_np = edge_attr.detach().cpu().numpy()
+        if attr_np.ndim == 1:
+            keys.append(attr_np)
+        else:
+            for col in attr_np.T[::-1]:
+                keys.append(col)
+    keys.append(dst)
+    keys.append(src)
+    order = np.lexsort(tuple(keys))
+    return torch.from_numpy(order).to(edge_index.device, dtype=torch.long)
+
+
+def canonicalize_graph(data: Data) -> Data:
+    """Return a canonicalized copy of the graph (sorted nodes/edges) for deterministic loading."""
+    if not isinstance(data, Data):
+        return data
+
+    # Work on a shallow clone to avoid mutating cached objects.
+    data = data.clone()
+
+    x = getattr(data, "x", None)
+    if isinstance(x, torch.Tensor) and x.numel() > 0:
+        perm = _node_permutation(x)
+        data.x = x[perm]
+
+        batch_attr = getattr(data, "batch", None)
+        if isinstance(batch_attr, torch.Tensor) and batch_attr.numel() == perm.numel():
+            data.batch = batch_attr[perm]
+
+        perm_inv = torch.empty_like(perm)
+        perm_inv[perm] = torch.arange(perm.numel(), device=perm.device, dtype=perm.dtype)
+
+        edge_index = getattr(data, "edge_index", None)
+        if isinstance(edge_index, torch.Tensor) and edge_index.numel() > 0:
+            remapped = perm_inv[edge_index]
+            edge_attr = getattr(data, "edge_attr", None)
+            if edge_attr is not None and not torch.is_tensor(edge_attr):
+                edge_attr = None
+            order = _edge_permutation(remapped, edge_attr)
+            data.edge_index = remapped[:, order]
+
+            for edge_field in ("edge_attr", "edge_weight"):
+                value = getattr(data, edge_field, None)
+                if isinstance(value, torch.Tensor) and value.size(0) == order.numel():
+                    setattr(data, edge_field, value[order])
+    else:
+        # No node features; fall back to sorting edges only if present.
+        edge_index = getattr(data, "edge_index", None)
+        edge_attr = getattr(data, "edge_attr", None)
+        if isinstance(edge_index, torch.Tensor) and edge_index.numel() > 0:
+            order = _edge_permutation(edge_index, edge_attr if torch.is_tensor(edge_attr) else None)
+            data.edge_index = edge_index[:, order]
+            if isinstance(edge_attr, torch.Tensor) and edge_attr.size(0) == order.numel():
+                data.edge_attr = edge_attr[order]
+
+    return data
 
 
 class CpuTopoQAModule(GNN_edge1_edgepooling):
@@ -1261,11 +1357,13 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         train_samples,
         profiler=load_profiler if load_profiler.enabled else None,
         cache=cache_instance,
+        canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
     )
     val_dataset = GraphRegressionDataset(
         val_samples,
         profiler=load_profiler if load_profiler.enabled else None,
         cache=cache_instance,
+        canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
     )
 
     train_loader = DataLoader(
