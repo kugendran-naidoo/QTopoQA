@@ -112,13 +112,20 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
                 edges.append([dst_idx, src_idx])
 
         if features:
-            feature_matrix = np.asarray(features, dtype=np.float32)
+            order = sorted(
+                range(len(edges)),
+                key=lambda idx: (edges[idx][0], edges[idx][1], features[idx][0]),
+            )
+            ordered_edges = [edges[idx] for idx in order]
+            ordered_features = [features[idx] for idx in order]
+
+            feature_matrix = np.asarray(ordered_features, dtype=np.float32)
             if scale_features and feature_matrix.size:
                 col_min = feature_matrix.min(axis=0, keepdims=True)
                 col_max = feature_matrix.max(axis=0, keepdims=True)
                 denom = np.where(col_max - col_min == 0.0, 1.0, col_max - col_min)
                 feature_matrix = (feature_matrix - col_min) / denom
-            edge_index = np.asarray(edges, dtype=np.int64)
+            edge_index = np.asarray(ordered_edges, dtype=np.int64)
         else:
             feature_matrix = np.empty((0, 11), dtype=np.float32)
             edge_index = np.empty((0, 2), dtype=np.int64)

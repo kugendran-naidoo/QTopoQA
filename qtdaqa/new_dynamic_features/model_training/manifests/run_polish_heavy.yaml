@@ -1,0 +1,71 @@
+shared:
+  notes: "Auto-generated polish manifest from best run: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lr035_seed777_2025-11-23_16-27-32_phase2_seed101"
+  log_lr: false
+  fast_dev_run: false
+
+jobs:
+  - name: polish_seed101
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed101.yaml
+    overrides:
+      trainer.num_epochs: 320
+      early_stopping.patience: 40
+      scheduler.patience: 20
+      scheduler.factor: 0.3
+      optimizer.learning_rate: 3e-3
+      dataloader.seed: 101
+
+  - name: polish_lr_low_seed101
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed101.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 50
+      scheduler.patience: 25
+      scheduler.factor: 0.3
+      optimizer.learning_rate: 2e-3
+      dataloader.batch_size: 12
+      trainer.accumulate_grad_batches: 48
+      dataloader.seed: 101
+  - name: polish_seed555
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed101.yaml
+    overrides:
+      trainer.num_epochs: 320
+      early_stopping.patience: 40
+      scheduler.patience: 20
+      scheduler.factor: 0.3
+      optimizer.learning_rate: 3e-3
+      dataloader.seed: 555
+
+  - name: polish_lr_low_seed555
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed101.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 50
+      scheduler.patience: 25
+      scheduler.factor: 0.3
+      optimizer.learning_rate: 2e-3
+      dataloader.batch_size: 12
+      trainer.accumulate_grad_batches: 48
+      dataloader.seed: 555
+  - name: polish_seed888
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed101.yaml
+    overrides:
+      trainer.num_epochs: 320
+      early_stopping.patience: 40
+      scheduler.patience: 20
+      scheduler.factor: 0.3
+      optimizer.learning_rate: 3e-3
+      dataloader.seed: 888
+
+  - name: polish_lr_low_seed888
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed101.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 50
+      scheduler.patience: 25
+      scheduler.factor: 0.3
+      optimizer.learning_rate: 2e-3
+      dataloader.batch_size: 12
+      trainer.accumulate_grad_batches: 48
+      dataloader.seed: 888
+
+continue_on_error: false
