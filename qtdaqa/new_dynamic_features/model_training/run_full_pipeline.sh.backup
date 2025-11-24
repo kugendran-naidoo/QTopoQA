@@ -95,9 +95,6 @@ if [[ "${VALIDATE_GRAPHS:-0}" != "0" ]]; then
       VALIDATOR_CMD+=(--write-manifest)
     fi
   fi
-  if [[ "${VALIDATE_GRAPHS_IGNORE_METADATA:-0}" != "0" ]]; then
-    VALIDATOR_CMD+=(--ignore-metadata)
-  fi
   echo "[run_full_pipeline] Validating graphs before training..."
   if ! "${VALIDATOR_CMD[@]}"; then
     echo "[run_full_pipeline] Graph validation failed; aborting." >&2
