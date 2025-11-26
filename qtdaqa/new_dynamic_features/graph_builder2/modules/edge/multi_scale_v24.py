@@ -282,7 +282,7 @@ class MultiscaleEdgeModuleV24(EdgeFeatureModule):
             "include_inverse_distance": True,
             "include_unit_vector": True,
             "unit_vector_epsilon": 1e-8,
-            "jobs": 8,
+            "jobs": 16,
         },
     )
 

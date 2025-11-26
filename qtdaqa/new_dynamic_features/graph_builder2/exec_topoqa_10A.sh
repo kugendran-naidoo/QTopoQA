@@ -1,5 +1,5 @@
 OUTPUT="output/11d_topoqa_10A"
-FEATURE_FILE="feature-config.yaml.topoqa.10A"
+FEATURE_FILE="feature_configs/feature-config.yaml.topoqa.10A"
 
 # mk dirs
 mkdir -p ${OUTPUT}/work

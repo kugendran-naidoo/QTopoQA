@@ -22,6 +22,5 @@ else
   fi
 fi
 
-cd "${REPO_ROOT}"
 export PYTHONPATH="${REPO_ROOT}:${PYTHONPATH:-}"
 exec "${PYTHON_BIN}" -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 "$@"

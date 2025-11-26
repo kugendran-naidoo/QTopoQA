@@ -18,7 +18,7 @@ from ...lib import interface_runner
 class DefaultInterfaceModule(InterfaceFeatureModule):
     module_id = "interface/polar_cutoff/v1"
     module_kind = "interface"
-    default_alias = "TopoQA default 10A cut-off"
+    default_alias = "n x 3D TopoQA default 10A cutoff"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -40,7 +40,7 @@ class DefaultInterfaceModule(InterfaceFeatureModule):
         defaults={
             "cutoff": 10.0,
             "coordinate_decimals": -1,
-            "jobs": 4,
+            "jobs": 16,
         },
     )
 

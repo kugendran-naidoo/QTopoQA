@@ -81,7 +81,7 @@ malformed parameters cause the run to stop immediately).
 
 ```yaml
 defaults:
-  jobs: 8           # optional global override for stage workers
+  jobs: 16          # optional global override for stage workers
 
 interface:
   module: interface/polar_cutoff/v1  # alias: TopoQA default 10A cut-off
@@ -91,7 +91,7 @@ interface:
   params:
     cutoff: 10.0
     coordinate_decimals: -1  # skip rounding to keep raw coords
-    jobs: 8
+    jobs: 16
 
 topology:           # optional, but common
   module: topology/persistence_basic/v1  # alias: TopoQA default
@@ -110,7 +110,7 @@ topology:           # optional, but common
       - ['C', 'O']
       - ['N', 'O']
       - ['C', 'N', 'O']
-    jobs: 8
+    jobs: 16
 
 node:
   module: node/dssp_topo_merge/v1  # alias: TopoQA default
@@ -119,7 +119,7 @@ node:
   description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
   params:
     drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
-    jobs: 8
+    jobs: 16
 
 edge:
   module: edge/legacy_band/v11
@@ -130,7 +130,7 @@ edge:
     distance_min: 0.0
     distance_max: 10.0
     scale_features: true
-    jobs: 8
+    jobs: 16
 
 # Optional extra stage (custom modules):
 # mol:
@@ -169,6 +169,11 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
   and concatenates the topology summary to the histogram vector. Tune
   `neighbor_distance`, `include_neighbors`, `filtration_cutoff`, and
   `min_persistence` to control the geometric context captured for each pair.
+- `edge/edge_plus_min_agg_topo/v1` (lean) – prepends the legacy 11‑D histogram
+  (distance + 10-bin atom histogram) and concatenates per-residue topology for each
+  endpoint: concat(u_topo, v_topo), abs-diff, cosine similarity, and norms
+  (defaults on). Deterministic edge ordering is preserved; histogram block can be
+  scaled independently via `scale_histogram`.
 - (Planned) Aggregated-topology edge variants – reuse the per-residue topology
   vectors already computed for interface residues to build relational signals per
   edge without rerunning persistence. For an edge (u, v), combine the endpoint
@@ -183,6 +188,40 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
   level. These will preserve the existing deterministic edge ordering
   (src_idx, dst_idx, distance) and rely on the canonical interface/node/topology
   sorting already in place.
+
+### Planned aggregated-topology edge modules (defaults and rationale)
+
+These three module families are planned (edge_plus_min_agg_topo lean is now implemented as
+`edge/edge_plus_min_agg_topo/v1`). Defaults below are meant to be sensible starting points
+that balance signal, cost, and determinism:
+
+- `edge_plus_min_agg_topo`
+  - Lean defaults: `include_norms=True`, `include_cosine=True`; no min/max block.
+  - Heavy defaults: `include_minmax=True`, `include_norms=True`, `include_cosine=True`.
+  - Rationale: the lean form keeps footprint small while still conveying relative
+    magnitude (norms) and directional similarity (cosine) between endpoint topo
+    vectors; the heavy form adds symmetric min/max for fuller contrast.
+
+- `edge_plus_bal_agg_topo`
+  - Lean defaults: include endpoint `mean`, `abs_diff`, `cosine`, and `norms`
+    (omit min/max).
+  - Heavy defaults: same as lean plus `min/max` on endpoints.
+  - Rationale: balanced summary (concat + mean + abs-diff) already captures
+    shared and divergent structure; cosine and norms add low-cost orientation and
+    scale cues. Heavy adds min/max to expose extremal differences without changing
+    ordering or determinism.
+
+- `edge_plus_pool_agg_topo`
+  - Shared defaults: neighbor pooling `k=5` (midpoint of 4–6) for deterministic,
+    modest local context.
+  - Lean defaults: endpoint block uses the balanced-lean set (mean/abs-diff/norms/
+    cosine, no min/max); pooled block uses mean/abs-diff/norms/cosine, no min/max.
+  - Heavy defaults: add min/max to both endpoint and pooled blocks while keeping
+    norms and cosine; keep `k=5`.
+  - Rationale: pooling brings nearby topo context without rerunning persistence;
+    k=5 keeps compute predictable. Lean avoids feature blow-up while leveraging
+    norms/cosine for stability; heavy parallels other heavy variants with min/max
+    on both raw and pooled summaries.
 
 ---
 

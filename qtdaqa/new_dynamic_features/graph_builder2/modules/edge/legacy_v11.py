@@ -43,6 +43,7 @@ def _distance_histogram(residue_a, residue_b) -> np.ndarray:
 class LegacyEdgeModuleV11(EdgeFeatureModule):
     module_id = "edge/legacy_band/v11"
     module_kind = "edge"
+    default_alias = "11D TopoQA default 10A cutoff"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -60,7 +61,7 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
             "scale_features": "Apply MinMax scaling across edge features.",
             "jobs": "Optional override for edge assembly worker count.",
         },
-        defaults={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True, "jobs": 8},
+        defaults={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True, "jobs": 16},
     )
 
     def build_edges(

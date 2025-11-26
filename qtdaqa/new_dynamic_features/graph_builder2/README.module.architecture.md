@@ -23,7 +23,7 @@ This document captures how feature modules are structured, registered, and consu
 Each required stage has a block:
 ```
 defaults:
-  jobs: 8        # optional global worker override
+  jobs: 16       # optional global worker override
 
 interface:
   module: interface/polar_cutoff/v1
@@ -33,7 +33,7 @@ interface:
   params:
     cutoff: 10.0
     coordinate_decimals: -1
-    jobs: 8
+    jobs: 16
 topology:
   module: topology/persistence_basic/v1
   params: { ... }
@@ -119,6 +119,7 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Follow the existing pattern: define `_metadata`, implement `validate_params`, register with `@register_feature_module`, provide the stage method (extract/generate/build), and document parameters/defaults.
 - Keep params YAML-friendly (primitives/lists), and ensure `validate_params` handles coercion and range checks.
 - Add descriptive `summary` and `description` for `--list-modules` and README/catalog generation.
+- After registering a new module, sanity-check that it appears in `--list-modules` and in the `--create-feature-config --include-alternates` output, and add a minimal test covering metadata/feature_dim for regression.
 
 ## Planned (not implemented yet)
 - Edge aggregation modules that reuse per-residue topology to build relational edge features without rerunning persistence:
