@@ -30,6 +30,7 @@ class BuilderConfig:
     jobs: int = 4
     topology_dedup_sort: Optional[bool] = None
     dump_edges: Optional[bool] = None
+    sort_artifacts: Optional[bool] = None
     feature_config: Optional[Path] = None
     features: Dict[str, object] = field(default_factory=dict)
     builder_name: Optional[str] = None
@@ -117,6 +118,14 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
     builder_name_raw = raw.get("id") or raw.get("name") or raw.get("builder")
     builder_name = str(builder_name_raw).strip() if builder_name_raw else None
 
+    sort_artifacts_raw = raw.get("sort_artifacts")
+    if sort_artifacts_raw is None:
+        sort_artifacts_flag = None
+    elif isinstance(sort_artifacts_raw, bool):
+        sort_artifacts_flag = sort_artifacts_raw
+    else:
+        raise ValueError("builder.sort_artifacts must be a boolean when provided.")
+
     feature_config_path = _resolve_optional_path(raw.get("feature_config"), base_dir)
     if feature_config_path is not None and not feature_config_path.exists():
         raise FileNotFoundError(f"builder.feature_config not found: {feature_config_path}")
@@ -124,6 +133,7 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
     return BuilderConfig(
         jobs=jobs_int,
         builder_name=builder_name or None,
+        sort_artifacts=sort_artifacts_flag,
         feature_config=feature_config_path,
     )
 
@@ -399,6 +409,8 @@ def run_graph_builder(
         "--jobs",
         str(cfg.builder.jobs),
     ]
+    if cfg.builder.sort_artifacts is False:
+        cmd.append("--no-sort-artifacts")
     if feature_config_path is not None:
         cmd.extend(["--feature-config", str(feature_config_path)])
     logging.info("Running graph builder (%s): %s", module_path, " ".join(cmd))

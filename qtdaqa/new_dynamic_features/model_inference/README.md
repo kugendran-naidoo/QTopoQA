@@ -43,6 +43,7 @@ paths:
 
 builder:
   jobs: 12
+  sort_artifacts: true        # optional; set to false to append --no-sort-artifacts when rebuilding graphs
 
 options:
   reuse_existing_graphs: false
