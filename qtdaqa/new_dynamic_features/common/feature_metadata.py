@@ -395,6 +395,11 @@ def load_graph_feature_metadata(
             metadata.notes.append(f"Unable to coerce edge dimension {edge_dim!r} to int.")
             edge_dim = None
 
+    # Placeholders for optional module IDs (not always present in graph_metadata)
+    node_module = None
+    topology_module = None
+    interface_module = None
+
     node_dim = None
     if isinstance(node_columns, list):
         node_dim = len(node_columns)
