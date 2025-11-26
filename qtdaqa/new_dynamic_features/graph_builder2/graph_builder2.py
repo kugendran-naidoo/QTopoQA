@@ -584,7 +584,7 @@ def _render_feature_config_template(
     lines.append("# Pick one module per required stage. Edit parameter values as needed.")
     lines.append("# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.")
     lines.append("defaults:")
-    lines.append("  jobs: 8  # Optional global worker override; remove if unused.")
+    lines.append("  jobs: 16  # Optional global worker override; remove if unused.")
 
     kind_order = _ordered_kinds(modules_by_kind.keys())
 

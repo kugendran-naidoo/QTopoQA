@@ -19,7 +19,7 @@ from ...lib import topology_runner
 class PersistenceTopologyModule(TopologyFeatureModule):
     module_id = "topology/persistence_basic/v1"
     module_kind = "topology"
-    default_alias = "TopoQA default"
+    default_alias = "140D summarizes interface features TopoQA default"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -53,7 +53,7 @@ class PersistenceTopologyModule(TopologyFeatureModule):
                 ("N", "O"),
                 ("C", "N", "O"),
             ),
-            "jobs": 8,
+            "jobs": 16,
         },
     )
 

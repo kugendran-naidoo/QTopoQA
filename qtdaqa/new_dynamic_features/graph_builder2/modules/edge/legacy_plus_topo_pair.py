@@ -201,7 +201,7 @@ class LegacyPlusTopoPairEdgeModule(EdgeFeatureModule):
             "include_neighbors": True,
             "filtration_cutoff": 8.0,
             "min_persistence": 0.01,
-            "jobs": 8,
+            "jobs": 16,
         },
     )
 

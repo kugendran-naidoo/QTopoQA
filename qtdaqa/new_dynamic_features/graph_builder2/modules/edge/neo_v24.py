@@ -357,7 +357,7 @@ class NeoEdgeModuleV24(EdgeFeatureModule):
             "contact_normalizer": 50.0,
             "short_contact_max": 5.0,
             "long_band_mask": True,
-            "jobs": 8,
+            "jobs": 16,
         },
     )
 
