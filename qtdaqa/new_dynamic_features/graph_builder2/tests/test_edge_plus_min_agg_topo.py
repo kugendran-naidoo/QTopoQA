@@ -113,4 +113,34 @@ def test_edge_plus_min_agg_topo_builds_expected_shapes(tmp_path):
 
 def test_edge_plus_min_agg_topo_rejects_non_lean_variant():
     with pytest.raises(ValueError):
-        EdgePlusMinAggTopoModule.validate_params({"variant": "heavy"})
+        EdgePlusMinAggTopoModule.validate_params({"variant": "bogus"})
+
+
+def test_edge_plus_min_agg_topo_heavy_includes_minmax(tmp_path):
+    residues, id_to_index = _build_residues()
+    structure = _DummyStructure()
+    node_df = pd.DataFrame({"ID": [res.descriptor for res in residues], "feat": [1.0, 2.0]})
+    topo_vectors = [[1.0, 0.5, 0.25], [0.2, 0.3, 0.4]]
+    topology_path = _write_topology(tmp_path, node_df["ID"].tolist(), topo_vectors)
+
+    module = EdgePlusMinAggTopoModule(scale_histogram=False, variant="heavy", include_minmax=True)
+    result = module.build_edges(
+        model_key="test_heavy",
+        residues=residues,
+        id_to_index=id_to_index,
+        structure=structure,
+        node_df=node_df,
+        interface_path=Path("iface"),
+        topology_path=topology_path,
+        node_path=Path("node"),
+        pdb_path=Path("pdb"),
+        dump_path=None,
+    )
+
+    topo_dim = len(topo_vectors[0])
+    agg_dim = topo_dim * 5 + 2 + 1  # concat + diff + min + max + norms + cosine
+    expected_dim = module._HIST_DIM + agg_dim
+
+    assert result.edge_attr.shape == (4, expected_dim)
+    assert result.metadata["variant"] == "heavy"
+    assert result.metadata["include_minmax"] is True

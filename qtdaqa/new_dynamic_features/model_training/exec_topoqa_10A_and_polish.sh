@@ -25,6 +25,8 @@ export PYTHONPATH=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA
 
 # Check before running model_training
 
+echo "Validating graphs using standalone tool ..."
+
 # FIRST use of graph sort order validation
 # check the manifest
 python -m tools.validate_graphs --ignore-metadata \
@@ -40,11 +42,15 @@ export VALIDATE_GRAPHS=1
 export VALIDATE_GRAPHS_IGNORE_METADATA=1
 export VALIDATE_GRAPHS_MANIFEST=${CHECK_GRAPH_DIR}/graph_manifest.json
 
+echo "Starting model training ..."
+
 # run initial model training
 ./run_full_pipeline.sh --manifest manifests/run_exhaustive.yaml | 
 tee ${OUTPUT}_run_exhaustive_$(date +%Y%m%d_%H%M%S).log
 
-# run post trainingi polish from best
+echo "Starting post model training polishing ..."
+
+# run post training polish from best
 LAUNCH=1 MANIFEST_PATH=manifests/run_polish_heavy.yaml \
 ./polish_from_best.sh |
 tee ${OUTPUT}_polish_from_best_$(date +%Y%m%d_%H%M%S).log

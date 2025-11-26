@@ -83,7 +83,8 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
             "scale_histogram": "Apply MinMax scaling across the legacy distance + histogram block only.",
             "include_norms": "Include L2 norms of endpoint topology vectors.",
             "include_cosine": "Include cosine similarity between endpoint topology vectors.",
-            "variant": "Aggregation variant (lean only for v1).",
+            "include_minmax": "Include per-dimension min/max across endpoints (used by heavy variant).",
+            "variant": "Aggregation variant: lean (default) or heavy (adds min/max block).",
             "jobs": "Optional override for edge assembly worker count.",
         },
         defaults={
@@ -92,6 +93,7 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
             "scale_histogram": True,
             "include_norms": True,
             "include_cosine": True,
+            "include_minmax": False,
             "variant": "lean",
             "jobs": 16,
         },
@@ -119,16 +121,18 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
         scale_histogram = params.get("scale_histogram", True)
         include_norms = params.get("include_norms", True)
         include_cosine = params.get("include_cosine", True)
+        include_minmax = params.get("include_minmax", False)
         variant = params.get("variant", "lean")
         jobs = params.get("jobs")
 
-        if variant != "lean":
-            raise ValueError(f"Unsupported variant '{variant}' for edge_plus_min_agg_topo (lean only in v1).")
+        if variant not in {"lean", "heavy"}:
+            raise ValueError(f"Unsupported variant '{variant}' for edge_plus_min_agg_topo (expected lean|heavy).")
 
         topo_map, topo_dim = _load_topology_vectors(topology_path)
         if topo_dim <= 0:
             raise ValueError(f"No topology feature columns found in {topology_path}")
-        agg_dim = topo_dim * 3 + (2 if include_norms else 0) + (1 if include_cosine else 0)
+        minmax_dim = topo_dim * 2 if (variant == "heavy" and include_minmax) else 0
+        agg_dim = topo_dim * 3 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
 
         edges: List[List[int]] = []
         distances: List[float] = []
@@ -163,6 +167,9 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
                 legacy_block = [distance] + hist.tolist()
 
                 parts: List[np.ndarray] = [topo_src, topo_dst, np.abs(topo_src - topo_dst)]
+                if variant == "heavy" and include_minmax:
+                    parts.append(np.minimum(topo_src, topo_dst))
+                    parts.append(np.maximum(topo_src, topo_dst))
                 if include_norms:
                     parts.append(np.array([np.linalg.norm(topo_src), np.linalg.norm(topo_dst)], dtype=np.float32))
                 if include_cosine:
@@ -214,6 +221,7 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
             "topology_feature_dim": topo_dim,
             "include_norms": bool(include_norms),
             "include_cosine": bool(include_cosine),
+            "include_minmax": bool(include_minmax) if variant == "heavy" else False,
             "distance_window": [float(distance_min), float(distance_max)],
             "histogram_dim": self._HIST_DIM,
             "aggregation_dim": agg_dim,
@@ -247,12 +255,40 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
         if include_cosine is not None:
             params["include_cosine"] = require_bool(include_cosine, "edge.params.include_cosine")
 
+        include_minmax = params.get("include_minmax")
+        if include_minmax is not None:
+            params["include_minmax"] = require_bool(include_minmax, "edge.params.include_minmax")
+
         variant = params.get("variant")
         if variant is not None:
-            if str(variant).strip().lower() != "lean":
-                raise ValueError("edge.params.variant supports only 'lean' in v1.")
-            params["variant"] = "lean"
+            normalised = str(variant).strip().lower()
+            if normalised not in {"lean", "heavy"}:
+                raise ValueError("edge.params.variant must be 'lean' or 'heavy'.")
+            params["variant"] = normalised
 
         jobs = params.get("jobs")
         if jobs is not None:
             params["jobs"] = require_positive_int(jobs, "edge.params.jobs")
+
+    @classmethod
+    def config_template(cls) -> Dict[str, object]:
+        base = super().config_template()
+        base_params = dict(base.get("params", {}))
+        param_comments = dict(base.get("param_comments", {}))
+        param_comments.setdefault("include_minmax", "heavy variant only; adds per-dimension min/max blocks")
+        param_comments.setdefault("variant", "lean or heavy")
+        base["param_comments"] = param_comments
+
+        heavy_params = dict(base_params)
+        heavy_params.update({"variant": "heavy", "include_minmax": True})
+        base["alternates"] = [
+            {
+                "module": cls.module_id,
+                "alias": "edge_plus_min_agg_topo (heavy)",
+                "params": heavy_params,
+                "param_comments": param_comments,
+                "summary": cls._metadata.summary,
+                "description": cls._metadata.description,
+            }
+        ]
+        return base

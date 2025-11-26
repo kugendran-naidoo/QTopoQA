@@ -183,6 +183,8 @@ def run_edge_stage(
     failures: List[Tuple[str, str, Path]] = []
     edge_dim: Optional[int] = None
     metadata_records: Dict[str, Dict[str, object]] = {}
+    total_edge_time = 0.0
+    total_save_time = 0.0
 
     worker_count = max(1, int(jobs)) if jobs else 1
 
@@ -212,6 +214,8 @@ def run_edge_stage(
             else:
                 success += 1
                 edge_dim = result["edge_dim"]
+                total_edge_time += result.get("edge_time", 0.0) or 0.0
+                total_save_time += result.get("save_time", 0.0) or 0.0
             progress.increment()
     else:
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
@@ -235,6 +239,8 @@ def run_edge_stage(
                 else:
                     success += 1
                     edge_dim = result["edge_dim"]
+                    total_edge_time += result.get("edge_time", 0.0) or 0.0
+                    total_save_time += result.get("save_time", 0.0) or 0.0
                 progress.increment()
 
     if builder_metadata_full:
@@ -245,6 +251,19 @@ def run_edge_stage(
     write_schema_summary(output_dir)
 
     elapsed = time.perf_counter() - start
+    if success > 0:
+        avg_edge_time = total_edge_time / success
+        avg_save_time = total_save_time / success
+        logger.info(
+            "Edge timing summary: graphs=%d edge_build_total=%.3fs save_total=%.3fs "
+            "edge_build_avg=%.4fs save_avg=%.4fs stage_elapsed=%.3fs",
+            success,
+            total_edge_time,
+            total_save_time,
+            avg_edge_time,
+            avg_save_time,
+            elapsed,
+        )
 
     return {
         "processed": len(tasks),
@@ -266,10 +285,12 @@ def _process_task(
     output_dir: Path,
     edge_dump_dir: Optional[Path],
     metadata_records: Dict[str, Dict[str, object]],
-    builder_metadata: Optional[Dict[str, object]],
-    sort_artifacts: bool,
+        builder_metadata: Optional[Dict[str, object]],
+        sort_artifacts: bool,
 ) -> Dict[str, object]:
     log_lines: List[str] = []
+    edge_time = 0.0
+    save_time = 0.0
     try:
         node_df, feature_cols = _load_node_features(task.node_path)
         residues = _parse_interface_file(task.interface_path)
@@ -283,6 +304,7 @@ def _process_task(
             dump_path = (edge_dump_dir / Path(task.model_key).with_suffix(".edges.csv")).resolve()
             dump_path.parent.mkdir(parents=True, exist_ok=True)
 
+        edge_start = time.perf_counter()
         edge_result: EdgeBuildResult = edge_module.build_edges(
             model_key=task.model_key,
             residues=residues,
@@ -295,6 +317,7 @@ def _process_task(
             pdb_path=task.pdb_path,
             dump_path=dump_path,
         )
+        edge_time = time.perf_counter() - edge_start
 
         module_id = edge_module.metadata().module_id
         edge_metadata = dict(edge_result.metadata)
@@ -320,7 +343,9 @@ def _process_task(
             data.metadata["builder"] = builder_metadata
         output_path = output_dir / Path(f"{task.model_key}.pt")
         output_path.parent.mkdir(parents=True, exist_ok=True)
+        save_start = time.perf_counter()
         torch.save(data, output_path)
+        save_time = time.perf_counter() - save_start
         entry = {
             "edge_module": module_id,
             "edge_params": edge_module.params,
@@ -346,7 +371,7 @@ def _process_task(
         )
         task.log_path.parent.mkdir(parents=True, exist_ok=True)
         task.log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
-        return {"error": None, "edge_dim": feature_dim}
+        return {"error": None, "edge_dim": feature_dim, "edge_time": edge_time, "save_time": save_time}
     except Exception as exc:  # pragma: no cover
         log_lines.extend(
             [
@@ -357,4 +382,4 @@ def _process_task(
         )
         task.log_path.parent.mkdir(parents=True, exist_ok=True)
         task.log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
-        return {"error": str(exc), "edge_dim": None}
+        return {"error": str(exc), "edge_dim": None, "edge_time": edge_time, "save_time": save_time}

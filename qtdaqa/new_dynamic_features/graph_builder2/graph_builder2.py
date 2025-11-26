@@ -429,6 +429,20 @@ def _collect_module_templates() -> Dict[str, List[Dict[str, object]]]:
             "description": meta.description or "",
         }
         templates.setdefault(meta.module_kind, []).append(entry)
+        alternates = snippet.get("alternates")
+        if isinstance(alternates, list):
+            for alt in alternates:
+                alt_params = dict(alt.get("params", params))
+                templates.setdefault(meta.module_kind, []).append(
+                    {
+                        "module_id": alt.get("module", meta.module_id),
+                        "alias": alt.get("alias") or getattr(module_cls, "default_alias", None),
+                        "params": alt_params,
+                        "param_comments": dict(alt.get("param_comments", {})),
+                        "summary": alt.get("summary", meta.summary or ""),
+                        "description": alt.get("description", meta.description or ""),
+                    }
+                )
 
     for entries in templates.values():
         entries.sort(key=lambda item: item["module_id"])  # type: ignore[index]
