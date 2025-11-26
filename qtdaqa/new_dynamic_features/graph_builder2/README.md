@@ -66,6 +66,11 @@ Pass `--edge-dump-dir /abs/elsewhere` to redirect them, `--no-dump-edges` to ski
 generating them, or `--dump-edges` to force them back on even if the feature config
 disables dumping.
 
+Determinism:
+- Interface files are always sorted (chain → residue_seq → insertion_code → residue_name → x → y → z).
+- Edge ordering inside `.pt` files is always sorted by (src_idx, dst_idx, distance).
+- Additional “belt-and-suspenders” sorting for topology/node/edge CSV artifacts is **on by default**; disable with `--no-sort-artifacts`. Disabling does not affect the mandatory interface or in-graph edge ordering.
+
 ---
 
 ## Feature Configuration
@@ -164,6 +169,20 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
   and concatenates the topology summary to the histogram vector. Tune
   `neighbor_distance`, `include_neighbors`, `filtration_cutoff`, and
   `min_persistence` to control the geometric context captured for each pair.
+- (Planned) Aggregated-topology edge variants – reuse the per-residue topology
+  vectors already computed for interface residues to build relational signals per
+  edge without rerunning persistence. For an edge (u, v), combine the endpoint
+  topo vectors with:
+  * Asymmetric context: keep both endpoints (concat) so source/target can differ.
+  * Symmetric relations: mean, abs-diff (and optionally min/max, cosine) to show
+    how similar or different the endpoints’ topology is.
+  * Optional local context: pool neighbors’ topo around each endpoint, then apply
+    the same mean/abs-diff (optionally min/max/cosine) to the pooled summaries.
+  This augments the legacy 11‑D histogram with cheap, deterministic relational
+  topology, leveraging the topo features that already performed well at the node
+  level. These will preserve the existing deterministic edge ordering
+  (src_idx, dst_idx, distance) and rely on the canonical interface/node/topology
+  sorting already in place.
 
 ---
 

@@ -220,6 +220,11 @@ def _discover_summary_path(graph_dir: Path, explicit: Optional[Path]) -> Optiona
         path = explicit.resolve()
         return path if path.exists() else None
 
+    # Prefer a summary co-located with the graph_dir (graph_builder copies it there)
+    local_summary = graph_dir / "graph_builder_summary.json"
+    if local_summary.exists():
+        return local_summary.resolve()
+
     def _candidate_logs_dirs(parent: Path) -> List[Path]:
         candidates: List[Path] = []
         default_logs = parent / "logs"
@@ -439,6 +444,20 @@ def load_graph_feature_metadata(
                 summary_text = edge_info.get("summary")
                 if summary_text:
                     metadata.edge_schema.setdefault("summary", summary_text)
+    # Fallback: if module_registry is still empty, derive minimal entries from metadata
+    if not metadata.module_registry:
+        derived: Dict[str, Dict[str, object]] = {}
+        if edge_module:
+            derived["edge"] = {"id": edge_module}
+        if node_module:
+            derived["node"] = {"id": node_module}
+        if topology_module:
+            derived["topology"] = {"id": topology_module}
+        if interface_module:
+            derived["interface"] = {"id": interface_module}
+        if derived:
+            metadata.module_registry = derived
+            metadata.notes.append("module_registry derived from graph_metadata (schema_summary missing or empty).")
 
     graph_paths = _iter_sample_paths(graph_dir, selected_models, max_pt_samples)
     edge_dims_from_graphs: List[int] = []

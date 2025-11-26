@@ -275,6 +275,14 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Disable writing per-structure edge CSV dumps.",
     )
     parser.add_argument(
+        "--no-sort-artifacts",
+        action="store_true",
+        help=(
+            "Disable belt-and-suspenders sorting for topology/node/edge CSV artifacts. "
+            "Interface ordering and in-graph edge ordering remain deterministic."
+        ),
+    )
+    parser.add_argument(
         "--pdb-warnings",
         action="store_true",
         help="Emit Bio.PDB structure parsing warnings instead of suppressing them.",
@@ -785,6 +793,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     feature_config_path = Path(args.feature_config).expanduser().resolve()
     args.feature_config = str(feature_config_path)
     cli_jobs = args.jobs if args.jobs is not None else None
+    sort_artifacts = not bool(getattr(args, "no_sort_artifacts", False))
 
     try:
         ensure_tree_readable(dataset_dir)
@@ -862,6 +871,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         _format_module(edge_module.metadata().module_id, edge_alias),
         edge_jobs,
     )
+    LOG.info(
+        "Artifact CSV sorting: %s (interface ordering always deterministic)",
+        "enabled" if sort_artifacts else "disabled via --no-sort-artifacts",
+    )
 
     pdb_files = sorted(dataset_dir.rglob("*.pdb"))
     if not pdb_files:
@@ -920,6 +933,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         interface_dir=interface_result["output_dir"],
         work_dir=work_dir,
         log_dir=run_info.run_dir,
+        sort_artifacts=sort_artifacts,
     )
     summary["topology"] = topology_result
     LOG.info("Topology stage complete: %d success, %d failures", topology_result["success"], len(topology_result["failures"]))
@@ -934,6 +948,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         topology_dir=topology_result["output_dir"],
         work_dir=work_dir,
         log_dir=run_info.run_dir,
+        sort_artifacts=sort_artifacts,
     )
     summary["node"] = node_result
     LOG.info("Node stage complete: %d success, %d failures", node_result["success"], len(node_result["failures"]))
@@ -988,6 +1003,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         jobs=edge_jobs,
         edge_dump_dir=edge_dump_dir,
         builder_info=builder_info,
+        sort_artifacts=sort_artifacts,
     )
     summary["edge"] = edge_result
     graph_stage_elapsed = time.perf_counter() - graph_stage_start

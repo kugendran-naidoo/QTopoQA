@@ -72,7 +72,7 @@ def _stage_inputs(task: NodeTask) -> Tuple[tempfile.TemporaryDirectory, Path, Pa
     return temp_dir, iface_dir, topo_dir
 
 
-def _process_task(task: NodeTask, drop_na: bool) -> Tuple[str, Optional[str]]:
+def _process_task(task: NodeTask, drop_na: bool, sort_artifacts: bool) -> Tuple[str, Optional[str]]:
     log_lines: List[str] = []
     temp: Optional[tempfile.TemporaryDirectory] = None
     task.log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -100,7 +100,7 @@ def _process_task(task: NodeTask, drop_na: bool) -> Tuple[str, Optional[str]]:
             pd.set_option("future.no_silent_downcasting", True)
             fea_df.replace("NA", pd.NA, inplace=True)
             fea_df = fea_df.dropna()
-        fea_df = _canonicalise_node_df(fea_df)
+        fea_df = _canonicalise_node_df(fea_df, sort_artifacts=sort_artifacts)
         fea_df.to_csv(task.output_path, index=False)
         if captured:
             log_lines.append("Warnings:")
@@ -128,6 +128,7 @@ def run_node_stage(
     log_dir: Path,
     drop_na: bool = False,
     jobs: Optional[int] = None,
+    sort_artifacts: bool = True,
 ) -> Dict[str, object]:
     node_dir = work_dir / "node_features"
     node_dir.mkdir(parents=True, exist_ok=True)
@@ -169,7 +170,7 @@ def run_node_stage(
         worker_count = max(1, int(jobs)) if jobs else 1
         if worker_count <= 1:
             for task in node_tasks:
-                model_key, error = _process_task(task, drop_na)
+                model_key, error = _process_task(task, drop_na, sort_artifacts)
                 if error:
                     failures.append((model_key, task.log_path, error))
                 else:
@@ -177,7 +178,10 @@ def run_node_stage(
                 progress.increment()
         else:
             with ThreadPoolExecutor(max_workers=worker_count) as executor:
-                future_map = {executor.submit(_process_task, task, drop_na): task.model_key for task in node_tasks}
+                future_map = {
+                    executor.submit(_process_task, task, drop_na, sort_artifacts): task.model_key
+                    for task in node_tasks
+                }
                 for future in as_completed(future_map):
                     model_key, error = future.result()
                     if error:
@@ -197,8 +201,8 @@ def run_node_stage(
     }
 
 
-def _canonicalise_node_df(fea_df: pd.DataFrame) -> pd.DataFrame:
-    if "ID" not in fea_df.columns:
+def _canonicalise_node_df(fea_df: pd.DataFrame, sort_artifacts: bool = True) -> pd.DataFrame:
+    if not sort_artifacts or "ID" not in fea_df.columns:
         return fea_df.reset_index(drop=True)
     order = canonical_id_order(list(fea_df["ID"]))
     if order == list(range(len(order))):
