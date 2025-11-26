@@ -64,6 +64,7 @@ class PersistenceTopologyModule(TopologyFeatureModule):
         interface_dir: Path,
         work_dir: Path,
         log_dir: Path,
+        sort_artifacts: bool = True,
     ):
         params = self.params
         element_filters: Sequence[Sequence[str]] = tuple(tuple(x) for x in params["element_filters"])
@@ -79,6 +80,7 @@ class PersistenceTopologyModule(TopologyFeatureModule):
             element_filters=element_filters,
             dedup_sort=bool(params["dedup_sort"]),
             jobs=params.get("jobs"),
+            sort_artifacts=sort_artifacts,
         )
 
     @classmethod

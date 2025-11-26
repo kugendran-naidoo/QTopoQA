@@ -44,6 +44,23 @@ except ImportError:  # pragma: no cover
 LOG = logging.getLogger(__name__)
 
 
+def _sort_edge_dump(dump_path: Path) -> None:
+    if not dump_path.exists():
+        return
+    try:
+        df = pd.read_csv(dump_path)
+    except Exception as exc:  # pragma: no cover - best-effort guard
+        LOG.warning("Could not sort edge dump %s: %s", dump_path, exc)
+        return
+    key_cols = [col for col in ("src_idx", "dst_idx", "distance") if col in df.columns]
+    if not key_cols:
+        return
+    tie_breakers = [col for col in ("src_id", "dst_id", "band") if col in df.columns and col not in key_cols]
+    sort_cols = key_cols + tie_breakers
+    df.sort_values(by=sort_cols, kind="mergesort", inplace=True)
+    df.to_csv(dump_path, index=False)
+
+
 @dataclass
 class GraphTask:
     model_key: str
@@ -145,6 +162,7 @@ def run_edge_stage(
     jobs: Optional[int] = None,
     edge_dump_dir: Optional[Path] = None,
     builder_info: Optional[Dict[str, object]] = None,
+    sort_artifacts: bool = True,
 ) -> Dict[str, object]:
     log_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -187,6 +205,7 @@ def run_edge_stage(
                 edge_dump_dir,
                 metadata_records,
                 builder_metadata_for_graphs,
+                sort_artifacts,
             )
             if result["error"]:
                 failures.append((task.model_key, result["error"], task.log_path))
@@ -205,6 +224,7 @@ def run_edge_stage(
                     edge_dump_dir,
                     metadata_records,
                     builder_metadata_for_graphs,
+                    sort_artifacts,
                 ): task
                 for task in tasks
             }
@@ -247,6 +267,7 @@ def _process_task(
     edge_dump_dir: Optional[Path],
     metadata_records: Dict[str, Dict[str, object]],
     builder_metadata: Optional[Dict[str, object]],
+    sort_artifacts: bool,
 ) -> Dict[str, object]:
     log_lines: List[str] = []
     try:
@@ -309,6 +330,8 @@ def _process_task(
         if builder_metadata:
             entry["builder"] = builder_metadata
         metadata_records[task.model_key] = entry
+        if sort_artifacts and dump_path is not None:
+            _sort_edge_dump(dump_path)
         log_lines.extend(
             [
                 f"Model key: {task.model_key}",

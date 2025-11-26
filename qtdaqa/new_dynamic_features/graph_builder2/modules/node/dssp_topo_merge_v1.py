@@ -38,6 +38,7 @@ class DSSPTopologyNodeModule(NodeFeatureModule):
         topology_dir: Path,
         work_dir: Path,
         log_dir: Path,
+        sort_artifacts: bool = True,
     ):
         params = self.params
         return node_runner.run_node_stage(
@@ -49,6 +50,7 @@ class DSSPTopologyNodeModule(NodeFeatureModule):
             log_dir=log_dir,
             drop_na=bool(params["drop_na"]),
             jobs=params.get("jobs"),
+            sort_artifacts=sort_artifacts,
         )
 
     @classmethod

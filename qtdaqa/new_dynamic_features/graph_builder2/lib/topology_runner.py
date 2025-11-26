@@ -61,6 +61,7 @@ def run_topology_stage(
     element_filters: Sequence[Sequence[str]],
     dedup_sort: bool = False,
     jobs: Optional[int] = None,
+    sort_artifacts: bool = True,
 ) -> Dict[str, object]:
     topology_dir = work_dir / "topology"
     topology_dir.mkdir(parents=True, exist_ok=True)
@@ -105,14 +106,19 @@ def run_topology_stage(
         if worker_count <= 1:
             for pdb_path, interface_path, output_path, log_path in tasks:
                 success += _process_single_topology_task(
-                    pdb_path, interface_path, output_path, log_path, config, failures
+                    pdb_path, interface_path, output_path, log_path, config, failures, sort_artifacts=sort_artifacts
                 )
                 progress.increment()
         else:
             with ProcessPoolExecutor(max_workers=worker_count) as executor:
                 future_to_meta = {
                     executor.submit(
-                        _process_topology_in_subprocess, pdb_path, interface_path, output_path, config
+                        _process_topology_in_subprocess,
+                        pdb_path,
+                        interface_path,
+                        output_path,
+                        config,
+                        sort_artifacts,
                     ): (
                         pdb_path,
                         interface_path,
@@ -169,6 +175,7 @@ def _process_single_topology_task(
     log_path: Path,
     config: TopologicalConfig,
     failures: List[Tuple[Path, Path, str]],
+    sort_artifacts: bool = True,
 ) -> int:
     descriptors, error = _load_interface_descriptors(interface_path)
     if error:
@@ -178,6 +185,8 @@ def _process_single_topology_task(
 
     try:
         frame = compute_features_for_residues(pdb_path, descriptors, config)
+        if sort_artifacts and "ID" in frame.columns:
+            frame = frame.sort_values(by=["ID"], kind="mergesort").reset_index(drop=True)
         frame.to_csv(output_path, index=False)
         log_path.write_text(
             "\n".join(
@@ -203,10 +212,13 @@ def _process_topology_in_subprocess(
     interface_path: Path,
     output_path: Path,
     config: TopologicalConfig,
+    sort_artifacts: bool = True,
 ) -> Dict[str, object]:
     descriptors, error = _load_interface_descriptors(interface_path)
     if error:
         return {"residue_count": 0, "error": error}
     frame = compute_features_for_residues(pdb_path, descriptors, config)
+    if sort_artifacts and "ID" in frame.columns:
+        frame = frame.sort_values(by=["ID"], kind="mergesort").reset_index(drop=True)
     frame.to_csv(output_path, index=False)
     return {"residue_count": len(descriptors), "error": None}
