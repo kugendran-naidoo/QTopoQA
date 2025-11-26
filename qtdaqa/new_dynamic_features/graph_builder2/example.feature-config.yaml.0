@@ -1,0 +1,165 @@
+# Auto-generated feature-config template
+# Pick one module per required stage. Edit parameter values as needed.
+# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.
+defaults:
+  jobs: 16  # Optional global worker override; remove if unused.
+
+# REQUIRED stage: interface
+interface:
+  module: interface/polar_cutoff/v1  # alias: n x 3D TopoQA default 10A cutoff
+  alias: "n x 3D TopoQA default 10A cutoff"
+  summary: "Polar interface detection using distance cutoff."
+  description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1  # skip rounding to keep raw coords
+    jobs: 16
+
+# OPTIONAL stage: topology
+topology:
+  module: topology/persistence_basic/v1  # alias: 140D summarizes interface features TopoQA default
+  alias: "140D summarizes interface features TopoQA default"
+  summary: "Persistent homology features with configurable distance thresholds."
+  description: "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input."
+  params:
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    dedup_sort: false
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    jobs: 16
+
+# REQUIRED stage: node
+node:
+  module: node/dssp_topo_merge/v1  # alias: 172D (140D Topological consumes Interface + 32D) TopoQA default
+  alias: "172D (140D Topological consumes Interface + 32D) TopoQA default"
+  summary: "DSSP-derived node features merged with topology statistics."
+  description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
+  params:
+    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 16
+
+# REQUIRED stage: edge
+edge:
+  module: edge/legacy_band/v11  # alias: 11D TopoQA default 10A cutoff
+  alias: "11D TopoQA default 10A cutoff"
+  summary: "11-D legacy edge features (distance + atom distance histogram)."
+  description: "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1]."
+  params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_features: true
+    jobs: 16
+
+# Alternate edge modules (uncomment to use):
+# edge:
+#   module: edge/edge_plus_min_agg_topo/v1  # alias: 11D Legacy + [3*140D topo + norms(2D) + cosine (1D)] = 434D topo concat/diff (lean)
+#   alias: "11D Legacy + [3*140D topo + norms(2D) + cosine (1D)] = 434D topo concat/diff (lean)"
+#   summary: "Legacy 11D histogram plus per-residue topology concat+abs-diff+cosine (lean)."
+#   description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.0
+#     scale_histogram: true
+#     include_norms: true
+#     include_cosine: true
+#     include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
+#     variant: lean  # lean or heavy
+#     jobs: 16
+#
+# edge:
+#   module: edge/edge_plus_min_agg_topo/v1  # alias: edge_plus_min_agg_topo (heavy)
+#   alias: "edge_plus_min_agg_topo (heavy)"
+#   summary: "Legacy 11D histogram plus per-residue topology concat+abs-diff+cosine (lean)."
+#   description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.0
+#     scale_histogram: true
+#     include_norms: true
+#     include_cosine: true
+#     include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
+#     variant: heavy  # lean or heavy
+#     jobs: 16
+#
+# edge:
+#   module: edge/legacy_plus_topo_pair  # alias: Legacy 11D + pair topology
+#   alias: "Legacy 11D + pair topology"
+#   summary: "11-D legacy edges augmented with pair-wise topological summaries."
+#   description: "Extends the legacy histogram features by computing persistent homology summaries over the two residues forming each edge (optionally including nearby residues)."
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.0
+#     scale_features: true
+#     neighbor_distance: 4.0
+#     include_neighbors: true
+#     filtration_cutoff: 8.0
+#     min_persistence: 0.01
+#     jobs: 16
+#
+# edge:
+#   module: edge/multi_scale/v24  # alias: 24D Scalars
+#   alias: "24D Scalars"
+#   summary: "24-D multi-scale edge features with distance bands and histograms."
+#   description: "Computes directed residue-residue edges with distance, inverse distance, unit vectors, chain/amino-acid encodings, band indicators, inter-residue distance histograms, and contact counts."
+#   params:
+#     bands:
+#       - label: short
+#         min_distance: 0.0
+#         max_distance: 6.0
+#       - label: medium
+#         min_distance: 6.0
+#         max_distance: 10.0
+#       - label: long
+#         min_distance: 10.0
+#         max_distance: 14.0
+#     histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0]
+#     contact_threshold: 5.0
+#     include_inverse_distance: true
+#     include_unit_vector: true
+#     unit_vector_epsilon: 1.0e-08
+#     jobs: 16
+#
+# edge:
+#   module: edge/neo/v24  # alias: Neo hybrid multi-scale
+#   alias: "Neo hybrid multi-scale"
+#   summary: "27-D neo edge features (hybrid histogram + geometric cues)."
+#   description: "Extends the legacy 11-D histogram with multi-scale distance bands, unit vectors, weighted histograms truncated to 10 \u00c5, multiple contact thresholds, and optional long-band masks."
+#   params:
+#     bands:
+#       - label: short
+#         min_distance: 0.0
+#         max_distance: 6.0
+#       - label: medium
+#         min_distance: 6.0
+#         max_distance: 10.0
+#       - label: long
+#         min_distance: 10.0
+#         max_distance: 14.0
+#     histogram_bins: [0.0, 2.0, 4.0, 6.0, 8.0, 10.0]
+#     histogram_mode: density_times_contact
+#     contact_thresholds: [5.0, 10.0]
+#     include_inverse_distance: true
+#     include_unit_vector: true
+#     unit_vector_epsilon: 1.0e-08
+#     scale_features: true
+#     contact_normalizer: 50.0
+#     short_contact_max: 5.0
+#     long_band_mask: true
+#     jobs: 16
+#
+
+# OPTIONAL custom stages ------------------------------------------------
+# Add new top-level keys (e.g., `mol`) only if the builder has logic to process them.
+# Each custom block must still follow the `module` + `params` structure shown above.
+# Example:
+# mol:
+#   module: custom/mol_stage/v1
+#   params: {}
