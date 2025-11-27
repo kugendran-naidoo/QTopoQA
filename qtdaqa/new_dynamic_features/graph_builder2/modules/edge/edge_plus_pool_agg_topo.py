@@ -105,7 +105,7 @@ def _pooled_mean(
 class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
     module_id = "edge/edge_plus_pool_agg_topo/v1"
     module_kind = "edge"
-    default_alias = "11D Legacy + pooled balanced topo agg (lean)"
+    default_alias = "11D Legacy + 1000D (lean) / 1400D (heavy) 10A"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -125,7 +125,8 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
             "include_norms": "Include L2 norms of endpoint topology vectors (and pooled means).",
             "include_cosine": "Include cosine similarity between endpoint (and pooled) topology vectors.",
             "pool_k": "Number of nearest interface residues to include in pooled means per endpoint.",
-            "variant": "Aggregation variant (lean only in v1).",
+            "include_minmax": "Include per-dimension min/max across endpoints and pooled summaries (heavy variant).",
+            "variant": "Aggregation variant: lean (default) or heavy (adds min/max blocks).",
             "jobs": "Optional override for edge assembly worker count.",
         },
         defaults={
@@ -135,6 +136,7 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
             "include_norms": True,
             "include_cosine": True,
             "pool_k": 5,
+            "include_minmax": False,
             "variant": "lean",
             "jobs": 16,
         },
@@ -164,16 +166,18 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
         include_cosine = params.get("include_cosine", True)
         pool_k = params.get("pool_k", 5)
         variant = params.get("variant", "lean")
+        include_minmax = params.get("include_minmax", False)
         jobs = params.get("jobs")
 
-        if variant != "lean":
-            raise ValueError(f"Unsupported variant '{variant}' for edge_plus_pool_agg_topo (lean only in v1).")
+        if variant not in {"lean", "heavy"}:
+            raise ValueError(f"Unsupported variant '{variant}' for edge_plus_pool_agg_topo (expected lean|heavy).")
 
         topo_map, topo_dim = _load_topology_vectors(topology_path)
         if topo_dim <= 0:
             raise ValueError(f"No topology feature columns found in {topology_path}")
-        endpoint_agg_dim = topo_dim * 4 + (2 if include_norms else 0) + (1 if include_cosine else 0)
-        pooled_agg_dim = topo_dim * 4 + (2 if include_norms else 0) + (1 if include_cosine else 0)
+        minmax_dim = topo_dim * 2 if (variant == "heavy" and include_minmax) else 0
+        endpoint_agg_dim = topo_dim * 4 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
+        pooled_agg_dim = topo_dim * 4 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
         agg_dim = endpoint_agg_dim + pooled_agg_dim
 
         edges: List[List[int]] = []
@@ -215,6 +219,9 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
 
                 mean_vec = (topo_src + topo_dst) * 0.5
                 parts_endpoint: List[np.ndarray] = [topo_src, topo_dst, mean_vec, np.abs(topo_src - topo_dst)]
+                if variant == "heavy" and include_minmax:
+                    parts_endpoint.append(np.minimum(topo_src, topo_dst))
+                    parts_endpoint.append(np.maximum(topo_src, topo_dst))
                 if include_norms:
                     parts_endpoint.append(np.array([np.linalg.norm(topo_src), np.linalg.norm(topo_dst)], dtype=np.float32))
                 if include_cosine:
@@ -223,6 +230,9 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
 
                 pooled_mean_vec = (pooled_src + pooled_dst) * 0.5
                 parts_pooled: List[np.ndarray] = [pooled_src, pooled_dst, pooled_mean_vec, np.abs(pooled_src - pooled_dst)]
+                if variant == "heavy" and include_minmax:
+                    parts_pooled.append(np.minimum(pooled_src, pooled_dst))
+                    parts_pooled.append(np.maximum(pooled_src, pooled_dst))
                 if include_norms:
                     parts_pooled.append(
                         np.array([np.linalg.norm(pooled_src), np.linalg.norm(pooled_dst)], dtype=np.float32)
@@ -278,6 +288,7 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
             "topology_feature_dim": topo_dim,
             "include_norms": bool(include_norms),
             "include_cosine": bool(include_cosine),
+            "include_minmax": bool(include_minmax) if variant == "heavy" else False,
             "pool_k": k_neighbors,
             "distance_window": [float(distance_min), float(distance_max)],
             "histogram_dim": self._HIST_DIM,
@@ -318,11 +329,15 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
         if pool_k is not None:
             params["pool_k"] = require_positive_int(pool_k, "edge.params.pool_k")
 
+        include_minmax = params.get("include_minmax")
+        if include_minmax is not None:
+            params["include_minmax"] = require_bool(include_minmax, "edge.params.include_minmax")
+
         variant = params.get("variant")
         if variant is not None:
             normalised = str(variant).strip().lower()
-            if normalised != "lean":
-                raise ValueError("edge.params.variant supports only 'lean' in v1.")
+            if normalised not in {"lean", "heavy"}:
+                raise ValueError("edge.params.variant must be 'lean' or 'heavy'.")
             params["variant"] = normalised
 
         jobs = params.get("jobs")
@@ -333,7 +348,20 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
     def config_template(cls) -> Dict[str, object]:
         base = super().config_template()
         param_comments = dict(base.get("param_comments", {}))
-        param_comments.setdefault("variant", "lean only (heavy will add min/max on endpoints and pooled)")
+        param_comments.setdefault("variant", "lean or heavy")
+        param_comments.setdefault("include_minmax", "heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg")
         param_comments.setdefault("pool_k", "number of nearest interface residues to pool per endpoint (default 5)")
         base["param_comments"] = param_comments
+        heavy_params = dict(base.get("params", {}))
+        heavy_params.update({"variant": "heavy", "include_minmax": True})
+        base["alternates"] = [
+            {
+                "module": cls.module_id,
+                "alias": "11D Legacy + 1000D (lean) / 1400D (heavy) 10A",
+                "params": heavy_params,
+                "param_comments": param_comments,
+                "summary": cls._metadata.summary,
+                "description": cls._metadata.description,
+            }
+        ]
         return base

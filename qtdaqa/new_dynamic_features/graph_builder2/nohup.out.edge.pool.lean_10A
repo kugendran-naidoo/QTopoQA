@@ -101,3 +101,22 @@
 2025-11-27 15:49:54 INFO [Graph assembly] 60.0% complete (8628/14391)
 2025-11-27 16:06:13 INFO [Graph assembly] 65.0% complete (9347/14391)
 2025-11-27 16:22:57 INFO [Graph assembly] 69.9% complete (10066/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 74.9% complete (10785/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 79.9% complete (11504/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 84.9% complete (12223/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 89.9% complete (12942/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 94.9% complete (13661/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 99.9% complete (14380/14391)
+2025-11-27 18:17:09 INFO [Graph assembly] 100.0% complete (14391/14391)
+2025-11-27 18:17:18 INFO Graph assembly (.pt output) complete: 14391 success, 0 failures
+2025-11-27 18:17:18 INFO Graph (.pt) generation elapsed time: 27648.84 s (edge stage: 27653.75 s)
+2025-11-27 18:17:18 INFO Summary written to graph_builder.2025-11-27_08-27-21/graph_builder_summary.json
+2025-11-27 18:17:18 INFO Summary log written to graph_builder.2025-11-27_08-27-21/graph_builder_summary.log
+2025-11-27 18:17:18 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_builder_summary.json
+2025-11-27 18:17:18 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_builder_summary.log
+2025-11-27 18:17:18 INFO Dynamic graph builder completed successfully.
+
+real	589m58.305s
+user	1393m37.694s
+sys	1218m10.669s
+    35398.35 real     83617.69 user     73090.67 sys

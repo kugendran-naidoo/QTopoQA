@@ -64,7 +64,7 @@ def _safe_cosine(vec_a: np.ndarray, vec_b: np.ndarray, eps: float = 1e-8) -> flo
 class EdgePlusBalAggTopoModule(EdgeFeatureModule):
     module_id = "edge/edge_plus_bal_agg_topo/v1"
     module_kind = "edge"
-    default_alias = "11D Legacy + balanced topo agg (lean)"
+    default_alias = "11D Legacy + 561D (lean) / 841D (heavy) 10A"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -283,7 +283,7 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
         base["alternates"] = [
             {
                 "module": cls.module_id,
-                "alias": "edge_plus_bal_agg_topo (heavy)",
+                "alias": "11D Legacy + 561D (lean) / 841D (heavy) 10A",
                 "params": heavy_params,
                 "param_comments": param_comments,
                 "summary": cls._metadata.summary,
