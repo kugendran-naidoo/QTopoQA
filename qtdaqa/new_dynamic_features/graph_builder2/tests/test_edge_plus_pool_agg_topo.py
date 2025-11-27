@@ -9,8 +9,8 @@ import pandas as pd
 import pytest
 
 from qtdaqa.new_dynamic_features.graph_builder2.lib.edge_common import InterfaceResidue
-from qtdaqa.new_dynamic_features.graph_builder2.modules.edge.edge_plus_bal_agg_topo import (
-    EdgePlusBalAggTopoModule,
+from qtdaqa.new_dynamic_features.graph_builder2.modules.edge.edge_plus_pool_agg_topo import (
+    EdgePlusPoolAggTopoModule,
 )
 
 
@@ -36,6 +36,7 @@ class _DummyStructure:
         self._store = {
             ("A", 1, " "): _FakeResidue([[0.0, 0.0, 0.0], [0.5, 0.0, 0.0]]),
             ("B", 2, " "): _FakeResidue([[0.0, 3.0, 0.0], [0.0, 3.5, 0.0]]),
+            ("B", 3, " "): _FakeResidue([[0.0, 5.0, 0.0], [0.0, 5.5, 0.0]]),
         }
 
     def get_residue(self, chain_id: str, residue_seq: int, insertion_code: str):
@@ -60,6 +61,14 @@ def _build_residues() -> Tuple[List[InterfaceResidue], dict]:
             residue_name="ARG",
             coord=np.array([0.0, 3.5, 0.0]),
         ),
+        InterfaceResidue(
+            descriptor="c<B>r<3>R<GLY>",
+            chain_id="B",
+            residue_seq=3,
+            insertion_code=" ",
+            residue_name="GLY",
+            coord=np.array([0.0, 5.0, 0.0]),
+        ),
     ]
     id_to_index = {res.descriptor: idx for idx, res in enumerate(residues)}
     return residues, id_to_index
@@ -76,14 +85,14 @@ def _write_topology(tmp_path: Path, ids: List[str], vectors: List[List[float]]) 
     return path
 
 
-def test_edge_plus_bal_agg_topo_builds_expected_shapes(tmp_path):
+def test_edge_plus_pool_agg_topo_builds_expected_shapes(tmp_path):
     residues, id_to_index = _build_residues()
     structure = _DummyStructure()
-    node_df = pd.DataFrame({"ID": [res.descriptor for res in residues], "feat": [1.0, 2.0]})
-    topo_vectors = [[1.0, 0.5, 0.25], [0.2, 0.3, 0.4]]
+    node_df = pd.DataFrame({"ID": [res.descriptor for res in residues], "feat": [1.0, 2.0, 3.0]})
+    topo_vectors = [[1.0, 0.5, 0.25], [0.2, 0.3, 0.4], [0.3, 0.1, 0.2]]
     topology_path = _write_topology(tmp_path, node_df["ID"].tolist(), topo_vectors)
 
-    module = EdgePlusBalAggTopoModule(scale_histogram=False)  # keep histogram block unscaled for assertions
+    module = EdgePlusPoolAggTopoModule(scale_histogram=False, pool_k=1)  # keep histogram block unscaled
     result = module.build_edges(
         model_key="test_model",
         residues=residues,
@@ -98,49 +107,22 @@ def test_edge_plus_bal_agg_topo_builds_expected_shapes(tmp_path):
     )
 
     topo_dim = len(topo_vectors[0])
-    agg_dim = topo_dim * 4 + 2 + 1  # concat + mean + abs diff + norms + cosine
+    endpoint_agg_dim = topo_dim * 4 + 2 + 1  # concat + mean + abs diff + norms + cosine
+    pooled_agg_dim = topo_dim * 4 + 2 + 1    # same structure on pooled means
+    agg_dim = endpoint_agg_dim + pooled_agg_dim
     expected_dim = module._HIST_DIM + agg_dim
 
-    assert result.edge_index.shape == (4, 2)
-    assert result.edge_attr.shape == (4, expected_dim)
-    assert result.metadata["edge_feature_variant"] == "edge_plus_bal_agg_topo/lean"
+    assert result.edge_index.shape[0] == result.edge_attr.shape[0]
+    assert result.edge_attr.shape[1] == expected_dim
+    assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_topo/lean"
     assert result.metadata["variant"] == "lean"
+    assert result.metadata["pool_k"] == 1
     assert result.metadata["feature_dim"] == expected_dim
     assert result.metadata["topology_feature_dim"] == topo_dim
     assert result.metadata["include_norms"] is True
     assert result.metadata["include_cosine"] is True
 
 
-def test_edge_plus_bal_agg_topo_rejects_heavy_variant():
+def test_edge_plus_pool_agg_topo_rejects_heavy_variant():
     with pytest.raises(ValueError):
-        EdgePlusBalAggTopoModule.validate_params({"variant": "bogus"})
-
-
-def test_edge_plus_bal_agg_topo_heavy_includes_minmax(tmp_path):
-    residues, id_to_index = _build_residues()
-    structure = _DummyStructure()
-    node_df = pd.DataFrame({"ID": [res.descriptor for res in residues], "feat": [1.0, 2.0]})
-    topo_vectors = [[1.0, 0.5, 0.25], [0.2, 0.3, 0.4]]
-    topology_path = _write_topology(tmp_path, node_df["ID"].tolist(), topo_vectors)
-
-    module = EdgePlusBalAggTopoModule(scale_histogram=False, variant="heavy", include_minmax=True)
-    result = module.build_edges(
-        model_key="test_heavy",
-        residues=residues,
-        id_to_index=id_to_index,
-        structure=structure,
-        node_df=node_df,
-        interface_path=Path("iface"),
-        topology_path=topology_path,
-        node_path=Path("node"),
-        pdb_path=Path("pdb"),
-        dump_path=None,
-    )
-
-    topo_dim = len(topo_vectors[0])
-    agg_dim = topo_dim * 6 + 2 + 1  # concat + mean + abs diff + min + max + norms + cosine
-    expected_dim = module._HIST_DIM + agg_dim
-
-    assert result.edge_attr.shape == (4, expected_dim)
-    assert result.metadata["variant"] == "heavy"
-    assert result.metadata["include_minmax"] is True
+        EdgePlusPoolAggTopoModule.validate_params({"variant": "heavy"})
