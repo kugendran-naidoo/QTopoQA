@@ -1,0 +1,1237 @@
+Skipped Validating graphs using standalone tool ...
+Starting model training ...
+[run_full_pipeline] Validating graphs before training...
+[validate_graphs] OK: validated 14391 graph(s) in /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data
+[run_full_pipeline] Starting sweep at 2025-11-27T20:54:45.455019+00:00 using manifest /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/manifests/run_exhaustive.yaml
+[train_cli][batch] (1/9) running job 'sched_boost_seed222' -> run_name=sched_boost_seed222_2025-11-27_20-54-45
+[train_cli] run_id=sched_boost_seed222_2025-11-27_20-54-45 | command=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py --config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/config/config.yaml --run-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45 --git-commit cdccb9f82 --git-dirty
+2025-11-27 20:54:56 INFO git_commit = cdccb9f82 (dirty)
+2025-11-27 20:54:56 INFO Training package root: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training
+2025-11-27 20:54:56 INFO Configuration loaded from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/config/config.yaml
+2025-11-27 20:54:56 INFO   graph_dir = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data
+2025-11-27 20:54:56 INFO   train_label_file = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/data.train.csv
+2025-11-27 20:54:56 INFO   val_label_file = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/data.validate.csv
+2025-11-27 20:54:56 INFO   save_dir = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45
+2025-11-27 20:54:56 INFO   metadata_path = None
+2025-11-27 20:54:56 INFO   summary_path = None
+2025-11-27 20:54:56 INFO   accelerator = cpu
+2025-11-27 20:54:56 INFO   devices = 1
+2025-11-27 20:54:56 INFO   attention_head = 8
+2025-11-27 20:54:56 INFO   pooling_type = mean
+2025-11-27 20:54:56 INFO   batch_size = 16
+2025-11-27 20:54:56 INFO   learning_rate = 0.005
+2025-11-27 20:54:56 INFO   num_epochs = 260
+2025-11-27 20:54:56 INFO   accumulate_grad_batches = 16
+2025-11-27 20:54:56 INFO   seed = 222
+2025-11-27 20:54:56 INFO   num_workers = 0
+2025-11-27 20:54:56 INFO   precision = 32
+2025-11-27 20:54:56 INFO   lr_scheduler_type = reduce_on_plateau
+2025-11-27 20:54:56 INFO   early_stopping_patience = 45
+2025-11-27 20:54:56 INFO   lr_scheduler_patience = 6
+2025-11-27 20:54:56 INFO   lr_scheduler_factor = 0.2
+2025-11-27 20:54:56 INFO   fast_dev_run = False
+2025-11-27 20:54:56 INFO   limit_train_batches = None
+2025-11-27 20:54:56 INFO   limit_val_batches = None
+2025-11-27 20:54:56 INFO   log_lr = False
+2025-11-27 20:54:56 INFO   progress_bar_refresh_rate = 0
+2025-11-27 20:54:56 INFO   log_every_n_steps = 100
+2025-11-27 20:54:56 INFO   use_val_spearman_as_secondary = True
+2025-11-27 20:54:56 INFO   spearman_secondary_min_delta = 0.0
+2025-11-27 20:54:56 INFO   spearman_secondary_weight = 1.0
+2025-11-27 20:54:56 INFO   selection_primary_metric = val_loss
+2025-11-27 20:54:56 INFO   coverage_minimum = 0.0
+2025-11-27 20:54:56 INFO   coverage_fail_on_missing = False
+2025-11-27 20:54:56 INFO   graph_load_profiling = False
+2025-11-27 20:54:56 INFO   graph_load_top_k = 5
+2025-11-27 20:54:56 INFO   enable_graph_cache = True
+2025-11-27 20:54:56 INFO   graph_cache_size = 256
+2025-11-27 20:54:56 INFO   canonicalize_on_load = False
+2025-11-27 20:54:56 INFO   mlflow = MlflowConfig(enabled=True, tracking_uri='./qtdaqa/new_dynamic_features/model_training/ml_runs', experiment='dynamic_topoqa', run_name=None, log_artifacts=True, tags={})
+2025-11-27 20:54:56 INFO   edge_schema = {}
+2025-11-27 20:54:56 INFO   topology_schema = {}
+Seed set to 222
+2025-11-27 20:54:57 INFO [train] label rows: 8723 | usable graphs: 8686 | coverage: 99.58%
+2025-11-27 20:54:57 ERROR [train] 37 label entries missing matching .pt graphs (first examples: 1A9X, 1FLE, 1HT9, 1OAO, 1R0R). Regenerate graph tensors or adjust coverage settings to proceed safely.
+2025-11-27 20:54:57 INFO [val] label rows: 3397 | usable graphs: 3376 | coverage: 99.38%
+2025-11-27 20:54:57 ERROR [val] 21 label entries missing matching .pt graphs (first examples: 1H59, 2B5L, 2C7M, 2GZH, 2W19). Regenerate graph tensors or adjust coverage settings to proceed safely.
+2025-11-27 20:54:57 INFO Graph cache enabled (max_items=256). Disable via selection cache.enable_graph_cache=false in config.
+2025-11-27 20:54:57 INFO Dataset coverage report written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/dataset_coverage.json
+2025-11-27 20:54:57 ERROR [coverage] train split: 37/8723 labels missing graph tensors (coverage 99.58%). See /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/dataset_coverage.json for details.
+2025-11-27 20:54:57 ERROR [coverage] val split: 21/3397 labels missing graph tensors (coverage 99.38%). See /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/dataset_coverage.json for details.
+2025-11-27 20:54:57 INFO Schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/schema_summary.json
+2025-11-27 20:54:57 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/feature_metadata.json
+2025-11-27 20:54:57 INFO Graph builder: graph_builder2 (version 2.0.0)
+2025-11-27 20:54:57 INFO Feature config snapshot: path=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.edge_pool_lean_10A, sha256=bcd5840f05788484bb01437d2217a190ae52fe5bcbe91b16b82b2c2e7657ba1d
+2025-11-27 20:54:57 INFO Edge dumps: enabled (output: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/work/edge_features)
+2025-11-27 20:54:57 INFO Feature metadata source: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json
+2025-11-27 20:54:57 INFO Graph builder summary: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/schema_summary.json
+2025-11-27 20:54:57 INFO Interface: interface/polar_cutoff/v1 (cutoff 10 Å), yielding 10 interface residues.
+2025-11-27 20:54:57 INFO Topology: topology/persistence_basic/v1 (filtration_cutoff 8 Å, min_persistence 0.01) supporting the 172-dimensional node features.
+2025-11-27 20:54:57 INFO Node: node/dssp_topo_merge/v1; metadata lists 172 feature columns matching the .pt tensor.
+2025-11-27 20:54:57 INFO Edge: edge/edge_plus_pool_agg_topo/v1 (variant edge_plus_pool_agg_topo/lean); .pt confirms 40 directed edges with 1137 feature values each.
+2025-11-27 20:54:57 INFO → Total feature dimensionality observed and confirmed: node_dim = 172, edge_dim = 1137.
+2025-11-27 20:54:57 INFO Secondary selection metric enabled: val_spearman_corr (weight=1.000, min_delta=0.000)
+2025-11-27 20:54:57 INFO Resolved feature metadata: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "node_schema": {
+    "dim": 172,
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "column_count": 172,
+    "columns_preview": [
+      "rasa",
+      "phi",
+      "psi",
+      "SS8_0",
+      "SS8_1"
+    ]
+  },
+  "metadata_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+  "summary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/schema_summary.json",
+  "module_registry": {
+    "edge": {
+      "id": "edge/edge_plus_pool_agg_topo/v1",
+      "alias": "11D Legacy + pooled balanced topo agg (lean)",
+      "jobs": 16,
+      "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+    },
+    "interface": {
+      "id": "interface/polar_cutoff/v1",
+      "alias": "n x 3D TopoQA default 10A cutoff",
+      "jobs": 16,
+      "summary": "Polar interface detection using distance cutoff."
+    },
+    "node": {
+      "id": "node/dssp_topo_merge/v1",
+      "alias": "172D (140D Topological consumes Interface + 32D) TopoQA default",
+      "jobs": 16,
+      "summary": "DSSP-derived node features merged with topology statistics."
+    },
+    "topology": {
+      "id": "topology/persistence_basic/v1",
+      "alias": "140D summarizes interface features TopoQA default",
+      "jobs": 16,
+      "summary": "Persistent homology features with configurable distance thresholds."
+    }
+  },
+  "notes": []
+}
+2025-11-27 20:54:57 INFO DataLoader num_workers=0 (recommended for macOS to avoid spawn issues; configurable via config.yaml -> num_workers).
+Experiment with name dynamic_topoqa not found. Creating it.
+2025-11-27 20:54:58 INFO MLflow logging enabled (experiment=dynamic_topoqa, run_id=af87648bd3504df1bccaaf0b587f102f)
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+2025-11-27 20:54:58 INFO Starting training (fast_dev_run=False)
+2025-11-27 20:54:58 INFO Detected GPU/MPS hardware. Current run uses accelerator='cpu' (configurable via config.yaml -> accelerator).
+/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:701: Checkpoint directory /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/model_checkpoints exists and is not empty.
+
+   | Name         | Type             | Params | Mode 
+-----------------------------------------------------------
+0  | criterion    | MeanSquaredError | 0      | train
+1  | relu         | ReLU             | 0      | train
+2  | sigmoid      | Sigmoid          | 0      | train
+3  | edge_embed   | ModuleList       | 37.5 K | train
+4  | embed        | ModuleList       | 5.5 K  | train
+5  | conv1        | ModuleList       | 50.2 K | train
+6  | conv2        | ModuleList       | 50.2 K | train
+7  | conv3        | ModuleList       | 50.2 K | train
+8  | fc_edge      | Linear           | 528    | train
+9  | protein_fc_1 | ModuleList       | 3.1 K  | train
+10 | fc1          | Linear           | 4.2 K  | train
+11 | out          | Linear           | 65     | train
+-----------------------------------------------------------
+201 K     Trainable params
+0         Non-trainable params
+201 K     Total params
+0.806     Total estimated model params size (MB)
+37        Modules in train mode
+0         Modules in eval mode
+2025-11-27 20:55:04 INFO Epoch 000 | 25% complete (batch 136/543)
+2025-11-27 20:55:10 INFO Epoch 000 | 50% complete (batch 272/543)
+2025-11-27 20:55:17 INFO Epoch 000 | 75% complete (batch 408/543)
+2025-11-27 20:55:33 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = 0.139774
+2025-11-27 20:55:33 INFO Epoch 000 | val_loss=0.139774
+Metric val_loss improved. New best score: 0.140
+2025-11-27 20:55:39 INFO Epoch 001 | 25% complete (batch 136/543)
+2025-11-27 20:55:45 INFO Epoch 001 | 50% complete (batch 272/543)
+2025-11-27 20:55:52 INFO Epoch 001 | 75% complete (batch 408/543)
+2025-11-27 20:56:08 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.294059
+2025-11-27 20:56:08 INFO Epoch 001 | train_mse=0.149539 | val_loss=0.139666 | best_val_loss=0.139774
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.140
+2025-11-27 20:56:15 INFO Epoch 002 | 25% complete (batch 136/543)
+2025-11-27 20:56:21 INFO Epoch 002 | 50% complete (batch 272/543)
+2025-11-27 20:56:28 INFO Epoch 002 | 75% complete (batch 408/543)
+2025-11-27 20:56:44 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.244159
+2025-11-27 20:56:44 INFO Epoch 002 | train_mse=0.142259 | val_loss=0.133604 | best_val_loss=0.139666
+Metric val_loss improved by 0.006 >= min_delta = 0.0. New best score: 0.134
+2025-11-27 20:56:50 INFO Epoch 003 | 25% complete (batch 136/543)
+2025-11-27 20:56:57 INFO Epoch 003 | 50% complete (batch 272/543)
+2025-11-27 20:57:04 INFO Epoch 003 | 75% complete (batch 408/543)
+2025-11-27 20:57:21 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.365353
+2025-11-27 20:57:21 INFO Epoch 003 | train_mse=0.145809 | val_loss=0.115215 | best_val_loss=0.133604
+Metric val_loss improved by 0.018 >= min_delta = 0.0. New best score: 0.115
+2025-11-27 20:57:27 INFO Epoch 004 | 25% complete (batch 136/543)
+2025-11-27 20:57:34 INFO Epoch 004 | 50% complete (batch 272/543)
+2025-11-27 20:57:41 INFO Epoch 004 | 75% complete (batch 408/543)
+2025-11-27 20:57:58 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.424781
+2025-11-27 20:57:58 INFO Epoch 004 | train_mse=0.132423 | val_loss=0.121587 | best_val_loss=0.115215
+2025-11-27 20:58:05 INFO Epoch 005 | 25% complete (batch 136/543)
+2025-11-27 20:58:12 INFO Epoch 005 | 50% complete (batch 272/543)
+2025-11-27 20:58:19 INFO Epoch 005 | 75% complete (batch 408/543)
+2025-11-27 20:58:38 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.435169
+2025-11-27 20:58:38 INFO Epoch 005 | train_mse=0.142607 | val_loss=0.135445 | best_val_loss=0.115215
+2025-11-27 20:58:48 INFO Epoch 006 | 25% complete (batch 136/543)
+2025-11-27 20:58:57 INFO Epoch 006 | 50% complete (batch 272/543)
+2025-11-27 20:59:06 INFO Epoch 006 | 75% complete (batch 408/543)
+2025-11-27 20:59:24 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.444994
+2025-11-27 20:59:24 INFO Epoch 006 | train_mse=0.161911 | val_loss=0.113497 | best_val_loss=0.115215
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.113
+2025-11-27 20:59:32 INFO Epoch 007 | 25% complete (batch 136/543)
+2025-11-27 20:59:39 INFO Epoch 007 | 50% complete (batch 272/543)
+2025-11-27 20:59:48 INFO Epoch 007 | 75% complete (batch 408/543)
+2025-11-27 21:00:07 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.483807
+2025-11-27 21:00:07 INFO Epoch 007 | train_mse=0.123980 | val_loss=0.084831 | best_val_loss=0.113497
+Metric val_loss improved by 0.029 >= min_delta = 0.0. New best score: 0.085
+2025-11-27 21:00:15 INFO Epoch 008 | 25% complete (batch 136/543)
+2025-11-27 21:00:22 INFO Epoch 008 | 50% complete (batch 272/543)
+2025-11-27 21:00:30 INFO Epoch 008 | 75% complete (batch 408/543)
+2025-11-27 21:00:48 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.500695
+2025-11-27 21:00:48 INFO Epoch 008 | train_mse=0.114078 | val_loss=0.098131 | best_val_loss=0.084831
+2025-11-27 21:00:56 INFO Epoch 009 | 25% complete (batch 136/543)
+2025-11-27 21:01:05 INFO Epoch 009 | 50% complete (batch 272/543)
+2025-11-27 21:01:15 INFO Epoch 009 | 75% complete (batch 408/543)
+2025-11-27 21:01:33 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.471154
+2025-11-27 21:01:33 INFO Epoch 009 | train_mse=0.104814 | val_loss=0.122890 | best_val_loss=0.084831
+2025-11-27 21:01:41 INFO Epoch 010 | 25% complete (batch 136/543)
+2025-11-27 21:01:49 INFO Epoch 010 | 50% complete (batch 272/543)
+2025-11-27 21:01:57 INFO Epoch 010 | 75% complete (batch 408/543)
+2025-11-27 21:02:21 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.520659
+2025-11-27 21:02:21 INFO Epoch 010 | train_mse=0.090736 | val_loss=0.083182 | best_val_loss=0.084831
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.083
+2025-11-27 21:02:27 INFO Epoch 011 | 25% complete (batch 136/543)
+2025-11-27 21:02:35 INFO Epoch 011 | 50% complete (batch 272/543)
+2025-11-27 21:02:42 INFO Epoch 011 | 75% complete (batch 408/543)
+2025-11-27 21:03:00 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.500063
+2025-11-27 21:03:00 INFO Epoch 011 | train_mse=0.088120 | val_loss=0.114952 | best_val_loss=0.083182
+2025-11-27 21:03:07 INFO Epoch 012 | 25% complete (batch 136/543)
+2025-11-27 21:03:15 INFO Epoch 012 | 50% complete (batch 272/543)
+2025-11-27 21:03:25 INFO Epoch 012 | 75% complete (batch 408/543)
+2025-11-27 21:03:42 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.550974
+2025-11-27 21:03:42 INFO Epoch 012 | train_mse=0.086577 | val_loss=0.082170 | best_val_loss=0.083182
+Metric val_loss improved by 0.001 >= min_delta = 0.0. New best score: 0.082
+2025-11-27 21:03:49 INFO Epoch 013 | 25% complete (batch 136/543)
+2025-11-27 21:03:57 INFO Epoch 013 | 50% complete (batch 272/543)
+2025-11-27 21:04:08 INFO Epoch 013 | 75% complete (batch 408/543)
+2025-11-27 21:04:26 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.557676
+2025-11-27 21:04:26 INFO Epoch 013 | train_mse=0.082604 | val_loss=0.078372 | best_val_loss=0.082170
+Metric val_loss improved by 0.004 >= min_delta = 0.0. New best score: 0.078
+2025-11-27 21:04:35 INFO Epoch 014 | 25% complete (batch 136/543)
+2025-11-27 21:04:47 INFO Epoch 014 | 50% complete (batch 272/543)
+2025-11-27 21:04:58 INFO Epoch 014 | 75% complete (batch 408/543)
+2025-11-27 21:05:15 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.558568
+2025-11-27 21:05:15 INFO Epoch 014 | train_mse=0.080934 | val_loss=0.076304 | best_val_loss=0.078372
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.076
+2025-11-27 21:05:23 INFO Epoch 015 | 25% complete (batch 136/543)
+2025-11-27 21:05:30 INFO Epoch 015 | 50% complete (batch 272/543)
+2025-11-27 21:05:38 INFO Epoch 015 | 75% complete (batch 408/543)
+2025-11-27 21:05:57 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.558024
+2025-11-27 21:05:57 INFO Epoch 015 | train_mse=0.084807 | val_loss=0.074525 | best_val_loss=0.076304
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.075
+2025-11-27 21:06:05 INFO Epoch 016 | 25% complete (batch 136/543)
+2025-11-27 21:06:12 INFO Epoch 016 | 50% complete (batch 272/543)
+2025-11-27 21:06:20 INFO Epoch 016 | 75% complete (batch 408/543)
+2025-11-27 21:06:39 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.565827
+2025-11-27 21:06:39 INFO Epoch 016 | train_mse=0.072439 | val_loss=0.078507 | best_val_loss=0.074525
+2025-11-27 21:06:45 INFO Epoch 017 | 25% complete (batch 136/543)
+2025-11-27 21:06:52 INFO Epoch 017 | 50% complete (batch 272/543)
+2025-11-27 21:07:00 INFO Epoch 017 | 75% complete (batch 408/543)
+2025-11-27 21:07:16 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.584309
+2025-11-27 21:07:16 INFO Epoch 017 | train_mse=0.066646 | val_loss=0.072769 | best_val_loss=0.074525
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.073
+2025-11-27 21:07:22 INFO Epoch 018 | 25% complete (batch 136/543)
+2025-11-27 21:07:29 INFO Epoch 018 | 50% complete (batch 272/543)
+2025-11-27 21:07:37 INFO Epoch 018 | 75% complete (batch 408/543)
+2025-11-27 21:07:55 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.557610
+2025-11-27 21:07:55 INFO Epoch 018 | train_mse=0.072672 | val_loss=0.098409 | best_val_loss=0.072769
+2025-11-27 21:08:03 INFO Epoch 019 | 25% complete (batch 136/543)
+2025-11-27 21:08:11 INFO Epoch 019 | 50% complete (batch 272/543)
+2025-11-27 21:08:18 INFO Epoch 019 | 75% complete (batch 408/543)
+2025-11-27 21:08:36 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.569051
+2025-11-27 21:08:36 INFO Epoch 019 | train_mse=0.091177 | val_loss=0.082751 | best_val_loss=0.072769
+2025-11-27 21:08:43 INFO Epoch 020 | 25% complete (batch 136/543)
+2025-11-27 21:08:51 INFO Epoch 020 | 50% complete (batch 272/543)
+2025-11-27 21:09:00 INFO Epoch 020 | 75% complete (batch 408/543)
+2025-11-27 21:09:19 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.593040
+2025-11-27 21:09:19 INFO Epoch 020 | train_mse=0.066010 | val_loss=0.077023 | best_val_loss=0.072769
+2025-11-27 21:09:26 INFO Epoch 021 | 25% complete (batch 136/543)
+2025-11-27 21:09:34 INFO Epoch 021 | 50% complete (batch 272/543)
+2025-11-27 21:09:42 INFO Epoch 021 | 75% complete (batch 408/543)
+2025-11-27 21:09:58 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.562600
+2025-11-27 21:09:58 INFO Epoch 021 | train_mse=0.077099 | val_loss=0.078432 | best_val_loss=0.072769
+2025-11-27 21:10:05 INFO Epoch 022 | 25% complete (batch 136/543)
+2025-11-27 21:10:11 INFO Epoch 022 | 50% complete (batch 272/543)
+2025-11-27 21:10:18 INFO Epoch 022 | 75% complete (batch 408/543)
+2025-11-27 21:10:35 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.590163
+2025-11-27 21:10:35 INFO Epoch 022 | train_mse=0.068506 | val_loss=0.069450 | best_val_loss=0.072769
+Metric val_loss improved by 0.003 >= min_delta = 0.0. New best score: 0.069
+2025-11-27 21:10:42 INFO Epoch 023 | 25% complete (batch 136/543)
+2025-11-27 21:10:49 INFO Epoch 023 | 50% complete (batch 272/543)
+2025-11-27 21:10:56 INFO Epoch 023 | 75% complete (batch 408/543)
+2025-11-27 21:11:13 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.585569
+2025-11-27 21:11:13 INFO Epoch 023 | train_mse=0.066015 | val_loss=0.078274 | best_val_loss=0.069450
+2025-11-27 21:11:19 INFO Epoch 024 | 25% complete (batch 136/543)
+2025-11-27 21:11:26 INFO Epoch 024 | 50% complete (batch 272/543)
+2025-11-27 21:11:33 INFO Epoch 024 | 75% complete (batch 408/543)
+2025-11-27 21:11:50 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.607499
+2025-11-27 21:11:50 INFO Epoch 024 | train_mse=0.079686 | val_loss=0.069751 | best_val_loss=0.069450
+2025-11-27 21:11:56 INFO Epoch 025 | 25% complete (batch 136/543)
+2025-11-27 21:12:03 INFO Epoch 025 | 50% complete (batch 272/543)
+2025-11-27 21:12:09 INFO Epoch 025 | 75% complete (batch 408/543)
+2025-11-27 21:12:26 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.601791
+2025-11-27 21:12:26 INFO Epoch 025 | train_mse=0.068853 | val_loss=0.075171 | best_val_loss=0.069450
+2025-11-27 21:12:32 INFO Epoch 026 | 25% complete (batch 136/543)
+2025-11-27 21:12:39 INFO Epoch 026 | 50% complete (batch 272/543)
+2025-11-27 21:12:46 INFO Epoch 026 | 75% complete (batch 408/543)
+2025-11-27 21:13:02 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.580953
+2025-11-27 21:13:02 INFO Epoch 026 | train_mse=0.062374 | val_loss=0.074749 | best_val_loss=0.069450
+2025-11-27 21:13:09 INFO Epoch 027 | 25% complete (batch 136/543)
+2025-11-27 21:13:17 INFO Epoch 027 | 50% complete (batch 272/543)
+2025-11-27 21:13:24 INFO Epoch 027 | 75% complete (batch 408/543)
+2025-11-27 21:13:40 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598000
+2025-11-27 21:13:40 INFO Epoch 027 | train_mse=0.071823 | val_loss=0.076357 | best_val_loss=0.069450
+2025-11-27 21:13:47 INFO Epoch 028 | 25% complete (batch 136/543)
+2025-11-27 21:13:53 INFO Epoch 028 | 50% complete (batch 272/543)
+2025-11-27 21:14:01 INFO Epoch 028 | 75% complete (batch 408/543)
+2025-11-27 21:14:18 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.577263
+2025-11-27 21:14:18 INFO Epoch 028 | train_mse=0.063320 | val_loss=0.080786 | best_val_loss=0.069450
+2025-11-27 21:14:24 INFO Epoch 029 | 25% complete (batch 136/543)
+2025-11-27 21:14:31 INFO Epoch 029 | 50% complete (batch 272/543)
+2025-11-27 21:14:38 INFO Epoch 029 | 75% complete (batch 408/543)
+2025-11-27 21:14:55 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.606311
+2025-11-27 21:14:55 INFO Epoch 029 | train_mse=0.072578 | val_loss=0.070504 | best_val_loss=0.069450
+2025-11-27 21:15:02 INFO Epoch 030 | 25% complete (batch 136/543)
+2025-11-27 21:15:08 INFO Epoch 030 | 50% complete (batch 272/543)
+2025-11-27 21:15:16 INFO Epoch 030 | 75% complete (batch 408/543)
+2025-11-27 21:15:33 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.603961
+2025-11-27 21:15:33 INFO Epoch 030 | train_mse=0.070436 | val_loss=0.067269 | best_val_loss=0.069450
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.067
+2025-11-27 21:15:39 INFO Epoch 031 | 25% complete (batch 136/543)
+2025-11-27 21:15:46 INFO Epoch 031 | 50% complete (batch 272/543)
+2025-11-27 21:15:53 INFO Epoch 031 | 75% complete (batch 408/543)
+2025-11-27 21:16:09 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.605795
+2025-11-27 21:16:09 INFO Epoch 031 | train_mse=0.062502 | val_loss=0.068539 | best_val_loss=0.067269
+2025-11-27 21:16:15 INFO Epoch 032 | 25% complete (batch 136/543)
+2025-11-27 21:16:22 INFO Epoch 032 | 50% complete (batch 272/543)
+2025-11-27 21:16:29 INFO Epoch 032 | 75% complete (batch 408/543)
+2025-11-27 21:16:45 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.604631
+2025-11-27 21:16:45 INFO Epoch 032 | train_mse=0.060956 | val_loss=0.068067 | best_val_loss=0.067269
+2025-11-27 21:16:52 INFO Epoch 033 | 25% complete (batch 136/543)
+2025-11-27 21:16:58 INFO Epoch 033 | 50% complete (batch 272/543)
+2025-11-27 21:17:06 INFO Epoch 033 | 75% complete (batch 408/543)
+2025-11-27 21:17:22 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600048
+2025-11-27 21:17:22 INFO Epoch 033 | train_mse=0.055310 | val_loss=0.070486 | best_val_loss=0.067269
+2025-11-27 21:17:30 INFO Epoch 034 | 25% complete (batch 136/543)
+2025-11-27 21:17:36 INFO Epoch 034 | 50% complete (batch 272/543)
+2025-11-27 21:17:43 INFO Epoch 034 | 75% complete (batch 408/543)
+2025-11-27 21:18:00 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599891
+2025-11-27 21:18:00 INFO Epoch 034 | train_mse=0.062921 | val_loss=0.069491 | best_val_loss=0.067269
+2025-11-27 21:18:06 INFO Epoch 035 | 25% complete (batch 136/543)
+2025-11-27 21:18:13 INFO Epoch 035 | 50% complete (batch 272/543)
+2025-11-27 21:18:20 INFO Epoch 035 | 75% complete (batch 408/543)
+2025-11-27 21:18:36 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597928
+2025-11-27 21:18:36 INFO Epoch 035 | train_mse=0.057221 | val_loss=0.071766 | best_val_loss=0.067269
+2025-11-27 21:18:43 INFO Epoch 036 | 25% complete (batch 136/543)
+2025-11-27 21:18:49 INFO Epoch 036 | 50% complete (batch 272/543)
+2025-11-27 21:18:56 INFO Epoch 036 | 75% complete (batch 408/543)
+2025-11-27 21:19:12 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.601029
+2025-11-27 21:19:12 INFO Epoch 036 | train_mse=0.061363 | val_loss=0.072016 | best_val_loss=0.067269
+2025-11-27 21:19:18 INFO Epoch 037 | 25% complete (batch 136/543)
+2025-11-27 21:19:25 INFO Epoch 037 | 50% complete (batch 272/543)
+2025-11-27 21:19:32 INFO Epoch 037 | 75% complete (batch 408/543)
+2025-11-27 21:19:48 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598667
+2025-11-27 21:19:48 INFO Epoch 037 | train_mse=0.057042 | val_loss=0.071189 | best_val_loss=0.067269
+2025-11-27 21:19:54 INFO Epoch 038 | 25% complete (batch 136/543)
+2025-11-27 21:20:01 INFO Epoch 038 | 50% complete (batch 272/543)
+2025-11-27 21:20:08 INFO Epoch 038 | 75% complete (batch 408/543)
+2025-11-27 21:20:24 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.594421
+2025-11-27 21:20:24 INFO Epoch 038 | train_mse=0.058867 | val_loss=0.070718 | best_val_loss=0.067269
+2025-11-27 21:20:31 INFO Epoch 039 | 25% complete (batch 136/543)
+2025-11-27 21:20:38 INFO Epoch 039 | 50% complete (batch 272/543)
+2025-11-27 21:20:45 INFO Epoch 039 | 75% complete (batch 408/543)
+2025-11-27 21:21:01 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.594978
+2025-11-27 21:21:01 INFO Epoch 039 | train_mse=0.055144 | val_loss=0.070670 | best_val_loss=0.067269
+2025-11-27 21:21:07 INFO Epoch 040 | 25% complete (batch 136/543)
+2025-11-27 21:21:14 INFO Epoch 040 | 50% complete (batch 272/543)
+2025-11-27 21:21:21 INFO Epoch 040 | 75% complete (batch 408/543)
+2025-11-27 21:21:37 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596100
+2025-11-27 21:21:37 INFO Epoch 040 | train_mse=0.064668 | val_loss=0.069425 | best_val_loss=0.067269
+2025-11-27 21:21:44 INFO Epoch 041 | 25% complete (batch 136/543)
+2025-11-27 21:21:51 INFO Epoch 041 | 50% complete (batch 272/543)
+2025-11-27 21:21:58 INFO Epoch 041 | 75% complete (batch 408/543)
+2025-11-27 21:22:14 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.594412
+2025-11-27 21:22:14 INFO Epoch 041 | train_mse=0.051812 | val_loss=0.068859 | best_val_loss=0.067269
+2025-11-27 21:22:21 INFO Epoch 042 | 25% complete (batch 136/543)
+2025-11-27 21:22:27 INFO Epoch 042 | 50% complete (batch 272/543)
+2025-11-27 21:22:35 INFO Epoch 042 | 75% complete (batch 408/543)
+2025-11-27 21:22:51 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597354
+2025-11-27 21:22:51 INFO Epoch 042 | train_mse=0.049973 | val_loss=0.069177 | best_val_loss=0.067269
+2025-11-27 21:22:57 INFO Epoch 043 | 25% complete (batch 136/543)
+2025-11-27 21:23:04 INFO Epoch 043 | 50% complete (batch 272/543)
+2025-11-27 21:23:11 INFO Epoch 043 | 75% complete (batch 408/543)
+2025-11-27 21:23:27 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599173
+2025-11-27 21:23:27 INFO Epoch 043 | train_mse=0.059400 | val_loss=0.068723 | best_val_loss=0.067269
+2025-11-27 21:23:33 INFO Epoch 044 | 25% complete (batch 136/543)
+2025-11-27 21:23:39 INFO Epoch 044 | 50% complete (batch 272/543)
+2025-11-27 21:23:46 INFO Epoch 044 | 75% complete (batch 408/543)
+2025-11-27 21:24:02 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597481
+2025-11-27 21:24:02 INFO Epoch 044 | train_mse=0.052867 | val_loss=0.068833 | best_val_loss=0.067269
+2025-11-27 21:24:08 INFO Epoch 045 | 25% complete (batch 136/543)
+2025-11-27 21:24:15 INFO Epoch 045 | 50% complete (batch 272/543)
+2025-11-27 21:24:22 INFO Epoch 045 | 75% complete (batch 408/543)
+2025-11-27 21:24:38 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597589
+2025-11-27 21:24:38 INFO Epoch 045 | train_mse=0.058469 | val_loss=0.068791 | best_val_loss=0.067269
+2025-11-27 21:24:44 INFO Epoch 046 | 25% complete (batch 136/543)
+2025-11-27 21:24:51 INFO Epoch 046 | 50% complete (batch 272/543)
+2025-11-27 21:24:57 INFO Epoch 046 | 75% complete (batch 408/543)
+2025-11-27 21:25:14 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598114
+2025-11-27 21:25:14 INFO Epoch 046 | train_mse=0.060564 | val_loss=0.068712 | best_val_loss=0.067269
+2025-11-27 21:25:20 INFO Epoch 047 | 25% complete (batch 136/543)
+2025-11-27 21:25:27 INFO Epoch 047 | 50% complete (batch 272/543)
+2025-11-27 21:25:34 INFO Epoch 047 | 75% complete (batch 408/543)
+2025-11-27 21:25:50 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597045
+2025-11-27 21:25:50 INFO Epoch 047 | train_mse=0.065757 | val_loss=0.069199 | best_val_loss=0.067269
+2025-11-27 21:25:56 INFO Epoch 048 | 25% complete (batch 136/543)
+2025-11-27 21:26:03 INFO Epoch 048 | 50% complete (batch 272/543)
+2025-11-27 21:26:10 INFO Epoch 048 | 75% complete (batch 408/543)
+2025-11-27 21:26:26 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598324
+2025-11-27 21:26:26 INFO Epoch 048 | train_mse=0.059948 | val_loss=0.068873 | best_val_loss=0.067269
+2025-11-27 21:26:32 INFO Epoch 049 | 25% complete (batch 136/543)
+2025-11-27 21:26:39 INFO Epoch 049 | 50% complete (batch 272/543)
+2025-11-27 21:26:46 INFO Epoch 049 | 75% complete (batch 408/543)
+2025-11-27 21:27:02 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598246
+2025-11-27 21:27:02 INFO Epoch 049 | train_mse=0.051028 | val_loss=0.068731 | best_val_loss=0.067269
+2025-11-27 21:27:08 INFO Epoch 050 | 25% complete (batch 136/543)
+2025-11-27 21:27:16 INFO Epoch 050 | 50% complete (batch 272/543)
+2025-11-27 21:27:23 INFO Epoch 050 | 75% complete (batch 408/543)
+2025-11-27 21:27:39 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597110
+2025-11-27 21:27:39 INFO Epoch 050 | train_mse=0.052404 | val_loss=0.068696 | best_val_loss=0.067269
+2025-11-27 21:27:45 INFO Epoch 051 | 25% complete (batch 136/543)
+2025-11-27 21:27:52 INFO Epoch 051 | 50% complete (batch 272/543)
+2025-11-27 21:27:59 INFO Epoch 051 | 75% complete (batch 408/543)
+2025-11-27 21:28:15 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597231
+2025-11-27 21:28:15 INFO Epoch 051 | train_mse=0.062576 | val_loss=0.068721 | best_val_loss=0.067269
+2025-11-27 21:28:22 INFO Epoch 052 | 25% complete (batch 136/543)
+2025-11-27 21:28:29 INFO Epoch 052 | 50% complete (batch 272/543)
+2025-11-27 21:28:37 INFO Epoch 052 | 75% complete (batch 408/543)
+2025-11-27 21:28:54 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596594
+2025-11-27 21:28:54 INFO Epoch 052 | train_mse=0.054590 | val_loss=0.068706 | best_val_loss=0.067269
+2025-11-27 21:29:01 INFO Epoch 053 | 25% complete (batch 136/543)
+2025-11-27 21:29:08 INFO Epoch 053 | 50% complete (batch 272/543)
+2025-11-27 21:29:17 INFO Epoch 053 | 75% complete (batch 408/543)
+2025-11-27 21:29:34 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596748
+2025-11-27 21:29:34 INFO Epoch 053 | train_mse=0.051880 | val_loss=0.068704 | best_val_loss=0.067269
+2025-11-27 21:29:41 INFO Epoch 054 | 25% complete (batch 136/543)
+2025-11-27 21:29:48 INFO Epoch 054 | 50% complete (batch 272/543)
+2025-11-27 21:29:55 INFO Epoch 054 | 75% complete (batch 408/543)
+2025-11-27 21:30:12 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596755
+2025-11-27 21:30:12 INFO Epoch 054 | train_mse=0.055073 | val_loss=0.068737 | best_val_loss=0.067269
+2025-11-27 21:30:18 INFO Epoch 055 | 25% complete (batch 136/543)
+2025-11-27 21:30:25 INFO Epoch 055 | 50% complete (batch 272/543)
+2025-11-27 21:30:33 INFO Epoch 055 | 75% complete (batch 408/543)
+2025-11-27 21:30:50 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597177
+2025-11-27 21:30:50 INFO Epoch 055 | train_mse=0.055513 | val_loss=0.068756 | best_val_loss=0.067269
+2025-11-27 21:30:57 INFO Epoch 056 | 25% complete (batch 136/543)
+2025-11-27 21:31:04 INFO Epoch 056 | 50% complete (batch 272/543)
+2025-11-27 21:31:11 INFO Epoch 056 | 75% complete (batch 408/543)
+2025-11-27 21:31:27 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597487
+2025-11-27 21:31:27 INFO Epoch 056 | train_mse=0.053367 | val_loss=0.068700 | best_val_loss=0.067269
+2025-11-27 21:31:34 INFO Epoch 057 | 25% complete (batch 136/543)
+2025-11-27 21:31:41 INFO Epoch 057 | 50% complete (batch 272/543)
+2025-11-27 21:31:48 INFO Epoch 057 | 75% complete (batch 408/543)
+2025-11-27 21:32:04 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597028
+2025-11-27 21:32:04 INFO Epoch 057 | train_mse=0.057708 | val_loss=0.068659 | best_val_loss=0.067269
+2025-11-27 21:32:10 INFO Epoch 058 | 25% complete (batch 136/543)
+2025-11-27 21:32:17 INFO Epoch 058 | 50% complete (batch 272/543)
+2025-11-27 21:32:24 INFO Epoch 058 | 75% complete (batch 408/543)
+2025-11-27 21:32:40 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596977
+2025-11-27 21:32:40 INFO Epoch 058 | train_mse=0.069548 | val_loss=0.068648 | best_val_loss=0.067269
+2025-11-27 21:32:47 INFO Epoch 059 | 25% complete (batch 136/543)
+2025-11-27 21:32:54 INFO Epoch 059 | 50% complete (batch 272/543)
+2025-11-27 21:33:01 INFO Epoch 059 | 75% complete (batch 408/543)
+2025-11-27 21:33:17 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596865
+2025-11-27 21:33:17 INFO Epoch 059 | train_mse=0.050711 | val_loss=0.068644 | best_val_loss=0.067269
+2025-11-27 21:33:23 INFO Epoch 060 | 25% complete (batch 136/543)
+2025-11-27 21:33:30 INFO Epoch 060 | 50% complete (batch 272/543)
+2025-11-27 21:33:37 INFO Epoch 060 | 75% complete (batch 408/543)
+2025-11-27 21:33:53 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596818
+2025-11-27 21:33:53 INFO Epoch 060 | train_mse=0.052325 | val_loss=0.068643 | best_val_loss=0.067269
+2025-11-27 21:34:00 INFO Epoch 061 | 25% complete (batch 136/543)
+2025-11-27 21:34:07 INFO Epoch 061 | 50% complete (batch 272/543)
+2025-11-27 21:34:14 INFO Epoch 061 | 75% complete (batch 408/543)
+2025-11-27 21:34:30 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596824
+2025-11-27 21:34:30 INFO Epoch 061 | train_mse=0.053718 | val_loss=0.068646 | best_val_loss=0.067269
+2025-11-27 21:34:37 INFO Epoch 062 | 25% complete (batch 136/543)
+2025-11-27 21:34:44 INFO Epoch 062 | 50% complete (batch 272/543)
+2025-11-27 21:34:51 INFO Epoch 062 | 75% complete (batch 408/543)
+2025-11-27 21:35:07 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596814
+2025-11-27 21:35:07 INFO Epoch 062 | train_mse=0.059720 | val_loss=0.068647 | best_val_loss=0.067269
+2025-11-27 21:35:14 INFO Epoch 063 | 25% complete (batch 136/543)
+2025-11-27 21:35:21 INFO Epoch 063 | 50% complete (batch 272/543)
+2025-11-27 21:35:27 INFO Epoch 063 | 75% complete (batch 408/543)
+2025-11-27 21:35:44 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596758
+2025-11-27 21:35:44 INFO Epoch 063 | train_mse=0.060211 | val_loss=0.068650 | best_val_loss=0.067269
+2025-11-27 21:35:50 INFO Epoch 064 | 25% complete (batch 136/543)
+2025-11-27 21:35:57 INFO Epoch 064 | 50% complete (batch 272/543)
+2025-11-27 21:36:04 INFO Epoch 064 | 75% complete (batch 408/543)
+2025-11-27 21:36:19 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596617
+2025-11-27 21:36:19 INFO Epoch 064 | train_mse=0.054331 | val_loss=0.068654 | best_val_loss=0.067269
+2025-11-27 21:36:26 INFO Epoch 065 | 25% complete (batch 136/543)
+2025-11-27 21:36:32 INFO Epoch 065 | 50% complete (batch 272/543)
+2025-11-27 21:36:39 INFO Epoch 065 | 75% complete (batch 408/543)
+2025-11-27 21:36:56 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:36:56 INFO Epoch 065 | train_mse=0.044892 | val_loss=0.068656 | best_val_loss=0.067269
+2025-11-27 21:37:02 INFO Epoch 066 | 25% complete (batch 136/543)
+2025-11-27 21:37:08 INFO Epoch 066 | 50% complete (batch 272/543)
+2025-11-27 21:37:15 INFO Epoch 066 | 75% complete (batch 408/543)
+2025-11-27 21:37:32 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:37:32 INFO Epoch 066 | train_mse=0.049061 | val_loss=0.068656 | best_val_loss=0.067269
+2025-11-27 21:37:38 INFO Epoch 067 | 25% complete (batch 136/543)
+2025-11-27 21:37:45 INFO Epoch 067 | 50% complete (batch 272/543)
+2025-11-27 21:37:52 INFO Epoch 067 | 75% complete (batch 408/543)
+2025-11-27 21:38:08 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596614
+2025-11-27 21:38:08 INFO Epoch 067 | train_mse=0.053170 | val_loss=0.068657 | best_val_loss=0.067269
+2025-11-27 21:38:14 INFO Epoch 068 | 25% complete (batch 136/543)
+2025-11-27 21:38:21 INFO Epoch 068 | 50% complete (batch 272/543)
+2025-11-27 21:38:28 INFO Epoch 068 | 75% complete (batch 408/543)
+2025-11-27 21:38:44 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596614
+2025-11-27 21:38:44 INFO Epoch 068 | train_mse=0.050552 | val_loss=0.068657 | best_val_loss=0.067269
+2025-11-27 21:38:50 INFO Epoch 069 | 25% complete (batch 136/543)
+2025-11-27 21:38:57 INFO Epoch 069 | 50% complete (batch 272/543)
+2025-11-27 21:39:04 INFO Epoch 069 | 75% complete (batch 408/543)
+2025-11-27 21:39:20 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596614
+2025-11-27 21:39:20 INFO Epoch 069 | train_mse=0.056412 | val_loss=0.068657 | best_val_loss=0.067269
+2025-11-27 21:39:26 INFO Epoch 070 | 25% complete (batch 136/543)
+2025-11-27 21:39:33 INFO Epoch 070 | 50% complete (batch 272/543)
+2025-11-27 21:39:40 INFO Epoch 070 | 75% complete (batch 408/543)
+2025-11-27 21:39:56 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596614
+2025-11-27 21:39:56 INFO Epoch 070 | train_mse=0.059252 | val_loss=0.068657 | best_val_loss=0.067269
+2025-11-27 21:40:02 INFO Epoch 071 | 25% complete (batch 136/543)
+2025-11-27 21:40:10 INFO Epoch 071 | 50% complete (batch 272/543)
+2025-11-27 21:40:17 INFO Epoch 071 | 75% complete (batch 408/543)
+2025-11-27 21:40:33 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:40:33 INFO Epoch 071 | train_mse=0.062448 | val_loss=0.068656 | best_val_loss=0.067269
+2025-11-27 21:40:39 INFO Epoch 072 | 25% complete (batch 136/543)
+2025-11-27 21:40:46 INFO Epoch 072 | 50% complete (batch 272/543)
+2025-11-27 21:40:53 INFO Epoch 072 | 75% complete (batch 408/543)
+2025-11-27 21:41:09 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:41:09 INFO Epoch 072 | train_mse=0.056648 | val_loss=0.068656 | best_val_loss=0.067269
+2025-11-27 21:41:15 INFO Epoch 073 | 25% complete (batch 136/543)
+2025-11-27 21:41:22 INFO Epoch 073 | 50% complete (batch 272/543)
+2025-11-27 21:41:29 INFO Epoch 073 | 75% complete (batch 408/543)
+2025-11-27 21:41:45 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:41:45 INFO Epoch 073 | train_mse=0.058453 | val_loss=0.068656 | best_val_loss=0.067269
+2025-11-27 21:41:51 INFO Epoch 074 | 25% complete (batch 136/543)
+2025-11-27 21:41:58 INFO Epoch 074 | 50% complete (batch 272/543)
+2025-11-27 21:42:05 INFO Epoch 074 | 75% complete (batch 408/543)
+2025-11-27 21:42:21 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:42:21 INFO Epoch 074 | train_mse=0.053979 | val_loss=0.068656 | best_val_loss=0.067269
+2025-11-27 21:42:28 INFO Epoch 075 | 25% complete (batch 136/543)
+2025-11-27 21:42:35 INFO Epoch 075 | 50% complete (batch 272/543)
+2025-11-27 21:42:41 INFO Epoch 075 | 75% complete (batch 408/543)
+2025-11-27 21:42:57 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596615
+2025-11-27 21:42:57 INFO Epoch 075 | train_mse=0.055008 | val_loss=0.068656 | best_val_loss=0.067269
+Monitored metric val_loss did not improve in the last 45 records. Best score: 0.067. Signaling Trainer to stop.
+2025-11-27 21:42:57 INFO Renamed checkpoint files: checkpoint.val-0.06727_epoch030.chkpt, checkpoint.val-0.06807_epoch032.chkpt, checkpoint.val-0.06854_epoch031.chkpt
+2025-11-27 21:42:57 INFO Training completed. Best checkpoint: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/model_checkpoints/checkpoint.val-0.06727_epoch030.chkpt
+2025-11-27 21:42:57 INFO Best validation loss: tensor(0.0673)
+2025-11-27 21:42:57 INFO Running final validation/evaluation pass on full validation set.
+Restoring states from the checkpoint path at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/model_checkpoints/checkpoint.val-0.06727_epoch030.chkpt
+Loaded model weights from the checkpoint at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45/model_checkpoints/checkpoint.val-0.06727_epoch030.chkpt
+2025-11-27 21:43:04 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = 0.067269
+2025-11-27 21:43:04 INFO Epoch 076 | val_loss=0.067269 | best_val_loss=0.067269
+2025-11-27 21:43:04 INFO Validation metrics: [{'val_loss': 0.0672692060470581, 'val_pearson_corr': 0.7205535173416138, 'val_spearman_corr': 0.6743339896202087}]
+2025-11-27 21:43:04 INFO Symlinked best.ckpt to checkpoint.val-0.06727_epoch030.chkpt
+2025-11-27 21:43:04 INFO Symlinked second_best.ckpt to checkpoint.val-0.06854_epoch031.chkpt
+2025-11-27 21:43:04 INFO Symlinked third_best.ckpt to checkpoint.val-0.06807_epoch032.chkpt
+2025-11-27 21:43:04 INFO Renamed checkpoint file: alt_selection.sel--0.60750_val-0.06975_epoch024.ckpt -> alt_selection.sel--0.60750_val-0.06975_epoch024.chkpt
+2025-11-27 21:43:04 INFO Symlinked selection_metric_best.ckpt to alt_selection.sel--0.60750_val-0.06975_epoch024.chkpt
+2025-11-27 21:43:04 WARNING Training proceeded with missing graphs. Consider regenerating .pt files to close the gap and potentially improve MSE.
+USING ADAM
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+     Validate metric           DataLoader 0
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        val_loss            0.0672692060470581
+    val_pearson_corr        0.7205535173416138
+    val_spearman_corr       0.6743339896202087
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+[train_cli] completed run sched_boost_seed222_2025-11-27_20-54-45 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed222_2025-11-27_20-54-45
+[train_cli][batch] job 'sched_boost_seed222' finished.
+[train_cli][batch] (2/9) running job 'sched_boost_seed777' -> run_name=sched_boost_seed777_2025-11-27_21-43-05
+[train_cli] run_id=sched_boost_seed777_2025-11-27_21-43-05 | command=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py --config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/config/config.yaml --run-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05 --git-commit cdccb9f82 --git-dirty
+2025-11-27 21:43:15 INFO git_commit = cdccb9f82 (dirty)
+2025-11-27 21:43:15 INFO Training package root: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training
+2025-11-27 21:43:15 INFO Configuration loaded from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/config/config.yaml
+2025-11-27 21:43:15 INFO   graph_dir = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data
+2025-11-27 21:43:15 INFO   train_label_file = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/data.train.csv
+2025-11-27 21:43:15 INFO   val_label_file = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/data.validate.csv
+2025-11-27 21:43:15 INFO   save_dir = /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05
+2025-11-27 21:43:15 INFO   metadata_path = None
+2025-11-27 21:43:15 INFO   summary_path = None
+2025-11-27 21:43:15 INFO   accelerator = cpu
+2025-11-27 21:43:15 INFO   devices = 1
+2025-11-27 21:43:15 INFO   attention_head = 8
+2025-11-27 21:43:15 INFO   pooling_type = mean
+2025-11-27 21:43:15 INFO   batch_size = 16
+2025-11-27 21:43:15 INFO   learning_rate = 0.005
+2025-11-27 21:43:15 INFO   num_epochs = 260
+2025-11-27 21:43:15 INFO   accumulate_grad_batches = 16
+2025-11-27 21:43:15 INFO   seed = 777
+2025-11-27 21:43:15 INFO   num_workers = 0
+2025-11-27 21:43:15 INFO   precision = 32
+2025-11-27 21:43:15 INFO   lr_scheduler_type = reduce_on_plateau
+2025-11-27 21:43:15 INFO   early_stopping_patience = 45
+2025-11-27 21:43:15 INFO   lr_scheduler_patience = 6
+2025-11-27 21:43:15 INFO   lr_scheduler_factor = 0.2
+2025-11-27 21:43:15 INFO   fast_dev_run = False
+2025-11-27 21:43:15 INFO   limit_train_batches = None
+2025-11-27 21:43:15 INFO   limit_val_batches = None
+2025-11-27 21:43:15 INFO   log_lr = False
+2025-11-27 21:43:15 INFO   progress_bar_refresh_rate = 0
+2025-11-27 21:43:15 INFO   log_every_n_steps = 100
+2025-11-27 21:43:15 INFO   use_val_spearman_as_secondary = True
+2025-11-27 21:43:15 INFO   spearman_secondary_min_delta = 0.0
+2025-11-27 21:43:15 INFO   spearman_secondary_weight = 1.0
+2025-11-27 21:43:15 INFO   selection_primary_metric = val_loss
+2025-11-27 21:43:15 INFO   coverage_minimum = 0.0
+2025-11-27 21:43:15 INFO   coverage_fail_on_missing = False
+2025-11-27 21:43:15 INFO   graph_load_profiling = False
+2025-11-27 21:43:15 INFO   graph_load_top_k = 5
+2025-11-27 21:43:15 INFO   enable_graph_cache = True
+2025-11-27 21:43:15 INFO   graph_cache_size = 256
+2025-11-27 21:43:15 INFO   canonicalize_on_load = False
+2025-11-27 21:43:15 INFO   mlflow = MlflowConfig(enabled=True, tracking_uri='./qtdaqa/new_dynamic_features/model_training/ml_runs', experiment='dynamic_topoqa', run_name=None, log_artifacts=True, tags={})
+2025-11-27 21:43:15 INFO   edge_schema = {}
+2025-11-27 21:43:15 INFO   topology_schema = {}
+Seed set to 777
+2025-11-27 21:43:16 INFO [train] label rows: 8723 | usable graphs: 8686 | coverage: 99.58%
+2025-11-27 21:43:16 ERROR [train] 37 label entries missing matching .pt graphs (first examples: 1A9X, 1FLE, 1HT9, 1OAO, 1R0R). Regenerate graph tensors or adjust coverage settings to proceed safely.
+2025-11-27 21:43:16 INFO [val] label rows: 3397 | usable graphs: 3376 | coverage: 99.38%
+2025-11-27 21:43:16 ERROR [val] 21 label entries missing matching .pt graphs (first examples: 1H59, 2B5L, 2C7M, 2GZH, 2W19). Regenerate graph tensors or adjust coverage settings to proceed safely.
+2025-11-27 21:43:16 INFO Graph cache enabled (max_items=256). Disable via selection cache.enable_graph_cache=false in config.
+2025-11-27 21:43:16 INFO Dataset coverage report written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/dataset_coverage.json
+2025-11-27 21:43:16 ERROR [coverage] train split: 37/8723 labels missing graph tensors (coverage 99.58%). See /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/dataset_coverage.json for details.
+2025-11-27 21:43:16 ERROR [coverage] val split: 21/3397 labels missing graph tensors (coverage 99.38%). See /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/dataset_coverage.json for details.
+2025-11-27 21:43:16 INFO Schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/schema_summary.json
+2025-11-27 21:43:16 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/feature_metadata.json
+2025-11-27 21:43:16 INFO Graph builder: graph_builder2 (version 2.0.0)
+2025-11-27 21:43:16 INFO Feature config snapshot: path=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.edge_pool_lean_10A, sha256=bcd5840f05788484bb01437d2217a190ae52fe5bcbe91b16b82b2c2e7657ba1d
+2025-11-27 21:43:16 INFO Edge dumps: enabled (output: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/work/edge_features)
+2025-11-27 21:43:16 INFO Feature metadata source: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json
+2025-11-27 21:43:16 INFO Graph builder summary: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/schema_summary.json
+2025-11-27 21:43:16 INFO Interface: interface/polar_cutoff/v1 (cutoff 10 Å), yielding 10 interface residues.
+2025-11-27 21:43:16 INFO Topology: topology/persistence_basic/v1 (filtration_cutoff 8 Å, min_persistence 0.01) supporting the 172-dimensional node features.
+2025-11-27 21:43:16 INFO Node: node/dssp_topo_merge/v1; metadata lists 172 feature columns matching the .pt tensor.
+2025-11-27 21:43:16 INFO Edge: edge/edge_plus_pool_agg_topo/v1 (variant edge_plus_pool_agg_topo/lean); .pt confirms 40 directed edges with 1137 feature values each.
+2025-11-27 21:43:16 INFO → Total feature dimensionality observed and confirmed: node_dim = 172, edge_dim = 1137.
+2025-11-27 21:43:16 INFO Secondary selection metric enabled: val_spearman_corr (weight=1.000, min_delta=0.000)
+2025-11-27 21:43:16 INFO Resolved feature metadata: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "node_schema": {
+    "dim": 172,
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "column_count": 172,
+    "columns_preview": [
+      "rasa",
+      "phi",
+      "psi",
+      "SS8_0",
+      "SS8_1"
+    ]
+  },
+  "metadata_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+  "summary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/schema_summary.json",
+  "module_registry": {
+    "edge": {
+      "id": "edge/edge_plus_pool_agg_topo/v1",
+      "alias": "11D Legacy + pooled balanced topo agg (lean)",
+      "jobs": 16,
+      "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+    },
+    "interface": {
+      "id": "interface/polar_cutoff/v1",
+      "alias": "n x 3D TopoQA default 10A cutoff",
+      "jobs": 16,
+      "summary": "Polar interface detection using distance cutoff."
+    },
+    "node": {
+      "id": "node/dssp_topo_merge/v1",
+      "alias": "172D (140D Topological consumes Interface + 32D) TopoQA default",
+      "jobs": 16,
+      "summary": "DSSP-derived node features merged with topology statistics."
+    },
+    "topology": {
+      "id": "topology/persistence_basic/v1",
+      "alias": "140D summarizes interface features TopoQA default",
+      "jobs": 16,
+      "summary": "Persistent homology features with configurable distance thresholds."
+    }
+  },
+  "notes": []
+}
+2025-11-27 21:43:16 INFO DataLoader num_workers=0 (recommended for macOS to avoid spawn issues; configurable via config.yaml -> num_workers).
+2025-11-27 21:43:17 INFO MLflow logging enabled (experiment=dynamic_topoqa, run_id=cf57afbf4cca43b8a87c95a3b2100a23)
+GPU available: True (mps), used: False
+TPU available: False, using: 0 TPU cores
+HPU available: False, using: 0 HPUs
+2025-11-27 21:43:17 INFO Starting training (fast_dev_run=False)
+2025-11-27 21:43:17 INFO Detected GPU/MPS hardware. Current run uses accelerator='cpu' (configurable via config.yaml -> accelerator).
+/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/pytorch_lightning/callbacks/model_checkpoint.py:701: Checkpoint directory /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_seed777_2025-11-27_21-43-05/model_checkpoints exists and is not empty.
+
+   | Name         | Type             | Params | Mode 
+-----------------------------------------------------------
+0  | criterion    | MeanSquaredError | 0      | train
+1  | relu         | ReLU             | 0      | train
+2  | sigmoid      | Sigmoid          | 0      | train
+3  | edge_embed   | ModuleList       | 37.5 K | train
+4  | embed        | ModuleList       | 5.5 K  | train
+5  | conv1        | ModuleList       | 50.2 K | train
+6  | conv2        | ModuleList       | 50.2 K | train
+7  | conv3        | ModuleList       | 50.2 K | train
+8  | fc_edge      | Linear           | 528    | train
+9  | protein_fc_1 | ModuleList       | 3.1 K  | train
+10 | fc1          | Linear           | 4.2 K  | train
+11 | out          | Linear           | 65     | train
+-----------------------------------------------------------
+201 K     Trainable params
+0         Non-trainable params
+201 K     Total params
+0.806     Total estimated model params size (MB)
+37        Modules in train mode
+0         Modules in eval mode
+2025-11-27 21:43:23 INFO Epoch 000 | 25% complete (batch 136/543)
+2025-11-27 21:43:30 INFO Epoch 000 | 50% complete (batch 272/543)
+2025-11-27 21:43:37 INFO Epoch 000 | 75% complete (batch 408/543)
+2025-11-27 21:43:53 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = 0.140298
+2025-11-27 21:43:53 INFO Epoch 000 | val_loss=0.140298
+Metric val_loss improved. New best score: 0.140
+2025-11-27 21:44:00 INFO Epoch 001 | 25% complete (batch 136/543)
+2025-11-27 21:44:06 INFO Epoch 001 | 50% complete (batch 272/543)
+2025-11-27 21:44:13 INFO Epoch 001 | 75% complete (batch 408/543)
+2025-11-27 21:44:29 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.108585
+2025-11-27 21:44:29 INFO Epoch 001 | train_mse=0.149373 | val_loss=0.139960 | best_val_loss=0.140298
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.140
+2025-11-27 21:44:36 INFO Epoch 002 | 25% complete (batch 136/543)
+2025-11-27 21:44:43 INFO Epoch 002 | 50% complete (batch 272/543)
+2025-11-27 21:44:50 INFO Epoch 002 | 75% complete (batch 408/543)
+2025-11-27 21:45:05 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.120008
+2025-11-27 21:45:05 INFO Epoch 002 | train_mse=0.146947 | val_loss=0.140102 | best_val_loss=0.139960
+2025-11-27 21:45:12 INFO Epoch 003 | 25% complete (batch 136/543)
+2025-11-27 21:45:18 INFO Epoch 003 | 50% complete (batch 272/543)
+2025-11-27 21:45:25 INFO Epoch 003 | 75% complete (batch 408/543)
+2025-11-27 21:45:41 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.252851
+2025-11-27 21:45:41 INFO Epoch 003 | train_mse=0.144909 | val_loss=0.150086 | best_val_loss=0.139960
+2025-11-27 21:45:47 INFO Epoch 004 | 25% complete (batch 136/543)
+2025-11-27 21:45:54 INFO Epoch 004 | 50% complete (batch 272/543)
+2025-11-27 21:46:01 INFO Epoch 004 | 75% complete (batch 408/543)
+2025-11-27 21:46:17 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.380522
+2025-11-27 21:46:17 INFO Epoch 004 | train_mse=0.143979 | val_loss=0.141127 | best_val_loss=0.139960
+2025-11-27 21:46:24 INFO Epoch 005 | 25% complete (batch 136/543)
+2025-11-27 21:46:31 INFO Epoch 005 | 50% complete (batch 272/543)
+2025-11-27 21:46:39 INFO Epoch 005 | 75% complete (batch 408/543)
+2025-11-27 21:46:56 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = 0.141650
+2025-11-27 21:46:56 INFO Epoch 005 | train_mse=0.145126 | val_loss=0.141650 | best_val_loss=0.139960
+2025-11-27 21:47:03 INFO Epoch 006 | 25% complete (batch 136/543)
+2025-11-27 21:47:10 INFO Epoch 006 | 50% complete (batch 272/543)
+2025-11-27 21:47:18 INFO Epoch 006 | 75% complete (batch 408/543)
+2025-11-27 21:47:34 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.079726
+2025-11-27 21:47:34 INFO Epoch 006 | train_mse=0.143196 | val_loss=0.138853 | best_val_loss=0.139960
+Metric val_loss improved by 0.001 >= min_delta = 0.0. New best score: 0.139
+2025-11-27 21:47:41 INFO Epoch 007 | 25% complete (batch 136/543)
+2025-11-27 21:47:48 INFO Epoch 007 | 50% complete (batch 272/543)
+2025-11-27 21:47:55 INFO Epoch 007 | 75% complete (batch 408/543)
+2025-11-27 21:48:11 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.363925
+2025-11-27 21:48:11 INFO Epoch 007 | train_mse=0.149974 | val_loss=0.141616 | best_val_loss=0.138853
+2025-11-27 21:48:17 INFO Epoch 008 | 25% complete (batch 136/543)
+2025-11-27 21:48:24 INFO Epoch 008 | 50% complete (batch 272/543)
+2025-11-27 21:48:31 INFO Epoch 008 | 75% complete (batch 408/543)
+2025-11-27 21:48:48 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.331120
+2025-11-27 21:48:48 INFO Epoch 008 | train_mse=0.148979 | val_loss=0.140702 | best_val_loss=0.138853
+2025-11-27 21:48:54 INFO Epoch 009 | 25% complete (batch 136/543)
+2025-11-27 21:49:01 INFO Epoch 009 | 50% complete (batch 272/543)
+2025-11-27 21:49:09 INFO Epoch 009 | 75% complete (batch 408/543)
+2025-11-27 21:49:25 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = 0.162852
+2025-11-27 21:49:25 INFO Epoch 009 | train_mse=0.146897 | val_loss=0.162852 | best_val_loss=0.138853
+2025-11-27 21:49:32 INFO Epoch 010 | 25% complete (batch 136/543)
+2025-11-27 21:49:39 INFO Epoch 010 | 50% complete (batch 272/543)
+2025-11-27 21:49:46 INFO Epoch 010 | 75% complete (batch 408/543)
+2025-11-27 21:50:02 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.396489
+2025-11-27 21:50:02 INFO Epoch 010 | train_mse=0.144452 | val_loss=0.131138 | best_val_loss=0.138853
+Metric val_loss improved by 0.008 >= min_delta = 0.0. New best score: 0.131
+2025-11-27 21:50:09 INFO Epoch 011 | 25% complete (batch 136/543)
+2025-11-27 21:50:15 INFO Epoch 011 | 50% complete (batch 272/543)
+2025-11-27 21:50:23 INFO Epoch 011 | 75% complete (batch 408/543)
+2025-11-27 21:50:38 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.421679
+2025-11-27 21:50:38 INFO Epoch 011 | train_mse=0.138582 | val_loss=0.101878 | best_val_loss=0.131138
+Metric val_loss improved by 0.029 >= min_delta = 0.0. New best score: 0.102
+2025-11-27 21:50:45 INFO Epoch 012 | 25% complete (batch 136/543)
+2025-11-27 21:50:52 INFO Epoch 012 | 50% complete (batch 272/543)
+2025-11-27 21:50:59 INFO Epoch 012 | 75% complete (batch 408/543)
+2025-11-27 21:51:15 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.458089
+2025-11-27 21:51:15 INFO Epoch 012 | train_mse=0.122976 | val_loss=0.111388 | best_val_loss=0.101878
+2025-11-27 21:51:22 INFO Epoch 013 | 25% complete (batch 136/543)
+2025-11-27 21:51:28 INFO Epoch 013 | 50% complete (batch 272/543)
+2025-11-27 21:51:36 INFO Epoch 013 | 75% complete (batch 408/543)
+2025-11-27 21:51:52 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.494569
+2025-11-27 21:51:52 INFO Epoch 013 | train_mse=0.110244 | val_loss=0.088907 | best_val_loss=0.101878
+Metric val_loss improved by 0.013 >= min_delta = 0.0. New best score: 0.089
+2025-11-27 21:51:58 INFO Epoch 014 | 25% complete (batch 136/543)
+2025-11-27 21:52:05 INFO Epoch 014 | 50% complete (batch 272/543)
+2025-11-27 21:52:12 INFO Epoch 014 | 75% complete (batch 408/543)
+2025-11-27 21:52:28 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.550751
+2025-11-27 21:52:28 INFO Epoch 014 | train_mse=0.101804 | val_loss=0.084090 | best_val_loss=0.088907
+Metric val_loss improved by 0.005 >= min_delta = 0.0. New best score: 0.084
+2025-11-27 21:52:36 INFO Epoch 015 | 25% complete (batch 136/543)
+2025-11-27 21:52:43 INFO Epoch 015 | 50% complete (batch 272/543)
+2025-11-27 21:52:50 INFO Epoch 015 | 75% complete (batch 408/543)
+2025-11-27 21:53:08 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.538197
+2025-11-27 21:53:08 INFO Epoch 015 | train_mse=0.103672 | val_loss=0.096949 | best_val_loss=0.084090
+2025-11-27 21:53:15 INFO Epoch 016 | 25% complete (batch 136/543)
+2025-11-27 21:53:22 INFO Epoch 016 | 50% complete (batch 272/543)
+2025-11-27 21:53:29 INFO Epoch 016 | 75% complete (batch 408/543)
+2025-11-27 21:53:46 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.568894
+2025-11-27 21:53:46 INFO Epoch 016 | train_mse=0.105281 | val_loss=0.077770 | best_val_loss=0.084090
+Metric val_loss improved by 0.006 >= min_delta = 0.0. New best score: 0.078
+2025-11-27 21:53:53 INFO Epoch 017 | 25% complete (batch 136/543)
+2025-11-27 21:54:00 INFO Epoch 017 | 50% complete (batch 272/543)
+2025-11-27 21:54:08 INFO Epoch 017 | 75% complete (batch 408/543)
+2025-11-27 21:54:25 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.570040
+2025-11-27 21:54:25 INFO Epoch 017 | train_mse=0.090343 | val_loss=0.077076 | best_val_loss=0.077770
+Metric val_loss improved by 0.001 >= min_delta = 0.0. New best score: 0.077
+2025-11-27 21:54:31 INFO Epoch 018 | 25% complete (batch 136/543)
+2025-11-27 21:54:38 INFO Epoch 018 | 50% complete (batch 272/543)
+2025-11-27 21:54:45 INFO Epoch 018 | 75% complete (batch 408/543)
+2025-11-27 21:55:03 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.557291
+2025-11-27 21:55:03 INFO Epoch 018 | train_mse=0.073784 | val_loss=0.094147 | best_val_loss=0.077076
+2025-11-27 21:55:10 INFO Epoch 019 | 25% complete (batch 136/543)
+2025-11-27 21:55:17 INFO Epoch 019 | 50% complete (batch 272/543)
+2025-11-27 21:55:25 INFO Epoch 019 | 75% complete (batch 408/543)
+2025-11-27 21:55:42 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.521832
+2025-11-27 21:55:42 INFO Epoch 019 | train_mse=0.088376 | val_loss=0.132205 | best_val_loss=0.077076
+2025-11-27 21:55:49 INFO Epoch 020 | 25% complete (batch 136/543)
+2025-11-27 21:55:56 INFO Epoch 020 | 50% complete (batch 272/543)
+2025-11-27 21:56:04 INFO Epoch 020 | 75% complete (batch 408/543)
+2025-11-27 21:56:21 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.589632
+2025-11-27 21:56:21 INFO Epoch 020 | train_mse=0.089600 | val_loss=0.071991 | best_val_loss=0.077076
+Metric val_loss improved by 0.005 >= min_delta = 0.0. New best score: 0.072
+2025-11-27 21:56:28 INFO Epoch 021 | 25% complete (batch 136/543)
+2025-11-27 21:56:35 INFO Epoch 021 | 50% complete (batch 272/543)
+2025-11-27 21:56:43 INFO Epoch 021 | 75% complete (batch 408/543)
+2025-11-27 21:57:01 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.573340
+2025-11-27 21:57:01 INFO Epoch 021 | train_mse=0.077835 | val_loss=0.078664 | best_val_loss=0.071991
+2025-11-27 21:57:07 INFO Epoch 022 | 25% complete (batch 136/543)
+2025-11-27 21:57:15 INFO Epoch 022 | 50% complete (batch 272/543)
+2025-11-27 21:57:22 INFO Epoch 022 | 75% complete (batch 408/543)
+2025-11-27 21:57:39 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.577344
+2025-11-27 21:57:39 INFO Epoch 022 | train_mse=0.066642 | val_loss=0.070977 | best_val_loss=0.071991
+Metric val_loss improved by 0.001 >= min_delta = 0.0. New best score: 0.071
+2025-11-27 21:57:47 INFO Epoch 023 | 25% complete (batch 136/543)
+2025-11-27 21:57:54 INFO Epoch 023 | 50% complete (batch 272/543)
+2025-11-27 21:58:01 INFO Epoch 023 | 75% complete (batch 408/543)
+2025-11-27 21:58:18 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.584114
+2025-11-27 21:58:18 INFO Epoch 023 | train_mse=0.073917 | val_loss=0.074119 | best_val_loss=0.070977
+2025-11-27 21:58:25 INFO Epoch 024 | 25% complete (batch 136/543)
+2025-11-27 21:58:33 INFO Epoch 024 | 50% complete (batch 272/543)
+2025-11-27 21:58:40 INFO Epoch 024 | 75% complete (batch 408/543)
+2025-11-27 21:58:57 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.550771
+2025-11-27 21:58:57 INFO Epoch 024 | train_mse=0.091706 | val_loss=0.104867 | best_val_loss=0.070977
+2025-11-27 21:59:04 INFO Epoch 025 | 25% complete (batch 136/543)
+2025-11-27 21:59:11 INFO Epoch 025 | 50% complete (batch 272/543)
+2025-11-27 21:59:19 INFO Epoch 025 | 75% complete (batch 408/543)
+2025-11-27 21:59:36 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.562886
+2025-11-27 21:59:36 INFO Epoch 025 | train_mse=0.069274 | val_loss=0.085415 | best_val_loss=0.070977
+2025-11-27 21:59:43 INFO Epoch 026 | 25% complete (batch 136/543)
+2025-11-27 21:59:50 INFO Epoch 026 | 50% complete (batch 272/543)
+2025-11-27 21:59:57 INFO Epoch 026 | 75% complete (batch 408/543)
+2025-11-27 22:00:14 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.574710
+2025-11-27 22:00:14 INFO Epoch 026 | train_mse=0.074513 | val_loss=0.079920 | best_val_loss=0.070977
+2025-11-27 22:00:20 INFO Epoch 027 | 25% complete (batch 136/543)
+2025-11-27 22:00:27 INFO Epoch 027 | 50% complete (batch 272/543)
+2025-11-27 22:00:35 INFO Epoch 027 | 75% complete (batch 408/543)
+2025-11-27 22:00:51 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.552631
+2025-11-27 22:00:51 INFO Epoch 027 | train_mse=0.073327 | val_loss=0.101345 | best_val_loss=0.070977
+2025-11-27 22:00:57 INFO Epoch 028 | 25% complete (batch 136/543)
+2025-11-27 22:01:04 INFO Epoch 028 | 50% complete (batch 272/543)
+2025-11-27 22:01:12 INFO Epoch 028 | 75% complete (batch 408/543)
+2025-11-27 22:01:28 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.583392
+2025-11-27 22:01:28 INFO Epoch 028 | train_mse=0.075655 | val_loss=0.073947 | best_val_loss=0.070977
+2025-11-27 22:01:34 INFO Epoch 029 | 25% complete (batch 136/543)
+2025-11-27 22:01:41 INFO Epoch 029 | 50% complete (batch 272/543)
+2025-11-27 22:01:48 INFO Epoch 029 | 75% complete (batch 408/543)
+2025-11-27 22:02:04 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.589888
+2025-11-27 22:02:04 INFO Epoch 029 | train_mse=0.076508 | val_loss=0.079230 | best_val_loss=0.070977
+2025-11-27 22:02:10 INFO Epoch 030 | 25% complete (batch 136/543)
+2025-11-27 22:02:17 INFO Epoch 030 | 50% complete (batch 272/543)
+2025-11-27 22:02:24 INFO Epoch 030 | 75% complete (batch 408/543)
+2025-11-27 22:02:41 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597048
+2025-11-27 22:02:41 INFO Epoch 030 | train_mse=0.064425 | val_loss=0.068948 | best_val_loss=0.070977
+Metric val_loss improved by 0.002 >= min_delta = 0.0. New best score: 0.069
+2025-11-27 22:02:47 INFO Epoch 031 | 25% complete (batch 136/543)
+2025-11-27 22:02:54 INFO Epoch 031 | 50% complete (batch 272/543)
+2025-11-27 22:03:01 INFO Epoch 031 | 75% complete (batch 408/543)
+2025-11-27 22:03:17 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599538
+2025-11-27 22:03:17 INFO Epoch 031 | train_mse=0.066910 | val_loss=0.070438 | best_val_loss=0.068948
+2025-11-27 22:03:24 INFO Epoch 032 | 25% complete (batch 136/543)
+2025-11-27 22:03:31 INFO Epoch 032 | 50% complete (batch 272/543)
+2025-11-27 22:03:38 INFO Epoch 032 | 75% complete (batch 408/543)
+2025-11-27 22:03:55 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.601840
+2025-11-27 22:03:55 INFO Epoch 032 | train_mse=0.060560 | val_loss=0.069676 | best_val_loss=0.068948
+2025-11-27 22:04:01 INFO Epoch 033 | 25% complete (batch 136/543)
+2025-11-27 22:04:09 INFO Epoch 033 | 50% complete (batch 272/543)
+2025-11-27 22:04:16 INFO Epoch 033 | 75% complete (batch 408/543)
+2025-11-27 22:04:31 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596100
+2025-11-27 22:04:31 INFO Epoch 033 | train_mse=0.061016 | val_loss=0.074708 | best_val_loss=0.068948
+2025-11-27 22:04:38 INFO Epoch 034 | 25% complete (batch 136/543)
+2025-11-27 22:04:45 INFO Epoch 034 | 50% complete (batch 272/543)
+2025-11-27 22:04:52 INFO Epoch 034 | 75% complete (batch 408/543)
+2025-11-27 22:05:08 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.604457
+2025-11-27 22:05:08 INFO Epoch 034 | train_mse=0.066662 | val_loss=0.070450 | best_val_loss=0.068948
+2025-11-27 22:05:15 INFO Epoch 035 | 25% complete (batch 136/543)
+2025-11-27 22:05:22 INFO Epoch 035 | 50% complete (batch 272/543)
+2025-11-27 22:05:29 INFO Epoch 035 | 75% complete (batch 408/543)
+2025-11-27 22:05:45 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598851
+2025-11-27 22:05:45 INFO Epoch 035 | train_mse=0.062850 | val_loss=0.073000 | best_val_loss=0.068948
+2025-11-27 22:05:52 INFO Epoch 036 | 25% complete (batch 136/543)
+2025-11-27 22:05:59 INFO Epoch 036 | 50% complete (batch 272/543)
+2025-11-27 22:06:07 INFO Epoch 036 | 75% complete (batch 408/543)
+2025-11-27 22:06:22 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598064
+2025-11-27 22:06:22 INFO Epoch 036 | train_mse=0.062116 | val_loss=0.070878 | best_val_loss=0.068948
+2025-11-27 22:06:29 INFO Epoch 037 | 25% complete (batch 136/543)
+2025-11-27 22:06:36 INFO Epoch 037 | 50% complete (batch 272/543)
+2025-11-27 22:06:43 INFO Epoch 037 | 75% complete (batch 408/543)
+2025-11-27 22:06:59 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.601888
+2025-11-27 22:06:59 INFO Epoch 037 | train_mse=0.063783 | val_loss=0.069912 | best_val_loss=0.068948
+2025-11-27 22:07:06 INFO Epoch 038 | 25% complete (batch 136/543)
+2025-11-27 22:07:13 INFO Epoch 038 | 50% complete (batch 272/543)
+2025-11-27 22:07:20 INFO Epoch 038 | 75% complete (batch 408/543)
+2025-11-27 22:07:36 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599580
+2025-11-27 22:07:36 INFO Epoch 038 | train_mse=0.054931 | val_loss=0.068364 | best_val_loss=0.068948
+Metric val_loss improved by 0.001 >= min_delta = 0.0. New best score: 0.068
+2025-11-27 22:07:43 INFO Epoch 039 | 25% complete (batch 136/543)
+2025-11-27 22:07:49 INFO Epoch 039 | 50% complete (batch 272/543)
+2025-11-27 22:07:57 INFO Epoch 039 | 75% complete (batch 408/543)
+2025-11-27 22:08:13 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597569
+2025-11-27 22:08:13 INFO Epoch 039 | train_mse=0.064412 | val_loss=0.068507 | best_val_loss=0.068364
+2025-11-27 22:08:19 INFO Epoch 040 | 25% complete (batch 136/543)
+2025-11-27 22:08:27 INFO Epoch 040 | 50% complete (batch 272/543)
+2025-11-27 22:08:34 INFO Epoch 040 | 75% complete (batch 408/543)
+2025-11-27 22:08:50 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597455
+2025-11-27 22:08:50 INFO Epoch 040 | train_mse=0.061152 | val_loss=0.070262 | best_val_loss=0.068364
+2025-11-27 22:08:57 INFO Epoch 041 | 25% complete (batch 136/543)
+2025-11-27 22:09:04 INFO Epoch 041 | 50% complete (batch 272/543)
+2025-11-27 22:09:11 INFO Epoch 041 | 75% complete (batch 408/543)
+2025-11-27 22:09:27 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599437
+2025-11-27 22:09:27 INFO Epoch 041 | train_mse=0.061039 | val_loss=0.069934 | best_val_loss=0.068364
+2025-11-27 22:09:34 INFO Epoch 042 | 25% complete (batch 136/543)
+2025-11-27 22:09:40 INFO Epoch 042 | 50% complete (batch 272/543)
+2025-11-27 22:09:47 INFO Epoch 042 | 75% complete (batch 408/543)
+2025-11-27 22:10:04 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.601393
+2025-11-27 22:10:04 INFO Epoch 042 | train_mse=0.057481 | val_loss=0.068149 | best_val_loss=0.068364
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.068
+2025-11-27 22:10:11 INFO Epoch 043 | 25% complete (batch 136/543)
+2025-11-27 22:10:17 INFO Epoch 043 | 50% complete (batch 272/543)
+2025-11-27 22:10:25 INFO Epoch 043 | 75% complete (batch 408/543)
+2025-11-27 22:10:41 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599185
+2025-11-27 22:10:41 INFO Epoch 043 | train_mse=0.051840 | val_loss=0.069170 | best_val_loss=0.068149
+2025-11-27 22:10:47 INFO Epoch 044 | 25% complete (batch 136/543)
+2025-11-27 22:10:54 INFO Epoch 044 | 50% complete (batch 272/543)
+2025-11-27 22:11:01 INFO Epoch 044 | 75% complete (batch 408/543)
+2025-11-27 22:11:17 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598670
+2025-11-27 22:11:17 INFO Epoch 044 | train_mse=0.059086 | val_loss=0.070664 | best_val_loss=0.068149
+2025-11-27 22:11:24 INFO Epoch 045 | 25% complete (batch 136/543)
+2025-11-27 22:11:31 INFO Epoch 045 | 50% complete (batch 272/543)
+2025-11-27 22:11:38 INFO Epoch 045 | 75% complete (batch 408/543)
+2025-11-27 22:11:54 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597326
+2025-11-27 22:11:54 INFO Epoch 045 | train_mse=0.060151 | val_loss=0.070252 | best_val_loss=0.068149
+2025-11-27 22:12:00 INFO Epoch 046 | 25% complete (batch 136/543)
+2025-11-27 22:12:07 INFO Epoch 046 | 50% complete (batch 272/543)
+2025-11-27 22:12:14 INFO Epoch 046 | 75% complete (batch 408/543)
+2025-11-27 22:12:30 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597135
+2025-11-27 22:12:30 INFO Epoch 046 | train_mse=0.055986 | val_loss=0.069993 | best_val_loss=0.068149
+2025-11-27 22:12:36 INFO Epoch 047 | 25% complete (batch 136/543)
+2025-11-27 22:12:43 INFO Epoch 047 | 50% complete (batch 272/543)
+2025-11-27 22:12:50 INFO Epoch 047 | 75% complete (batch 408/543)
+2025-11-27 22:13:06 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596322
+2025-11-27 22:13:06 INFO Epoch 047 | train_mse=0.060330 | val_loss=0.070278 | best_val_loss=0.068149
+2025-11-27 22:13:13 INFO Epoch 048 | 25% complete (batch 136/543)
+2025-11-27 22:13:20 INFO Epoch 048 | 50% complete (batch 272/543)
+2025-11-27 22:13:27 INFO Epoch 048 | 75% complete (batch 408/543)
+2025-11-27 22:13:43 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598142
+2025-11-27 22:13:43 INFO Epoch 048 | train_mse=0.058393 | val_loss=0.068262 | best_val_loss=0.068149
+2025-11-27 22:13:49 INFO Epoch 049 | 25% complete (batch 136/543)
+2025-11-27 22:13:56 INFO Epoch 049 | 50% complete (batch 272/543)
+2025-11-27 22:14:03 INFO Epoch 049 | 75% complete (batch 408/543)
+2025-11-27 22:14:19 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596038
+2025-11-27 22:14:19 INFO Epoch 049 | train_mse=0.063886 | val_loss=0.069191 | best_val_loss=0.068149
+2025-11-27 22:14:26 INFO Epoch 050 | 25% complete (batch 136/543)
+2025-11-27 22:14:33 INFO Epoch 050 | 50% complete (batch 272/543)
+2025-11-27 22:14:40 INFO Epoch 050 | 75% complete (batch 408/543)
+2025-11-27 22:14:56 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598408
+2025-11-27 22:14:56 INFO Epoch 050 | train_mse=0.053176 | val_loss=0.068701 | best_val_loss=0.068149
+2025-11-27 22:15:03 INFO Epoch 051 | 25% complete (batch 136/543)
+2025-11-27 22:15:09 INFO Epoch 051 | 50% complete (batch 272/543)
+2025-11-27 22:15:16 INFO Epoch 051 | 75% complete (batch 408/543)
+2025-11-27 22:15:32 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598257
+2025-11-27 22:15:32 INFO Epoch 051 | train_mse=0.048296 | val_loss=0.068234 | best_val_loss=0.068149
+2025-11-27 22:15:39 INFO Epoch 052 | 25% complete (batch 136/543)
+2025-11-27 22:15:46 INFO Epoch 052 | 50% complete (batch 272/543)
+2025-11-27 22:15:53 INFO Epoch 052 | 75% complete (batch 408/543)
+2025-11-27 22:16:09 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597800
+2025-11-27 22:16:09 INFO Epoch 052 | train_mse=0.060021 | val_loss=0.067975 | best_val_loss=0.068149
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.068
+2025-11-27 22:16:16 INFO Epoch 053 | 25% complete (batch 136/543)
+2025-11-27 22:16:23 INFO Epoch 053 | 50% complete (batch 272/543)
+2025-11-27 22:16:30 INFO Epoch 053 | 75% complete (batch 408/543)
+2025-11-27 22:16:46 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596386
+2025-11-27 22:16:46 INFO Epoch 053 | train_mse=0.063398 | val_loss=0.067989 | best_val_loss=0.067975
+2025-11-27 22:16:53 INFO Epoch 054 | 25% complete (batch 136/543)
+2025-11-27 22:17:00 INFO Epoch 054 | 50% complete (batch 272/543)
+2025-11-27 22:17:07 INFO Epoch 054 | 75% complete (batch 408/543)
+2025-11-27 22:17:23 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.596350
+2025-11-27 22:17:23 INFO Epoch 054 | train_mse=0.054456 | val_loss=0.067993 | best_val_loss=0.067975
+2025-11-27 22:17:29 INFO Epoch 055 | 25% complete (batch 136/543)
+2025-11-27 22:17:36 INFO Epoch 055 | 50% complete (batch 272/543)
+2025-11-27 22:17:43 INFO Epoch 055 | 75% complete (batch 408/543)
+2025-11-27 22:17:59 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597499
+2025-11-27 22:17:59 INFO Epoch 055 | train_mse=0.055744 | val_loss=0.068080 | best_val_loss=0.067975
+2025-11-27 22:18:05 INFO Epoch 056 | 25% complete (batch 136/543)
+2025-11-27 22:18:12 INFO Epoch 056 | 50% complete (batch 272/543)
+2025-11-27 22:18:20 INFO Epoch 056 | 75% complete (batch 408/543)
+2025-11-27 22:18:35 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598746
+2025-11-27 22:18:35 INFO Epoch 056 | train_mse=0.056982 | val_loss=0.067907 | best_val_loss=0.067975
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.068
+2025-11-27 22:18:42 INFO Epoch 057 | 25% complete (batch 136/543)
+2025-11-27 22:18:49 INFO Epoch 057 | 50% complete (batch 272/543)
+2025-11-27 22:18:56 INFO Epoch 057 | 75% complete (batch 408/543)
+2025-11-27 22:19:12 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.597465
+2025-11-27 22:19:12 INFO Epoch 057 | train_mse=0.056753 | val_loss=0.067877 | best_val_loss=0.067907
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.068
+2025-11-27 22:19:18 INFO Epoch 058 | 25% complete (batch 136/543)
+2025-11-27 22:19:25 INFO Epoch 058 | 50% complete (batch 272/543)
+2025-11-27 22:19:32 INFO Epoch 058 | 75% complete (batch 408/543)
+2025-11-27 22:19:49 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598773
+2025-11-27 22:19:49 INFO Epoch 058 | train_mse=0.051933 | val_loss=0.067726 | best_val_loss=0.067877
+Metric val_loss improved by 0.000 >= min_delta = 0.0. New best score: 0.068
+2025-11-27 22:19:55 INFO Epoch 059 | 25% complete (batch 136/543)
+2025-11-27 22:20:02 INFO Epoch 059 | 50% complete (batch 272/543)
+2025-11-27 22:20:09 INFO Epoch 059 | 75% complete (batch 408/543)
+2025-11-27 22:20:25 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.598841
+2025-11-27 22:20:25 INFO Epoch 059 | train_mse=0.064667 | val_loss=0.067892 | best_val_loss=0.067726
+2025-11-27 22:20:32 INFO Epoch 060 | 25% complete (batch 136/543)
+2025-11-27 22:20:39 INFO Epoch 060 | 50% complete (batch 272/543)
+2025-11-27 22:20:46 INFO Epoch 060 | 75% complete (batch 408/543)
+2025-11-27 22:21:02 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599401
+2025-11-27 22:21:02 INFO Epoch 060 | train_mse=0.055502 | val_loss=0.068155 | best_val_loss=0.067726
+2025-11-27 22:21:09 INFO Epoch 061 | 25% complete (batch 136/543)
+2025-11-27 22:21:15 INFO Epoch 061 | 50% complete (batch 272/543)
+2025-11-27 22:21:23 INFO Epoch 061 | 75% complete (batch 408/543)
+2025-11-27 22:21:39 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599848
+2025-11-27 22:21:39 INFO Epoch 061 | train_mse=0.057498 | val_loss=0.067869 | best_val_loss=0.067726
+2025-11-27 22:21:46 INFO Epoch 062 | 25% complete (batch 136/543)
+2025-11-27 22:21:53 INFO Epoch 062 | 50% complete (batch 272/543)
+2025-11-27 22:22:00 INFO Epoch 062 | 75% complete (batch 408/543)
+2025-11-27 22:22:17 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599407
+2025-11-27 22:22:17 INFO Epoch 062 | train_mse=0.052078 | val_loss=0.068153 | best_val_loss=0.067726
+2025-11-27 22:22:24 INFO Epoch 063 | 25% complete (batch 136/543)
+2025-11-27 22:22:31 INFO Epoch 063 | 50% complete (batch 272/543)
+2025-11-27 22:22:38 INFO Epoch 063 | 75% complete (batch 408/543)
+2025-11-27 22:22:55 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599498
+2025-11-27 22:22:55 INFO Epoch 063 | train_mse=0.061217 | val_loss=0.068892 | best_val_loss=0.067726
+2025-11-27 22:23:01 INFO Epoch 064 | 25% complete (batch 136/543)
+2025-11-27 22:23:08 INFO Epoch 064 | 50% complete (batch 272/543)
+2025-11-27 22:23:15 INFO Epoch 064 | 75% complete (batch 408/543)
+2025-11-27 22:23:32 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600987
+2025-11-27 22:23:32 INFO Epoch 064 | train_mse=0.060700 | val_loss=0.068603 | best_val_loss=0.067726
+2025-11-27 22:23:39 INFO Epoch 065 | 25% complete (batch 136/543)
+2025-11-27 22:23:46 INFO Epoch 065 | 50% complete (batch 272/543)
+2025-11-27 22:23:53 INFO Epoch 065 | 75% complete (batch 408/543)
+2025-11-27 22:24:10 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.601178
+2025-11-27 22:24:10 INFO Epoch 065 | train_mse=0.061737 | val_loss=0.067786 | best_val_loss=0.067726
+2025-11-27 22:24:17 INFO Epoch 066 | 25% complete (batch 136/543)
+2025-11-27 22:24:24 INFO Epoch 066 | 50% complete (batch 272/543)
+2025-11-27 22:24:31 INFO Epoch 066 | 75% complete (batch 408/543)
+2025-11-27 22:24:48 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600249
+2025-11-27 22:24:48 INFO Epoch 066 | train_mse=0.057464 | val_loss=0.067804 | best_val_loss=0.067726
+2025-11-27 22:24:55 INFO Epoch 067 | 25% complete (batch 136/543)
+2025-11-27 22:25:02 INFO Epoch 067 | 50% complete (batch 272/543)
+2025-11-27 22:25:09 INFO Epoch 067 | 75% complete (batch 408/543)
+2025-11-27 22:25:25 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600048
+2025-11-27 22:25:25 INFO Epoch 067 | train_mse=0.056079 | val_loss=0.067931 | best_val_loss=0.067726
+2025-11-27 22:25:31 INFO Epoch 068 | 25% complete (batch 136/543)
+2025-11-27 22:25:38 INFO Epoch 068 | 50% complete (batch 272/543)
+2025-11-27 22:25:45 INFO Epoch 068 | 75% complete (batch 408/543)
+2025-11-27 22:26:01 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600424
+2025-11-27 22:26:01 INFO Epoch 068 | train_mse=0.051727 | val_loss=0.068048 | best_val_loss=0.067726
+2025-11-27 22:26:08 INFO Epoch 069 | 25% complete (batch 136/543)
+2025-11-27 22:26:15 INFO Epoch 069 | 50% complete (batch 272/543)
+2025-11-27 22:26:22 INFO Epoch 069 | 75% complete (batch 408/543)
+2025-11-27 22:26:38 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600422
+2025-11-27 22:26:38 INFO Epoch 069 | train_mse=0.054856 | val_loss=0.068057 | best_val_loss=0.067726
+2025-11-27 22:26:45 INFO Epoch 070 | 25% complete (batch 136/543)
+2025-11-27 22:26:52 INFO Epoch 070 | 50% complete (batch 272/543)
+2025-11-27 22:26:59 INFO Epoch 070 | 75% complete (batch 408/543)
+2025-11-27 22:27:15 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600357
+2025-11-27 22:27:15 INFO Epoch 070 | train_mse=0.056791 | val_loss=0.068216 | best_val_loss=0.067726
+2025-11-27 22:27:21 INFO Epoch 071 | 25% complete (batch 136/543)
+2025-11-27 22:27:28 INFO Epoch 071 | 50% complete (batch 272/543)
+2025-11-27 22:27:35 INFO Epoch 071 | 75% complete (batch 408/543)
+2025-11-27 22:27:51 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600083
+2025-11-27 22:27:51 INFO Epoch 071 | train_mse=0.054056 | val_loss=0.068325 | best_val_loss=0.067726
+2025-11-27 22:27:57 INFO Epoch 072 | 25% complete (batch 136/543)
+2025-11-27 22:28:04 INFO Epoch 072 | 50% complete (batch 272/543)
+2025-11-27 22:28:11 INFO Epoch 072 | 75% complete (batch 408/543)
+2025-11-27 22:28:27 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599993
+2025-11-27 22:28:27 INFO Epoch 072 | train_mse=0.057789 | val_loss=0.068394 | best_val_loss=0.067726
+2025-11-27 22:28:33 INFO Epoch 073 | 25% complete (batch 136/543)
+2025-11-27 22:28:40 INFO Epoch 073 | 50% complete (batch 272/543)
+2025-11-27 22:28:47 INFO Epoch 073 | 75% complete (batch 408/543)
+2025-11-27 22:29:03 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600354
+2025-11-27 22:29:03 INFO Epoch 073 | train_mse=0.056799 | val_loss=0.068367 | best_val_loss=0.067726
+2025-11-27 22:29:10 INFO Epoch 074 | 25% complete (batch 136/543)
+2025-11-27 22:29:16 INFO Epoch 074 | 50% complete (batch 272/543)
+2025-11-27 22:29:24 INFO Epoch 074 | 75% complete (batch 408/543)
+2025-11-27 22:29:40 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600382
+2025-11-27 22:29:40 INFO Epoch 074 | train_mse=0.055836 | val_loss=0.068339 | best_val_loss=0.067726
+2025-11-27 22:29:46 INFO Epoch 075 | 25% complete (batch 136/543)
+2025-11-27 22:29:53 INFO Epoch 075 | 50% complete (batch 272/543)
+2025-11-27 22:30:00 INFO Epoch 075 | 75% complete (batch 408/543)
+2025-11-27 22:30:16 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600303
+2025-11-27 22:30:16 INFO Epoch 075 | train_mse=0.067010 | val_loss=0.068342 | best_val_loss=0.067726
+2025-11-27 22:30:22 INFO Epoch 076 | 25% complete (batch 136/543)
+2025-11-27 22:30:29 INFO Epoch 076 | 50% complete (batch 272/543)
+2025-11-27 22:30:36 INFO Epoch 076 | 75% complete (batch 408/543)
+2025-11-27 22:30:53 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600325
+2025-11-27 22:30:53 INFO Epoch 076 | train_mse=0.058337 | val_loss=0.068320 | best_val_loss=0.067726
+2025-11-27 22:30:59 INFO Epoch 077 | 25% complete (batch 136/543)
+2025-11-27 22:31:06 INFO Epoch 077 | 50% complete (batch 272/543)
+2025-11-27 22:31:13 INFO Epoch 077 | 75% complete (batch 408/543)
+2025-11-27 22:31:29 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600300
+2025-11-27 22:31:29 INFO Epoch 077 | train_mse=0.060585 | val_loss=0.068346 | best_val_loss=0.067726
+2025-11-27 22:31:36 INFO Epoch 078 | 25% complete (batch 136/543)
+2025-11-27 22:31:42 INFO Epoch 078 | 50% complete (batch 272/543)
+2025-11-27 22:31:49 INFO Epoch 078 | 75% complete (batch 408/543)
+2025-11-27 22:32:05 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600127
+2025-11-27 22:32:05 INFO Epoch 078 | train_mse=0.059519 | val_loss=0.068332 | best_val_loss=0.067726
+2025-11-27 22:32:12 INFO Epoch 079 | 25% complete (batch 136/543)
+2025-11-27 22:32:19 INFO Epoch 079 | 50% complete (batch 272/543)
+2025-11-27 22:32:26 INFO Epoch 079 | 75% complete (batch 408/543)
+2025-11-27 22:32:42 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600086
+2025-11-27 22:32:42 INFO Epoch 079 | train_mse=0.056156 | val_loss=0.068373 | best_val_loss=0.067726
+2025-11-27 22:32:48 INFO Epoch 080 | 25% complete (batch 136/543)
+2025-11-27 22:32:55 INFO Epoch 080 | 50% complete (batch 272/543)
+2025-11-27 22:33:02 INFO Epoch 080 | 75% complete (batch 408/543)
+2025-11-27 22:33:18 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600079
+2025-11-27 22:33:18 INFO Epoch 080 | train_mse=0.057412 | val_loss=0.068380 | best_val_loss=0.067726
+2025-11-27 22:33:24 INFO Epoch 081 | 25% complete (batch 136/543)
+2025-11-27 22:33:31 INFO Epoch 081 | 50% complete (batch 272/543)
+2025-11-27 22:33:38 INFO Epoch 081 | 75% complete (batch 408/543)
+2025-11-27 22:33:54 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600086
+2025-11-27 22:33:54 INFO Epoch 081 | train_mse=0.055124 | val_loss=0.068373 | best_val_loss=0.067726
+2025-11-27 22:34:00 INFO Epoch 082 | 25% complete (batch 136/543)
+2025-11-27 22:34:07 INFO Epoch 082 | 50% complete (batch 272/543)
+2025-11-27 22:34:14 INFO Epoch 082 | 75% complete (batch 408/543)
+2025-11-27 22:34:30 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600097
+2025-11-27 22:34:30 INFO Epoch 082 | train_mse=0.052076 | val_loss=0.068362 | best_val_loss=0.067726
+2025-11-27 22:34:36 INFO Epoch 083 | 25% complete (batch 136/543)
+2025-11-27 22:34:43 INFO Epoch 083 | 50% complete (batch 272/543)
+2025-11-27 22:34:50 INFO Epoch 083 | 75% complete (batch 408/543)
+2025-11-27 22:35:07 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600101
+2025-11-27 22:35:07 INFO Epoch 083 | train_mse=0.056261 | val_loss=0.068358 | best_val_loss=0.067726
+2025-11-27 22:35:13 INFO Epoch 084 | 25% complete (batch 136/543)
+2025-11-27 22:35:20 INFO Epoch 084 | 50% complete (batch 272/543)
+2025-11-27 22:35:27 INFO Epoch 084 | 75% complete (batch 408/543)
+2025-11-27 22:35:43 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600101
+2025-11-27 22:35:43 INFO Epoch 084 | train_mse=0.053750 | val_loss=0.068358 | best_val_loss=0.067726
+2025-11-27 22:35:49 INFO Epoch 085 | 25% complete (batch 136/543)
+2025-11-27 22:35:56 INFO Epoch 085 | 50% complete (batch 272/543)
+2025-11-27 22:36:03 INFO Epoch 085 | 75% complete (batch 408/543)
+2025-11-27 22:36:19 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600108
+2025-11-27 22:36:19 INFO Epoch 085 | train_mse=0.055280 | val_loss=0.068351 | best_val_loss=0.067726
+2025-11-27 22:36:25 INFO Epoch 086 | 25% complete (batch 136/543)
+2025-11-27 22:36:32 INFO Epoch 086 | 50% complete (batch 272/543)
+2025-11-27 22:36:40 INFO Epoch 086 | 75% complete (batch 408/543)
+2025-11-27 22:36:55 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600111
+2025-11-27 22:36:55 INFO Epoch 086 | train_mse=0.055853 | val_loss=0.068348 | best_val_loss=0.067726
+2025-11-27 22:37:02 INFO Epoch 087 | 25% complete (batch 136/543)
+2025-11-27 22:37:08 INFO Epoch 087 | 50% complete (batch 272/543)
+2025-11-27 22:37:15 INFO Epoch 087 | 75% complete (batch 408/543)
+2025-11-27 22:37:31 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600113
+2025-11-27 22:37:31 INFO Epoch 087 | train_mse=0.051427 | val_loss=0.068346 | best_val_loss=0.067726
+2025-11-27 22:37:38 INFO Epoch 088 | 25% complete (batch 136/543)
+2025-11-27 22:37:44 INFO Epoch 088 | 50% complete (batch 272/543)
+2025-11-27 22:37:52 INFO Epoch 088 | 75% complete (batch 408/543)
+2025-11-27 22:38:08 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600113
+2025-11-27 22:38:08 INFO Epoch 088 | train_mse=0.065954 | val_loss=0.068346 | best_val_loss=0.067726
+2025-11-27 22:38:15 INFO Epoch 089 | 25% complete (batch 136/543)
+2025-11-27 22:38:22 INFO Epoch 089 | 50% complete (batch 272/543)
+2025-11-27 22:38:29 INFO Epoch 089 | 75% complete (batch 408/543)
+2025-11-27 22:38:45 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600111
+2025-11-27 22:38:45 INFO Epoch 089 | train_mse=0.057945 | val_loss=0.068348 | best_val_loss=0.067726
+2025-11-27 22:38:51 INFO Epoch 090 | 25% complete (batch 136/543)
+2025-11-27 22:38:58 INFO Epoch 090 | 50% complete (batch 272/543)
+2025-11-27 22:39:05 INFO Epoch 090 | 75% complete (batch 408/543)
+2025-11-27 22:39:21 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.600109
+2025-11-27 22:39:21 INFO Epoch 090 | train_mse=0.058088 | val_loss=0.068350 | best_val_loss=0.067726
+2025-11-27 22:39:28 INFO Epoch 091 | 25% complete (batch 136/543)
+2025-11-27 22:39:34 INFO Epoch 091 | 50% complete (batch 272/543)
+2025-11-27 22:39:42 INFO Epoch 091 | 75% complete (batch 408/543)
+2025-11-27 22:39:58 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599922
+2025-11-27 22:39:58 INFO Epoch 091 | train_mse=0.062379 | val_loss=0.068350 | best_val_loss=0.067726
+2025-11-27 22:40:04 INFO Epoch 092 | 25% complete (batch 136/543)
+2025-11-27 22:40:11 INFO Epoch 092 | 50% complete (batch 272/543)
+2025-11-27 22:40:18 INFO Epoch 092 | 75% complete (batch 408/543)
+2025-11-27 22:40:34 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599921
+2025-11-27 22:40:34 INFO Epoch 092 | train_mse=0.060639 | val_loss=0.068351 | best_val_loss=0.067726
+2025-11-27 22:40:40 INFO Epoch 093 | 25% complete (batch 136/543)
+2025-11-27 22:40:47 INFO Epoch 093 | 50% complete (batch 272/543)
+2025-11-27 22:40:54 INFO Epoch 093 | 75% complete (batch 408/543)
+2025-11-27 22:41:10 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.599920
+2025-11-27 22:41:10 INFO Epoch 093 | train_mse=0.054094 | val_loss=0.068353 | best_val_loss=0.067726
+2025-11-27 22:41:16 INFO Epoch 094 | 25% complete (batch 136/543)
+2025-11-27 22:41:23 INFO Epoch 094 | 50% complete (batch 272/543)
+2025-11-27 22:41:30 INFO Epoch 094 | 75% complete (batch 408/543)
