@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import csv
+import heapq
 import numpy as np
 import pandas as pd
 
@@ -60,20 +61,60 @@ def _safe_cosine(vec_a: np.ndarray, vec_b: np.ndarray, eps: float = 1e-8) -> flo
     return float(np.dot(vec_a, vec_b) / denom)
 
 
+def _k_nearest_residues(
+    residues: List[InterfaceResidue],
+    target: InterfaceResidue,
+    *,
+    k: int,
+) -> List[InterfaceResidue]:
+    heap: List[Tuple[float, str, InterfaceResidue]] = []
+    for candidate in residues:
+        if candidate.descriptor == target.descriptor:
+            continue
+        dist = float(np.linalg.norm(candidate.coord - target.coord))
+        # use descriptor as a deterministic tie-breaker
+        heapq.heappush(heap, (dist, candidate.descriptor, candidate))
+    selected: List[InterfaceResidue] = []
+    while heap and len(selected) < k:
+        _, _, res = heapq.heappop(heap)
+        selected.append(res)
+    return selected
+
+
+def _pooled_mean(
+    residues: List[InterfaceResidue],
+    topo_map: Dict[str, np.ndarray],
+    target: InterfaceResidue,
+    *,
+    k: int,
+    topo_dim: int,
+) -> np.ndarray:
+    neighbors = _k_nearest_residues(residues, target, k=k)
+    if not neighbors:
+        return np.zeros((topo_dim,), dtype=np.float32)
+    vectors = []
+    for res in neighbors:
+        vec = topo_map.get(res.descriptor)
+        if vec is None:
+            raise ValueError(f"Missing topology vector for pooled neighbor {res.descriptor}")
+        vectors.append(vec)
+    return np.mean(np.stack(vectors, axis=0), axis=0).astype(np.float32) if vectors else np.zeros((topo_dim,), dtype=np.float32)
+
+
 @register_feature_module
-class EdgePlusBalAggTopoModule(EdgeFeatureModule):
-    module_id = "edge/edge_plus_bal_agg_topo/v1"
+class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
+    module_id = "edge/edge_plus_pool_agg_topo/v1"
     module_kind = "edge"
-    default_alias = "11D Legacy + balanced topo agg (lean)"
+    default_alias = "11D Legacy + pooled balanced topo agg (lean)"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
-        summary="Legacy 11D histogram plus balanced topo concat+mean+abs-diff+cosine (lean).",
+        summary="Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean).",
         description=(
-            "Reuses per-residue topology vectors to build edge features without rerunning persistence. "
-            "For each cross-chain edge, concatenates (u_topo, v_topo, mean(u,v), |u-v|) and appends cosine "
-            "similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) "
-            "is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+            "Extends balanced aggregation by adding pooled neighbor topology means per endpoint (k-nearest), "
+            "then computing mean/abs-diff/cosine (and optional norms) on both endpoints and pooled summaries. "
+            "Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic "
+            "edge ordering is preserved (src_idx, dst_idx, distance)."
         ),
         inputs=("interface_residues", "pdb_structure", "topology_csv"),
         outputs=("edge_index", "edge_attr"),
@@ -81,10 +122,10 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
             "distance_min": "Minimum interface Cα distance (Å) to include an edge.",
             "distance_max": "Maximum interface Cα distance (Å) to include an edge.",
             "scale_histogram": "Apply MinMax scaling across the legacy distance + histogram block only.",
-            "include_norms": "Include L2 norms of endpoint topology vectors.",
-            "include_cosine": "Include cosine similarity between endpoint topology vectors.",
-            "include_minmax": "Include per-dimension min/max across endpoints (heavy variant).",
-            "variant": "Aggregation variant: lean (default) or heavy (adds min/max block).",
+            "include_norms": "Include L2 norms of endpoint topology vectors (and pooled means).",
+            "include_cosine": "Include cosine similarity between endpoint (and pooled) topology vectors.",
+            "pool_k": "Number of nearest interface residues to include in pooled means per endpoint.",
+            "variant": "Aggregation variant (lean only in v1).",
             "jobs": "Optional override for edge assembly worker count.",
         },
         defaults={
@@ -93,7 +134,7 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
             "scale_histogram": True,
             "include_norms": True,
             "include_cosine": True,
-            "include_minmax": False,
+            "pool_k": 5,
             "variant": "lean",
             "jobs": 16,
         },
@@ -121,23 +162,26 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
         scale_histogram = params.get("scale_histogram", True)
         include_norms = params.get("include_norms", True)
         include_cosine = params.get("include_cosine", True)
-        include_minmax = params.get("include_minmax", False)
+        pool_k = params.get("pool_k", 5)
         variant = params.get("variant", "lean")
         jobs = params.get("jobs")
 
-        if variant not in {"lean", "heavy"}:
-            raise ValueError(f"Unsupported variant '{variant}' for edge_plus_bal_agg_topo (expected lean|heavy).")
+        if variant != "lean":
+            raise ValueError(f"Unsupported variant '{variant}' for edge_plus_pool_agg_topo (lean only in v1).")
 
         topo_map, topo_dim = _load_topology_vectors(topology_path)
         if topo_dim <= 0:
             raise ValueError(f"No topology feature columns found in {topology_path}")
-        minmax_dim = topo_dim * 2 if (variant == "heavy" and include_minmax) else 0
-        agg_dim = topo_dim * 4 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
+        endpoint_agg_dim = topo_dim * 4 + (2 if include_norms else 0) + (1 if include_cosine else 0)
+        pooled_agg_dim = topo_dim * 4 + (2 if include_norms else 0) + (1 if include_cosine else 0)
+        agg_dim = endpoint_agg_dim + pooled_agg_dim
 
         edges: List[List[int]] = []
         distances: List[float] = []
         hist_rows: List[List[float]] = []
         agg_rows: List[np.ndarray] = []
+
+        k_neighbors = max(1, int(pool_k)) if pool_k is not None else 5
 
         for i, src in enumerate(residues):
             src_idx = id_to_index.get(src.descriptor)
@@ -163,19 +207,31 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
                 if topo_src is None or topo_dst is None:
                     raise ValueError(f"Missing topology vector for {src.descriptor} or {dst.descriptor}")
 
+                pooled_src = _pooled_mean(residues, topo_map, src, k=k_neighbors, topo_dim=topo_dim)
+                pooled_dst = _pooled_mean(residues, topo_map, dst, k=k_neighbors, topo_dim=topo_dim)
+
                 hist = _distance_histogram(residue_a, residue_b)
                 legacy_block = [distance] + hist.tolist()
 
                 mean_vec = (topo_src + topo_dst) * 0.5
-                parts: List[np.ndarray] = [topo_src, topo_dst, mean_vec, np.abs(topo_src - topo_dst)]
-                if variant == "heavy" and include_minmax:
-                    parts.append(np.minimum(topo_src, topo_dst))
-                    parts.append(np.maximum(topo_src, topo_dst))
+                parts_endpoint: List[np.ndarray] = [topo_src, topo_dst, mean_vec, np.abs(topo_src - topo_dst)]
                 if include_norms:
-                    parts.append(np.array([np.linalg.norm(topo_src), np.linalg.norm(topo_dst)], dtype=np.float32))
+                    parts_endpoint.append(np.array([np.linalg.norm(topo_src), np.linalg.norm(topo_dst)], dtype=np.float32))
                 if include_cosine:
-                    parts.append(np.array([_safe_cosine(topo_src, topo_dst)], dtype=np.float32))
-                agg_vector = np.concatenate(parts, axis=0).astype(np.float32)
+                    parts_endpoint.append(np.array([_safe_cosine(topo_src, topo_dst)], dtype=np.float32))
+                endpoint_vector = np.concatenate(parts_endpoint, axis=0).astype(np.float32)
+
+                pooled_mean_vec = (pooled_src + pooled_dst) * 0.5
+                parts_pooled: List[np.ndarray] = [pooled_src, pooled_dst, pooled_mean_vec, np.abs(pooled_src - pooled_dst)]
+                if include_norms:
+                    parts_pooled.append(
+                        np.array([np.linalg.norm(pooled_src), np.linalg.norm(pooled_dst)], dtype=np.float32)
+                    )
+                if include_cosine:
+                    parts_pooled.append(np.array([_safe_cosine(pooled_src, pooled_dst)], dtype=np.float32))
+                pooled_vector = np.concatenate(parts_pooled, axis=0).astype(np.float32)
+
+                agg_vector = np.concatenate([endpoint_vector, pooled_vector], axis=0).astype(np.float32)
 
                 for edge_pair in ((src_idx, dst_idx), (dst_idx, src_idx)):
                     edges.append([edge_pair[0], edge_pair[1]])
@@ -217,15 +273,17 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
         metadata: Dict[str, Any] = {
             "edge_count": int(edge_index.shape[0]),
             "feature_dim": feature_dim,
-            "edge_feature_variant": f"edge_plus_bal_agg_topo/{variant}",
+            "edge_feature_variant": "edge_plus_pool_agg_topo/lean",
             "variant": variant,
             "topology_feature_dim": topo_dim,
             "include_norms": bool(include_norms),
             "include_cosine": bool(include_cosine),
-            "include_minmax": bool(include_minmax) if variant == "heavy" else False,
+            "pool_k": k_neighbors,
             "distance_window": [float(distance_min), float(distance_max)],
             "histogram_dim": self._HIST_DIM,
             "aggregation_dim": agg_dim,
+            "endpoint_aggregation_dim": endpoint_agg_dim,
+            "pooled_aggregation_dim": pooled_agg_dim,
         }
         if jobs is not None:
             metadata["requested_jobs"] = int(jobs)
@@ -256,15 +314,15 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
         if include_cosine is not None:
             params["include_cosine"] = require_bool(include_cosine, "edge.params.include_cosine")
 
-        include_minmax = params.get("include_minmax")
-        if include_minmax is not None:
-            params["include_minmax"] = require_bool(include_minmax, "edge.params.include_minmax")
+        pool_k = params.get("pool_k")
+        if pool_k is not None:
+            params["pool_k"] = require_positive_int(pool_k, "edge.params.pool_k")
 
         variant = params.get("variant")
         if variant is not None:
             normalised = str(variant).strip().lower()
-            if normalised not in {"lean", "heavy"}:
-                raise ValueError("edge.params.variant must be 'lean' or 'heavy'.")
+            if normalised != "lean":
+                raise ValueError("edge.params.variant supports only 'lean' in v1.")
             params["variant"] = normalised
 
         jobs = params.get("jobs")
@@ -275,19 +333,7 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
     def config_template(cls) -> Dict[str, object]:
         base = super().config_template()
         param_comments = dict(base.get("param_comments", {}))
-        param_comments.setdefault("variant", "lean or heavy")
-        param_comments.setdefault("include_minmax", "heavy variant only; adds per-dimension min/max blocks")
+        param_comments.setdefault("variant", "lean only (heavy will add min/max on endpoints and pooled)")
+        param_comments.setdefault("pool_k", "number of nearest interface residues to pool per endpoint (default 5)")
         base["param_comments"] = param_comments
-        heavy_params = dict(base.get("params", {}))
-        heavy_params.update({"variant": "heavy", "include_minmax": True})
-        base["alternates"] = [
-            {
-                "module": cls.module_id,
-                "alias": "edge_plus_bal_agg_topo (heavy)",
-                "params": heavy_params,
-                "param_comments": param_comments,
-                "summary": cls._metadata.summary,
-                "description": cls._metadata.description,
-            }
-        ]
         return base

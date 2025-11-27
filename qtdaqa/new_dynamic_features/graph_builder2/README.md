@@ -169,9 +169,13 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
   and concatenates the topology summary to the histogram vector. Tune
   `neighbor_distance`, `include_neighbors`, `filtration_cutoff`, and
   `min_persistence` to control the geometric context captured for each pair.
-- `edge/edge_plus_bal_agg_topo/v1` (lean) – legacy 11‑D histogram prepended to balanced
+- `edge/edge_plus_bal_agg_topo/v1` – legacy 11‑D histogram prepended to balanced
   aggregation of endpoint topology: concat(u,v), mean, abs-diff, cosine, and norms
-  (no min/max).
+  (lean). Heavy adds per-dimension min/max on endpoints.
+- `edge/edge_plus_pool_agg_topo/v1` (lean) – legacy 11‑D histogram prepended to balanced
+  aggregation plus pooled neighbor context: concat/mean/abs-diff on endpoints and on
+  pooled mean_topo_neighbors(u,k)/v, with norms/cosine (no min/max). Deterministic
+  edge ordering preserved.
 - `edge/edge_plus_min_agg_topo/v1` (lean) – prepends the legacy 11‑D histogram
   (distance + 10-bin atom histogram) and concatenates per-residue topology for each
   endpoint: concat(u_topo, v_topo), abs-diff, cosine similarity, and norms
