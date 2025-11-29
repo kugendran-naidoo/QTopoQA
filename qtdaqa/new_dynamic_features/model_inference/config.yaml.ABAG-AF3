@@ -18,7 +18,7 @@ num_workers: 0
 # Builder options
 builder:
   sort_artefacts: false # new field; causes inference to append --no-sort-artifacts
-  jobs: 6
+  jobs: 24
 
 # Optional run-time behaviour toggles
 options:

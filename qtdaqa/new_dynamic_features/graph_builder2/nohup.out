@@ -1,0 +1,126 @@
+2025-11-28 22:45:58 INFO PDB warnings enabled (Bio.PDB.PDBConstructionWarning will be logged).
+2025-11-28 22:45:58 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.edge_pool_lean_10A
+2025-11-28 22:45:59 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/logs_output/edge_pool_lean_10A_small_pilot/graph_builder.2025-11-28_22-45-58
+2025-11-28 22:45:59 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/smaller_pilot_batch_Dockground_MAF2
+2025-11-28 22:45:59 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A_small_pilot/work
+2025-11-28 22:45:59 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A_small_pilot/graph_data
+2025-11-28 22:45:59 INFO Jobs: 16 (from CLI)
+2025-11-28 22:45:59 INFO Interface module: interface/polar_cutoff/v1 [alias: n x 3D TopoQA default 10A cutoff] (jobs=16)
+2025-11-28 22:45:59 INFO Topology module : topology/persistence_basic/v1 [alias: 140D summarizes interface features TopoQA default] (jobs=16)
+2025-11-28 22:45:59 INFO Node module     : node/dssp_topo_merge/v1 [alias: 172D (140D Topological consumes Interface + 32D) TopoQA default] (jobs=16)
+2025-11-28 22:45:59 INFO Edge module     : edge/edge_plus_pool_agg_topo/v1 [alias: 11D Legacy + pooled balanced topo agg (lean)] (jobs=16)
+2025-11-28 22:45:59 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2025-11-28 22:45:59 INFO Identified 215 PDB files for processing.
+2025-11-28 22:45:59 INFO Beginning interface stage (jobs=16)
+2025-11-28 22:46:01 INFO [Interface] 4.7% complete (10/215)
+2025-11-28 22:46:01 INFO [Interface] 9.3% complete (20/215)
+2025-11-28 22:46:01 INFO [Interface] 14.0% complete (30/215)
+2025-11-28 22:46:02 INFO [Interface] 18.6% complete (40/215)
+2025-11-28 22:46:02 INFO [Interface] 23.3% complete (50/215)
+2025-11-28 22:46:03 INFO [Interface] 27.9% complete (60/215)
+2025-11-28 22:46:03 INFO [Interface] 32.6% complete (70/215)
+2025-11-28 22:46:03 INFO [Interface] 37.2% complete (80/215)
+2025-11-28 22:46:04 INFO [Interface] 41.9% complete (90/215)
+2025-11-28 22:46:04 INFO [Interface] 46.5% complete (100/215)
+2025-11-28 22:46:05 INFO [Interface] 51.2% complete (110/215)
+2025-11-28 22:46:06 INFO [Interface] 55.8% complete (120/215)
+2025-11-28 22:46:07 INFO [Interface] 60.5% complete (130/215)
+2025-11-28 22:46:08 INFO [Interface] 65.1% complete (140/215)
+2025-11-28 22:46:09 INFO [Interface] 69.8% complete (150/215)
+2025-11-28 22:46:10 INFO [Interface] 74.4% complete (160/215)
+2025-11-28 22:46:11 INFO [Interface] 79.1% complete (170/215)
+2025-11-28 22:46:12 INFO [Interface] 83.7% complete (180/215)
+2025-11-28 22:46:13 INFO [Interface] 88.4% complete (190/215)
+2025-11-28 22:46:14 INFO [Interface] 93.0% complete (200/215)
+2025-11-28 22:46:15 INFO [Interface] 97.7% complete (210/215)
+2025-11-28 22:46:15 INFO [Interface] 100.0% complete (215/215)
+2025-11-28 22:46:15 INFO Interface stage complete: 215 success, 0 failures
+2025-11-28 22:46:15 INFO Interface feature extraction elapsed time: 16.11 s
+2025-11-28 22:46:15 INFO Beginning topology stage (jobs=16)
+2025-11-28 22:46:21 INFO [Topology] 4.7% complete (10/215)
+2025-11-28 22:46:25 INFO [Topology] 9.3% complete (20/215)
+2025-11-28 22:46:26 INFO [Topology] 14.0% complete (30/215)
+2025-11-28 22:46:30 INFO [Topology] 18.6% complete (40/215)
+2025-11-28 22:46:34 INFO [Topology] 23.3% complete (50/215)
+2025-11-28 22:46:35 INFO [Topology] 27.9% complete (60/215)
+2025-11-28 22:46:39 INFO [Topology] 32.6% complete (70/215)
+2025-11-28 22:46:40 INFO [Topology] 37.2% complete (80/215)
+2025-11-28 22:46:44 INFO [Topology] 41.9% complete (90/215)
+2025-11-28 22:46:46 INFO [Topology] 46.5% complete (100/215)
+2025-11-28 22:46:49 INFO [Topology] 51.2% complete (110/215)
+2025-11-28 22:46:58 INFO [Topology] 55.8% complete (120/215)
+2025-11-28 22:47:07 INFO [Topology] 60.5% complete (130/215)
+2025-11-28 22:47:10 INFO [Topology] 65.1% complete (140/215)
+2025-11-28 22:47:19 INFO [Topology] 69.8% complete (150/215)
+2025-11-28 22:47:27 INFO [Topology] 74.4% complete (160/215)
+2025-11-28 22:47:31 INFO [Topology] 79.1% complete (170/215)
+2025-11-28 22:47:39 INFO [Topology] 83.7% complete (180/215)
+2025-11-28 22:47:44 INFO [Topology] 88.4% complete (190/215)
+2025-11-28 22:47:51 INFO [Topology] 93.0% complete (200/215)
+2025-11-28 22:47:54 INFO [Topology] 97.7% complete (210/215)
+2025-11-28 22:47:56 INFO [Topology] 100.0% complete (215/215)
+2025-11-28 22:47:57 INFO Topology stage complete: 212 success, 3 failures
+2025-11-28 22:47:57 INFO Topology feature extraction elapsed time: 101.69 s
+2025-11-28 22:47:57 INFO Beginning node stage (jobs=16)
+2025-11-28 22:48:01 INFO [Node] 4.7% complete (10/212)
+2025-11-28 22:48:04 INFO [Node] 9.4% complete (20/212)
+2025-11-28 22:48:07 INFO [Node] 14.2% complete (30/212)
+2025-11-28 22:48:09 INFO [Node] 18.9% complete (40/212)
+2025-11-28 22:48:11 INFO [Node] 23.6% complete (50/212)
+2025-11-28 22:48:13 INFO [Node] 28.3% complete (60/212)
+2025-11-28 22:48:17 INFO [Node] 33.0% complete (70/212)
+2025-11-28 22:48:19 INFO [Node] 37.7% complete (80/212)
+2025-11-28 22:48:21 INFO [Node] 42.5% complete (90/212)
+2025-11-28 22:48:24 INFO [Node] 47.2% complete (100/212)
+2025-11-28 22:48:27 INFO [Node] 51.9% complete (110/212)
+2025-11-28 22:48:30 INFO [Node] 56.6% complete (120/212)
+2025-11-28 22:48:32 INFO [Node] 61.3% complete (130/212)
+2025-11-28 22:48:36 INFO [Node] 66.0% complete (140/212)
+2025-11-28 22:48:39 INFO [Node] 70.8% complete (150/212)
+2025-11-28 22:48:41 INFO [Node] 75.5% complete (160/212)
+2025-11-28 22:48:44 INFO [Node] 80.2% complete (170/212)
+2025-11-28 22:48:47 INFO [Node] 84.9% complete (180/212)
+2025-11-28 22:48:50 INFO [Node] 89.6% complete (190/212)
+2025-11-28 22:48:53 INFO [Node] 94.3% complete (200/212)
+2025-11-28 22:48:54 INFO [Node] 99.1% complete (210/212)
+2025-11-28 22:48:54 INFO [Node] 100.0% complete (212/212)
+2025-11-28 22:48:54 INFO Node stage complete: 212 success, 0 failures
+2025-11-28 22:48:54 INFO Node feature extraction elapsed time: 57.58 s
+2025-11-28 22:48:54 INFO Edge dumps enabled; writing CSVs to:
+2025-11-28 22:48:54 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A_small_pilot/work/edge_features
+2025-11-28 22:48:54 INFO Edge dump preparation elapsed time: 0.00 s
+2025-11-28 22:48:54 INFO Beginning graph assembly (.pt output) stage (jobs=16)
+2025-11-28 22:49:33 INFO [Graph assembly] 4.7% complete (10/212)
+2025-11-28 22:49:59 INFO [Graph assembly] 9.4% complete (20/212)
+2025-11-28 22:50:08 INFO [Graph assembly] 14.2% complete (30/212)
+2025-11-28 22:50:27 INFO [Graph assembly] 18.9% complete (40/212)
+2025-11-28 22:50:50 INFO [Graph assembly] 23.6% complete (50/212)
+2025-11-28 22:51:05 INFO [Graph assembly] 28.3% complete (60/212)
+2025-11-28 22:51:29 INFO [Graph assembly] 33.0% complete (70/212)
+2025-11-28 22:51:40 INFO [Graph assembly] 37.7% complete (80/212)
+2025-11-28 22:52:04 INFO [Graph assembly] 42.5% complete (90/212)
+2025-11-28 22:52:35 INFO [Graph assembly] 47.2% complete (100/212)
+2025-11-28 22:54:35 INFO [Graph assembly] 51.9% complete (110/212)
+2025-11-28 22:54:58 INFO [Graph assembly] 56.6% complete (120/212)
+2025-11-28 22:57:20 INFO [Graph assembly] 61.3% complete (130/212)
+2025-11-28 22:57:53 INFO [Graph assembly] 66.0% complete (140/212)
+2025-11-28 22:59:07 INFO [Graph assembly] 70.8% complete (150/212)
+2025-11-28 23:00:51 INFO [Graph assembly] 75.5% complete (160/212)
+2025-11-28 23:01:52 INFO [Graph assembly] 80.2% complete (170/212)
+2025-11-28 23:03:33 INFO [Graph assembly] 84.9% complete (180/212)
+2025-11-28 23:05:17 INFO [Graph assembly] 89.6% complete (190/212)
+2025-11-28 23:06:05 INFO [Graph assembly] 94.3% complete (200/212)
+2025-11-28 23:06:21 INFO [Graph assembly] 99.1% complete (210/212)
+2025-11-28 23:06:21 INFO [Graph assembly] 100.0% complete (212/212)
+2025-11-28 23:06:26 INFO Graph assembly (.pt output) complete: 212 success, 0 failures
+2025-11-28 23:06:26 INFO Graph (.pt) generation elapsed time: 1051.11 s (edge stage: 1051.19 s)
+2025-11-28 23:06:26 INFO Summary written to graph_builder.2025-11-28_22-45-58/graph_builder_summary.json
+2025-11-28 23:06:26 INFO Summary log written to graph_builder.2025-11-28_22-45-58/graph_builder_summary.log
+2025-11-28 23:06:26 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A_small_pilot/graph_data/graph_builder_summary.json
+2025-11-28 23:06:26 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A_small_pilot/graph_data/graph_builder_summary.log
+2025-11-28 23:06:26 INFO Dynamic graph builder completed successfully.
+
+real	20m29.147s
+user	36m37.084s
+sys	39m7.634s
+     1229.16 real      2197.08 user      2347.64 sys

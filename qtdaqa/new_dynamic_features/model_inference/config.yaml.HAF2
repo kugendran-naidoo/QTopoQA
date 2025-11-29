@@ -18,7 +18,7 @@ num_workers: 0
 # Builder options (use training metadata for feature layout; only jobs typically need adjustment)
 builder:
   sort_artefacts: false # new field; causes inference to append --no-sort-artifacts
-  jobs: 8
+  jobs: 12
 
 # Optional run-time behaviour toggles
 options:

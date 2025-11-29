@@ -1,0 +1,1093 @@
+Using checkpoints:
+  [1] val-0.04729_epoch118 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+  [2] val-0.04933_epoch211 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+  [3] val-0.04991_epoch126 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+  [4] val-0.05134_epoch118 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+  [5] val-0.05191_epoch161 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+Stage1: BM55-AF2 using val-0.04729_epoch118 (build graphs + inference)
+Stage1: HAF2 using val-0.04729_epoch118 (build graphs + inference)
+Stage1: ABAG-AF3 using val-0.04729_epoch118 (build graphs + inference)
+Waiting for Stage1 (graph build) to complete ...
+2025-11-29 15:11:00,208 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:00,216 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:00,216 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118"
+}
+2025-11-29 15:11:00,216 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/feature_metadata.json
+2025-11-29 15:11:00,216 INFO 
+2025-11-29 15:11:00,216 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+2025-11-29 15:11:00,216 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:00,216 INFO 
+2025-11-29 15:11:00,229 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:00,230 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:00,232 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:00,232 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118"
+}
+2025-11-29 15:11:00,232 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/feature_metadata.json
+2025-11-29 15:11:00,232 INFO 
+2025-11-29 15:11:00,232 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+2025-11-29 15:11:00,233 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:11:00,233 INFO 
+2025-11-29 15:11:00,233 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:00,234 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118"
+}
+2025-11-29 15:11:00,234 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/feature_metadata.json
+2025-11-29 15:11:00,234 INFO 
+2025-11-29 15:11:00,234 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+2025-11-29 15:11:00,234 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:11:00,234 INFO 
+2025-11-29 15:11:00,239 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:00,239 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:00,239 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+2025-11-29 15:11:00,239 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:00,256 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:00,257 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/schema_summary.json
+2025-11-29 15:11:00,257 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:00,272 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json)).
+2025-11-29 15:11:00,272 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:11:00,272 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+2025-11-29 15:11:00,272 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:11:00,285 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:00,285 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:11:00,285 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt
+2025-11-29 15:11:00,285 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:11:00,305 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-11-29 15:11:00,305 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/schema_summary.json
+2025-11-29 15:11:00,305 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:11:00,329 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:00,330 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/schema_summary.json
+2025-11-29 15:11:00,330 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:11:00,536 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: ranked_3 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_0 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_4 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_1 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_2 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:11:00,652 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:11:09,211 INFO Wrote 449 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/BM55-AF2/inference_results.csv
+       11.38 real        14.57 user        12.38 sys
+2025-11-29 15:11:16,013 INFO Wrote 875 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/ABAG-AF3/inference_results.csv
+       18.12 real        29.14 user        28.34 sys
+2025-11-29 15:11:17,523 INFO Wrote 1370 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/HAF2/inference_results.csv
+       19.49 real        33.92 user        32.82 sys
+Stage2 precheck: BM55-AF2 with val-0.04933_epoch211
+REUSE_OK (reuse-only mode)
+Stage2: BM55-AF2 using val-0.04933_epoch211 (reuse graphs, serialized)
+2025-11-29 15:11:20,297 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:20,302 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:20,303 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211"
+}
+2025-11-29 15:11:20,303 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/feature_metadata.json
+2025-11-29 15:11:20,303 INFO 
+2025-11-29 15:11:20,303 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+2025-11-29 15:11:20,303 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:20,303 INFO 
+2025-11-29 15:11:20,325 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:20,325 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:20,325 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+2025-11-29 15:11:20,325 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:20,341 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:20,341 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/schema_summary.json
+2025-11-29 15:11:20,341 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:20,630 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: ranked_3 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_0 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_4 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_1 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_2 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:11:26,128 INFO Wrote 449 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/BM55-AF2/inference_results.csv
+        7.74 real        21.28 user        21.39 sys
+Stage2 precheck: BM55-AF2 with val-0.04991_epoch126
+REUSE_OK (reuse-only mode)
+Stage2: BM55-AF2 using val-0.04991_epoch126 (reuse graphs, serialized)
+2025-11-29 15:11:28,623 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:28,631 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:28,631 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126"
+}
+2025-11-29 15:11:28,631 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/feature_metadata.json
+2025-11-29 15:11:28,631 INFO 
+2025-11-29 15:11:28,631 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+2025-11-29 15:11:28,631 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:28,631 INFO 
+2025-11-29 15:11:28,650 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:28,650 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:28,650 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+2025-11-29 15:11:28,650 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:28,666 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:28,667 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/schema_summary.json
+2025-11-29 15:11:28,667 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:28,907 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: ranked_3 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_0 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_4 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_1 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_2 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:11:34,130 INFO Wrote 449 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/BM55-AF2/inference_results.csv
+        7.27 real        22.12 user        20.09 sys
+Stage2 precheck: BM55-AF2 with val-0.05134_epoch118
+REUSE_OK (reuse-only mode)
+Stage2: BM55-AF2 using val-0.05134_epoch118 (reuse graphs, serialized)
+2025-11-29 15:11:36,615 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:36,622 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:36,622 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118"
+}
+2025-11-29 15:11:36,622 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/feature_metadata.json
+2025-11-29 15:11:36,622 INFO 
+2025-11-29 15:11:36,622 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+2025-11-29 15:11:36,622 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:36,622 INFO 
+2025-11-29 15:11:36,641 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:36,641 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:36,641 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+2025-11-29 15:11:36,641 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:36,657 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:36,658 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/schema_summary.json
+2025-11-29 15:11:36,658 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:36,898 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: ranked_3 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_0 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_4 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_1 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_2 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:11:42,346 INFO Wrote 449 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/BM55-AF2/inference_results.csv
+        7.46 real        21.85 user        20.64 sys
+Stage2 precheck: BM55-AF2 with val-0.05191_epoch161
+REUSE_OK (reuse-only mode)
+Stage2: BM55-AF2 using val-0.05191_epoch161 (reuse graphs, serialized)
+2025-11-29 15:11:44,779 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:44,786 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:44,786 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161"
+}
+2025-11-29 15:11:44,787 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/feature_metadata.json
+2025-11-29 15:11:44,787 INFO 
+2025-11-29 15:11:44,787 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+2025-11-29 15:11:44,787 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:44,787 INFO 
+2025-11-29 15:11:44,805 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:44,805 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:44,805 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+2025-11-29 15:11:44,805 INFO Inference config: config.yaml.BM55-AF2
+2025-11-29 15:11:44,822 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:44,822 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/schema_summary.json
+2025-11-29 15:11:44,822 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/BM55-AF2/graph_data
+2025-11-29 15:11:45,059 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: ranked_3 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_0 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_4 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_1 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG, ranked_2 -> 3RJQ, 3U7Y, 3WD5, 4ETQ, 4M5Z, 4Y7M, 5CBA, 5E5M, 5GRJ, 5HGG, 5KOV, 5O1R, 5SV3, 5WK3, 5X0T, 5Y9J, 6A0Z, 6A77, 6AL0, 6B0S, 6CWG, 6DBG). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:11:50,215 INFO Wrote 449 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/BM55-AF2/inference_results.csv
+        7.17 real        21.21 user        19.84 sys
+Stage2 precheck: HAF2 with val-0.04933_epoch211
+REUSE_OK (reuse-only mode)
+Stage2: HAF2 using val-0.04933_epoch211 (reuse graphs, serialized)
+2025-11-29 15:11:52,630 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:11:52,633 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:11:52,633 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211"
+}
+2025-11-29 15:11:52,634 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/feature_metadata.json
+2025-11-29 15:11:52,634 INFO 
+2025-11-29 15:11:52,634 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+2025-11-29 15:11:52,634 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:11:52,634 INFO 
+2025-11-29 15:11:52,683 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json)).
+2025-11-29 15:11:52,683 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:11:52,683 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+2025-11-29 15:11:52,683 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:11:52,726 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-11-29 15:11:52,726 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/schema_summary.json
+2025-11-29 15:11:52,726 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:11:53,026 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:12:03,460 INFO Wrote 1370 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/HAF2/inference_results.csv
+       12.56 real        45.58 user        42.76 sys
+Stage2 precheck: HAF2 with val-0.04991_epoch126
+REUSE_OK (reuse-only mode)
+Stage2: HAF2 using val-0.04991_epoch126 (reuse graphs, serialized)
+2025-11-29 15:12:05,943 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:12:05,946 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:12:05,947 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126"
+}
+2025-11-29 15:12:05,947 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/feature_metadata.json
+2025-11-29 15:12:05,947 INFO 
+2025-11-29 15:12:05,947 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+2025-11-29 15:12:05,947 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:12:05,947 INFO 
+2025-11-29 15:12:05,994 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json)).
+2025-11-29 15:12:05,994 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:12:05,994 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+2025-11-29 15:12:05,994 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:12:06,038 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-11-29 15:12:06,038 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/schema_summary.json
+2025-11-29 15:12:06,039 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:12:06,339 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:12:16,428 INFO Wrote 1370 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/HAF2/inference_results.csv
+       12.24 real        44.48 user        41.99 sys
+Stage2 precheck: HAF2 with val-0.05134_epoch118
+REUSE_OK (reuse-only mode)
+Stage2: HAF2 using val-0.05134_epoch118 (reuse graphs, serialized)
+2025-11-29 15:12:18,886 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:12:18,889 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:12:18,889 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118"
+}
+2025-11-29 15:12:18,890 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/feature_metadata.json
+2025-11-29 15:12:18,890 INFO 
+2025-11-29 15:12:18,890 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+2025-11-29 15:12:18,890 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:12:18,890 INFO 
+2025-11-29 15:12:18,936 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json)).
+2025-11-29 15:12:18,936 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:12:18,936 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+2025-11-29 15:12:18,936 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:12:18,979 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-11-29 15:12:18,979 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/schema_summary.json
+2025-11-29 15:12:18,979 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:12:19,278 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:12:29,438 INFO Wrote 1370 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/HAF2/inference_results.csv
+       12.28 real        45.26 user        41.76 sys
+Stage2 precheck: HAF2 with val-0.05191_epoch161
+REUSE_OK (reuse-only mode)
+Stage2: HAF2 using val-0.05191_epoch161 (reuse graphs, serialized)
+2025-11-29 15:12:31,888 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:12:31,891 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:12:31,892 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/decoy",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161"
+}
+2025-11-29 15:12:31,892 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/feature_metadata.json
+2025-11-29 15:12:31,892 INFO 
+2025-11-29 15:12:31,892 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+2025-11-29 15:12:31,892 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:12:31,892 INFO 
+2025-11-29 15:12:31,938 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json)).
+2025-11-29 15:12:31,938 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:12:31,938 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+2025-11-29 15:12:31,938 INFO Inference config: config.yaml.HAF2
+2025-11-29 15:12:31,981 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-11-29 15:12:31,981 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/schema_summary.json
+2025-11-29 15:12:31,981 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/HAF2/graph_data
+2025-11-29 15:12:32,281 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+2025-11-29 15:12:42,511 INFO Wrote 1370 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/HAF2/inference_results.csv
+       12.35 real        45.19 user        42.20 sys
+Stage2 precheck: ABAG-AF3 with val-0.04933_epoch211
+REUSE_OK (reuse-only mode)
+Stage2: ABAG-AF3 using val-0.04933_epoch211 (reuse graphs, serialized)
+2025-11-29 15:12:44,977 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:12:44,980 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:12:44,980 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211"
+}
+2025-11-29 15:12:44,980 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/feature_metadata.json
+2025-11-29 15:12:44,980 INFO 
+2025-11-29 15:12:44,980 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+2025-11-29 15:12:44,980 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:12:44,980 INFO 
+2025-11-29 15:12:45,017 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json)).
+2025-11-29 15:12:45,017 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:12:45,017 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-11-28_07-19-43/model_checkpoints/checkpoint.val-0.04933_epoch211.chkpt
+2025-11-29 15:12:45,017 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:12:45,047 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-11-29 15:12:45,048 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/schema_summary.json
+2025-11-29 15:12:45,048 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:12:55,454 INFO Wrote 875 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/ABAG-AF3/inference_results.csv
+       12.16 real        42.83 user        41.12 sys
+Stage2 precheck: ABAG-AF3 with val-0.04991_epoch126
+REUSE_OK (reuse-only mode)
+Stage2: ABAG-AF3 using val-0.04991_epoch126 (reuse graphs, serialized)
+2025-11-29 15:12:57,898 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:12:57,902 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:12:57,902 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126"
+}
+2025-11-29 15:12:57,902 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/feature_metadata.json
+2025-11-29 15:12:57,902 INFO 
+2025-11-29 15:12:57,902 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+2025-11-29 15:12:57,902 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:12:57,902 INFO 
+2025-11-29 15:12:57,935 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json)).
+2025-11-29 15:12:57,935 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:12:57,935 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-11-28_09-51-54/model_checkpoints/checkpoint.val-0.04991_epoch126.chkpt
+2025-11-29 15:12:57,935 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:12:57,965 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-11-29 15:12:57,966 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/schema_summary.json
+2025-11-29 15:12:57,966 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:13:08,115 INFO Wrote 875 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/ABAG-AF3/inference_results.csv
+       11.92 real        41.62 user        40.47 sys
+Stage2 precheck: ABAG-AF3 with val-0.05134_epoch118
+REUSE_OK (reuse-only mode)
+Stage2: ABAG-AF3 using val-0.05134_epoch118 (reuse graphs, serialized)
+2025-11-29 15:13:10,582 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:13:10,585 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:13:10,585 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118"
+}
+2025-11-29 15:13:10,585 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/feature_metadata.json
+2025-11-29 15:13:10,585 INFO 
+2025-11-29 15:13:10,585 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+2025-11-29 15:13:10,585 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:13:10,585 INFO 
+2025-11-29 15:13:10,618 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json)).
+2025-11-29 15:13:10,618 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:13:10,618 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed555_2025-11-28_14-56-58/model_checkpoints/checkpoint.val-0.05134_epoch118.chkpt
+2025-11-29 15:13:10,618 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:13:10,648 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-11-29 15:13:10,649 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/schema_summary.json
+2025-11-29 15:13:10,649 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:13:20,755 INFO Wrote 875 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/ABAG-AF3/inference_results.csv
+       11.92 real        41.45 user        40.55 sys
+Stage2 precheck: ABAG-AF3 with val-0.05191_epoch161
+REUSE_OK (reuse-only mode)
+Stage2: ABAG-AF3 using val-0.05191_epoch161 (reuse graphs, serialized)
+2025-11-29 15:13:23,179 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed888_2025-11-28_18-10-10/model_checkpoints/checkpoint.val-0.04729_epoch118.chkpt (score=0.04729108139872551, run=polish_lr_low_seed888_2025-11-28_18-10-10) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-11-29 15:13:23,182 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 1137,
+    "module": "edge/edge_plus_pool_agg_topo/v1",
+    "variant": "edge_plus_pool_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_norms": true,
+      "jobs": 16,
+      "pool_k": 5,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json",
+    "alias": "11D Legacy + pooled balanced topo agg (lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  },
+  "topology_schema": {}
+}
+2025-11-29 15:13:23,182 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_structures",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": null,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161"
+}
+2025-11-29 15:13:23,183 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/feature_metadata.json
+2025-11-29 15:13:23,183 INFO 
+2025-11-29 15:13:23,183 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+2025-11-29 15:13:23,183 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:13:23,183 INFO 
+2025-11-29 15:13:23,216 WARNING Reuse-only mode enabled; keeping existing graphs at /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data despite metadata mismatch (edge schema key 'source' mismatch (expected /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/edge_pool_lean_10A/graph_data/graph_metadata.json, found /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json)).
+2025-11-29 15:13:23,216 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:13:23,216 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed555_2025-11-28_11-56-25/model_checkpoints/checkpoint.val-0.05191_epoch161.chkpt
+2025-11-29 15:13:23,216 INFO Inference config: config.yaml.ABAG-AF3
+2025-11-29 15:13:23,246 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-11-29 15:13:23,246 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/schema_summary.json
+2025-11-29 15:13:23,246 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-11-29 15:13:33,513 INFO Wrote 875 predictions to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/ABAG-AF3/inference_results.csv
+       12.02 real        42.98 user        40.16 sys
+Inference complete - Running final results ...
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/BM55-AF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/BM55-AF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/BM55-AF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/BM55-AF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/BM55-AF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/BM55-AF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/BM55-AF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/BM55-AF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/BM55-AF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/BM55-AF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/HAF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/HAF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/HAF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/HAF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/HAF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/HAF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/HAF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/HAF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/HAF2/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/HAF2/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/ABAG-AF3/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04729_epoch118/ABAG-AF3/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/ABAG-AF3/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04933_epoch211/ABAG-AF3/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/ABAG-AF3/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.04991_epoch126/ABAG-AF3/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/ABAG-AF3/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05134_epoch118/ABAG-AF3/final_results_hit_rate.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/ABAG-AF3/final_results_dockq.csv
+Summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/edge_pool_lean_10A/results/val-0.05191_epoch161/ABAG-AF3/final_results_hit_rate.csv
+      156.25 real       527.41 user       510.18 sys
