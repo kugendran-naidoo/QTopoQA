@@ -99,7 +99,7 @@ def run_topology_stage(
         dedup_sort=dedup_sort,
     )
 
-    progress = StageProgress("Topology", len(tasks))
+    progress = StageProgress("Topology", len(tasks), dataset_name=dataset_dir.name)
 
     if tasks:
         start = time.perf_counter()
