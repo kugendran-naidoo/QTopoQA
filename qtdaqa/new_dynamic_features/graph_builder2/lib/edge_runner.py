@@ -196,7 +196,7 @@ def run_edge_stage(
 
     start = time.perf_counter()
 
-    progress = StageProgress("Graph assembly", len(tasks))
+    progress = StageProgress("Graph assembly", len(tasks), dataset_name=dataset_dir.name)
 
     if worker_count <= 1:
         for task in tasks:

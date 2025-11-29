@@ -163,7 +163,7 @@ def run_node_stage(
     elapsed = 0.0
     task_map = {task.model_key: task for task in node_tasks}
 
-    progress = StageProgress("Node", len(node_tasks))
+    progress = StageProgress("Node", len(node_tasks), dataset_name=dataset_dir.name)
 
     if node_tasks:
         start = time.perf_counter()

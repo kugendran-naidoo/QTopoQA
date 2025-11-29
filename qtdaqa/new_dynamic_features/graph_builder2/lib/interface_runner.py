@@ -81,7 +81,7 @@ def run_interface_stage(
     failures: List[Tuple[Path, Path, str]] = []
     elapsed = 0.0
 
-    progress = StageProgress("Interface", len(tasks))
+    progress = StageProgress("Interface", len(tasks), dataset_name=dataset_dir.name)
 
     if tasks:
         start = time.perf_counter()

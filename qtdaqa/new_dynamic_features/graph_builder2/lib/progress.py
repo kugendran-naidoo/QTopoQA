@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from typing import Optional
 
 
@@ -15,11 +16,17 @@ class StageProgress:
         total: int,
         logger: Optional[logging.Logger] = None,
         steps: int = 20,
+        dataset_name: Optional[str] = None,
+        heartbeat_seconds: int = 300,
     ) -> None:
         self.stage_name = stage_name
+        self.dataset_name = dataset_name
+        self.stage_label = f"{stage_name} - {dataset_name}" if dataset_name else stage_name
         self.total = total
         self.logger = logger or logging.getLogger("graph_builder")
         self.completed = 0
+        self._heartbeat = heartbeat_seconds if heartbeat_seconds > 0 else None
+        self._last_log_time = time.perf_counter()
         if total <= 0:
             self._step = None
         else:
@@ -32,9 +39,15 @@ class StageProgress:
         if self._step is None:
             return
         self.completed += count
+        now = time.perf_counter()
         if self.completed >= self.total:
             self._log(force=True)
             self._step = None
+            return
+        if self._heartbeat is not None and (now - self._last_log_time) >= self._heartbeat:
+            self._log(force=True)
+            self._last_log_time = now
+            self._next_log = min(self.total, self.completed + (self._step or 0))
             return
         if self.completed >= self._next_log:
             self._log()
@@ -48,8 +61,9 @@ class StageProgress:
         percent = (self.completed / self.total) * 100
         self.logger.info(
             "[%s] %.1f%% complete (%s/%s)",
-            self.stage_name,
+            self.stage_label,
             percent,
             self.completed,
             self.total,
         )
+        self._last_log_time = time.perf_counter()
