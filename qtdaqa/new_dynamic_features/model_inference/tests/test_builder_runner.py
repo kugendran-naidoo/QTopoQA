@@ -1,6 +1,7 @@
 import json
 import sys
 from pathlib import Path
+import subprocess
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
@@ -112,6 +113,12 @@ def test_parse_builder_config_accepts_explicit_feature_config(tmp_path: Path) ->
     assert rel_config.feature_config == features.resolve()
 
 
+def test_parse_builder_config_rejects_unknown_keys(tmp_path: Path) -> None:
+    with pytest.raises(ValueError) as exc:
+        parse_builder_config({"jobs": 2, "sort_artefacts": False}, tmp_path)
+    assert "unrecognized keys" in str(exc.value)
+
+
 def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> None:
     builder = BuilderConfig(dump_edges=False)
     cfg = _make_dummy_config(tmp_path, builder)
@@ -129,6 +136,20 @@ def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> No
     assert invoked_cmd[0] == sys.executable
     assert invoked_cmd[1:3] == ["-m", "qtdaqa.new_dynamic_features.graph_builder.graph_builder"]
     assert "--feature-config" in invoked_cmd
+
+
+def test_run_graph_builder_classifies_subprocess_error(tmp_path: Path) -> None:
+    builder = BuilderConfig()
+    cfg = _make_dummy_config(tmp_path, builder)
+
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.subprocess.run",
+        side_effect=subprocess.CalledProcessError(returncode=2, cmd=["python", "-m", "builder"]),
+    ):
+        with pytest.raises(RuntimeError) as exc:
+            run_graph_builder(cfg)
+    assert "Graph builder failed" in str(exc.value)
+    assert "return code 2" in str(exc.value)
 
 
 def test_run_graph_builder_respects_custom_module(tmp_path: Path) -> None:

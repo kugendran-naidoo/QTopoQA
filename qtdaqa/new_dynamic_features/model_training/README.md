@@ -120,6 +120,8 @@ Throughout the process, each run stores:
   every `.ckpt` under `checkpoint["feature_metadata"]`.
 - `model_checkpoints/` – `best.ckpt`, `second_best.ckpt`, `third_best.ckpt`
   symlinks plus full checkpoint files.
+- `train_cli summarise/leaderboard` include a `builder_advisory` line (edge module,
+  variant, builder id) so inference can confirm compatibility with the builder version in use.
 - `dataset_coverage.json` – label vs. graph coverage for each split.
 - Logs: `training.log` (file) and `training_console.log` (Lightning stdout).
 - Metrics: CSV logs under `metrics/`, ready for plotting.

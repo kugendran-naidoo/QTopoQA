@@ -244,9 +244,9 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--list-modules-format",
-        choices=("text", "markdown"),
+        choices=("text", "markdown", "json"),
         default="text",
-        help="Formatting to use when listing modules (text or markdown).",
+        help="Formatting to use when listing modules (text, markdown, or json).",
     )
     parser.add_argument(
         "--create-feature-config",
@@ -675,12 +675,36 @@ def _format_module_listing(meta: "FeatureModuleMetadata", module_cls: Type) -> L
     return lines
 
 
+def _module_to_dict(meta: "FeatureModuleMetadata", module_cls: Type) -> Dict[str, object]:
+    try:
+        param_desc = module_cls.list_params()  # type: ignore[attr-defined]
+    except AttributeError:  # pragma: no cover - legacy modules
+        param_desc = dict(meta.parameters)
+    defaults = dict(meta.defaults)
+    return {
+        "id": meta.module_id,
+        "kind": meta.module_kind,
+        "alias": getattr(module_cls, "default_alias", None),
+        "summary": meta.summary or meta.description,
+        "parameters": param_desc,
+        "defaults": defaults,
+    }
+
+
 def _list_registered_modules(output_format: str = "text") -> None:
     module_map: Dict[str, List[Tuple["FeatureModuleMetadata", Type]]] = {}
     for meta, module_cls in _iter_registered_modules():
         module_map.setdefault(meta.module_kind, []).append((meta, module_cls))
 
     kinds = _ordered_kinds(module_map.keys())
+
+    if output_format == "json":
+        payload: Dict[str, List[Dict[str, object]]] = {}
+        for kind in kinds:
+            entries = module_map.get(kind, [])
+            payload[kind] = [_module_to_dict(meta, cls) for meta, cls in sorted(entries, key=lambda item: item[0].module_id)]
+        print(json.dumps(payload, indent=2))
+        return
 
     if output_format == "markdown":
         lines: List[str] = []

@@ -169,6 +169,39 @@ def _normalise_ratio(value: float | int | str, default: float = 0.0) -> float:
     return min(max(numeric, 0.0), 1.0)
 
 
+def _merge_defaults_into_edge_schema(feature_metadata: "GraphFeatureMetadata") -> None:
+    """Merge recorded defaults into edge_schema.module_params to make schemas explicit."""
+    edge_schema = feature_metadata.edge_schema or {}
+    module_id = edge_schema.get("module")
+    if not module_id:
+        return
+
+    registry = feature_metadata.module_registry if isinstance(feature_metadata.module_registry, dict) else {}
+    defaults: Dict[str, object] = {}
+    candidates: List[Dict[str, object]] = []
+    edge_entry = registry.get("edge")
+    if isinstance(edge_entry, dict):
+        candidates.append(edge_entry)
+    candidates.extend([entry for entry in registry.values() if isinstance(entry, dict)])
+    for entry in candidates:
+        module_value = entry.get("id") or entry.get("module")
+        if module_value != module_id:
+            continue
+        if isinstance(entry.get("defaults"), dict):
+            defaults.update(entry["defaults"])
+        if isinstance(entry.get("params"), dict):
+            defaults.update(entry["params"])
+        break
+
+    if not defaults:
+        return
+
+    current_params = edge_schema.get("module_params") if isinstance(edge_schema, dict) else None
+    merged = {**defaults, **(current_params or {})}
+    feature_metadata.edge_schema = dict(edge_schema)
+    feature_metadata.edge_schema["module_params"] = merged
+
+
 def _resolve_path(
     raw: str | Path,
     base: Path,
@@ -1342,6 +1375,7 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         metadata_path=cfg.metadata_path,
         summary_path=cfg.summary_path,
     )
+    _merge_defaults_into_edge_schema(feature_metadata)
 
     load_profiler = GraphLoadProfiler(cfg.graph_load_profiling, cfg.graph_load_top_k, cfg.num_workers, logger)
 

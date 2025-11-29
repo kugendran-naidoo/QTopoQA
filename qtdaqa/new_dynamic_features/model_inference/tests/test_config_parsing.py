@@ -92,6 +92,7 @@ def test_load_config_structured(tmp_path: Path) -> None:
 
         options:
           reuse_existing_graphs: true
+          check_schema: true
         """,
     )
     cfg = inference_topoqa_cpu.load_config(cfg_path)
@@ -106,6 +107,7 @@ def test_load_config_structured(tmp_path: Path) -> None:
     assert cfg.reuse_existing_graphs is True
     assert cfg.batch_size == 64
     assert cfg.config_name == cfg_path.name
+    assert cfg.check_schema is True
 
 
 def test_load_config_rejects_legacy_keys(tmp_path: Path) -> None:
@@ -156,6 +158,7 @@ def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
         options:
           reuse_existing_graphs: true
           use_checkpoint_schema: false
+          check_schema: true
 
         interface_schema:
           module: interface/polar_cutoff/v1
@@ -182,6 +185,7 @@ def test_load_config_accepts_schema_override(tmp_path: Path) -> None:
     assert cfg.node_schema["module"] == "node/dssp_topo_merge/v1"
     assert cfg.node_schema["jobs"] == 6
     assert cfg.use_checkpoint_schema is False
+    assert cfg.check_schema is True
 
 
 def test_load_config_auto_selects_checkpoint(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

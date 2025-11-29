@@ -20,10 +20,12 @@ from torch_geometric.loader import DataLoader
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
+from . import builder_runner
 from .builder_runner import (
     BuilderConfig,
     ensure_graph_dir,
     parse_builder_config,
+    _preflight_registry_support,
     validate_graph_metadata,
 )
 from qtdaqa.new_dynamic_features.model_training import train_cli
@@ -56,6 +58,7 @@ class InferenceConfig:
     dataset_name: Optional[str] = None
     work_dir_base: Optional[Path] = None
     results_dir_base: Optional[Path] = None
+    check_schema: bool = False
 
 
 @dataclasses.dataclass
@@ -269,6 +272,28 @@ def _write_inference_schema_summary(
     return summary_path
 
 
+def _run_schema_check(cfg: InferenceConfig, final_schema: Dict[str, Dict[str, object]]) -> None:
+    logging.info("Schema check-only mode enabled; no graphs will be built.")
+    builder_runner._preflight_registry_support(final_schema)
+
+    graph_dir = None
+    if cfg.work_dir:
+        graph_dir = Path(cfg.work_dir) / "graph_data"
+
+    if graph_dir and graph_dir.exists() and any(graph_dir.rglob("*.pt")):
+        logging.info("Validating existing graphs at %s against the resolved schema...", graph_dir)
+        builder_runner.validate_graph_metadata(graph_dir, final_schema)
+        logging.info("Existing graphs are compatible with the resolved schema.")
+    else:
+        if graph_dir:
+            logging.info(
+                "No existing graphs found under %s. Schema is supported locally; build graphs before running inference.",
+                graph_dir,
+            )
+        else:
+            logging.info("No work_dir provided; schema is supported locally.")
+
+
 def load_config(raw_path: Path) -> InferenceConfig:
     with raw_path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
@@ -324,6 +349,7 @@ def load_config(raw_path: Path) -> InferenceConfig:
     reuse_existing = bool(options_cfg.get("reuse_existing_graphs", False)) if options_cfg else False
     use_checkpoint_schema = options_cfg.get("use_checkpoint_schema", True)
     use_checkpoint_schema = bool(use_checkpoint_schema)
+    check_schema = bool(options_cfg.get("check_schema", False)) if options_cfg else False
 
     interface_schema_cfg = data.get("interface_schema") or {}
     if interface_schema_cfg and not isinstance(interface_schema_cfg, dict):
@@ -371,6 +397,7 @@ def load_config(raw_path: Path) -> InferenceConfig:
         dataset_name=dataset_name,
         work_dir_base=work_dir,
         results_dir_base=results_dir,
+        check_schema=check_schema,
     )
 
 
@@ -890,6 +917,11 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="Reuse graphs already present in the work directory when compatible.",
     )
+    parser.add_argument(
+        "--check-schema",
+        action="store_true",
+        help="Validate schema compatibility (checkpoint + local builder + existing graphs) and exit without running inference or building graphs.",
+    )
     return parser.parse_args(argv)
 
 
@@ -967,6 +999,7 @@ def _merge_cli_overrides(config: InferenceConfig, args: argparse.Namespace) -> I
         dataset_name=dataset_name,
         work_dir_base=work_base,
         results_dir_base=results_base,
+        check_schema=bool(args.check_schema) or config.check_schema,
     )
 
 
@@ -1020,6 +1053,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             dataset_name=dataset_name,
             work_dir_base=work_base,
             results_dir_base=results_base,
+            check_schema=bool(args.check_schema),
         )
 
     cfg = _merge_cli_overrides(cfg, args)
@@ -1039,6 +1073,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     with schema_dump_path.open("w", encoding="utf-8") as handle:
         json.dump(final_schema, handle, indent=2)
     logging.info("Feature metadata written to %s", schema_dump_path)
+
+    if cfg.check_schema:
+        _run_schema_check(cfg, final_schema)
+        return 0
 
     run_inference(cfg, final_schema, checkpoint_meta)
     return 0
