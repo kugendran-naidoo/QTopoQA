@@ -138,6 +138,27 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
     )
 
 
+_MISSING = object()
+
+
+def _params_equivalent(expected: Optional[Dict[str, object]], observed: Optional[Dict[str, object]]) -> Tuple[bool, str]:
+    """Treat missing keys as default/falsey; require equality otherwise."""
+    exp = expected or {}
+    obs = observed or {}
+    keys = set(exp.keys()) | set(obs.keys())
+    for key in keys:
+        v_exp = exp.get(key, _MISSING)
+        v_obs = obs.get(key, _MISSING)
+        if v_exp is _MISSING and v_obs in (False, None, 0, "", [], {}):
+            continue
+        if v_obs is _MISSING and v_exp in (False, None, 0, "", [], {}):
+            continue
+        if v_exp == v_obs:
+            continue
+        return False, f"key '{key}' mismatch (expected {v_exp!r}, found {v_obs!r})"
+    return True, ""
+
+
 def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str, object]]:
     edge_schema: Optional[Dict[str, object]] = None
     if isinstance(feature_metadata, GraphFeatureMetadata):
@@ -430,6 +451,11 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
     actual_edge = metadata.edge_schema or {}
     for key, expected_value in expected_edge.items():
         actual_value = actual_edge.get(key)
+        if key == "module_params":
+            ok, reason = _params_equivalent(expected_value if isinstance(expected_value, dict) else {}, actual_value if isinstance(actual_value, dict) else {})
+            if not ok:
+                return False, f"edge schema module_params mismatch: {reason}"
+            continue
         if actual_value != expected_value:
             return False, f"edge schema key '{key}' mismatch (expected {expected_value}, found {actual_value})"
     return True, ""
@@ -438,6 +464,9 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
 def validate_graph_metadata(
     graph_dir: Path, final_schema: Dict[str, Dict[str, object]]
 ) -> GraphFeatureMetadata:
+    # Allow overriding strict validation for reuse-only scenarios.
+    if os.environ.get("QTOPO_REUSE_ONLY", "").strip().lower() in {"1", "true", "yes"}:
+        return load_graph_feature_metadata(graph_dir, max_pt_samples=0)
     try:
         metadata = load_graph_feature_metadata(graph_dir, max_pt_samples=0)
     except Exception as exc:  # pragma: no cover - defensive
@@ -453,6 +482,14 @@ def validate_graph_metadata(
         if key in expected_edge:
             expected_value = expected_edge.get(key)
             actual_value = observed_edge.get(key)
+            if key == "module_params":
+                ok, reason = _params_equivalent(
+                    expected_value if isinstance(expected_value, dict) else {},
+                    actual_value if isinstance(actual_value, dict) else {},
+                )
+                if not ok:
+                    mismatches.append(f"edge_schema.module_params: {reason}")
+                continue
             if actual_value != expected_value:
                 mismatches.append(
                     f"edge_schema.{key}: expected {expected_value!r}, observed {actual_value!r}"
@@ -505,10 +542,17 @@ def ensure_graph_dir(
                 work_dir, schema_payload, "features.from_schema.yaml"
             )
 
-    if reuse and graph_dir.exists() and any(graph_dir.glob("*.pt")):
+    if reuse and graph_dir.exists() and any(graph_dir.rglob("*.pt")):
         matches, reason = _graph_metadata_matches(graph_dir, final_schema)
         if matches:
             logging.info("Reusing existing graphs at %s (metadata matched checkpoint schema).", graph_dir)
+            return graph_dir
+        if os.environ.get("QTOPO_REUSE_ONLY"):
+            logging.warning(
+                "Reuse-only mode enabled; keeping existing graphs at %s despite metadata mismatch (%s).",
+                graph_dir,
+                reason,
+            )
             return graph_dir
         logging.warning(
             "Existing graphs at %s are incompatible with checkpoint metadata (%s); rebuilding.", graph_dir, reason

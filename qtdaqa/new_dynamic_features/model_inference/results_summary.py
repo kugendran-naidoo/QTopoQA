@@ -104,7 +104,23 @@ def generate_dockq_summary(results_dir: Path, *, allow_missing: bool = False) ->
     )
     if not pairs and not allow_missing:
         raise RuntimeError(f"No summary metrics found under {results_dir}")
-    return write_summary(results_dir, sorted(pairs), "final_results_dockq.csv", ["target", "dockq"])
+    numeric_values = []
+    for _, value in pairs:
+        try:
+            numeric_values.append(float(value))
+        except (TypeError, ValueError):
+            continue
+    footer: List[Tuple[str, str]] = []
+    if numeric_values:
+        mean = sum(numeric_values) / len(numeric_values)
+        var = sum((x - mean) ** 2 for x in numeric_values) / len(numeric_values)
+        std = var ** 0.5
+        footer.append(("Mean", f"{mean:.3f}"))
+        footer.append(("Std Dev", f"{std:.3f}"))
+    rows = sorted(pairs)
+    if footer:
+        rows = rows + [("", "")] + footer
+    return write_summary(results_dir, rows, "final_results_dockq.csv", ["target", "dockq"])
 
 
 def _format_hit_rate(row: List[str], offsets: Sequence[int]) -> str:
