@@ -9,7 +9,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import yaml
 
@@ -18,6 +18,7 @@ from qtdaqa.new_dynamic_features.common.feature_metadata import (
     load_graph_feature_metadata,
 )
 from qtdaqa.new_dynamic_features.graph_builder2.lib.features_config import DEFAULT_FEATURES
+from qtdaqa.new_dynamic_features.graph_builder2.modules import instantiate_module
 
 GRAPH_BUILDER2_MODULE = "qtdaqa.new_dynamic_features.graph_builder2.graph_builder2"
 _BUILDER_MODULES = {
@@ -108,6 +109,14 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
             f"(disallowed keys: {', '.join(disallowed)}). Training metadata is used instead."
         )
 
+    allowed_keys = {"jobs", "id", "name", "builder", "sort_artifacts", "feature_config"}
+    unknown = sorted(key for key in raw.keys() if key not in allowed_keys and key not in legacy_keys)
+    if unknown:
+        raise ValueError(
+            "builder configuration has unrecognized keys: "
+            f"{', '.join(unknown)}. Remove typos/unknown fields."
+        )
+
     jobs = raw.get("jobs", 4)
     try:
         jobs_int = int(jobs)
@@ -139,6 +148,44 @@ def parse_builder_config(raw: object, base_dir: Path) -> BuilderConfig:
 
 
 _MISSING = object()
+
+
+def _extract_module_defaults(module_registry: Optional[Dict[str, object]], module_id: Optional[str]) -> Dict[str, object]:
+    """Best-effort lookup of defaults for a module id from module_registry."""
+    if not module_registry or not module_id:
+        return {}
+    if not isinstance(module_registry, dict):
+        return {}
+    candidates: List[Dict[str, object]] = []
+    edge_entry = module_registry.get("edge")
+    if isinstance(edge_entry, dict):
+        candidates.append(edge_entry)
+    for entry in module_registry.values():
+        if isinstance(entry, dict):
+            candidates.append(entry)
+    for entry in candidates:
+        module_value = entry.get("id") or entry.get("module")
+        if module_value != module_id:
+            continue
+        defaults: Dict[str, object] = {}
+        entry_defaults = entry.get("defaults")
+        if isinstance(entry_defaults, dict):
+            defaults.update(entry_defaults)
+        entry_params = entry.get("params")
+        if isinstance(entry_params, dict):
+            # params recorded in module_registry act as defaults for comparison purposes
+            defaults.update(entry_params)
+        return copy.deepcopy(defaults)
+    return {}
+
+
+def _normalize_params(params: Optional[Dict[str, object]], defaults: Optional[Dict[str, object]]) -> Dict[str, object]:
+    merged: Dict[str, object] = {}
+    if defaults:
+        merged.update(copy.deepcopy(defaults))
+    if params:
+        merged.update(params)
+    return merged
 
 
 def _params_equivalent(expected: Optional[Dict[str, object]], observed: Optional[Dict[str, object]]) -> Tuple[bool, str]:
@@ -395,6 +442,27 @@ def _build_schema_feature_payload(final_schema: Dict[str, Dict[str, object]]) ->
     return payload
 
 
+def _preflight_registry_support(final_schema: Dict[str, Dict[str, object]]) -> None:
+    """Ensure the requested modules/variants are available locally before spawning builder."""
+    edge_schema = final_schema.get("edge_schema") or {}
+    module_id = edge_schema.get("module")
+    if not module_id:
+        return
+    params = edge_schema.get("module_params") or {}
+    try:
+        instantiate_module(module_id, **params)
+    except KeyError as exc:
+        raise RuntimeError(
+            f"Requested edge module '{module_id}' is not available in this environment. "
+            "Install/upgrade graph_builder2 to a version that provides this module/variant."
+        ) from exc
+    except Exception as exc:
+        raise RuntimeError(
+            f"Edge module '{module_id}' rejected parameters {params}: {exc}. "
+            "Verify feature schema matches the local builder version."
+        ) from exc
+
+
 def run_graph_builder(
     cfg,
     metadata_feature_config: Optional[Path] = None,
@@ -435,7 +503,15 @@ def run_graph_builder(
     if feature_config_path is not None:
         cmd.extend(["--feature-config", str(feature_config_path)])
     logging.info("Running graph builder (%s): %s", module_path, " ".join(cmd))
-    subprocess.run(cmd, check=True)
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as exc:
+        snippet = _summarize_builder_logs(builder_logs)
+        raise RuntimeError(
+            f"Graph builder failed with return code {exc.returncode}. "
+            f"Logs: {builder_logs}. Command: {' '.join(cmd)}"
+            + (f"\nLast logs:\n{snippet}" if snippet else "")
+        ) from exc
     return graph_dir
 
 
@@ -449,16 +525,36 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
         return False, f"metadata load failed ({exc})"
 
     actual_edge = metadata.edge_schema or {}
+    defaults = _extract_module_defaults(metadata.module_registry, expected_edge.get("module") or actual_edge.get("module"))
     for key, expected_value in expected_edge.items():
         actual_value = actual_edge.get(key)
         if key == "module_params":
-            ok, reason = _params_equivalent(expected_value if isinstance(expected_value, dict) else {}, actual_value if isinstance(actual_value, dict) else {})
+            exp_params = _normalize_params(expected_value if isinstance(expected_value, dict) else {}, defaults)
+            obs_params = _normalize_params(actual_value if isinstance(actual_value, dict) else {}, defaults)
+            ok, reason = _params_equivalent(exp_params, obs_params)
             if not ok:
                 return False, f"edge schema module_params mismatch: {reason}"
             continue
         if actual_value != expected_value:
             return False, f"edge schema key '{key}' mismatch (expected {expected_value}, found {actual_value})"
     return True, ""
+
+
+def _summarize_builder_logs(log_dir: Path, tail_lines: int = 40) -> str:
+    """Return a small tail from the most recent builder log, if available."""
+    if not log_dir.exists():
+        return ""
+    log_files = sorted(log_dir.glob("*.log"), key=lambda p: p.stat().st_mtime, reverse=True)
+    if not log_files:
+        return ""
+    latest = log_files[0]
+    try:
+        lines = latest.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except OSError:
+        return ""
+    if not lines:
+        return ""
+    return "\n".join(lines[-tail_lines:])
 
 
 def validate_graph_metadata(
@@ -476,6 +572,7 @@ def validate_graph_metadata(
 
     expected_edge = final_schema.get("edge_schema") or {}
     observed_edge = metadata.edge_schema or {}
+    defaults = _extract_module_defaults(metadata.module_registry, expected_edge.get("module") or observed_edge.get("module"))
 
     mismatches: List[str] = []
     for key in ("module", "variant", "dim", "bands", "module_params"):
@@ -483,10 +580,9 @@ def validate_graph_metadata(
             expected_value = expected_edge.get(key)
             actual_value = observed_edge.get(key)
             if key == "module_params":
-                ok, reason = _params_equivalent(
-                    expected_value if isinstance(expected_value, dict) else {},
-                    actual_value if isinstance(actual_value, dict) else {},
-                )
+                exp_params = _normalize_params(expected_value if isinstance(expected_value, dict) else {}, defaults)
+                obs_params = _normalize_params(actual_value if isinstance(actual_value, dict) else {}, defaults)
+                ok, reason = _params_equivalent(exp_params, obs_params)
                 if not ok:
                     mismatches.append(f"edge_schema.module_params: {reason}")
                 continue
@@ -522,6 +618,9 @@ def ensure_graph_dir(
     final_schema: Dict[str, Dict[str, object]],
     feature_metadata: Optional[Dict[str, object]] = None,
 ) -> Path:
+    # Fail fast if the requested module/variant isn't available locally.
+    _preflight_registry_support(final_schema)
+
     work_dir = Path(cfg.work_dir)
     graph_dir = work_dir / "graph_data"
     reuse = bool(getattr(cfg, "reuse_existing_graphs", False))

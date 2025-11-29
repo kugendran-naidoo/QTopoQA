@@ -59,6 +59,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from qtdaqa.new_dynamic_features.model_inference import builder_runner  # noqa: E402
+from qtdaqa.new_dynamic_features.model_inference.inference_topoqa_cpu import (  # noqa: E402
+    InferenceConfig,
+    _run_schema_check,
+)
 
 
 def test_load_and_validate_metadata_success(tmp_path: Path) -> None:
@@ -126,3 +130,80 @@ def test_load_and_validate_metadata_load_error(tmp_path: Path) -> None:
         with pytest.raises(RuntimeError) as exc:
             builder_runner.validate_graph_metadata(tmp_path, final_schema)
     assert "Unable to load graph metadata" in str(exc.value)
+
+
+def test_validate_metadata_allows_defaulted_params(tmp_path: Path) -> None:
+    # Metadata omits a param that is present in the checkpoint schema, but the module_registry
+    # records it as a default. Validation should treat them as equivalent.
+    metadata_obj = SimpleNamespace(
+        edge_schema={"module": "edge/edge_plus_pool_agg_topo/v1", "dim": 854, "module_params": {}},
+        node_schema={"dim": 140},
+        module_registry={
+            "edge": {
+                "id": "edge/edge_plus_pool_agg_topo/v1",
+                "defaults": {"include_norms": True, "distance_max": 10.0},
+            }
+        },
+        metadata_path=str(tmp_path / "graph_metadata.json"),
+    )
+    final_schema = {
+        "edge_schema": {
+            "module": "edge/edge_plus_pool_agg_topo/v1",
+            "dim": 854,
+            "module_params": {"include_norms": True},
+        },
+        "topology_schema": {"dim": 140},
+    }
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.load_graph_feature_metadata",
+        return_value=metadata_obj,
+    ):
+        result = builder_runner.validate_graph_metadata(tmp_path, final_schema)
+    assert result is metadata_obj
+
+
+def test_preflight_registry_missing_module(monkeypatch) -> None:
+    final_schema = {"edge_schema": {"module": "edge/does_not_exist/v1", "module_params": {}}}
+
+    def _raise_missing(module_id: str, **params):
+        raise KeyError(module_id)
+
+    monkeypatch.setattr(builder_runner, "instantiate_module", _raise_missing)
+    with pytest.raises(RuntimeError) as exc:
+        builder_runner._preflight_registry_support(final_schema)
+    assert "not available" in str(exc.value)
+
+
+def test_preflight_registry_rejects_params(monkeypatch) -> None:
+    final_schema = {"edge_schema": {"module": "edge/edge_plus_pool_agg_topo/v1", "module_params": {"variant": "mega"}}}
+
+    def _reject(module_id: str, **params):
+        raise ValueError("unsupported variant")
+
+    monkeypatch.setattr(builder_runner, "instantiate_module", _reject)
+    with pytest.raises(RuntimeError) as exc:
+        builder_runner._preflight_registry_support(final_schema)
+    assert "rejected parameters" in str(exc.value)
+
+
+def test_schema_check_uses_existing_graphs(tmp_path: Path, monkeypatch) -> None:
+    work_dir = tmp_path / "work"
+    graph_dir = work_dir / "graph_data"
+    graph_dir.mkdir(parents=True, exist_ok=True)
+    (graph_dir / "dummy.pt").touch()
+
+    cfg = InferenceConfig(
+        data_dir=tmp_path,
+        work_dir=work_dir,
+        checkpoint_path=tmp_path / "ckpt",
+        results_dir=tmp_path / "results",
+        output_file=tmp_path / "out.csv",
+        check_schema=True,
+    )
+
+    calls: list[str] = []
+    monkeypatch.setattr(builder_runner, "_preflight_registry_support", lambda fs: calls.append("preflight"))
+    monkeypatch.setattr(builder_runner, "validate_graph_metadata", lambda gd, fs: calls.append("validate"))
+
+    _run_schema_check(cfg, {"edge_schema": {"module": "edge/multi_scale/v24"}})
+    assert calls == ["preflight", "validate"]

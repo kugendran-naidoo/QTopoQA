@@ -2,9 +2,9 @@
 
 This folder contains the “dynamic” TopoQA stack. It automates three stages:
 
-1. **Graph Builder (`graph_builder/`)** – extracts interface/topology/node/edge features and writes PyG `.pt` graphs plus metadata.
+1. **Graph Builder (`graph_builder2/`)** – extracts interface/topology/node/edge features and writes PyG `.pt` graphs plus metadata.
 2. **Model Training (`model_training/`)** – consumes the graphs and metadata to train models (sweep + fine-tune).
-3. **Model Inference (`model_inference/`)** – loads the best checkpoint, regenerates graphs if needed, and scores evaluation decoys.
+3. **Model Inference (`model_inference/`)** – loads the best checkpoint, regenerates or reuses graphs, and scores evaluation decoys.
 
 The sections below explain how the pieces fit together and which files carry the metadata buses that keep everything in sync.
 
@@ -12,12 +12,12 @@ The sections below explain how the pieces fit together and which files carry the
 
 ## Graph Builder (feature extraction)
 
-*Where:* `qtdaqa/new_dynamic_features/graph_builder`  
+*Where:* `qtdaqa/new_dynamic_features/graph_builder2`  
 *Docs:* `graph_builder/README.md`
 
 - **Purpose:** convert raw PDB structures into graphs (PyTorch Geometric `Data` objects) containing interface coordinates, topology features, node features, and edge attributes.  
 - **Wrapper:** `./run_graph_builder.sh` (exposes `--dataset-dir`, `--work-dir`, `--graph-dir`, `--log-dir`, `--jobs`, `--feature-config`). All paths are mandatory so accidental defaults never creep in.
-- **Feature configs:** users pick one module per stage (`interface`, `topology`, `node`, `edge`). The config schema is validated up front (missing sections, malformed element filters, etc., cause the program to stop immediately). `--create-feature-config` writes a minimal template with inline instructions; `--list-modules` shows every available module ID and description.
+- **Feature configs:** users pick one module per stage (`interface`, `topology`, `node`, `edge`). The config schema is validated up front (missing sections, malformed element filters, etc., cause the program to stop immediately). `--create-feature-config` writes a minimal template with inline instructions; `--list-modules` shows every available module ID and description. Use `--list-modules-format json|markdown` for script/README generation.
 - **Outputs:**  
   - `graph_dir/*.pt` – graphs with metadata embedded (`data.metadata`).  
   - `graph_dir/graph_metadata.json` – canonical schema (edge dim, module IDs, node columns).  
@@ -57,7 +57,7 @@ If you plan to run inference later, don’t delete these run directories—they 
 *Where:* `qtdaqa/new_dynamic_features/model_inference`  
 *Docs:* `model_inference/README.md`
 
-- **Purpose:** take evaluation PDBs (e.g., HAF2, BM55), regenerate graphs with the exact same feature modules used during training, and produce DockQ predictions plus detailed ranking summaries.  
+- **Purpose:** take evaluation PDBs (e.g., HAF2, BM55), reuse cached graphs when compatible (or regenerate with the exact same feature modules used during training), and produce DockQ predictions plus detailed ranking summaries.  
 - **Wrapper:** `./run_model_inference.sh --config config.yaml.<dataset>`  
 - **Config highlights:**  
   - `paths.data_dir` – evaluation structures.  
@@ -65,6 +65,7 @@ If you plan to run inference later, don’t delete these run directories—they 
   - `paths.results_dir` – root directory for per-dataset results (`<results_dir>/<dataset>/…`).  
   - `paths.checkpoint` – optional; if omitted, inference scans `paths.training_root` and auto-selects the best checkpoint using each run’s recorded `selection.primary_metric`.  
   - `builder.jobs` / `options.reuse_existing_graphs` – control how the helper interacts with the graph builder when graphs must be regenerated.  
+  - `options.check_schema` – validate checkpoint → builder → cached graphs and exit without running inference.  
   - `paths.training_root` – where to look for training runs (`../model_training/training_runs` by default).
 - **Automatic metadata plumbing:**  
   - Each training checkpoint stores `feature_metadata`. Inference reads it, writes `<work_dir>/feature_metadata.json`, and generates `builder_features/features.from_metadata.yaml` on the fly.  
@@ -73,6 +74,7 @@ If you plan to run inference later, don’t delete these run directories—they 
 - **Outputs:**  
   - Prediction CSV (`<results_dir>/<dataset>/inference_results.csv`) plus per-target ranking-loss/hit-rate summaries under `<results_dir>/<dataset>/<target>/`.  
   - Work directory contains `feature_metadata.json`, regenerated graphs (if needed), logs, and the auto-generated builder config for reproducibility.
+- **Batch wrapper:** `vscode_exec_edge_pool_lean_10A.sh` runs the top-K checkpoints across BM55-AF2/HAF2/ABAG-AF3, builds graphs once per dataset, and reuses them for remaining checkpoints (uses `QTOPO_REUSE_ONLY=1` to allow reuse when metadata sources differ but params match).
 
 ---
 

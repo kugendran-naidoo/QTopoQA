@@ -55,7 +55,7 @@ Helpers:
 
 - `./run_graph_builder2.sh --list-modules` – list every registered interface,
   topology, node, edge, and custom module kind with summaries and parameter descriptions. Add
-  `--list-modules-format markdown` to emit README-ready Markdown.
+  `--list-modules-format markdown` to emit README-ready Markdown, or `json` for scripting.
 - `./run_graph_builder2.sh --create-feature-config` – write a minimal template
   with inline instructions (no giant catalog to edit by hand). Add
   `--include-alternates` if you also want fully-detailed (commented) blocks for every
@@ -154,81 +154,13 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
 
 ### Edge Modules
 
-- `edge/legacy_band/v11` – default 11‑D histogram mirroring the historical TopoQA
-  training data (0–10 Å pairs, 1 Å histogram bins, MinMax scaling).
-- `edge/multi_scale/v24` – 24‑D geometric features (distance, inverse, unit
-  vectors, chain/residue encodings, multi-band histograms, single contact count).
-- `edge/neo/v24` – hybrid module combining the proven 11‑D histogram window with
-  multi-scale geometry. It supports 0–10 Å truncated bins, multiple contact
-  thresholds, optional long-band masks, and lightweight feature scaling. Select it
-  when you want the geometric expressiveness of multi-scale edges without giving up
-  the DockQ-friendly histogram behavior.
-- `edge/legacy_plus_topo_pair` – builds on the 11‑D legacy module and appends
-  20 persistent-homology statistics per edge. By default it considers the two
-  residues forming the edge plus neighbors within 4 Å, runs a small Rips complex,
-  and concatenates the topology summary to the histogram vector. Tune
-  `neighbor_distance`, `include_neighbors`, `filtration_cutoff`, and
-  `min_persistence` to control the geometric context captured for each pair.
-- `edge/edge_plus_bal_agg_topo/v1` – legacy 11‑D histogram prepended to balanced
-  aggregation of endpoint topology: concat(u,v), mean, abs-diff, cosine, and norms
-  (lean). Heavy adds per-dimension min/max on endpoints.
-- `edge/edge_plus_pool_agg_topo/v1` (lean) – legacy 11‑D histogram prepended to balanced
-  aggregation plus pooled neighbor context: concat/mean/abs-diff on endpoints and on
-  pooled mean_topo_neighbors(u,k)/v, with norms/cosine (no min/max). Deterministic
-  edge ordering preserved.
-- `edge/edge_plus_min_agg_topo/v1` (lean) – prepends the legacy 11‑D histogram
-  (distance + 10-bin atom histogram) and concatenates per-residue topology for each
-  endpoint: concat(u_topo, v_topo), abs-diff, cosine similarity, and norms
-  (defaults on). Deterministic edge ordering is preserved; histogram block can be
-  scaled independently via `scale_histogram`.
-- (Planned) Aggregated-topology edge variants – reuse the per-residue topology
-  vectors already computed for interface residues to build relational signals per
-  edge without rerunning persistence. For an edge (u, v), combine the endpoint
-  topo vectors with:
-  * Asymmetric context: keep both endpoints (concat) so source/target can differ.
-  * Symmetric relations: mean, abs-diff (and optionally min/max, cosine) to show
-    how similar or different the endpoints’ topology is.
-  * Optional local context: pool neighbors’ topo around each endpoint, then apply
-    the same mean/abs-diff (optionally min/max/cosine) to the pooled summaries.
-  This augments the legacy 11‑D histogram with cheap, deterministic relational
-  topology, leveraging the topo features that already performed well at the node
-  level. These will preserve the existing deterministic edge ordering
-  (src_idx, dst_idx, distance) and rely on the canonical interface/node/topology
-  sorting already in place.
+- `edge/legacy_band/v11` – 11‑D legacy histogram (distance + 10-bin atom histogram).
+- `edge/multi_scale/v24` – 24‑D geometric (distance/inverse/unit vectors/encodings/histograms/contact count).
+- `edge/edge_plus_min_agg_topo/v1` – legacy 11‑D histogram + concat/abs-diff/cosine/norms of endpoint topo (lean); heavy adds per-dimension min/max.
+- `edge/edge_plus_bal_agg_topo/v1` – legacy 11‑D histogram + balanced topo agg (concat + mean + abs-diff + cosine + norms); heavy adds min/max.
+- `edge/edge_plus_pool_agg_topo/v1` – legacy 11‑D histogram + balanced topo agg + pooled neighbor topo means; heavy adds min/max to endpoint and pooled summaries.
 
-### Planned aggregated-topology edge modules (defaults and rationale)
-
-These three module families are planned (edge_plus_min_agg_topo lean is now implemented as
-`edge/edge_plus_min_agg_topo/v1`). Defaults below are meant to be sensible starting points
-that balance signal, cost, and determinism:
-
-- `edge_plus_min_agg_topo`
-  - Lean defaults: `include_norms=True`, `include_cosine=True`; no min/max block.
-  - Heavy defaults: `include_minmax=True`, `include_norms=True`, `include_cosine=True`.
-  - Rationale: the lean form keeps footprint small while still conveying relative
-    magnitude (norms) and directional similarity (cosine) between endpoint topo
-    vectors; the heavy form adds symmetric min/max for fuller contrast.
-
-- `edge_plus_bal_agg_topo`
-  - Lean defaults: include endpoint `mean`, `abs_diff`, `cosine`, and `norms`
-    (omit min/max).
-  - Heavy defaults: same as lean plus `min/max` on endpoints.
-  - Rationale: balanced summary (concat + mean + abs-diff) already captures
-    shared and divergent structure; cosine and norms add low-cost orientation and
-    scale cues. Heavy adds min/max to expose extremal differences without changing
-    ordering or determinism.
-
-- `edge_plus_pool_agg_topo`
-  - Shared defaults: neighbor pooling `k=5` (midpoint of 4–6) for deterministic,
-    modest local context.
-  - Lean defaults: endpoint block uses the balanced-lean set (mean/abs-diff/norms/
-    cosine, no min/max); pooled block uses mean/abs-diff/norms/cosine, no min/max.
-  - Heavy defaults: add min/max to both endpoint and pooled blocks while keeping
-    norms and cosine; keep `k=5`.
-  - Rationale: pooling brings nearby topo context without rerunning persistence;
-    k=5 keeps compute predictable. Lean avoids feature blow-up while leveraging
-    norms/cosine for stability; heavy parallels other heavy variants with min/max
-    on both raw and pooled summaries.
+Use `--list-modules --list-modules-format json|markdown` to see full parameter/default listings for every module.
 
 ---
 

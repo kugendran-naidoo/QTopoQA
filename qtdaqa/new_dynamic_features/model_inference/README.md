@@ -47,6 +47,7 @@ builder:
 
 options:
   reuse_existing_graphs: false
+  check_schema: false         # optional: validate checkpoint/builder/graphs and exit
 
 batch_size: 32
 num_workers: 0
@@ -97,6 +98,10 @@ for debugging). Otherwise the command runs the full pipeline.
    - If they match, it reuses them (fast path).
    - If not, it reruns the builder with the generated config so the new graphs
      match training exactly.
+   - `--check-schema` (or `options.check_schema: true`) validates checkpoint → builder → cached graphs
+     and exits without building.
+   - `QTOPO_REUSE_ONLY=1` (used by the batch script below) will prefer reuse even if
+     the metadata source path differs but the feature params are otherwise compatible.
 
 4. **Inference run** – `inference_topoqa_cpu.py` loads graphs via a PyTorch
    Geometric `DataLoader`, feeds batches to the checkpointed model, and writes
@@ -132,6 +137,12 @@ to reuse the regenerated graphs later.
   cached graphs don’t match the checkpoint’s schema (wrong edge module, feature
   dimension, etc.). Remove `<work_dir>/graph_data` or set
   `options.reuse_existing_graphs: false` to force regeneration.
+- **Schema dry-run** – Add `--check-schema` (or set `options.check_schema: true`)
+  to validate the checkpoint schema, local builder support, and any cached graphs,
+  then exit without building or scoring.
+- **Reuse-only mode** – Setting `QTOPO_REUSE_ONLY=1` keeps existing graphs even if
+  the metadata source path differs (useful when the builder location changed but
+  the features are otherwise compatible). Prefer normal reuse checks first.
 - **Selecting a specific checkpoint** – set `paths.checkpoint` to an absolute
   `.ckpt` path. You should also set `paths.training_root` to the folder
   containing that run so logs resolve correctly. If you add manual
@@ -144,6 +155,26 @@ to reuse the regenerated graphs later.
 - **Need to regenerate graphs manually?** – the builder helper writes the exact
   config it used under `<work_dir>/builder_features/`. You can rerun the builder
   yourself for debugging.
+
+---
+
+## Batch wrapper: `vscode_exec_edge_pool_lean_10A.sh`
+
+Location: `qtdaqa/new_dynamic_features/model_inference/vscode_exec_edge_pool_lean_10A.sh`
+
+- Auto-selects the top `TOP_K` checkpoints (default 5) from `model_training` via `train_cli.rank_runs`.
+- Runs datasets `BM55-AF2`, `HAF2`, `ABAG-AF3` by default; adjust the `DATASETS` array as needed.
+- Builds graphs once per dataset for the first checkpoint, then reuses them for the remaining checkpoints; sets `QTOPO_REUSE_ONLY=1`/`REUSE_ONLY=true` so reuse is forced when params match.
+- Derives `WORK_DIR` from checkpoint metadata (graph_metadata source) unless you set it manually; optional timestamping via `APPEND_TIMESTAMP=true`.
+- Exports `TOP_K`, `QTOPO_REUSE_ONLY`, and `REUSE_ONLY` so the Python layer honors reuse-only behavior; uses `--reuse-existing-graphs` everywhere and fails fast if reuse would trigger a rebuild.
+- Supports schema validation (`--check-schema` semantics) implicitly by running reuse prechecks before Stage 2; stops if reuse eligibility fails to avoid clobbering graph_data.
+
+Run via:
+```bash
+cd qtdaqa/new_dynamic_features/model_inference
+bash ./vscode_exec_edge_pool_lean_10A.sh
+```
+Review `nohup.out`/logs under `output/<WORK_DIR>/` for per-checkpoint/dataset progress.
 
 ---
 

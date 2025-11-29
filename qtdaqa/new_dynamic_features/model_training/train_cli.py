@@ -1043,7 +1043,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
                     "epoch": entry["epoch"],
                 }
             )
-        selection_best = sorted_by_selection[0]
+    selection_best = sorted_by_selection[0]
 
     selection_alternates: List[Dict[str, Any]] = []
     selection_alt_checkpoint = alternate_checkpoint_meta.get("selection_metric")
@@ -1070,6 +1070,26 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     feature_info = {}
     if feature_metadata_path.exists():
         feature_info = json.loads(feature_metadata_path.read_text(encoding="utf-8"))
+
+    def _make_builder_advisory() -> Optional[str]:
+        edge_schema = feature_info.get("edge_schema", {}) if isinstance(feature_info, dict) else {}
+        edge_module = edge_schema.get("module")
+        edge_variant = edge_schema.get("variant")
+        builder_block = feature_info.get("builder") if isinstance(feature_info, dict) else {}
+        builder_id = None
+        if isinstance(builder_block, dict):
+            builder_id = builder_block.get("id") or builder_block.get("module")
+
+        parts = []
+        if edge_module:
+            parts.append(f"edge module: {edge_module}")
+        if edge_variant:
+            parts.append(f"variant: {edge_variant}")
+        if builder_id:
+            parts.append(f"builder: {builder_id}")
+        if not parts:
+            return None
+        return "; ".join(parts) + " — ensure inference uses a builder with these modules/variants."
 
     training_parameters = run_metadata.get("training_parameters") if isinstance(run_metadata, dict) else None
 
@@ -1118,6 +1138,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "best_selection_val_loss": selection_best.get("val_loss") if selection_best else None,
         "best_selection_val_spearman": selection_best.get("val_spearman_corr") if selection_best else None,
         "selection_primary_metric": selection_primary_metric,
+        "builder_advisory": _make_builder_advisory(),
     }
     if alternate_checkpoint_meta:
         summary["alternate_checkpoints"] = alternate_checkpoint_meta
@@ -1209,6 +1230,7 @@ def _leaderboard_entries(root: Path) -> List[Dict[str, Any]]:
             "checkpoint": _as_repo_relative(summary.get("best_checkpoint")) if summary.get("best_checkpoint") else None,
             "selection_alternates": alt_entries,
             "metadata": summary,
+            "builder_advisory": summary.get("builder_advisory"),
         }
         entries.append(entry)
     return entries
@@ -1245,6 +1267,9 @@ def _print_leaderboard(entries: List[Dict[str, Any]], limit: int, show_alt: bool
                 print("   alt_selection_rank: (selection metric ranks current run)")
         if entry["checkpoint"]:
             print(f"   checkpoint: {entry['checkpoint']}")
+        advisory = entry.get("builder_advisory")
+        if advisory:
+            print(f"   builder_advisory: {advisory}")
         print("")
 
 
