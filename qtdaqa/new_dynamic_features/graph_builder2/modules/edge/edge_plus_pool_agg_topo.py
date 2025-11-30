@@ -101,6 +101,47 @@ def _pooled_mean(
     return np.mean(np.stack(vectors, axis=0), axis=0).astype(np.float32) if vectors else np.zeros((topo_dim,), dtype=np.float32)
 
 
+def _compute_pooled_means_vectorized(
+    residues: List[InterfaceResidue],
+    topo_vectors: np.ndarray,
+    descriptors: List[str],
+    *,
+    k: int,
+) -> np.ndarray:
+    """Compute pooled neighbor means for each residue using vectorized distance ranking.
+
+    Tie-breaks for equal distances use descriptor rank (lexicographic) to stay deterministic.
+    Missing topo vectors should already be filtered before calling this helper.
+    """
+    n = len(residues)
+    if n == 0:
+        return np.empty((0, topo_vectors.shape[1]), dtype=np.float32)
+
+    coords = np.stack([res.coord for res in residues], axis=0).astype(np.float64)
+    dist_matrix = np.linalg.norm(coords[:, None, :] - coords[None, :, :], axis=2)
+    np.fill_diagonal(dist_matrix, np.inf)
+
+    # Tie-breaker: add a tiny offset proportional to descriptor rank (lexicographic).
+    rank = {desc: idx for idx, desc in enumerate(sorted(descriptors))}
+    rank_vec = np.array([rank[d] for d in descriptors], dtype=np.float64)
+    dist_with_ties = dist_matrix + (rank_vec[None, :] * 1e-9)
+
+    # Mask any missing topo vectors (should not occur, but keep defensive).
+    missing = np.isnan(topo_vectors).any(axis=1)
+    if missing.any():
+        dist_with_ties[:, missing] = np.inf
+
+    neighbors = np.argsort(dist_with_ties, axis=1)[:, :k]
+    pooled = np.zeros_like(topo_vectors, dtype=np.float32)
+    for i in range(n):
+        idxs = neighbors[i]
+        finite_mask = np.isfinite(dist_matrix[i, idxs])
+        if not finite_mask.any():
+            continue
+        pooled[i] = topo_vectors[idxs[finite_mask]].mean(axis=0).astype(np.float32)
+    return pooled
+
+
 @register_feature_module
 class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
     module_id = "edge/edge_plus_pool_agg_topo/v1"
@@ -175,96 +216,142 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
         topo_map, topo_dim = _load_topology_vectors(topology_path)
         if topo_dim <= 0:
             raise ValueError(f"No topology feature columns found in {topology_path}")
+
+        k_neighbors = max(1, int(pool_k)) if pool_k is not None else 5
         minmax_dim = topo_dim * 2 if (variant == "heavy" and include_minmax) else 0
         endpoint_agg_dim = topo_dim * 4 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
         pooled_agg_dim = topo_dim * 4 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
         agg_dim = endpoint_agg_dim + pooled_agg_dim
 
+        # Prepare arrays
+        descriptors = [res.descriptor for res in residues]
+        topo_vectors = []
+        valid_residue = []
+        for res in residues:
+            vec = topo_map.get(res.descriptor)
+            topo_vectors.append(vec if vec is not None else np.full((topo_dim,), np.nan, dtype=np.float32))
+            valid_residue.append(vec is not None and id_to_index.get(res.descriptor) is not None)
+        topo_vectors = np.stack(topo_vectors, axis=0).astype(np.float32) if topo_vectors else np.empty((0, topo_dim), dtype=np.float32)
+        valid_mask = np.array(valid_residue, dtype=bool)
+
+        coords = np.stack([res.coord for res in residues], axis=0).astype(np.float64) if residues else np.empty((0, 3))
+        chains = np.array([res.chain_id for res in residues])
+
+        # Compute pooled means (vectorized) for valid residues only
+        pooled_means = _compute_pooled_means_vectorized(residues, topo_vectors, descriptors, k=k_neighbors)
+
         edges: List[List[int]] = []
         distances: List[float] = []
         hist_rows: List[List[float]] = []
-        agg_rows: List[np.ndarray] = []
+        src_pos_list: List[int] = []
+        dst_pos_list: List[int] = []
 
-        k_neighbors = max(1, int(pool_k)) if pool_k is not None else 5
-
-        for i, src in enumerate(residues):
-            src_idx = id_to_index.get(src.descriptor)
-            if src_idx is None:
-                continue
-            for j, dst in enumerate(residues):
-                if i == j or src.chain_id == dst.chain_id:
+        if len(residues) > 1:
+            diff = coords[:, None, :] - coords[None, :, :]
+            dist_matrix = np.linalg.norm(diff, axis=2)
+            for i in range(len(residues)):
+                if not valid_mask[i]:
                     continue
-                dst_idx = id_to_index.get(dst.descriptor)
-                if dst_idx is None:
-                    continue
-                distance = float(np.linalg.norm(dst.coord - src.coord))
-                if distance <= distance_min or distance >= distance_max:
-                    continue
+                for j in range(len(residues)):
+                    if i == j or chains[i] == chains[j] or not valid_mask[j]:
+                        continue
+                    distance = float(dist_matrix[i, j])
+                    if distance <= distance_min or distance >= distance_max:
+                        continue
 
-                residue_a = structure.get_residue(src.chain_id, src.residue_seq, src.insertion_code)
-                residue_b = structure.get_residue(dst.chain_id, dst.residue_seq, dst.insertion_code)
-                if residue_a is None or residue_b is None:
-                    continue
+                    residue_a = structure.get_residue(residues[i].chain_id, residues[i].residue_seq, residues[i].insertion_code)
+                    residue_b = structure.get_residue(residues[j].chain_id, residues[j].residue_seq, residues[j].insertion_code)
+                    if residue_a is None or residue_b is None:
+                        continue
 
-                topo_src = topo_map.get(src.descriptor)
-                topo_dst = topo_map.get(dst.descriptor)
-                if topo_src is None or topo_dst is None:
-                    raise ValueError(f"Missing topology vector for {src.descriptor} or {dst.descriptor}")
+                    hist = _distance_histogram(residue_a, residue_b)
+                    legacy_block = [distance] + hist.tolist()
 
-                pooled_src = _pooled_mean(residues, topo_map, src, k=k_neighbors, topo_dim=topo_dim)
-                pooled_dst = _pooled_mean(residues, topo_map, dst, k=k_neighbors, topo_dim=topo_dim)
+                    src_idx = id_to_index.get(residues[i].descriptor)
+                    dst_idx = id_to_index.get(residues[j].descriptor)
+                    if src_idx is None or dst_idx is None:
+                        continue
 
-                hist = _distance_histogram(residue_a, residue_b)
-                legacy_block = [distance] + hist.tolist()
-
-                mean_vec = (topo_src + topo_dst) * 0.5
-                parts_endpoint: List[np.ndarray] = [topo_src, topo_dst, mean_vec, np.abs(topo_src - topo_dst)]
-                if variant == "heavy" and include_minmax:
-                    parts_endpoint.append(np.minimum(topo_src, topo_dst))
-                    parts_endpoint.append(np.maximum(topo_src, topo_dst))
-                if include_norms:
-                    parts_endpoint.append(np.array([np.linalg.norm(topo_src), np.linalg.norm(topo_dst)], dtype=np.float32))
-                if include_cosine:
-                    parts_endpoint.append(np.array([_safe_cosine(topo_src, topo_dst)], dtype=np.float32))
-                endpoint_vector = np.concatenate(parts_endpoint, axis=0).astype(np.float32)
-
-                pooled_mean_vec = (pooled_src + pooled_dst) * 0.5
-                parts_pooled: List[np.ndarray] = [pooled_src, pooled_dst, pooled_mean_vec, np.abs(pooled_src - pooled_dst)]
-                if variant == "heavy" and include_minmax:
-                    parts_pooled.append(np.minimum(pooled_src, pooled_dst))
-                    parts_pooled.append(np.maximum(pooled_src, pooled_dst))
-                if include_norms:
-                    parts_pooled.append(
-                        np.array([np.linalg.norm(pooled_src), np.linalg.norm(pooled_dst)], dtype=np.float32)
-                    )
-                if include_cosine:
-                    parts_pooled.append(np.array([_safe_cosine(pooled_src, pooled_dst)], dtype=np.float32))
-                pooled_vector = np.concatenate(parts_pooled, axis=0).astype(np.float32)
-
-                agg_vector = np.concatenate([endpoint_vector, pooled_vector], axis=0).astype(np.float32)
-
-                for edge_pair in ((src_idx, dst_idx), (dst_idx, src_idx)):
-                    edges.append([edge_pair[0], edge_pair[1]])
+                    # Emit both directions to preserve legacy behavior.
+                    edges.append([src_idx, dst_idx])
                     distances.append(distance)
                     hist_rows.append(legacy_block)
-                    agg_rows.append(agg_vector.copy())
+                    src_pos_list.append(i)
+                    dst_pos_list.append(j)
+
+                    edges.append([dst_idx, src_idx])
+                    distances.append(distance)
+                    hist_rows.append(legacy_block)
+                    src_pos_list.append(j)
+                    dst_pos_list.append(i)
 
         if edges:
-            order = sorted(range(len(edges)), key=lambda idx: (edges[idx][0], edges[idx][1], distances[idx]))
-            ordered_edges = [edges[idx] for idx in order]
-            ordered_hist = [hist_rows[idx] for idx in order]
-            ordered_agg = [agg_rows[idx] for idx in order]
+            src_pos = np.array(src_pos_list, dtype=np.int64)
+            dst_pos = np.array(dst_pos_list, dtype=np.int64)
 
-            hist_matrix = np.asarray(ordered_hist, dtype=np.float32)
+            topo_src = topo_vectors[src_pos].astype(np.float32, copy=False)
+            topo_dst = topo_vectors[dst_pos].astype(np.float32, copy=False)
+            pooled_src = pooled_means[src_pos].astype(np.float32, copy=False)
+            pooled_dst = pooled_means[dst_pos].astype(np.float32, copy=False)
+
+            mean_vec = (topo_src + topo_dst) * 0.5
+            pooled_mean_vec = (pooled_src + pooled_dst) * 0.5
+            abs_diff = np.abs(topo_src - topo_dst)
+            pooled_abs_diff = np.abs(pooled_src - pooled_dst)
+
+            parts_endpoint = [topo_src, topo_dst, mean_vec, abs_diff]
+            parts_pooled = [pooled_src, pooled_dst, pooled_mean_vec, pooled_abs_diff]
+
+            if variant == "heavy" and include_minmax:
+                parts_endpoint.extend([np.minimum(topo_src, topo_dst), np.maximum(topo_src, topo_dst)])
+                parts_pooled.extend([np.minimum(pooled_src, pooled_dst), np.maximum(pooled_src, pooled_dst)])
+
+            if include_norms:
+                endpoint_norms = np.stack(
+                    [np.linalg.norm(topo_src, axis=1), np.linalg.norm(topo_dst, axis=1)],
+                    axis=1,
+                ).astype(np.float32)
+                pooled_norms = np.stack(
+                    [np.linalg.norm(pooled_src, axis=1), np.linalg.norm(pooled_dst, axis=1)],
+                    axis=1,
+                ).astype(np.float32)
+                parts_endpoint.append(endpoint_norms)
+                parts_pooled.append(pooled_norms)
+
+            if include_cosine:
+                eps = 1e-8
+                dot_endpoint = np.einsum("ij,ij->i", topo_src, topo_dst)
+                norm_src = np.linalg.norm(topo_src, axis=1)
+                norm_dst = np.linalg.norm(topo_dst, axis=1)
+                denom = norm_src * norm_dst
+                cosine_endpoint = np.where(denom > eps, dot_endpoint / denom, 0.0).astype(np.float32)
+                parts_endpoint.append(cosine_endpoint[:, None])
+
+                dot_pooled = np.einsum("ij,ij->i", pooled_src, pooled_dst)
+                norm_p_src = np.linalg.norm(pooled_src, axis=1)
+                norm_p_dst = np.linalg.norm(pooled_dst, axis=1)
+                denom_p = norm_p_src * norm_p_dst
+                cosine_pooled = np.where(denom_p > eps, dot_pooled / denom_p, 0.0).astype(np.float32)
+                parts_pooled.append(cosine_pooled[:, None])
+
+            endpoint_vector = np.concatenate(parts_endpoint, axis=1).astype(np.float32, copy=False)
+            pooled_vector = np.concatenate(parts_pooled, axis=1).astype(np.float32, copy=False)
+            agg_matrix = np.concatenate([endpoint_vector, pooled_vector], axis=1).astype(np.float32, copy=False)
+
+            hist_matrix = np.asarray(hist_rows, dtype=np.float32)
             if scale_histogram and hist_matrix.size:
                 col_min = hist_matrix.min(axis=0, keepdims=True)
                 col_max = hist_matrix.max(axis=0, keepdims=True)
                 denom = np.where(col_max - col_min == 0.0, 1.0, col_max - col_min)
                 hist_matrix = (hist_matrix - col_min) / denom
 
-            agg_matrix = np.vstack(ordered_agg).astype(np.float32) if ordered_agg else np.empty((0, agg_dim))
-            feature_matrix = np.concatenate([hist_matrix, agg_matrix], axis=1) if ordered_agg else hist_matrix
-            edge_index = np.asarray(ordered_edges, dtype=np.int64)
+            feature_matrix = np.concatenate([hist_matrix, agg_matrix], axis=1) if agg_matrix.size else hist_matrix
+            edge_index = np.asarray(edges, dtype=np.int64)
+
+            order = np.lexsort((np.asarray(distances, dtype=np.float64), edge_index[:, 1], edge_index[:, 0]))
+            edge_index = edge_index[order]
+            feature_matrix = feature_matrix[order]
+            distances = [distances[idx] for idx in order]
         else:
             hist_matrix = np.empty((0, self._HIST_DIM), dtype=np.float32)
             agg_matrix = np.empty((0, agg_dim), dtype=np.float32)
@@ -276,7 +363,7 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
             with dump_path.open("w", encoding="utf-8", newline="") as handle:
                 writer = csv.writer(handle)
                 writer.writerow(["src_idx", "dst_idx", "distance"])
-                for (src_idx, dst_idx), dist in zip(edges, distances):
+                for (src_idx, dst_idx), dist in zip(edge_index.tolist(), distances):
                     writer.writerow([src_idx, dst_idx, dist])
 
         feature_dim = int(feature_matrix.shape[1]) if feature_matrix.ndim >= 2 else 0

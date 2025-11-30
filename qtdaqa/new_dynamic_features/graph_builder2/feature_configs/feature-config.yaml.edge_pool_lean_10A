@@ -49,7 +49,7 @@ node:
 # REQUIRED stage: edge
 edge:
   module: edge/edge_plus_pool_agg_topo/v1  # alias: 11D Legacy + pooled balanced topo agg (lean)
-  alias: "11D Legacy + pooled balanced topo agg (lean)"
+  alias: "11D Legacy + 1000D (lean) 10A"
   summary: "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
   description: "Extends balanced aggregation by adding pooled neighbor topology means per endpoint (k-nearest), then computing mean/abs-diff/cosine (and optional norms) on both endpoints and pooled summaries. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
   params:
