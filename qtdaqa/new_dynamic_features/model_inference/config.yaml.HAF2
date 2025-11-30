@@ -2,7 +2,7 @@
 
 # Input/output paths resolved relative to this YAML
 paths:
-  data_dir: ../../../datasets/evaluation/HAF2/decoy
+  data_dir: ../../../datasets/evaluation/HAF2/HAF2_decoys
   label_file: ../../../datasets/evaluation/HAF2/label_info.csv
   # set at cli
   work_dir: null
@@ -17,7 +17,7 @@ num_workers: 0
 
 # Builder options (use training metadata for feature layout; only jobs typically need adjustment)
 builder:
-  sort_artefacts: false # new field; causes inference to append --no-sort-artifacts
+  sort_artifacts: false # new field; causes inference to append --no-sort-artifacts
   jobs: 12
 
 # Optional run-time behaviour toggles

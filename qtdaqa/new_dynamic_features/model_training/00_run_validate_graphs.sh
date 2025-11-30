@@ -1,1 +1,1 @@
-time python -m tools.validate_graphs --graph-dir ../graph_builder2/output/edge_pool_lean_10A/graph_data --write-manifest --manifest ../graph_builder2/output/edge_pool_lean_10A/graph_data/graph_manifest.json
+time python -m tools.validate_graphs --graph-dir ../graph_builder2/output/lapl_edge_min_lean_10A/graph_data --write-manifest --manifest ../graph_builder2/output/lapl_edge_min_lean_10A/graph_data/graph_manifest.json
