@@ -134,70 +134,105 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
         minmax_dim = topo_dim * 2 if (variant == "heavy" and include_minmax) else 0
         agg_dim = topo_dim * 3 + minmax_dim + (2 if include_norms else 0) + (1 if include_cosine else 0)
 
+        # Prepare arrays for vectorized operations
+        descriptors = [res.descriptor for res in residues]
+        chains = np.array([res.chain_id for res in residues])
+        coords = np.stack([res.coord for res in residues], axis=0).astype(np.float64) if residues else np.empty((0, 3))
+
+        topo_vectors = []
+        valid_mask = []
+        for res in residues:
+            vec = topo_map.get(res.descriptor)
+            topo_vectors.append(vec if vec is not None else np.full((topo_dim,), np.nan, dtype=np.float32))
+            valid_mask.append(vec is not None and id_to_index.get(res.descriptor) is not None)
+        topo_vectors = np.stack(topo_vectors, axis=0).astype(np.float32) if topo_vectors else np.empty((0, topo_dim), dtype=np.float32)
+        valid_mask = np.array(valid_mask, dtype=bool)
+
         edges: List[List[int]] = []
         distances: List[float] = []
         hist_rows: List[List[float]] = []
-        agg_rows: List[np.ndarray] = []
+        src_pos_list: List[int] = []
+        dst_pos_list: List[int] = []
 
-        for i, src in enumerate(residues):
-            src_idx = id_to_index.get(src.descriptor)
-            if src_idx is None:
-                continue
-            for j, dst in enumerate(residues):
-                if i == j or src.chain_id == dst.chain_id:
+        if len(residues) > 1:
+            diff = coords[:, None, :] - coords[None, :, :]
+            dist_matrix = np.linalg.norm(diff, axis=2)
+            for i in range(len(residues)):
+                if not valid_mask[i]:
                     continue
-                dst_idx = id_to_index.get(dst.descriptor)
-                if dst_idx is None:
-                    continue
-                distance = float(np.linalg.norm(dst.coord - src.coord))
-                if distance <= distance_min or distance >= distance_max:
-                    continue
+                for j in range(len(residues)):
+                    if i == j or chains[i] == chains[j] or not valid_mask[j]:
+                        continue
+                    distance = float(dist_matrix[i, j])
+                    if distance <= distance_min or distance >= distance_max:
+                        continue
+                    residue_a = structure.get_residue(residues[i].chain_id, residues[i].residue_seq, residues[i].insertion_code)
+                    residue_b = structure.get_residue(residues[j].chain_id, residues[j].residue_seq, residues[j].insertion_code)
+                    if residue_a is None or residue_b is None:
+                        continue
+                    hist = _distance_histogram(residue_a, residue_b)
+                    legacy_block = [distance] + hist.tolist()
 
-                residue_a = structure.get_residue(src.chain_id, src.residue_seq, src.insertion_code)
-                residue_b = structure.get_residue(dst.chain_id, dst.residue_seq, dst.insertion_code)
-                if residue_a is None or residue_b is None:
-                    continue
+                    src_idx = id_to_index.get(residues[i].descriptor)
+                    dst_idx = id_to_index.get(residues[j].descriptor)
+                    if src_idx is None or dst_idx is None:
+                        continue
 
-                topo_src = topo_map.get(src.descriptor)
-                topo_dst = topo_map.get(dst.descriptor)
-                if topo_src is None or topo_dst is None:
-                    raise ValueError(f"Missing topology vector for {src.descriptor} or {dst.descriptor}")
-
-                hist = _distance_histogram(residue_a, residue_b)
-                legacy_block = [distance] + hist.tolist()
-
-                parts: List[np.ndarray] = [topo_src, topo_dst, np.abs(topo_src - topo_dst)]
-                if variant == "heavy" and include_minmax:
-                    parts.append(np.minimum(topo_src, topo_dst))
-                    parts.append(np.maximum(topo_src, topo_dst))
-                if include_norms:
-                    parts.append(np.array([np.linalg.norm(topo_src), np.linalg.norm(topo_dst)], dtype=np.float32))
-                if include_cosine:
-                    parts.append(np.array([_safe_cosine(topo_src, topo_dst)], dtype=np.float32))
-                agg_vector = np.concatenate(parts, axis=0).astype(np.float32)
-
-                for edge_pair in ((src_idx, dst_idx), (dst_idx, src_idx)):
-                    edges.append([edge_pair[0], edge_pair[1]])
+                    # emit both directions
+                    edges.append([src_idx, dst_idx])
                     distances.append(distance)
                     hist_rows.append(legacy_block)
-                    agg_rows.append(agg_vector.copy())
+                    src_pos_list.append(i)
+                    dst_pos_list.append(j)
+
+                    edges.append([dst_idx, src_idx])
+                    distances.append(distance)
+                    hist_rows.append(legacy_block)
+                    src_pos_list.append(j)
+                    dst_pos_list.append(i)
 
         if edges:
-            order = sorted(range(len(edges)), key=lambda idx: (edges[idx][0], edges[idx][1], distances[idx]))
-            ordered_edges = [edges[idx] for idx in order]
-            ordered_hist = [hist_rows[idx] for idx in order]
-            ordered_agg = [agg_rows[idx] for idx in order]
+            src_pos = np.array(src_pos_list, dtype=np.int64)
+            dst_pos = np.array(dst_pos_list, dtype=np.int64)
 
-            hist_matrix = np.asarray(ordered_hist, dtype=np.float32)
+            topo_src = topo_vectors[src_pos].astype(np.float32, copy=False)
+            topo_dst = topo_vectors[dst_pos].astype(np.float32, copy=False)
+
+            abs_diff = np.abs(topo_src - topo_dst)
+            parts = [topo_src, topo_dst, abs_diff]
+            if variant == "heavy" and include_minmax:
+                parts.extend([np.minimum(topo_src, topo_dst), np.maximum(topo_src, topo_dst)])
+            if include_norms:
+                norms = np.stack(
+                    [np.linalg.norm(topo_src, axis=1), np.linalg.norm(topo_dst, axis=1)],
+                    axis=1,
+                ).astype(np.float32)
+                parts.append(norms)
+            if include_cosine:
+                eps = 1e-8
+                dot = np.einsum("ij,ij->i", topo_src, topo_dst)
+                norm_src = np.linalg.norm(topo_src, axis=1)
+                norm_dst = np.linalg.norm(topo_dst, axis=1)
+                denom = norm_src * norm_dst
+                cosine = np.where(denom > eps, dot / denom, 0.0).astype(np.float32)
+                parts.append(cosine[:, None])
+
+            agg_matrix = np.concatenate(parts, axis=1).astype(np.float32, copy=False)
+
+            hist_matrix = np.asarray(hist_rows, dtype=np.float32)
             if scale_histogram and hist_matrix.size:
                 col_min = hist_matrix.min(axis=0, keepdims=True)
                 col_max = hist_matrix.max(axis=0, keepdims=True)
                 denom = np.where(col_max - col_min == 0.0, 1.0, col_max - col_min)
                 hist_matrix = (hist_matrix - col_min) / denom
 
-            agg_matrix = np.vstack(ordered_agg).astype(np.float32) if ordered_agg else np.empty((0, agg_dim))
-            feature_matrix = np.concatenate([hist_matrix, agg_matrix], axis=1) if ordered_agg else hist_matrix
-            edge_index = np.asarray(ordered_edges, dtype=np.int64)
+            feature_matrix = np.concatenate([hist_matrix, agg_matrix], axis=1) if agg_matrix.size else hist_matrix
+            edge_index = np.asarray(edges, dtype=np.int64)
+
+            order = np.lexsort((np.asarray(distances, dtype=np.float64), edge_index[:, 1], edge_index[:, 0]))
+            edge_index = edge_index[order]
+            feature_matrix = feature_matrix[order]
+            distances = [distances[idx] for idx in order]
         else:
             hist_matrix = np.empty((0, self._HIST_DIM), dtype=np.float32)
             agg_matrix = np.empty((0, agg_dim), dtype=np.float32)
