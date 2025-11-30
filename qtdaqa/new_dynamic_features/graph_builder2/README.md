@@ -112,6 +112,31 @@ topology:           # optional, but common
       - ['C', 'N', 'O']
     jobs: 16
 
+# Alternate topology example (hybrid PH + Laplacian)
+# topology:
+#   module: topology/persistence_laplacian_hybrid/v1
+#   alias: "140D topology + 32D Laplacian"
+#   summary: "Persistent homology plus Laplacian spectral moments per interface residue."
+#   params:
+#     neighbor_distance: 8.0
+#     filtration_cutoff: 8.0
+#     min_persistence: 0.01
+#     element_filters:
+#       - [C]
+#       - [N]
+#       - [O]
+#       - [C, N]
+#       - [C, O]
+#       - [N, O]
+#       - [C, N, O]
+#     lap_graph_mode: cross_chain
+#     lap_distance_cutoff: 8.0
+#     lap_edge_weight: gaussian
+#     lap_sigma: 4.0
+#     lap_eigs_count: 16
+#     lap_moment_orders: [1, 2, 3, 4]
+#     lap_heat_times: [0.1, 1.0, 5.0]
+
 node:
   module: node/dssp_topo_merge/v1  # alias: TopoQA default
   alias: "TopoQA default"
@@ -136,6 +161,21 @@ edge:
 # mol:
 #   module: custom/mol_stage/v1
 #   params: {}
+
+# Example pairing with hybrid topology:
+# topology:
+#   module: topology/persistence_laplacian_hybrid/v1
+#   params: {...}
+# edge:
+#   module: edge/edge_plus_min_agg_lap_hybrid/v1  # Use with 172D PH+Lap topology vectors
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.0
+#     scale_histogram: true
+#     include_norms: true
+#     include_cosine: true
+#     include_minmax: false
+#     variant: lean
 ```
 
 Rules:
@@ -159,6 +199,7 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
 - `edge/edge_plus_min_agg_topo/v1` – legacy 11‑D histogram + concat/abs-diff/cosine/norms of endpoint topo (lean); heavy adds per-dimension min/max.
 - `edge/edge_plus_bal_agg_topo/v1` – legacy 11‑D histogram + balanced topo agg (concat + mean + abs-diff + cosine + norms); heavy adds min/max.
 - `edge/edge_plus_pool_agg_topo/v1` – legacy 11‑D histogram + balanced topo agg + pooled neighbor topo means; heavy adds min/max to endpoint and pooled summaries.
+- `edge/edge_plus_min_agg_lap_hybrid/v1` – same as edge_plus_min_agg_topo but documented for hybrid topology (PH+Lap 172D).
 
 Use `--list-modules --list-modules-format json|markdown` to see full parameter/default listings for every module.
 
@@ -210,3 +251,13 @@ module catalog with:
 
 Review the resulting file and copy the updated sections into the README whenever
 modules or defaults change.
+
+---
+
+## Guidance for adding new modules
+
+- Keep outputs deterministic: sort rows when artifact sorting is enabled, and use lexicographic tie-breakers for any neighbor selection.
+- Provide sensible defaults, aliases, and clear summaries/descriptions so `--list-modules` and `--create-feature-config` remain informative.
+- Validate parameters and keep them YAML-friendly; expose param comments via `config_template`.
+- Record feature dimensions in metadata and keep CSV outputs ID-first; ensure new modules appear in listings/templates.
+- Add unit tests to lock in feature_dim, ordering, and validation before relying on new modules in pipelines.

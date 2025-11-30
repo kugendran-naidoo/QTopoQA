@@ -2,7 +2,7 @@
 
 # Input/output paths resolved relative to this YAML
 paths:
-  data_dir: ../../../datasets/evaluation/ABAG-AF3/ABAG-AF3_structures
+  data_dir: ../../../datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys
   label_file: ../../../datasets/evaluation/ABAG-AF3/label_info.csv
   # set at cli
   work_dir: null
@@ -17,7 +17,7 @@ num_workers: 0
 
 # Builder options
 builder:
-  sort_artefacts: false # new field; causes inference to append --no-sort-artifacts
+  sort_artifacts: false # new field; causes inference to append --no-sort-artifacts
   jobs: 24
 
 # Optional run-time behaviour toggles

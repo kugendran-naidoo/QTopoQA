@@ -120,6 +120,10 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Keep params YAML-friendly (primitives/lists), and ensure `validate_params` handles coercion and range checks.
 - Add descriptive `summary` and `description` for `--list-modules` and README/catalog generation.
 - After registering a new module, sanity-check that it appears in `--list-modules` and in the `--create-feature-config --include-alternates` output, and add a minimal test covering metadata/feature_dim for regression.
+- Add unit tests to lock deterministic ordering, feature_dim, and param validation; ensure new modules appear in listings/templates.
+- Prefer vectorized implementations and deterministic tie-breakers (lexicographic) for neighbor selection; respect `sort_artifacts`.
+- Provide sensible defaults, aliases, and clear param comments via `config_template`; document feature_dim in metadata and keep CSV outputs ID-first.
+- Keep optional enhancements behind parameters and off by default to avoid unexpected regressions.
 
 ## Aggregated-topology edge modules
 - Implemented: `edge_plus_min_agg_topo`, `edge_plus_bal_agg_topo`, `edge_plus_pool_agg_topo` (lean + heavy variants). Each prepends the legacy 11‑D histogram and keeps deterministic edge ordering; heavy variants add min/max blocks.

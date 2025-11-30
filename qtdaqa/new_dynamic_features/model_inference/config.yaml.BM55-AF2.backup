@@ -4,9 +4,12 @@
 paths:
   data_dir: ../../../datasets/evaluation/BM55-AF2/decoy
   label_file: ../../../datasets/evaluation/BM55-AF2/label_info.csv
-  work_dir: ./output/11d_topoqa_10.5A/BM55-AF2/work
-  results_dir: ./output/11d_topoqa_10.5A/BM55-AF2/results
+  # set at cli (root directory; dataset-name subdir is auto-created)
+  work_dir: null
+  # set at cli (root directory; dataset-name subdir is auto-created)
+  results_dir: null
   dataset_name: BM55-AF2
+  # set at cli - use metadata from model_training to choose
   checkpoint: null
 
 batch_size: 32
@@ -14,7 +17,8 @@ num_workers: 0
 
 # Builder options (use training metadata for feature layout; only jobs typically need adjustment)
 builder:
-  jobs: 12
+  sort_artifacts: false # new field; causes inference to append --no-sort-artifacts
+  jobs: 8
 
 # Optional run-time behaviour toggles
 options:
