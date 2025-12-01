@@ -146,7 +146,7 @@ def _compute_pooled_means_vectorized(
 class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
     module_id = "edge/edge_plus_pool_agg_topo/v1"
     module_kind = "edge"
-    default_alias = "11D Legacy + 1000D (lean) / 1400D (heavy) 10A"
+    default_alias = "Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -434,21 +434,29 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
     @classmethod
     def config_template(cls) -> Dict[str, object]:
         base = super().config_template()
-        param_comments = dict(base.get("param_comments", {}))
-        param_comments.setdefault("variant", "lean or heavy")
-        param_comments.setdefault("include_minmax", "heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg")
-        param_comments.setdefault("pool_k", "number of nearest interface residues to pool per endpoint (default 5)")
-        base["param_comments"] = param_comments
-        heavy_params = dict(base.get("params", {}))
+        param_comments = {
+            "variant": "lean or heavy",
+            "include_minmax": "heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg",
+            "pool_k": "number of nearest interface residues to pool per endpoint (default 5)",
+        }
+        params = dict(cls._metadata.defaults)
+        heavy_params = dict(params)
         heavy_params.update({"variant": "heavy", "include_minmax": True})
-        base["alternates"] = [
-            {
-                "module": cls.module_id,
-                "alias": "11D Legacy + 1000D (lean) / 1400D (heavy) 10A",
-                "params": heavy_params,
-                "param_comments": param_comments,
-                "summary": cls._metadata.summary,
-                "description": cls._metadata.description,
-            }
-        ]
-        return base
+        return {
+            "module": cls.module_id,
+            "alias": cls.default_alias,
+            "summary": cls._metadata.summary,
+            "description": cls._metadata.description,
+            "params": params,
+            "param_comments": param_comments,
+            "alternates": [
+                {
+                    "module": cls.module_id,
+                    "alias": cls.default_alias,
+                    "params": heavy_params,
+                    "param_comments": param_comments,
+                    "summary": cls._metadata.summary,
+                    "description": cls._metadata.description,
+                }
+            ],
+        }

@@ -12,7 +12,7 @@ from ...lib import node_runner
 class DSSPTopologyNodeModule(NodeFeatureModule):
     module_id = "node/dssp_topo_merge/v1"
     module_kind = "node"
-    default_alias = "172D (140D Topological consumes Interface + 32D) TopoQA default"
+    default_alias = "140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,

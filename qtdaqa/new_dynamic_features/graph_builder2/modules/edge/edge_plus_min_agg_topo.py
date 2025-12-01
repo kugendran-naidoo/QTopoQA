@@ -64,7 +64,7 @@ def _safe_cosine(vec_a: np.ndarray, vec_b: np.ndarray, eps: float = 1e-8) -> flo
 class EdgePlusMinAggTopoModule(EdgeFeatureModule):
     module_id = "edge/edge_plus_min_agg_topo/v1"
     module_kind = "edge"
-    default_alias = "11D Legacy + 434D (lean) / 561D (heavy) 10A"
+    default_alias = "Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -316,14 +316,21 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
 
         heavy_params = dict(base_params)
         heavy_params.update({"variant": "heavy", "include_minmax": True})
-        base["alternates"] = [
-            {
-                "module": cls.module_id,
-                "alias": "11D Legacy + 434D (lean) / 561D (heavy) 10A",
-                "params": heavy_params,
-                "param_comments": param_comments,
-                "summary": cls._metadata.summary,
-                "description": cls._metadata.description,
-            }
-        ]
-        return base
+        return {
+            "module": cls.module_id,
+            "alias": cls.default_alias,
+            "summary": cls._metadata.summary,
+            "description": cls._metadata.description,
+            "params": base_params,
+            "param_comments": param_comments,
+            "alternates": [
+                {
+                    "module": cls.module_id,
+                    "alias": cls.default_alias,
+                    "params": heavy_params,
+                    "param_comments": param_comments,
+                    "summary": cls._metadata.summary,
+                    "description": cls._metadata.description,
+                }
+            ],
+        }

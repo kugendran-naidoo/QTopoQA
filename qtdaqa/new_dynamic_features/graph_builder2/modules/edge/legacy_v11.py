@@ -43,7 +43,7 @@ def _distance_histogram(residue_a, residue_b) -> np.ndarray:
 class LegacyEdgeModuleV11(EdgeFeatureModule):
     module_id = "edge/legacy_band/v11"
     module_kind = "edge"
-    default_alias = "11D TopoQA default 10A cutoff"
+    default_alias = "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,

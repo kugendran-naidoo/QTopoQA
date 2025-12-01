@@ -176,6 +176,16 @@ edge:
 #     include_cosine: true
 #     include_minmax: false
 #     variant: lean
+# edge:
+#   module: edge/edge_plus_bal_agg_lap_hybrid/v1  # or edge_plus_pool_agg_lap_hybrid/v1 for pooled variant
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.0
+#     scale_histogram: true
+#     include_norms: true
+#     include_cosine: true
+#     include_minmax: false
+#     variant: lean
 ```
 
 Rules:
@@ -191,6 +201,11 @@ Rules:
 
 To switch to the 24‑D multi-scale edges, change the `edge` block to
 `edge/multi_scale/v24` and configure its distance bands / histogram bins.
+
+### Node Modules
+
+- `node/dssp_topo_merge/v1` – DSSP-derived node features merged with topology statistics (assumes legacy 140D topology).
+- `node/dssp_topo_merge_passthrough/v1` – DSSP/basic 32D features merged with all topology columns (passthrough; dynamic dims, preserves PH+Lap).
 
 ### Edge Modules
 
@@ -217,8 +232,18 @@ For each run you’ll find:
   inference to learn the node/edge layouts (dimensions, module IDs, node column
   names, sample graphs, etc.).
 - `graph_dir/schema_summary.json` – human-readable snapshot of the resolved
-  schema (module registry, node/edge dims, notes). Useful for quick inspection
-  or when debugging legacy checkpoints.
+  schema (module registry, node/edge dims, notes). Topology columns (auto-extracted
+  during the edge stage when topology CSVs are present) and node_feature_columns
+  are included when available. Useful for quick inspection or when debugging
+  legacy checkpoints.
+
+### Feature dimensionality (defaults)
+- Topology: `topology/persistence_basic/v1` → 140 dims; `topology/persistence_laplacian_hybrid/v1` → 172 dims (140 PH + 32 Laplacian).
+- Node: `node/dssp_topo_merge/v1` → 172 dims (32 DSSP/basic + 140 topology). `node/dssp_topo_merge_passthrough/v1` → 32 DSSP/basic + all topology columns (dynamic; e.g., 32 + 172 = 204 with hybrid topology).
+- Edge (with hybrid topology topo_dim=172):
+  - `edge_plus_min_agg_lap_hybrid` lean: 530 dims (11 hist + 3×172 + norms+cosine); heavy: 874 dims (+min/max).
+  - `edge_plus_bal_agg_lap_hybrid` lean: 702 dims (11 hist + 4×172 + norms+cosine); heavy: 1,046 dims (+min/max).
+  - `edge_plus_pool_agg_lap_hybrid` lean: 1,393 dims (11 hist + endpoint agg + pooled agg); heavy: 2,081 dims (+min/max in both blocks).
 - `log_dir/graph_builder_summary.json` – run summary (module selections, job
   counts, success/failure tallies) plus stage logs for debugging.
 

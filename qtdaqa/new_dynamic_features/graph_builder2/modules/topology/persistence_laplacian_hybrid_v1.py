@@ -272,7 +272,7 @@ def _laplacian_features(
 class PersistenceLaplacianHybridModule(TopologyFeatureModule):
     module_id = "topology/persistence_laplacian_hybrid/v1"
     module_kind = "topology"
-    default_alias = "140D topology + 32D Laplacian"
+    default_alias = "140D PH (Betti 0 and Betti 1 topology summaries on interface coords) + 32D Laplacian = 172D"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,

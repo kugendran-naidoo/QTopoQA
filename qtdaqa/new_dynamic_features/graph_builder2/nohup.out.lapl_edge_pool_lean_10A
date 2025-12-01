@@ -1,0 +1,122 @@
+2025-12-01 01:01:39 INFO PDB warnings enabled (Bio.PDB.PDBConstructionWarning will be logged).
+2025-12-01 01:01:39 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.lapl_edge_pool_lean_10A
+2025-12-01 01:01:39 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/logs_output/lapl_edge_pool_lean_10A/graph_builder.2025-12-01_01-01-39
+2025-12-01 01:01:39 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/Dockground_MAF2
+2025-12-01 01:01:39 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_lean_10A/work
+2025-12-01 01:01:39 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_lean_10A/graph_data
+2025-12-01 01:01:39 INFO Jobs: 16 (from CLI)
+2025-12-01 01:01:39 INFO Interface module: interface/polar_cutoff/v1 [alias: n x 3D TopoQA default 10A cutoff] (jobs=16)
+2025-12-01 01:01:39 INFO Topology module : topology/persistence_laplacian_hybrid/v1 [alias: 140D topology + 32D Laplacian] (jobs=16)
+2025-12-01 01:01:39 INFO Node module     : node/dssp_topo_merge/v1 [alias: 172D (140D Topological consumes Interface + 32D) TopoQA default] (jobs=16)
+2025-12-01 01:01:39 INFO Edge module     : edge/edge_plus_pool_agg_lap_hybrid/v1 [alias: 11D Legacy + hybrid topo (PH+Lap 172D)] (jobs=16)
+2025-12-01 01:01:39 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2025-12-01 01:01:40 INFO Identified 14635 PDB files for processing.
+2025-12-01 01:01:40 INFO Beginning interface stage (jobs=16)
+2025-12-01 01:02:09 INFO [Interface - Dockground_MAF2] 5.0% complete (731/14635)
+2025-12-01 01:02:34 INFO [Interface - Dockground_MAF2] 10.0% complete (1462/14635)
+2025-12-01 01:02:55 INFO [Interface - Dockground_MAF2] 15.0% complete (2193/14635)
+2025-12-01 01:03:30 INFO [Interface - Dockground_MAF2] 20.0% complete (2924/14635)
+2025-12-01 01:04:18 INFO [Interface - Dockground_MAF2] 25.0% complete (3655/14635)
+2025-12-01 01:05:06 INFO [Interface - Dockground_MAF2] 30.0% complete (4386/14635)
+2025-12-01 01:05:41 INFO [Interface - Dockground_MAF2] 35.0% complete (5117/14635)
+2025-12-01 01:06:15 INFO [Interface - Dockground_MAF2] 40.0% complete (5848/14635)
+2025-12-01 01:06:49 INFO [Interface - Dockground_MAF2] 45.0% complete (6579/14635)
+2025-12-01 01:07:12 INFO [Interface - Dockground_MAF2] 49.9% complete (7310/14635)
+2025-12-01 01:07:41 INFO [Interface - Dockground_MAF2] 54.9% complete (8041/14635)
+2025-12-01 01:08:02 INFO [Interface - Dockground_MAF2] 59.9% complete (8772/14635)
+2025-12-01 01:08:25 INFO [Interface - Dockground_MAF2] 64.9% complete (9503/14635)
+2025-12-01 01:08:52 INFO [Interface - Dockground_MAF2] 69.9% complete (10234/14635)
+2025-12-01 01:09:23 INFO [Interface - Dockground_MAF2] 74.9% complete (10965/14635)
+2025-12-01 01:09:44 INFO [Interface - Dockground_MAF2] 79.9% complete (11696/14635)
+2025-12-01 01:10:14 INFO [Interface - Dockground_MAF2] 84.9% complete (12427/14635)
+2025-12-01 01:10:45 INFO [Interface - Dockground_MAF2] 89.9% complete (13158/14635)
+2025-12-01 01:11:18 INFO [Interface - Dockground_MAF2] 94.9% complete (13889/14635)
+2025-12-01 01:11:51 INFO [Interface - Dockground_MAF2] 99.9% complete (14620/14635)
+2025-12-01 01:11:51 INFO [Interface - Dockground_MAF2] 100.0% complete (14635/14635)
+2025-12-01 01:11:52 INFO Interface stage complete: 14635 success, 0 failures
+2025-12-01 01:11:52 INFO Interface feature extraction elapsed time: 611.07 s
+2025-12-01 01:11:52 INFO Beginning topology stage (jobs=16)
+2025-12-01 01:14:09 INFO [Topology (PH+Lap) - Dockground_MAF2] 5.0% complete (731/14635)
+2025-12-01 01:17:05 INFO [Topology (PH+Lap) - Dockground_MAF2] 10.0% complete (1462/14635)
+2025-12-01 01:19:24 INFO [Topology (PH+Lap) - Dockground_MAF2] 15.0% complete (2193/14635)
+2025-12-01 01:22:35 INFO [Topology (PH+Lap) - Dockground_MAF2] 20.0% complete (2924/14635)
+2025-12-01 01:26:00 INFO [Topology (PH+Lap) - Dockground_MAF2] 25.0% complete (3655/14635)
+2025-12-01 01:30:23 INFO [Topology (PH+Lap) - Dockground_MAF2] 30.0% complete (4386/14635)
+2025-12-01 01:33:19 INFO [Topology (PH+Lap) - Dockground_MAF2] 35.0% complete (5117/14635)
+2025-12-01 01:35:53 INFO [Topology (PH+Lap) - Dockground_MAF2] 40.0% complete (5848/14635)
+2025-12-01 01:39:04 INFO [Topology (PH+Lap) - Dockground_MAF2] 45.0% complete (6579/14635)
+2025-12-01 01:41:19 INFO [Topology (PH+Lap) - Dockground_MAF2] 49.9% complete (7310/14635)
+2025-12-01 01:43:41 INFO [Topology (PH+Lap) - Dockground_MAF2] 54.9% complete (8041/14635)
+2025-12-01 01:46:27 INFO [Topology (PH+Lap) - Dockground_MAF2] 59.9% complete (8772/14635)
+2025-12-01 01:48:44 INFO [Topology (PH+Lap) - Dockground_MAF2] 64.9% complete (9503/14635)
+2025-12-01 01:51:03 INFO [Topology (PH+Lap) - Dockground_MAF2] 69.9% complete (10234/14635)
+2025-12-01 01:53:23 INFO [Topology (PH+Lap) - Dockground_MAF2] 74.9% complete (10965/14635)
+2025-12-01 01:55:30 INFO [Topology (PH+Lap) - Dockground_MAF2] 79.9% complete (11696/14635)
+2025-12-01 01:57:43 INFO [Topology (PH+Lap) - Dockground_MAF2] 84.9% complete (12427/14635)
+2025-12-01 01:59:59 INFO [Topology (PH+Lap) - Dockground_MAF2] 89.9% complete (13158/14635)
+2025-12-01 02:02:23 INFO [Topology (PH+Lap) - Dockground_MAF2] 94.9% complete (13889/14635)
+2025-12-01 02:04:54 INFO [Topology (PH+Lap) - Dockground_MAF2] 99.9% complete (14620/14635)
+2025-12-01 02:04:56 INFO [Topology (PH+Lap) - Dockground_MAF2] 100.0% complete (14635/14635)
+2025-12-01 02:04:57 INFO Topology stage complete: 14391 success, 244 failures
+2025-12-01 02:04:57 INFO Topology feature extraction elapsed time: 3184.88 s
+2025-12-01 02:04:58 INFO Beginning node stage (jobs=16)
+2025-12-01 02:08:13 INFO [Node - Dockground_MAF2] 5.0% complete (719/14391)
+2025-12-01 02:11:16 INFO [Node - Dockground_MAF2] 10.0% complete (1438/14391)
+2025-12-01 02:14:15 INFO [Node - Dockground_MAF2] 15.0% complete (2157/14391)
+2025-12-01 02:17:21 INFO [Node - Dockground_MAF2] 20.0% complete (2876/14391)
+2025-12-01 02:20:30 INFO [Node - Dockground_MAF2] 25.0% complete (3595/14391)
+2025-12-01 02:23:45 INFO [Node - Dockground_MAF2] 30.0% complete (4314/14391)
+2025-12-01 02:26:49 INFO [Node - Dockground_MAF2] 35.0% complete (5033/14391)
+2025-12-01 02:29:54 INFO [Node - Dockground_MAF2] 40.0% complete (5752/14391)
+2025-12-01 02:33:01 INFO [Node - Dockground_MAF2] 45.0% complete (6471/14391)
+2025-12-01 02:36:06 INFO [Node - Dockground_MAF2] 50.0% complete (7190/14391)
+2025-12-01 02:39:14 INFO [Node - Dockground_MAF2] 55.0% complete (7909/14391)
+2025-12-01 02:42:10 INFO [Node - Dockground_MAF2] 60.0% complete (8628/14391)
+2025-12-01 02:45:16 INFO [Node - Dockground_MAF2] 65.0% complete (9347/14391)
+2025-12-01 02:48:26 INFO [Node - Dockground_MAF2] 69.9% complete (10066/14391)
+2025-12-01 02:51:36 INFO [Node - Dockground_MAF2] 74.9% complete (10785/14391)
+2025-12-01 02:54:39 INFO [Node - Dockground_MAF2] 79.9% complete (11504/14391)
+2025-12-01 02:57:52 INFO [Node - Dockground_MAF2] 84.9% complete (12223/14391)
+2025-12-01 03:01:03 INFO [Node - Dockground_MAF2] 89.9% complete (12942/14391)
+2025-12-01 03:04:18 INFO [Node - Dockground_MAF2] 94.9% complete (13661/14391)
+2025-12-01 03:07:32 INFO [Node - Dockground_MAF2] 99.9% complete (14380/14391)
+2025-12-01 03:07:33 INFO [Node - Dockground_MAF2] 100.0% complete (14391/14391)
+2025-12-01 03:07:33 INFO Node stage complete: 14391 success, 0 failures
+2025-12-01 03:07:33 INFO Node feature extraction elapsed time: 3751.45 s
+2025-12-01 03:07:33 INFO Edge dumps enabled; writing CSVs to:
+2025-12-01 03:07:33 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_lean_10A/work/edge_features
+2025-12-01 03:07:33 INFO Edge dump preparation elapsed time: 0.00 s
+2025-12-01 03:07:33 INFO Beginning graph assembly (.pt output) stage (jobs=16)
+2025-12-01 03:09:24 INFO [Graph assembly - Dockground_MAF2] 5.0% complete (719/14391)
+2025-12-01 03:11:16 INFO [Graph assembly - Dockground_MAF2] 10.0% complete (1438/14391)
+2025-12-01 03:12:53 INFO [Graph assembly - Dockground_MAF2] 15.0% complete (2157/14391)
+2025-12-01 03:15:01 INFO [Graph assembly - Dockground_MAF2] 20.0% complete (2876/14391)
+2025-12-01 03:17:15 INFO [Graph assembly - Dockground_MAF2] 25.0% complete (3595/14391)
+2025-12-01 03:20:04 INFO [Graph assembly - Dockground_MAF2] 30.0% complete (4314/14391)
+2025-12-01 03:22:03 INFO [Graph assembly - Dockground_MAF2] 35.0% complete (5033/14391)
+2025-12-01 03:23:56 INFO [Graph assembly - Dockground_MAF2] 40.0% complete (5752/14391)
+2025-12-01 03:26:05 INFO [Graph assembly - Dockground_MAF2] 45.0% complete (6471/14391)
+2025-12-01 03:27:53 INFO [Graph assembly - Dockground_MAF2] 50.0% complete (7190/14391)
+2025-12-01 03:29:47 INFO [Graph assembly - Dockground_MAF2] 55.0% complete (7909/14391)
+2025-12-01 03:31:40 INFO [Graph assembly - Dockground_MAF2] 60.0% complete (8628/14391)
+2025-12-01 03:33:30 INFO [Graph assembly - Dockground_MAF2] 65.0% complete (9347/14391)
+2025-12-01 03:35:27 INFO [Graph assembly - Dockground_MAF2] 69.9% complete (10066/14391)
+2025-12-01 03:39:09 INFO [Graph assembly - Dockground_MAF2] 74.9% complete (10785/14391)
+2025-12-01 03:39:09 INFO [Graph assembly - Dockground_MAF2] 79.9% complete (11504/14391)
+2025-12-01 03:41:10 INFO [Graph assembly - Dockground_MAF2] 84.9% complete (12223/14391)
+2025-12-01 03:43:07 INFO [Graph assembly - Dockground_MAF2] 89.9% complete (12942/14391)
+2025-12-01 03:45:08 INFO [Graph assembly - Dockground_MAF2] 94.9% complete (13661/14391)
+2025-12-01 03:47:13 INFO [Graph assembly - Dockground_MAF2] 99.9% complete (14380/14391)
+2025-12-01 03:47:13 INFO [Graph assembly - Dockground_MAF2] 100.0% complete (14391/14391)
+2025-12-01 03:47:17 INFO Graph assembly (.pt output) complete: 14391 success, 0 failures
+2025-12-01 03:47:17 INFO Graph (.pt) generation elapsed time: 2378.37 s (edge stage: 2382.70 s)
+2025-12-01 03:47:17 INFO Summary written to graph_builder.2025-12-01_01-01-39/graph_builder_summary.json
+2025-12-01 03:47:17 INFO Summary log written to graph_builder.2025-12-01_01-01-39/graph_builder_summary.log
+2025-12-01 03:47:17 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_lean_10A/graph_data/graph_builder_summary.json
+2025-12-01 03:47:17 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_lean_10A/graph_data/graph_builder_summary.log
+2025-12-01 03:47:17 INFO Dynamic graph builder completed successfully.
+
+real	165m40.016s
+user	1140m48.031s
+sys	350m11.084s
+     9939.96 real     68448.03 user     21011.09 sys
