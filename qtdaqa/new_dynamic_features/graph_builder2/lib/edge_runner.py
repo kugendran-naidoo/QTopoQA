@@ -44,6 +44,23 @@ except ImportError:  # pragma: no cover
 LOG = logging.getLogger(__name__)
 
 
+def _write_topology_columns_file(topology_dir: Path, graph_dir: Path) -> None:
+    """Best-effort helper to emit topology_columns.json in the graph directory."""
+    try:
+        csv_files = sorted(topology_dir.rglob("*.csv"))
+        if not csv_files:
+            LOG.warning("No topology CSV files found to extract columns for schema summary.")
+            return
+        sample = csv_files[0]
+        df = pd.read_csv(sample, nrows=0)
+        columns = [col for col in df.columns if col.strip()]
+        target = graph_dir / "topology_columns.json"
+        target.write_text(json.dumps(columns, indent=2), encoding="utf-8")
+        LOG.info("Topology columns written to %s", target)
+    except Exception as exc:  # pragma: no cover - best effort
+        LOG.warning("Unable to write topology_columns.json: %s", exc)
+
+
 def _sort_edge_dump(dump_path: Path) -> None:
     if not dump_path.exists():
         return
@@ -248,6 +265,7 @@ def run_edge_stage(
 
     metadata_path = output_dir / "graph_metadata.json"
     metadata_path.write_text(json.dumps(metadata_records, indent=2, sort_keys=True), encoding="utf-8")
+    _write_topology_columns_file(topology_dir, output_dir)
     write_schema_summary(output_dir)
 
     elapsed = time.perf_counter() - start

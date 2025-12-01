@@ -200,6 +200,8 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
 - `edge/edge_plus_bal_agg_topo/v1` – legacy 11‑D histogram + balanced topo agg (concat + mean + abs-diff + cosine + norms); heavy adds min/max.
 - `edge/edge_plus_pool_agg_topo/v1` – legacy 11‑D histogram + balanced topo agg + pooled neighbor topo means; heavy adds min/max to endpoint and pooled summaries.
 - `edge/edge_plus_min_agg_lap_hybrid/v1` – same as edge_plus_min_agg_topo but documented for hybrid topology (PH+Lap 172D).
+- `edge/edge_plus_bal_agg_lap_hybrid/v1` – same as edge_plus_bal_agg_topo but documented for hybrid topology (PH+Lap 172D).
+- `edge/edge_plus_pool_agg_lap_hybrid/v1` – same as edge_plus_pool_agg_topo but documented for hybrid topology (PH+Lap 172D).
 
 Use `--list-modules --list-modules-format json|markdown` to see full parameter/default listings for every module.
 

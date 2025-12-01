@@ -59,10 +59,10 @@ node:
 
 # REQUIRED stage: edge
 edge:
-  module: edge/edge_plus_min_agg_lap_hybrid/v1  # alias: 11D Legacy + hybrid topo (PH+Lap 172D)
-  alias: "11D Legacy + hybrid topo (PH+Lap 172D) = 530D (lean) / 874D (heavy)"
-  summary: "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
-  description: "Same aggregation as edge_plus_min_agg_topo/v1, intended for use with topology/persistence_laplacian_hybrid/v1 (per-residue PH + Laplacian vectors, expected topo_dim\u2248172). Concatenates (u_topo, v_topo, |u-v|) and optional norms/cosine; heavy variant adds min/max. Prepends the legacy 11D distance histogram and preserves deterministic edge ordering (src_idx, dst_idx, distance)."
+  module: edge/edge_plus_bal_agg_lap_hybrid/v1  # alias: 11D Legacy + hybrid topo (PH+Lap 172D)
+  alias: "11D Legacy + hybrid topo (PH+Lap 172D)"
+  summary: "Legacy 11D histogram + hybrid balanced topo agg (PH+Lap 172D)."
+  description: "Same aggregation as edge_plus_bal_agg_topo/v1, intended for use with topology/persistence_laplacian_hybrid/v1 (per-residue PH + Laplacian vectors, expected topo_dim\u2248172). Prepends the legacy 11D distance histogram, then concatenates (u_topo, v_topo, mean(u,v), |u-v|) with optional norms/cosine; heavy variant adds per-dimension min/max. Preserves deterministic edge ordering (src_idx, dst_idx, distance)."
   params:
     distance_min: 0.0
     distance_max: 10.0

@@ -4,6 +4,7 @@ import json
 import logging
 from pathlib import Path
 import traceback
+import os
 
 try:  # support package execution and direct script invocation
     from ...common.feature_metadata import load_graph_feature_metadata
@@ -12,6 +13,28 @@ except ImportError:  # pragma: no cover
     from common.feature_metadata import load_graph_feature_metadata, GraphFeatureMetadata  # type: ignore
 
 LOG = logging.getLogger(__name__)
+
+
+def _load_topology_columns(graph_dir: Path) -> list[str] | None:
+    """
+    Attempt to load topology column names for schema summary enrichment.
+
+    Source path can be overridden with QTOPO_TOPOLOGY_COLUMNS_PATH; defaults to
+    <graph_dir>/topology_columns.json. Missing or invalid files emit a warning.
+    """
+    override = os.environ.get("QTOPO_TOPOLOGY_COLUMNS_PATH")
+    candidate = Path(override).expanduser() if override else graph_dir / "topology_columns.json"
+    if not candidate.exists():
+        LOG.warning("Topology columns file not found for schema summary: %s", candidate)
+        return None
+    try:
+        data = json.loads(candidate.read_text(encoding="utf-8"))
+        if isinstance(data, list) and all(isinstance(item, str) for item in data):
+            return data
+        LOG.warning("Topology columns file %s is not a list of strings; skipping.", candidate)
+    except Exception as exc:  # pragma: no cover - best effort
+        LOG.warning("Unable to load topology columns from %s: %s", candidate, exc)
+    return None
 
 
 def write_schema_summary(graph_dir: Path) -> Path | None:
@@ -57,6 +80,12 @@ def write_schema_summary(graph_dir: Path) -> Path | None:
             metadata.module_registry = ordered
 
         payload = metadata.to_dict()
+        # Explicitly mirror node feature columns for convenience
+        if hasattr(metadata, "node_feature_columns") and metadata.node_feature_columns:
+            payload["node_feature_columns"] = list(metadata.node_feature_columns)
+        topo_cols = _load_topology_columns(graph_dir)
+        if topo_cols is not None:
+            payload["topology_columns"] = topo_cols
         summary_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         LOG.info("Schema summary written to %s", summary_path)
         return summary_path
