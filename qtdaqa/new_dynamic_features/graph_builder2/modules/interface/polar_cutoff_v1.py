@@ -18,11 +18,11 @@ from ...lib import interface_runner
 class DefaultInterfaceModule(InterfaceFeatureModule):
     module_id = "interface/polar_cutoff/v1"
     module_kind = "interface"
-    default_alias = "n x 3D TopoQA default 10A cutoff"
+    default_alias = "residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
-        summary="Polar interface detection using distance cutoff.",
+        summary="Polar interface detection using distance cutoff. ID + coords for downstream stages",
         description=(
             "Identifies interface residues across chains using the polar interface "
             "routine (new_calculate_interface.process_pdb_file) with configurable "

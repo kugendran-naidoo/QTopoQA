@@ -19,7 +19,7 @@ from ...lib import topology_runner
 class PersistenceTopologyModule(TopologyFeatureModule):
     module_id = "topology/persistence_basic/v1"
     module_kind = "topology"
-    default_alias = "140D summarizes interface features TopoQA default"
+    default_alias = "Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,

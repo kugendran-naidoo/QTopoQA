@@ -124,6 +124,15 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Prefer vectorized implementations and deterministic tie-breakers (lexicographic) for neighbor selection; respect `sort_artifacts`.
 - Provide sensible defaults, aliases, and clear param comments via `config_template`; document feature_dim in metadata and keep CSV outputs ID-first.
 - Keep optional enhancements behind parameters and off by default to avoid unexpected regressions.
+- Schema summary: topology columns are auto-extracted during the edge stage (when topology CSVs exist) and node_feature_columns are mirrored into `schema_summary.json`; if modules add explicit column naming (e.g., edge), ensure these can be surfaced consistently.
+
+### Dimensionality guide (defaults)
+- Topology: `topology/persistence_basic/v1` → 140 dims; `topology/persistence_laplacian_hybrid/v1` → 172 dims (140 PH + 32 Laplacian).
+- Node: `node/dssp_topo_merge/v1` → 172 dims (32 DSSP/basic + 140 topology); `node/dssp_topo_merge_passthrough/v1` → 32 DSSP/basic + all topology columns (dynamic; e.g., 204 with hybrid topo).
+- Edge (assuming hybrid topology topo_dim=172; prepend 11D legacy histogram):
+  - edge_plus_min_agg_lap_hybrid: lean 530 dims (11 + 3×172 + norms+cosine); heavy 874 dims (+min/max).
+  - edge_plus_bal_agg_lap_hybrid: lean 702 dims (11 + 4×172 + norms+cosine); heavy 1,046 dims (+min/max).
+  - edge_plus_pool_agg_lap_hybrid: lean 1,393 dims (11 + endpoint agg + pooled agg); heavy 2,081 dims (+min/max in both blocks).
 
 ## Aggregated-topology edge modules
 - Implemented: `edge_plus_min_agg_topo`, `edge_plus_bal_agg_topo`, `edge_plus_pool_agg_topo` (lean + heavy variants). Each prepends the legacy 11‑D histogram and keeps deterministic edge ordering; heavy variants add min/max blocks.

@@ -19,7 +19,7 @@ class EdgePlusMinAggLapHybridModule(EdgePlusMinAggTopoModule):
 
     module_id = "edge/edge_plus_min_agg_lap_hybrid/v1"
     module_kind = "edge"
-    default_alias = "11D Legacy + hybrid topo (PH+Lap 172D)"
+    default_alias = "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -40,9 +40,33 @@ class EdgePlusMinAggLapHybridModule(EdgePlusMinAggTopoModule):
 
     @classmethod
     def config_template(cls) -> dict:
-        template = super().config_template()
-        param_comments = dict(template.get("param_comments", {}))
-        param_comments.setdefault("note", "Use with topology/persistence_laplacian_hybrid/v1 (172D PH+Lap).")
-        template["param_comments"] = param_comments
-        template["alias"] = cls.default_alias
-        return template
+        params = dict(cls._metadata.defaults)
+        param_comments = {
+            "note": "Use with topology/persistence_laplacian_hybrid/v1 (172D PH+Lap).",
+            "variant": "lean or heavy",
+            "include_minmax": "heavy variant only; adds per-dimension min/max blocks",
+        }
+        heavy_params = dict(params)
+        heavy_params.update({"variant": "heavy", "include_minmax": True})
+        heavy_alias = (
+            "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | "
+            "Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)"
+        )
+        return {
+            "module": cls.module_id,
+            "alias": cls.default_alias,
+            "summary": cls._metadata.summary,
+            "description": cls._metadata.description,
+            "params": params,
+            "param_comments": param_comments,
+            "alternates": [
+                {
+                    "module": cls.module_id,
+                    "alias": heavy_alias,
+                    "params": heavy_params,
+                    "param_comments": param_comments,
+                    "summary": cls._metadata.summary,
+                    "description": cls._metadata.description,
+                }
+            ],
+        }
