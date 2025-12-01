@@ -7,7 +7,7 @@ This document captures how feature modules are structured, registered, and consu
   - `modules/interface` (e.g., `interface/polar_cutoff/v1`)
   - `modules/topology` (e.g., `topology/persistence_basic/v1`)
   - `modules/node` (e.g., `node/dssp_topo_merge/v1`)
-  - `modules/edge` (e.g., `edge/legacy_band/v11`, `edge/multi_scale/v24`, `edge/neo_v24`, `edge/legacy_plus_topo_pair`)
+  - `modules/edge` (e.g., `edge/legacy_band/v11`, hybrid PH+Lap aggregation variants); deprecated modules are kept under `modules/edge/deregistered` and are not auto-registered.
 - `modules/base.py` – base classes per kind and helpers:
   - `InterfaceFeatureModule`, `TopologyFeatureModule`, `NodeFeatureModule`, `EdgeFeatureModule`
   - `build_metadata(...)` to define module metadata (id, summary, description, inputs, outputs, parameters, defaults)
@@ -61,9 +61,7 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Node: `node/dssp_topo_merge/v1` – merges DSSP with topology; params: `drop_na`, `jobs`. Depends on external `mkdssp`; node IDs are canonicalized/sorted; `drop_na` may remove rows.
 - Edge:
   - `edge/legacy_band/v11` – 11D histogram; params: `distance_min/max`, `scale_features`, `jobs`. Deterministic edge ordering by (src_idx, dst_idx, distance); optional edge CSV dumps.
-  - `edge/multi_scale/v24` – 24D geometric; params for bands, histogram bins, include_inverse_distance, unit_vector options, contact thresholds; writes optional edge dumps.
-  - `edge/neo_v24` – hybrid 24D hist + multi-scale geometry; params include bands, histogram_bins (truncated), legacy_histogram_bins, histogram_mode (density | density_times_contact | density_and_count), contact_thresholds, include_inverse_distance, include_unit_vector, unit_vector_epsilon, scale_features, contact_normalizer, short_contact_max, long_band_mask, jobs.
-  - `edge/legacy_plus_topo_pair` – legacy + per-edge pair topology (PH over residues + optional neighbors within `neighbor_distance`); params: `distance_min/max`, `scale_features`, `neighbor_distance`, `include_neighbors`, `filtration_cutoff`, `min_persistence`, `jobs`. Uses Gudhi for PH; can be slow when `include_neighbors` is true.
+  - Deregistered (reference only; not auto-registered): `edge/multi_scale_v24`, `edge/neo_v24`, `edge/legacy_plus_topo_pair` (relocated to `modules/edge/deregistered`).
 
 ## Pipeline Contract
 - Interface modules expose `extract_interfaces(...)`.

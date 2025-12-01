@@ -166,6 +166,7 @@ class DSSPTopologyMergePassthrough(NodeFeatureModule):
                     "Status: SUCCESS",
                 ]
             )
+            log_path.parent.mkdir(parents=True, exist_ok=True)
             log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
             return True, None
         except Exception as exc:  # pragma: no cover
@@ -178,6 +179,7 @@ class DSSPTopologyMergePassthrough(NodeFeatureModule):
                     f"Error: {exc}",
                 ]
             )
+            log_path.parent.mkdir(parents=True, exist_ok=True)
             log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
             return False, (model_key, log_path, str(exc))
 

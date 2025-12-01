@@ -31,6 +31,9 @@ def _iter_module_names() -> Iterable[str]:
         short_name = module_info.name.rsplit(".", 1)[-1]
         if short_name in _DISCOVERY_EXCLUDES:
             continue
+        # Skip any modules placed under a "deregistered" subpackage
+        if "deregistered" in module_info.name.split("."):
+            continue
         yield module_info.name
 
 
