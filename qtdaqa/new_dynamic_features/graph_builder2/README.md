@@ -217,6 +217,7 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
 - `edge/edge_plus_min_agg_lap_hybrid/v1` – same as edge_plus_min_agg_topo but documented for hybrid topology (PH+Lap 172D).
 - `edge/edge_plus_bal_agg_lap_hybrid/v1` – same as edge_plus_bal_agg_topo but documented for hybrid topology (PH+Lap 172D).
 - `edge/edge_plus_pool_agg_lap_hybrid/v1` – same as edge_plus_pool_agg_topo but documented for hybrid topology (PH+Lap 172D).
+- Deregistered (retained for reference only; not auto-loaded): `edge/multi_scale_v24`, `edge/neo_v24`, `edge/legacy_plus_topo_pair` (moved to `modules/edge/deregistered`).
 
 Use `--list-modules --list-modules-format json|markdown` to see full parameter/default listings for every module.
 

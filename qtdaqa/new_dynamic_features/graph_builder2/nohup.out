@@ -1,0 +1,138 @@
+2025-12-01 11:56:24 INFO PDB warnings enabled (Bio.PDB.PDBConstructionWarning will be logged).
+2025-12-01 11:56:24 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.lapl_edge_pool_heavy_10A
+2025-12-01 11:56:25 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/logs_output/lapl_edge_pool_heavy_10A/graph_builder.2025-12-01_11-56-24
+2025-12-01 11:56:25 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/smaller_pilot_batch_Dockground_MAF2
+2025-12-01 11:56:25 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_heavy_10A/work
+2025-12-01 11:56:25 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_heavy_10A/graph_data
+2025-12-01 11:56:25 INFO Jobs: 16 (from CLI)
+2025-12-01 11:56:25 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2025-12-01 11:56:25 INFO Topology module : topology/persistence_laplacian_hybrid/v1 [alias: 140D PH (Betti 0 and Betti 1 topology summaries on interface coords) + 32D Laplacian = 172D] (jobs=16)
+2025-12-01 11:56:25 INFO Node module     : node/dssp_topo_merge_passthrough/v1 [alias: Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims] (jobs=16)
+2025-12-01 11:56:25 INFO Edge module     : edge/edge_plus_pool_agg_lap_hybrid/v1 [alias: Legacy 11D Edge + 2070D {(hist + endpoint agg + pooled agg + minmax) from laplacian_hybrid} = Edge 2081D (Heavy)] (jobs=16)
+2025-12-01 11:56:25 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2025-12-01 11:56:25 INFO Identified 215 PDB files for processing.
+2025-12-01 11:56:25 INFO Beginning interface stage (jobs=16)
+2025-12-01 11:56:27 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (10/215)
+2025-12-01 11:56:27 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 9.3% complete (20/215)
+2025-12-01 11:56:28 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 14.0% complete (30/215)
+2025-12-01 11:56:28 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 18.6% complete (40/215)
+2025-12-01 11:56:28 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 23.3% complete (50/215)
+2025-12-01 11:56:29 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 27.9% complete (60/215)
+2025-12-01 11:56:29 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 32.6% complete (70/215)
+2025-12-01 11:56:29 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 37.2% complete (80/215)
+2025-12-01 11:56:30 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 41.9% complete (90/215)
+2025-12-01 11:56:30 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 46.5% complete (100/215)
+2025-12-01 11:56:32 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 51.2% complete (110/215)
+2025-12-01 11:56:32 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 55.8% complete (120/215)
+2025-12-01 11:56:33 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 60.5% complete (130/215)
+2025-12-01 11:56:34 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 65.1% complete (140/215)
+2025-12-01 11:56:35 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 69.8% complete (150/215)
+2025-12-01 11:56:37 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 74.4% complete (160/215)
+2025-12-01 11:56:37 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 79.1% complete (170/215)
+2025-12-01 11:56:38 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 83.7% complete (180/215)
+2025-12-01 11:56:40 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 88.4% complete (190/215)
+2025-12-01 11:56:40 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 93.0% complete (200/215)
+2025-12-01 11:56:41 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 97.7% complete (210/215)
+2025-12-01 11:56:41 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (215/215)
+2025-12-01 11:56:41 INFO Interface stage complete: 215 success, 0 failures
+2025-12-01 11:56:41 INFO Interface feature extraction elapsed time: 15.99 s
+2025-12-01 11:56:41 INFO Beginning topology stage (jobs=16)
+2025-12-01 11:56:49 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (10/215)
+2025-12-01 11:56:54 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 9.3% complete (20/215)
+2025-12-01 11:56:54 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 14.0% complete (30/215)
+2025-12-01 11:56:59 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 18.6% complete (40/215)
+2025-12-01 11:57:02 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 23.3% complete (50/215)
+2025-12-01 11:57:04 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 27.9% complete (60/215)
+2025-12-01 11:57:07 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 32.6% complete (70/215)
+2025-12-01 11:57:09 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 37.2% complete (80/215)
+2025-12-01 11:57:13 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 41.9% complete (90/215)
+2025-12-01 11:57:15 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 46.5% complete (100/215)
+2025-12-01 11:57:18 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 51.2% complete (110/215)
+2025-12-01 11:57:27 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 55.8% complete (120/215)
+2025-12-01 11:57:37 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 60.5% complete (130/215)
+2025-12-01 11:57:40 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 65.1% complete (140/215)
+2025-12-01 11:57:48 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 69.8% complete (150/215)
+2025-12-01 11:57:57 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 74.4% complete (160/215)
+2025-12-01 11:58:00 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 79.1% complete (170/215)
+2025-12-01 11:58:09 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 83.7% complete (180/215)
+2025-12-01 11:58:15 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 88.4% complete (190/215)
+2025-12-01 11:58:21 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 93.0% complete (200/215)
+2025-12-01 11:58:25 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 97.7% complete (210/215)
+2025-12-01 11:58:27 INFO [Topology (PH+Lap) - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (215/215)
+2025-12-01 11:58:28 INFO Topology stage complete: 212 success, 3 failures
+2025-12-01 11:58:28 INFO Topology feature extraction elapsed time: 107.26 s
+2025-12-01 11:58:28 INFO Beginning node stage (jobs=16)
+2025-12-01 11:58:34 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (10/212)
+2025-12-01 11:58:36 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 9.4% complete (20/212)
+2025-12-01 11:58:39 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 14.2% complete (30/212)
+2025-12-01 11:58:41 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 18.9% complete (40/212)
+2025-12-01 11:58:44 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 23.6% complete (50/212)
+2025-12-01 11:58:46 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 28.3% complete (60/212)
+2025-12-01 11:58:48 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 33.0% complete (70/212)
+2025-12-01 11:58:51 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 37.7% complete (80/212)
+2025-12-01 11:58:53 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 42.5% complete (90/212)
+/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/Bio/PDB/PDBParser.py:384: PDBConstructionWarning: Ignoring unrecognized record 'TER' at line 7646
+  warnings.warn(
+/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/Bio/PDB/PDBParser.py:403: PDBConstructionWarning: PDBConstructionException: Atom OXT defined twice in residue <Residue ASN het=  resseq=483 icode= > at line 15291.
+Exception ignored.
+Some atoms or residues may be missing in the data structure.
+  warnings.warn(
+2025-12-01 11:58:57 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 47.2% complete (100/212)
+2025-12-01 11:58:59 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 51.9% complete (110/212)
+2025-12-01 11:59:03 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 56.6% complete (120/212)
+2025-12-01 11:59:06 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 61.3% complete (130/212)
+2025-12-01 11:59:08 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 66.0% complete (140/212)
+2025-12-01 11:59:11 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 70.8% complete (150/212)
+2025-12-01 11:59:14 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 75.5% complete (160/212)
+2025-12-01 11:59:17 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 80.2% complete (170/212)
+2025-12-01 11:59:20 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 84.9% complete (180/212)
+2025-12-01 11:59:23 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 89.6% complete (190/212)
+2025-12-01 11:59:26 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 94.3% complete (200/212)
+2025-12-01 11:59:27 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 99.1% complete (210/212)
+2025-12-01 11:59:28 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (212/212)
+2025-12-01 11:59:28 INFO Node stage complete: 212 success, 0 failures
+2025-12-01 11:59:28 INFO Node feature extraction elapsed time: 59.21 s
+2025-12-01 11:59:28 INFO Edge dumps enabled; writing CSVs to:
+2025-12-01 11:59:28 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_heavy_10A/work/edge_features
+2025-12-01 11:59:28 INFO Edge dump preparation elapsed time: 0.00 s
+2025-12-01 11:59:28 INFO Beginning graph assembly (.pt output) stage (jobs=16)
+2025-12-01 11:59:31 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (10/212)
+2025-12-01 11:59:33 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 9.4% complete (20/212)
+2025-12-01 11:59:34 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 14.2% complete (30/212)
+2025-12-01 11:59:37 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 18.9% complete (40/212)
+2025-12-01 11:59:39 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 23.6% complete (50/212)
+2025-12-01 11:59:39 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 28.3% complete (60/212)
+2025-12-01 11:59:42 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 33.0% complete (70/212)
+2025-12-01 11:59:43 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 37.7% complete (80/212)
+2025-12-01 11:59:45 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 42.5% complete (90/212)
+/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/Bio/PDB/PDBParser.py:384: PDBConstructionWarning: Ignoring unrecognized record 'TER' at line 7646
+  warnings.warn(
+/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/Bio/PDB/PDBParser.py:403: PDBConstructionWarning: PDBConstructionException: Atom OXT defined twice in residue <Residue ASN het=  resseq=483 icode= > at line 15291.
+Exception ignored.
+Some atoms or residues may be missing in the data structure.
+  warnings.warn(
+2025-12-01 11:59:48 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 47.2% complete (100/212)
+2025-12-01 11:59:51 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 51.9% complete (110/212)
+2025-12-01 11:59:53 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 56.6% complete (120/212)
+2025-12-01 11:59:58 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 61.3% complete (130/212)
+2025-12-01 12:00:01 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 66.0% complete (140/212)
+2025-12-01 12:00:04 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 70.8% complete (150/212)
+2025-12-01 12:00:08 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 75.5% complete (160/212)
+2025-12-01 12:00:11 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 80.2% complete (170/212)
+2025-12-01 12:00:15 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 84.9% complete (180/212)
+2025-12-01 12:00:20 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 89.6% complete (190/212)
+2025-12-01 12:00:22 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 94.3% complete (200/212)
+2025-12-01 12:00:24 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 99.1% complete (210/212)
+2025-12-01 12:00:24 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (212/212)
+2025-12-01 12:00:24 INFO Graph assembly (.pt output) complete: 212 success, 0 failures
+2025-12-01 12:00:24 INFO Graph (.pt) generation elapsed time: 55.54 s (edge stage: 55.58 s)
+2025-12-01 12:00:24 INFO Summary written to graph_builder.2025-12-01_11-56-24/graph_builder_summary.json
+2025-12-01 12:00:24 INFO Summary log written to graph_builder.2025-12-01_11-56-24/graph_builder_summary.log
+2025-12-01 12:00:24 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_heavy_10A/graph_data/graph_builder_summary.json
+2025-12-01 12:00:24 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_pool_heavy_10A/graph_data/graph_builder_summary.log
+2025-12-01 12:00:24 INFO Dynamic graph builder completed successfully.
+
+real	4m0.548s
+user	27m37.185s
+sys	6m10.526s
+      240.56 real      1657.19 user       370.53 sys
