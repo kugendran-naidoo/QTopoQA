@@ -11,7 +11,7 @@ export PYTHONPATH=/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA
 # AWS
 # export TMPDIR=/home/app/phd/github/QTopoQA/temp
 # export GRAPH_DIR=/home/app/phd/github/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/${OUTPUT}/graph_data
-# export CHECK_GRAPH_DIR=/home/app/phd/github/QTopoQA/qtdaqa/new_dynamic_eatures/graph_builder2/output/${CHECK}/graph_data
+# export CHECK_GRAPH_DIR=/home/app/phd/github/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/${CHECK}/graph_data
 # export PYTHONPATH=/home/app/phd/github/QTopoQA
 
 # Generate this after graph_builder2 for a golden hash
