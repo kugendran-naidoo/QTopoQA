@@ -517,6 +517,7 @@ def run_graph_builder(
 
 def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, object]]) -> Tuple[bool, str]:
     expected_edge = final_schema.get("edge_schema") or {}
+    expected_node = final_schema.get("node_schema") or {}
     if not expected_edge:
         return True, ""
     try:
@@ -525,6 +526,7 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
         return False, f"metadata load failed ({exc})"
 
     actual_edge = metadata.edge_schema or {}
+    actual_node = metadata.node_schema or {}
     defaults = _extract_module_defaults(metadata.module_registry, expected_edge.get("module") or actual_edge.get("module"))
     for key, expected_value in expected_edge.items():
         actual_value = actual_edge.get(key)
@@ -537,6 +539,22 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
             continue
         if actual_value != expected_value:
             return False, f"edge schema key '{key}' mismatch (expected {expected_value}, found {actual_value})"
+    if expected_node:
+        exp_node_dim = expected_node.get("dim")
+        if exp_node_dim is not None:
+            try:
+                exp_node_dim = int(exp_node_dim)
+            except (TypeError, ValueError):
+                return False, f"node schema dim is not an integer: {exp_node_dim!r}"
+            obs_node_dim = actual_node.get("dim")
+            if obs_node_dim is None:
+                return False, "node schema dim missing in graph metadata"
+            try:
+                obs_node_dim_int = int(obs_node_dim)
+            except (TypeError, ValueError):
+                return False, f"node schema dim in graph metadata is not an integer: {obs_node_dim!r}"
+            if obs_node_dim_int != exp_node_dim:
+                return False, f"node schema dim mismatch (expected {exp_node_dim}, found {obs_node_dim_int})"
     return True, ""
 
 
@@ -591,14 +609,21 @@ def validate_graph_metadata(
                     f"edge_schema.{key}: expected {expected_value!r}, observed {actual_value!r}"
                 )
 
-    expected_topology = final_schema.get("topology_schema") or {}
-    observed_topology = metadata.node_schema or {}
-    if "dim" in expected_topology:
-        expected_dim = expected_topology.get("dim")
-        actual_dim = observed_topology.get("dim")
+    expected_node = final_schema.get("node_schema") or {}
+    observed_node = metadata.node_schema or {}
+    if "dim" in expected_node:
+        expected_dim = expected_node.get("dim")
+        actual_dim = observed_node.get("dim")
         if actual_dim != expected_dim:
             mismatches.append(
-                f"topology/node dim: expected {expected_dim!r}, observed {actual_dim!r}"
+                f"node dim: expected {expected_dim!r}, observed {actual_dim!r}"
+            )
+    if "module" in expected_node:
+        expected_node_module = expected_node.get("module")
+        actual_node_module = observed_node.get("module")
+        if actual_node_module != expected_node_module:
+            mismatches.append(
+                f"node_schema.module: expected {expected_node_module!r}, observed {actual_node_module!r}"
             )
 
     if mismatches:

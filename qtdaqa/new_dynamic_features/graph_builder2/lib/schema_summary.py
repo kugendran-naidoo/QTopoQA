@@ -83,6 +83,14 @@ def write_schema_summary(graph_dir: Path) -> Path | None:
         # Explicitly mirror node feature columns for convenience
         if hasattr(metadata, "node_feature_columns") and metadata.node_feature_columns:
             payload["node_feature_columns"] = list(metadata.node_feature_columns)
+        node_dim = None
+        try:
+            node_dim = metadata.node_schema.get("dim") if hasattr(metadata, "node_schema") else None
+        except Exception:
+            node_dim = None
+        if node_dim is not None:
+            payload.setdefault("node_schema", {}).setdefault("dim", node_dim)
+            payload["node_feature_dim"] = node_dim
         topo_cols = _load_topology_columns(graph_dir)
         if topo_cols is not None:
             payload["topology_columns"] = topo_cols

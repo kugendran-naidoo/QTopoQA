@@ -48,6 +48,7 @@ builder:
 options:
   reuse_existing_graphs: false
   check_schema: false         # optional: validate checkpoint/builder/graphs and exit
+  force_node_dim: null        # optional emergency override; prefer using checkpoint/graph metadata
 
 batch_size: 32
 num_workers: 0
@@ -91,7 +92,8 @@ for debugging). Otherwise the command runs the full pipeline.
    (copied from the builder’s `graph_metadata.json`). Inference writes this to
    `<work_dir>/feature_metadata.json` for reference and converts it into
    `builder_features/features.from_metadata.yaml`. This YAML mirrors the builder
-   config used during training.
+   config used during training. Node/edge schemas (dims and columns) are carried
+   through and enforced; `force_node_dim` is available as a last-resort override.
 
 3. **Graph reuse or regeneration** – `builder_runner.ensure_graph_dir` compares
    any cached graphs under `<work_dir>/graph_data` with the expected schema:
@@ -122,7 +124,8 @@ and per-target reports).
   - `hit.rate_result.csv` (hit counts above DockQ 0.23/0.49/0.80).
   - `ranking_loss_result.csv` (m*, m^, ranking loss) plus TOP-10 listings.
 - `<work_dir>/<dataset_name>/feature_metadata.json` – the schema recovered from the
-  checkpoint (handy for auditing and reproducing builder runs).
+  checkpoint (handy for auditing and reproducing builder runs). Includes `edge_schema`
+  and `node_schema` with dims/columns.
 - `<work_dir>/<dataset_name>/graph_load_profile.json` (if enabled via builder options) –
   profile of slowest graph loads.
 
@@ -151,7 +154,8 @@ to reuse the regenerated graphs later.
   prevents long builder runs with mismatched configs.
 - **Inspecting metadata without running inference** – use
   `./run_model_inference.sh --config ... --dump-metadata` to print the checkpoint
-  schema and exit.
+  schema and exit. For deeper inspection, `tools/inspect_schema.py --checkpoint <ckpt> [--graph-dir <graph_dir>]`
+  prints node/edge dims and schemas.
 - **Need to regenerate graphs manually?** – the builder helper writes the exact
   config it used under `<work_dir>/builder_features/`. You can rerun the builder
   yourself for debugging.

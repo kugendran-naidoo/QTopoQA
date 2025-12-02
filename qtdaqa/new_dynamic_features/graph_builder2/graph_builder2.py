@@ -23,6 +23,7 @@ import logging
 import shutil
 import sys
 import time
+import re
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, Tuple, TYPE_CHECKING, Type
 
@@ -420,27 +421,33 @@ def _collect_module_templates() -> Dict[str, List[Dict[str, object]]]:
         else:  # pragma: no cover - backward compatibility helper
             snippet = {"module": meta.module_id, "params": dict(meta.defaults)}
         params = dict(snippet.get("params", {}))  # make a copy to keep class defaults immutable
+        alias_value = snippet.get("alias") or getattr(module_cls, "default_alias", None)
+        dim_hint = _extract_dim_hint(alias_value, params)
         entry = {
             "module_id": snippet.get("module", meta.module_id),
-            "alias": snippet.get("alias") or getattr(module_cls, "default_alias", None),
+            "alias": alias_value,
             "params": params,
             "param_comments": dict(snippet.get("param_comments", {})),
             "summary": meta.summary or "",
             "description": meta.description or "",
+            "dim_hint": dim_hint,
         }
         templates.setdefault(meta.module_kind, []).append(entry)
         alternates = snippet.get("alternates")
         if isinstance(alternates, list):
             for alt in alternates:
                 alt_params = dict(alt.get("params", params))
+                alt_alias = alt.get("alias") or getattr(module_cls, "default_alias", None)
+                alt_dim_hint = _extract_dim_hint(alt_alias, alt_params)
                 templates.setdefault(meta.module_kind, []).append(
                     {
                         "module_id": alt.get("module", meta.module_id),
-                        "alias": alt.get("alias") or getattr(module_cls, "default_alias", None),
+                        "alias": alt_alias,
                         "params": alt_params,
                         "param_comments": dict(alt.get("param_comments", {})),
                         "summary": alt.get("summary", meta.summary or ""),
                         "description": alt.get("description", meta.description or ""),
+                        "dim_hint": alt_dim_hint,
                     }
                 )
 
@@ -564,10 +571,15 @@ def _render_stage_block(
     lines.append(wrap(f"{stage}:"))
     lines.append(wrap(module_value))
 
+    dim_hint = entry.get("dim_hint")
+    if dim_hint is None:
+        dim_hint = _extract_dim_hint(entry.get("alias"), entry.get("params"))
     for meta_key in ("alias", "summary", "description"):
         meta_line = _format_string_line(meta_key, entry.get(meta_key), allow_empty=True)
         if meta_line:
             lines.append(wrap(meta_line))
+    if dim_hint is not None:
+        lines.append(wrap(f"  # dim: {dim_hint}"))
 
     param_lines = _format_params_block(
         entry.get("params", {}),
@@ -586,6 +598,44 @@ def _ordered_kinds(module_kinds: Iterable[str]) -> List[str]:
         if kind not in ordered:
             ordered.append(kind)
     return ordered
+
+
+def _extract_dim_hint(alias: Optional[str], params: Optional[Dict[str, object]] = None) -> Optional[int]:
+    """Best-effort dimension hint from alias text, respecting variant when present."""
+    if not alias:
+        return None
+    alias_lower = alias.lower()
+    if "dynamic" in alias_lower:
+        return None
+
+    variant = None
+    if isinstance(params, dict):
+        v = params.get("variant")
+        if isinstance(v, str):
+            variant = v.strip().lower()
+
+    # If the alias encodes both lean/heavy separated by '|', pick the segment matching variant.
+    segments = [seg.strip() for seg in alias.split("|") if seg.strip()]
+    segment = alias
+    if len(segments) > 1 and variant:
+        if variant == "lean":
+            segment = segments[0]
+        elif variant == "heavy":
+            segment = segments[-1]
+    elif len(segments) > 1:
+        # default to first segment for multi-part aliases when variant unknown
+        segment = segments[0]
+
+    matches = re.findall(r"(\d+)\s*D|Edge\s+(\d+)", segment, flags=re.IGNORECASE)
+    if not matches:
+        return None
+    numbers: List[int] = []
+    for a, b in matches:
+        if a:
+            numbers.append(int(a))
+        if b:
+            numbers.append(int(b))
+    return numbers[-1] if numbers else None
 
 
 def _render_feature_config_template(
@@ -656,11 +706,14 @@ def _format_module_listing(meta: "FeatureModuleMetadata", module_cls: Type) -> L
     alias = getattr(module_cls, "default_alias", None)
     alias_note = f" (alias: {alias})" if alias else ""
     summary = meta.summary or meta.description or "No summary provided."
+    dim_hint = _extract_dim_hint(alias)
 
     lines = [
         f"  {meta.module_id}{alias_note}",
         f"    summary : {summary}",
     ]
+    if dim_hint is not None:
+        lines.append(f"    dim     : {dim_hint}")
 
     try:
         param_desc = module_cls.list_params()  # type: ignore[attr-defined]
@@ -727,9 +780,11 @@ def _list_registered_modules(output_format: str = "text") -> None:
                 continue
             for meta, module_cls in sorted(entries, key=lambda item: item[0].module_id):
                 alias = getattr(module_cls, "default_alias", None)
+                dim_hint = _extract_dim_hint(alias)
+                dim_note = f" [dim={dim_hint}]" if dim_hint is not None else ""
                 alias_note = f" *(alias: {alias})*" if alias else ""
                 summary = meta.summary or meta.description or "No summary provided."
-                lines.append(f"- `{meta.module_id}`{alias_note} — {summary}")
+                lines.append(f"- `{meta.module_id}`{alias_note}{dim_note} — {summary}")
                 try:
                     param_desc = module_cls.list_params()  # type: ignore[attr-defined]
                 except AttributeError:

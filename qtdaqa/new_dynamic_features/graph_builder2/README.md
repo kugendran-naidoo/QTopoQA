@@ -220,6 +220,7 @@ To switch to the 24‑D multi-scale edges, change the `edge` block to
 - Deregistered (retained for reference only; not auto-loaded): `edge/multi_scale_v24`, `edge/neo_v24`, `edge/legacy_plus_topo_pair` (moved to `modules/edge/deregistered`).
 
 Use `--list-modules --list-modules-format json|markdown` to see full parameter/default listings for every module.
+`--create-feature-config --include-alternates` now emits a `# dim:` comment next to aliases when a dimension hint is known (variant-aware); dynamic passthrough aliases suppress the hint.
 
 ---
 
@@ -231,12 +232,13 @@ For each run you’ll find:
   `data.metadata` describing the edge module, parameters, and sample counts.
 - `graph_dir/graph_metadata.json` – canonical schema used by model training and
   inference to learn the node/edge layouts (dimensions, module IDs, node column
-  names, sample graphs, etc.).
+  names, sample graphs, etc.). `node_feature_columns` and `node_feature_dim`
+  are populated for downstream consumers.
 - `graph_dir/schema_summary.json` – human-readable snapshot of the resolved
   schema (module registry, node/edge dims, notes). Topology columns (auto-extracted
   during the edge stage when topology CSVs are present) and node_feature_columns
-  are included when available. Useful for quick inspection or when debugging
-  legacy checkpoints.
+  are included when available; node_feature_dim is mirrored when present.
+  Useful for quick inspection or when debugging legacy checkpoints.
 
 ### Feature dimensionality (defaults)
 - Topology: `topology/persistence_basic/v1` → 140 dims; `topology/persistence_laplacian_hybrid/v1` → 172 dims (140 PH + 32 Laplacian).

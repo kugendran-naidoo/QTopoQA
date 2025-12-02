@@ -73,6 +73,7 @@ def test_write_feature_config_uses_live_module_templates(tmp_path: Path, monkeyp
         "edge": [
             _module(
                 "edge/legacy_band/v11",
+                alias="Edge 11D legacy",
                 summary="Legacy summary",
                 description="Legacy description",
                 params={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True, "jobs": 16},
@@ -121,7 +122,8 @@ def test_write_feature_config_uses_live_module_templates(tmp_path: Path, monkeyp
     assert '  summary: "Node summary"' in text
     assert '  description: "Node description"' in text
     assert "edge:\n  module: edge/legacy_band/v11" in text
-    assert '  alias: ""' in text
+    assert '  alias: "Edge 11D legacy"' in text
+    assert "  # dim: 11" in text
     assert '  summary: "Legacy summary"' in text
     assert '  description: "Legacy description"' in text
     assert "element_filters:" in text and "- [C, N]" in text
@@ -140,6 +142,7 @@ def test_write_feature_config_can_include_alternates(tmp_path: Path, monkeypatch
         "edge": [
             _module(
                 "edge/legacy_band/v11",
+                alias="Edge 11D legacy",
                 params={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True, "jobs": 16},
             ),
             _module(
@@ -165,10 +168,12 @@ def test_write_feature_config_can_include_alternates(tmp_path: Path, monkeypatch
     text = output_path.read_text()
 
     assert "edge:\n  module: edge/legacy_band/v11" in text
+    assert "  # dim: 11" in text
     assert "# Alternate edge modules (uncomment to use):" in text
     assert "# edge:" in text
     assert "#   module: edge/multi_scale/v24  # alias: 24D Scalars" in text
     assert '#   alias: "24D Scalars"' in text
+    assert "#   # dim: 24" in text
     assert '#   summary: "Edge summary"' in text
     assert "#     jobs: 16" in text
     assert "#   module: edge/neo/v24  # alias: Neo hybrid multi-scale" in text
@@ -186,3 +191,28 @@ def test_render_template_warns_when_stage_missing() -> None:
     text = graph_builder._render_feature_config_template(module_map)
     assert "# OPTIONAL stage: topology" in text
     assert "No registered topology modules were found" in text
+
+
+def test_format_module_listing_includes_dim_hint() -> None:
+    from qtdaqa.new_dynamic_features.graph_builder2.modules.registry import FeatureModuleMetadata
+
+    class DummyModule:
+        module_id = "edge/dim_test/v1"
+        default_alias = "Edge 42D test"
+
+        @classmethod
+        def metadata(cls):
+            return FeatureModuleMetadata(
+                module_id=cls.module_id,
+                module_kind="edge",
+                summary="dummy",
+                description="dummy",
+            )
+
+        @classmethod
+        def list_params(cls):
+            return {}
+
+    meta = DummyModule.metadata()
+    lines = graph_builder._format_module_listing(meta, DummyModule)
+    assert any("dim" in line and "42" in line for line in lines)

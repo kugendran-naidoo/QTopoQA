@@ -364,11 +364,13 @@ def _process_task(
         save_start = time.perf_counter()
         torch.save(data, output_path)
         save_time = time.perf_counter() - save_start
+        node_feature_dim = len(feature_cols)
         entry = {
             "edge_module": module_id,
             "edge_params": edge_module.params,
             "edge_metadata": edge_metadata,
             "node_feature_columns": feature_cols,
+            "node_feature_dim": node_feature_dim,
         }
         if builder_metadata:
             entry["builder"] = builder_metadata
@@ -385,6 +387,7 @@ def _process_task(
                 f"Node features: {task.node_path}",
                 f"Output pt: {output_path}",
                 f"Edge dim: {feature_dim}",
+                f"Node dim: {node_feature_dim}",
             ]
         )
         task.log_path.parent.mkdir(parents=True, exist_ok=True)
