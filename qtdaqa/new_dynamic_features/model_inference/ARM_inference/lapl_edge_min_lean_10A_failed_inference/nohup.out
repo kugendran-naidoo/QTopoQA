@@ -1,0 +1,498 @@
+Using checkpoints:
+  [1] val-0.04182_epoch158 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt
+  [2] val-0.04732_epoch210 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-12-01_18-40-33/model_checkpoints/checkpoint.val-0.04732_epoch210.chkpt
+  [3] val-0.06118_epoch069 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lean_seed222_2025-12-01_15-11-21/model_checkpoints/checkpoint.val-0.06118_epoch069.chkpt
+  [4] val-0.06123_epoch072 -> /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/sched_boost_lean_seed222_2025-12-01_15-11-21_phase1/model_checkpoints/checkpoint.val-0.06123_epoch072.chkpt
+Stage1: BM55-AF2 using val-0.04182_epoch158 (build graphs + inference)
+Stage1: HAF2 using val-0.04182_epoch158 (build graphs + inference)
+Stage1: ABAG-AF3 using val-0.04182_epoch158 (build graphs + inference)
+Waiting for Stage1 (graph build) to complete ...
+2025-12-01 21:59:00,462 WARNING Failed to summarise training run /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/history: local variable 'sorted_by_selection' referenced before assignment
+2025-12-01 21:59:00,463 WARNING Failed to summarise training run /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/history: local variable 'sorted_by_selection' referenced before assignment
+2025-12-01 21:59:00,464 WARNING Failed to summarise training run /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/history: local variable 'sorted_by_selection' referenced before assignment
+2025-12-01 21:59:00,504 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt (score=0.041817307472229004, run=polish_seed101_2025-12-01_17-16-30) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-12-01 21:59:00,505 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt (score=0.041817307472229004, run=polish_seed101_2025-12-01_17-16-30) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-12-01 21:59:00,506 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt (score=0.041817307472229004, run=polish_seed101_2025-12-01_17-16-30) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs
+2025-12-01 21:59:00,513 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 530,
+    "module": "edge/edge_plus_min_agg_lap_hybrid/v1",
+    "variant": "edge_plus_min_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_minmax": false,
+      "include_norms": true,
+      "jobs": 16,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_min_lean_10A/graph_data/graph_metadata.json",
+    "alias": "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
+  },
+  "topology_schema": {}
+}
+2025-12-01 21:59:00,513 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 530,
+    "module": "edge/edge_plus_min_agg_lap_hybrid/v1",
+    "variant": "edge_plus_min_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_minmax": false,
+      "include_norms": true,
+      "jobs": 16,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_min_lean_10A/graph_data/graph_metadata.json",
+    "alias": "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
+  },
+  "topology_schema": {}
+}
+2025-12-01 21:59:00,513 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 530,
+    "module": "edge/edge_plus_min_agg_lap_hybrid/v1",
+    "variant": "edge_plus_min_agg_topo/lean",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "include_cosine": true,
+      "include_minmax": false,
+      "include_norms": true,
+      "jobs": 16,
+      "scale_histogram": true,
+      "variant": "lean"
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lapl_edge_min_lean_10A/graph_data/graph_metadata.json",
+    "alias": "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean)",
+    "jobs": 16,
+    "summary": "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
+  },
+  "topology_schema": {}
+}
+2025-12-01 21:59:00,513 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/BM55-AF2_decoys",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": false,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158",
+  "check_schema": false
+}
+2025-12-01 21:59:00,513 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/HAF2_decoys",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": false,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158",
+  "check_schema": false
+}
+2025-12-01 21:59:00,513 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": false,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/results/val-0.04182_epoch158",
+  "check_schema": false
+}
+2025-12-01 21:59:00,513 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/BM55-AF2/feature_metadata.json
+2025-12-01 21:59:00,513 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/feature_metadata.json
+2025-12-01 21:59:00,514 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/feature_metadata.json
+2025-12-01 21:59:00,514 INFO 
+2025-12-01 21:59:00,514 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt
+2025-12-01 21:59:00,514 INFO 
+2025-12-01 21:59:00,514 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt
+2025-12-01 21:59:00,514 INFO Inference config: config.yaml.BM55-AF2
+2025-12-01 21:59:00,514 INFO 
+2025-12-01 21:59:00,514 INFO Inference config: config.yaml.HAF2
+2025-12-01 21:59:00,514 INFO 
+2025-12-01 21:59:00,514 INFO 
+2025-12-01 21:59:00,514 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt
+2025-12-01 21:59:00,514 INFO Inference config: config.yaml.ABAG-AF3
+2025-12-01 21:59:00,514 INFO 
+2025-12-01 21:59:00,516 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+Traceback (most recent call last):
+  File "/Volumes/PData/Data/Users/kn/.pyenv/versions/3.10.11/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Volumes/PData/Data/Users/kn/.pyenv/versions/3.10.11/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 1086, in <module>
+2025-12-01 21:59:00,516 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+    raise SystemExit(main())
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 1081, in main
+2025-12-01 21:59:00,516 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2025-12-01 21:59:00,516 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_logs --jobs 24 --no-sort-artifacts --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_features/features.from_metadata.yaml
+    run_inference(cfg, final_schema, checkpoint_meta)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 762, in run_inference
+    graph_dir = ensure_graph_dir(cfg, final_schema, feature_metadata)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/builder_runner.py", line 660, in ensure_graph_dir
+2025-12-01 21:59:00,517 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/HAF2_decoys --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_logs --jobs 12 --no-sort-artifacts --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_features/features.from_metadata.yaml
+    return run_graph_builder(
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/builder_runner.py", line 472, in run_graph_builder
+    raise FileNotFoundError(f"Data directory not found: {cfg.data_dir}")
+FileNotFoundError: Data directory not found: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/BM55-AF2_decoys
+2025-12-01 21:59:00 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2025-12-01 21:59:00 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_features/features.from_metadata.yaml
+2025-12-01 21:59:00 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2025-12-01 21:59:00 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_features/features.from_metadata.yaml
+        3.49 real         3.08 user         1.35 sys
+2025-12-01 21:59:01 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_logs/graph_builder.2025-12-01_21-59-00
+2025-12-01 21:59:01 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/HAF2_decoys
+2025-12-01 21:59:01 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_work
+2025-12-01 21:59:01 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data
+2025-12-01 21:59:01 INFO Jobs: 12 (from CLI)
+2025-12-01 21:59:01 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2025-12-01 21:59:01 INFO Topology module : topology/persistence_laplacian_hybrid/v1 [alias: 140D PH (Betti 0 and Betti 1 topology summaries on interface coords) + 32D Laplacian = 172D] (jobs=16)
+2025-12-01 21:59:01 INFO Node module     : node/dssp_topo_merge_passthrough/v1 [alias: Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims] (jobs=16)
+2025-12-01 21:59:01 INFO Edge module     : edge/edge_plus_min_agg_lap_hybrid/v1 [alias: Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean)] (jobs=16)
+2025-12-01 21:59:01 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2025-12-01 21:59:01 INFO Identified 1270 PDB files for processing.
+2025-12-01 21:59:01 INFO Beginning interface stage (jobs=16)
+2025-12-01 21:59:01 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_logs/graph_builder.2025-12-01_21-59-00
+2025-12-01 21:59:01 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys
+2025-12-01 21:59:01 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_work
+2025-12-01 21:59:01 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-12-01 21:59:01 INFO Jobs: 24 (from CLI)
+2025-12-01 21:59:01 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2025-12-01 21:59:01 INFO Topology module : topology/persistence_laplacian_hybrid/v1 [alias: 140D PH (Betti 0 and Betti 1 topology summaries on interface coords) + 32D Laplacian = 172D] (jobs=16)
+2025-12-01 21:59:01 INFO Node module     : node/dssp_topo_merge_passthrough/v1 [alias: Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims] (jobs=16)
+2025-12-01 21:59:01 INFO Edge module     : edge/edge_plus_min_agg_lap_hybrid/v1 [alias: Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean)] (jobs=16)
+2025-12-01 21:59:01 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2025-12-01 21:59:01 INFO Identified 875 PDB files for processing.
+2025-12-01 21:59:01 INFO Beginning interface stage (jobs=16)
+2025-12-01 21:59:29 INFO [Interface - ABAG-AF3_decoys] 4.9% complete (43/875)
+2025-12-01 21:59:35 INFO [Interface - HAF2_decoys] 5.0% complete (63/1270)
+2025-12-01 22:00:06 INFO [Interface - ABAG-AF3_decoys] 9.8% complete (86/875)
+2025-12-01 22:00:11 INFO [Interface - HAF2_decoys] 9.9% complete (126/1270)
+2025-12-01 22:00:16 INFO [Interface - ABAG-AF3_decoys] 14.7% complete (129/875)
+2025-12-01 22:00:23 INFO [Interface - ABAG-AF3_decoys] 19.7% complete (172/875)
+2025-12-01 22:00:27 INFO [Interface - ABAG-AF3_decoys] 24.6% complete (215/875)
+2025-12-01 22:00:30 INFO [Interface - HAF2_decoys] 14.9% complete (189/1270)
+2025-12-01 22:00:32 INFO [Interface - ABAG-AF3_decoys] 29.5% complete (258/875)
+2025-12-01 22:00:33 INFO [Interface - HAF2_decoys] 19.8% complete (252/1270)
+2025-12-01 22:00:38 INFO [Interface - ABAG-AF3_decoys] 34.4% complete (301/875)
+2025-12-01 22:00:49 INFO [Interface - HAF2_decoys] 24.8% complete (315/1270)
+2025-12-01 22:00:52 INFO [Interface - ABAG-AF3_decoys] 39.3% complete (344/875)
+2025-12-01 22:01:02 INFO [Interface - HAF2_decoys] 29.8% complete (378/1270)
+2025-12-01 22:01:10 INFO [Interface - HAF2_decoys] 34.7% complete (441/1270)
+2025-12-01 22:01:17 INFO [Interface - HAF2_decoys] 39.7% complete (504/1270)
+2025-12-01 22:01:21 INFO [Interface - HAF2_decoys] 44.6% complete (567/1270)
+2025-12-01 22:01:22 INFO [Interface - ABAG-AF3_decoys] 44.2% complete (387/875)
+2025-12-01 22:01:46 INFO [Interface - ABAG-AF3_decoys] 49.1% complete (430/875)
+2025-12-01 22:01:53 INFO [Interface - ABAG-AF3_decoys] 54.1% complete (473/875)
+2025-12-01 22:01:55 INFO [Interface - HAF2_decoys] 49.6% complete (630/1270)
+2025-12-01 22:01:59 INFO [Interface - ABAG-AF3_decoys] 59.0% complete (516/875)
+2025-12-01 22:02:36 INFO [Interface - ABAG-AF3_decoys] 63.9% complete (559/875)
+2025-12-01 22:02:47 INFO [Interface - HAF2_decoys] 54.6% complete (693/1270)
+2025-12-01 22:03:04 INFO [Interface - HAF2_decoys] 59.5% complete (756/1270)
+2025-12-01 22:03:15 INFO [Interface - HAF2_decoys] 64.5% complete (819/1270)
+2025-12-01 22:03:18 INFO [Interface - HAF2_decoys] 69.4% complete (882/1270)
+2025-12-01 22:03:22 INFO [Interface - HAF2_decoys] 74.4% complete (945/1270)
+2025-12-01 22:03:25 INFO [Interface - HAF2_decoys] 79.4% complete (1008/1270)
+2025-12-01 22:03:29 INFO [Interface - HAF2_decoys] 84.3% complete (1071/1270)
+2025-12-01 22:03:33 INFO [Interface - HAF2_decoys] 89.3% complete (1134/1270)
+2025-12-01 22:03:35 INFO [Interface - HAF2_decoys] 94.3% complete (1197/1270)
+2025-12-01 22:03:36 INFO [Interface - HAF2_decoys] 99.2% complete (1260/1270)
+2025-12-01 22:03:36 INFO [Interface - HAF2_decoys] 100.0% complete (1270/1270)
+2025-12-01 22:03:36 INFO Interface stage complete: 1270 success, 0 failures
+2025-12-01 22:03:36 INFO Interface feature extraction elapsed time: 274.87 s
+2025-12-01 22:03:36 INFO Beginning topology stage (jobs=16)
+2025-12-01 22:04:03 INFO [Interface - ABAG-AF3_decoys] 68.8% complete (602/875)
+2025-12-01 22:04:21 INFO [Topology (PH+Lap) - HAF2_decoys] 5.0% complete (63/1270)
+2025-12-01 22:04:47 INFO [Topology (PH+Lap) - HAF2_decoys] 9.9% complete (126/1270)
+2025-12-01 22:05:12 INFO [Topology (PH+Lap) - HAF2_decoys] 14.9% complete (189/1270)
+2025-12-01 22:05:36 INFO [Topology (PH+Lap) - HAF2_decoys] 19.8% complete (252/1270)
+2025-12-01 22:06:24 INFO [Topology (PH+Lap) - HAF2_decoys] 24.8% complete (315/1270)
+2025-12-01 22:06:49 INFO [Interface - ABAG-AF3_decoys] 73.7% complete (645/875)
+2025-12-01 22:06:54 INFO [Interface - ABAG-AF3_decoys] 78.6% complete (688/875)
+2025-12-01 22:07:07 INFO [Interface - ABAG-AF3_decoys] 83.5% complete (731/875)
+2025-12-01 22:07:11 INFO [Topology (PH+Lap) - HAF2_decoys] 29.8% complete (378/1270)
+2025-12-01 22:07:13 INFO [Interface - ABAG-AF3_decoys] 88.5% complete (774/875)
+2025-12-01 22:07:21 INFO [Interface - ABAG-AF3_decoys] 93.4% complete (817/875)
+2025-12-01 22:07:26 INFO [Interface - ABAG-AF3_decoys] 98.3% complete (860/875)
+2025-12-01 22:07:44 INFO [Topology (PH+Lap) - HAF2_decoys] 34.7% complete (441/1270)
+2025-12-01 22:07:49 INFO [Interface - ABAG-AF3_decoys] 100.0% complete (875/875)
+2025-12-01 22:07:49 INFO Interface stage complete: 875 success, 0 failures
+2025-12-01 22:07:49 INFO Interface feature extraction elapsed time: 527.56 s
+2025-12-01 22:07:49 INFO Beginning topology stage (jobs=16)
+2025-12-01 22:08:26 INFO [Topology (PH+Lap) - HAF2_decoys] 39.7% complete (504/1270)
+2025-12-01 22:08:27 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 4.9% complete (43/875)
+2025-12-01 22:08:49 INFO [Topology (PH+Lap) - HAF2_decoys] 44.6% complete (567/1270)
+2025-12-01 22:09:01 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 9.8% complete (86/875)
+2025-12-01 22:09:42 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 14.7% complete (129/875)
+2025-12-01 22:10:16 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 19.7% complete (172/875)
+2025-12-01 22:10:37 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 24.6% complete (215/875)
+2025-12-01 22:10:39 INFO [Topology (PH+Lap) - HAF2_decoys] 49.6% complete (630/1270)
+2025-12-01 22:11:09 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 29.5% complete (258/875)
+2025-12-01 22:11:42 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 34.4% complete (301/875)
+2025-12-01 22:12:36 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 39.3% complete (344/875)
+2025-12-01 22:13:11 INFO [Topology (PH+Lap) - HAF2_decoys] 54.6% complete (693/1270)
+2025-12-01 22:13:37 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 44.2% complete (387/875)
+2025-12-01 22:14:05 INFO [Topology (PH+Lap) - HAF2_decoys] 59.5% complete (756/1270)
+2025-12-01 22:14:44 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 49.1% complete (430/875)
+2025-12-01 22:14:44 INFO [Topology (PH+Lap) - HAF2_decoys] 64.5% complete (819/1270)
+2025-12-01 22:15:08 INFO [Topology (PH+Lap) - HAF2_decoys] 69.4% complete (882/1270)
+2025-12-01 22:15:25 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 54.1% complete (473/875)
+2025-12-01 22:15:34 INFO [Topology (PH+Lap) - HAF2_decoys] 74.4% complete (945/1270)
+2025-12-01 22:15:55 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 59.0% complete (516/875)
+2025-12-01 22:16:00 INFO [Topology (PH+Lap) - HAF2_decoys] 79.4% complete (1008/1270)
+2025-12-01 22:16:24 INFO [Topology (PH+Lap) - HAF2_decoys] 84.3% complete (1071/1270)
+2025-12-01 22:16:29 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 63.9% complete (559/875)
+2025-12-01 22:16:50 INFO [Topology (PH+Lap) - HAF2_decoys] 89.3% complete (1134/1270)
+2025-12-01 22:17:09 INFO [Topology (PH+Lap) - HAF2_decoys] 94.3% complete (1197/1270)
+2025-12-01 22:17:24 INFO [Topology (PH+Lap) - HAF2_decoys] 99.2% complete (1260/1270)
+2025-12-01 22:17:27 INFO [Topology (PH+Lap) - HAF2_decoys] 100.0% complete (1270/1270)
+2025-12-01 22:17:29 INFO Topology stage complete: 1270 success, 0 failures
+2025-12-01 22:17:29 INFO Topology feature extraction elapsed time: 832.26 s
+2025-12-01 22:17:29 INFO Beginning node stage (jobs=16)
+2025-12-01 22:18:23 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 68.8% complete (602/875)
+2025-12-01 22:18:27 INFO [Node (passthrough) - HAF2_decoys] 5.0% complete (63/1270)
+2025-12-01 22:19:14 INFO [Node (passthrough) - HAF2_decoys] 9.9% complete (126/1270)
+2025-12-01 22:19:49 INFO [Node (passthrough) - HAF2_decoys] 14.9% complete (189/1270)
+2025-12-01 22:20:17 INFO [Node (passthrough) - HAF2_decoys] 19.8% complete (252/1270)
+2025-12-01 22:20:51 INFO [Node (passthrough) - HAF2_decoys] 24.8% complete (315/1270)
+2025-12-01 22:21:28 INFO [Node (passthrough) - HAF2_decoys] 29.8% complete (378/1270)
+2025-12-01 22:21:59 INFO [Node (passthrough) - HAF2_decoys] 34.7% complete (441/1270)
+2025-12-01 22:22:05 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 73.7% complete (645/875)
+2025-12-01 22:22:31 INFO [Node (passthrough) - HAF2_decoys] 39.7% complete (504/1270)
+2025-12-01 22:22:45 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 78.6% complete (688/875)
+2025-12-01 22:22:58 INFO [Node (passthrough) - HAF2_decoys] 44.6% complete (567/1270)
+2025-12-01 22:23:21 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 83.5% complete (731/875)
+2025-12-01 22:23:32 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 88.5% complete (774/875)
+2025-12-01 22:23:42 INFO [Node (passthrough) - HAF2_decoys] 49.6% complete (630/1270)
+2025-12-01 22:24:07 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 93.4% complete (817/875)
+2025-12-01 22:24:33 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 98.3% complete (860/875)
+2025-12-01 22:24:38 INFO [Topology (PH+Lap) - ABAG-AF3_decoys] 100.0% complete (875/875)
+2025-12-01 22:24:39 INFO [Node (passthrough) - HAF2_decoys] 54.6% complete (693/1270)
+2025-12-01 22:24:42 INFO Topology stage complete: 875 success, 0 failures
+2025-12-01 22:24:42 INFO Topology feature extraction elapsed time: 1013.05 s
+2025-12-01 22:24:42 INFO Beginning node stage (jobs=16)
+2025-12-01 22:25:12 INFO [Node (passthrough) - HAF2_decoys] 59.5% complete (756/1270)
+2025-12-01 22:25:24 INFO [Node (passthrough) - ABAG-AF3_decoys] 4.9% complete (43/875)
+2025-12-01 22:25:43 INFO [Node (passthrough) - HAF2_decoys] 64.5% complete (819/1270)
+2025-12-01 22:26:04 INFO [Node (passthrough) - ABAG-AF3_decoys] 9.8% complete (86/875)
+2025-12-01 22:26:13 INFO [Node (passthrough) - HAF2_decoys] 69.4% complete (882/1270)
+2025-12-01 22:26:33 INFO [Node (passthrough) - ABAG-AF3_decoys] 14.7% complete (129/875)
+2025-12-01 22:26:44 INFO [Node (passthrough) - HAF2_decoys] 74.4% complete (945/1270)
+2025-12-01 22:26:56 INFO [Node (passthrough) - ABAG-AF3_decoys] 19.7% complete (172/875)
+2025-12-01 22:27:14 INFO [Node (passthrough) - HAF2_decoys] 79.4% complete (1008/1270)
+2025-12-01 22:27:19 INFO [Node (passthrough) - ABAG-AF3_decoys] 24.6% complete (215/875)
+2025-12-01 22:27:41 INFO [Node (passthrough) - ABAG-AF3_decoys] 29.5% complete (258/875)
+2025-12-01 22:27:46 INFO [Node (passthrough) - HAF2_decoys] 84.3% complete (1071/1270)
+2025-12-01 22:28:05 INFO [Node (passthrough) - ABAG-AF3_decoys] 34.4% complete (301/875)
+2025-12-01 22:28:17 INFO [Node (passthrough) - HAF2_decoys] 89.3% complete (1134/1270)
+2025-12-01 22:28:31 INFO [Node (passthrough) - ABAG-AF3_decoys] 39.3% complete (344/875)
+2025-12-01 22:28:46 INFO [Node (passthrough) - HAF2_decoys] 94.3% complete (1197/1270)
+2025-12-01 22:29:07 INFO [Node (passthrough) - ABAG-AF3_decoys] 44.2% complete (387/875)
+2025-12-01 22:29:12 INFO [Node (passthrough) - HAF2_decoys] 99.2% complete (1260/1270)
+2025-12-01 22:29:16 INFO [Node (passthrough) - HAF2_decoys] 100.0% complete (1270/1270)
+2025-12-01 22:29:16 INFO Node stage complete: 1270 success, 0 failures
+2025-12-01 22:29:16 INFO Node feature extraction elapsed time: 706.29 s
+2025-12-01 22:29:16 INFO Edge dumps enabled; writing CSVs to:
+2025-12-01 22:29:16 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/builder_work/edge_features
+2025-12-01 22:29:16 INFO Edge dump preparation elapsed time: 0.00 s
+2025-12-01 22:29:16 INFO Beginning graph assembly (.pt output) stage (jobs=16)
+2025-12-01 22:29:26 INFO [Node (passthrough) - ABAG-AF3_decoys] 49.1% complete (430/875)
+2025-12-01 22:29:39 INFO [Node (passthrough) - ABAG-AF3_decoys] 54.1% complete (473/875)
+2025-12-01 22:29:43 INFO [Graph assembly - HAF2_decoys] 5.0% complete (63/1270)
+2025-12-01 22:29:52 INFO [Node (passthrough) - ABAG-AF3_decoys] 59.0% complete (516/875)
+2025-12-01 22:30:00 INFO [Graph assembly - HAF2_decoys] 9.9% complete (126/1270)
+2025-12-01 22:30:13 INFO [Node (passthrough) - ABAG-AF3_decoys] 63.9% complete (559/875)
+2025-12-01 22:30:15 INFO [Graph assembly - HAF2_decoys] 14.9% complete (189/1270)
+2025-12-01 22:30:24 INFO [Graph assembly - HAF2_decoys] 19.8% complete (252/1270)
+2025-12-01 22:30:39 INFO [Node (passthrough) - ABAG-AF3_decoys] 68.8% complete (602/875)
+2025-12-01 22:30:44 INFO [Graph assembly - HAF2_decoys] 24.8% complete (315/1270)
+2025-12-01 22:31:04 INFO [Graph assembly - HAF2_decoys] 29.8% complete (378/1270)
+2025-12-01 22:31:22 INFO [Node (passthrough) - ABAG-AF3_decoys] 73.7% complete (645/875)
+2025-12-01 22:31:26 INFO [Graph assembly - HAF2_decoys] 34.7% complete (441/1270)
+2025-12-01 22:31:36 INFO [Node (passthrough) - ABAG-AF3_decoys] 78.6% complete (688/875)
+2025-12-01 22:31:46 INFO [Graph assembly - HAF2_decoys] 39.7% complete (504/1270)
+2025-12-01 22:31:50 INFO [Node (passthrough) - ABAG-AF3_decoys] 83.5% complete (731/875)
+2025-12-01 22:31:56 INFO [Graph assembly - HAF2_decoys] 44.6% complete (567/1270)
+2025-12-01 22:32:04 INFO [Node (passthrough) - ABAG-AF3_decoys] 88.5% complete (774/875)
+2025-12-01 22:32:16 INFO [Node (passthrough) - ABAG-AF3_decoys] 93.4% complete (817/875)
+2025-12-01 22:32:27 INFO [Node (passthrough) - ABAG-AF3_decoys] 98.3% complete (860/875)
+2025-12-01 22:32:30 INFO [Node (passthrough) - ABAG-AF3_decoys] 100.0% complete (875/875)
+2025-12-01 22:32:30 INFO Node stage complete: 875 success, 0 failures
+2025-12-01 22:32:30 INFO Node feature extraction elapsed time: 467.34 s
+2025-12-01 22:32:30 INFO Edge dumps enabled; writing CSVs to:
+2025-12-01 22:32:30 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/builder_work/edge_features
+2025-12-01 22:32:30 INFO Edge dump preparation elapsed time: 0.00 s
+2025-12-01 22:32:30 INFO Beginning graph assembly (.pt output) stage (jobs=16)
+2025-12-01 22:32:45 INFO [Graph assembly - ABAG-AF3_decoys] 4.9% complete (43/875)
+2025-12-01 22:33:00 INFO [Graph assembly - ABAG-AF3_decoys] 9.8% complete (86/875)
+2025-12-01 22:33:05 INFO [Graph assembly - HAF2_decoys] 49.6% complete (630/1270)
+2025-12-01 22:33:13 INFO [Graph assembly - ABAG-AF3_decoys] 14.7% complete (129/875)
+2025-12-01 22:33:26 INFO [Graph assembly - ABAG-AF3_decoys] 19.7% complete (172/875)
+2025-12-01 22:33:33 INFO [Graph assembly - ABAG-AF3_decoys] 24.6% complete (215/875)
+2025-12-01 22:33:43 INFO [Graph assembly - ABAG-AF3_decoys] 29.5% complete (258/875)
+2025-12-01 22:33:53 INFO [Graph assembly - ABAG-AF3_decoys] 34.4% complete (301/875)
+2025-12-01 22:34:02 INFO [Graph assembly - HAF2_decoys] 54.6% complete (693/1270)
+2025-12-01 22:34:02 INFO [Graph assembly - HAF2_decoys] 59.5% complete (756/1270)
+2025-12-01 22:34:11 INFO [Graph assembly - HAF2_decoys] 64.5% complete (819/1270)
+2025-12-01 22:34:12 INFO [Graph assembly - ABAG-AF3_decoys] 39.3% complete (344/875)
+2025-12-01 22:34:20 INFO [Graph assembly - HAF2_decoys] 69.4% complete (882/1270)
+2025-12-01 22:34:30 INFO [Graph assembly - HAF2_decoys] 74.4% complete (945/1270)
+2025-12-01 22:34:35 INFO [Graph assembly - ABAG-AF3_decoys] 44.2% complete (387/875)
+2025-12-01 22:34:41 INFO [Graph assembly - HAF2_decoys] 79.4% complete (1008/1270)
+2025-12-01 22:34:51 INFO [Graph assembly - HAF2_decoys] 84.3% complete (1071/1270)
+2025-12-01 22:35:00 INFO [Graph assembly - ABAG-AF3_decoys] 49.1% complete (430/875)
+2025-12-01 22:35:01 INFO [Graph assembly - HAF2_decoys] 89.3% complete (1134/1270)
+2025-12-01 22:35:11 INFO [Graph assembly - HAF2_decoys] 94.3% complete (1197/1270)
+2025-12-01 22:35:13 INFO [Graph assembly - ABAG-AF3_decoys] 54.1% complete (473/875)
+2025-12-01 22:35:17 INFO [Graph assembly - HAF2_decoys] 99.2% complete (1260/1270)
+2025-12-01 22:35:17 INFO [Graph assembly - HAF2_decoys] 100.0% complete (1270/1270)
+2025-12-01 22:35:17 INFO Graph assembly (.pt output) complete: 1270 success, 0 failures
+2025-12-01 22:35:17 INFO Graph (.pt) generation elapsed time: 359.71 s (edge stage: 360.05 s)
+2025-12-01 22:35:17 INFO Summary written to graph_builder.2025-12-01_21-59-00/graph_builder_summary.json
+2025-12-01 22:35:17 INFO Summary log written to graph_builder.2025-12-01_21-59-00/graph_builder_summary.log
+2025-12-01 22:35:17 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data/graph_builder_summary.json
+2025-12-01 22:35:17 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data/graph_builder_summary.log
+2025-12-01 22:35:17 INFO Dynamic graph builder completed successfully.
+2025-12-01 22:35:18,320 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data
+2025-12-01 22:35:18,321 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt
+2025-12-01 22:35:18,321 INFO Inference config: config.yaml.HAF2
+2025-12-01 22:35:18,373 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data/graph_metadata.json).
+2025-12-01 22:35:18,373 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/schema_summary.json
+2025-12-01 22:35:18,373 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/HAF2/graph_data
+2025-12-01 22:35:18,419 WARNING Label CSV /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv contains duplicate unqualified model names mapped to multiple targets (examples: structure_temp_dimer_3 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, string_interact_uniref_a3m_4 -> 7ALB, 7D3Y, 7D7F, 7EEL, 7EKQ, 7F5B, 7KBR, 7LXT, 7MJP, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, species_interact_uniref_a3m_0 -> 7ALA, 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7JZY, 7KBR, 7LIV, 7LXT, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, structure_temp_dimer_a_0 -> 7ALA, 7ALB, 7AMV, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z, sequence_based_template_with_alphafold_0 -> 7ALB, 7AOF, 7AOH, 7AP8, 7D3Y, 7D7F, 7EEL, 7EEP, 7EKQ, 7F5B, 7JZY, 7KBR, 7L2M, 7LIV, 7LXT, 7MJP, 7MRW, 7NKZ, 7O27, 7O28, 7OEL, 7OI7, 7OOP, 7OZN, 7P3Z). Ensure per-target names remain unique or rely on target-qualified keys.
+Traceback (most recent call last):
+  File "/Volumes/PData/Data/Users/kn/.pyenv/versions/3.10.11/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Volumes/PData/Data/Users/kn/.pyenv/versions/3.10.11/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 1086, in <module>
+    raise SystemExit(main())
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 1081, in main
+    run_inference(cfg, final_schema, checkpoint_meta)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 789, in run_inference
+    model = load_model(cfg, final_schema["edge_schema"])
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 743, in load_model
+    missing, unexpected = model.load_state_dict(state_dict, strict=False)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2153, in load_state_dict
+    raise RuntimeError('Error(s) in loading state_dict for {}:\n\t{}'.format(
+RuntimeError: Error(s) in loading state_dict for GNN_edge1_edgepooling:
+	size mismatch for embed.0.weight: copying a param with shape torch.Size([32, 204]) from checkpoint, the shape in current model is torch.Size([32, 172]).
+     2183.22 real      8705.95 user      1018.01 sys
+2025-12-01 22:35:24 INFO [Graph assembly - ABAG-AF3_decoys] 59.0% complete (516/875)
+2025-12-01 22:35:39 INFO [Graph assembly - ABAG-AF3_decoys] 63.9% complete (559/875)
+2025-12-01 22:36:25 INFO [Graph assembly - ABAG-AF3_decoys] 68.8% complete (602/875)
+2025-12-01 22:37:58 INFO [Graph assembly - ABAG-AF3_decoys] 73.7% complete (645/875)
+2025-12-01 22:38:17 INFO [Graph assembly - ABAG-AF3_decoys] 78.6% complete (688/875)
+2025-12-01 22:38:17 INFO [Graph assembly - ABAG-AF3_decoys] 83.5% complete (731/875)
+2025-12-01 22:38:21 INFO [Graph assembly - ABAG-AF3_decoys] 88.5% complete (774/875)
+2025-12-01 22:38:33 INFO [Graph assembly - ABAG-AF3_decoys] 93.4% complete (817/875)
+2025-12-01 22:38:43 INFO [Graph assembly - ABAG-AF3_decoys] 98.3% complete (860/875)
+2025-12-01 22:38:43 INFO [Graph assembly - ABAG-AF3_decoys] 100.0% complete (875/875)
+2025-12-01 22:38:43 INFO Graph assembly (.pt output) complete: 875 success, 0 failures
+2025-12-01 22:38:43 INFO Graph (.pt) generation elapsed time: 371.29 s (edge stage: 371.51 s)
+2025-12-01 22:38:43 INFO Summary written to graph_builder.2025-12-01_21-59-00/graph_builder_summary.json
+2025-12-01 22:38:43 INFO Summary log written to graph_builder.2025-12-01_21-59-00/graph_builder_summary.log
+2025-12-01 22:38:43 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_builder_summary.json
+2025-12-01 22:38:43 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_builder_summary.log
+2025-12-01 22:38:43 INFO Dynamic graph builder completed successfully.
+2025-12-01 22:38:44,072 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data
+2025-12-01 22:38:44,072 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed101_2025-12-01_17-16-30/model_checkpoints/checkpoint.val-0.04182_epoch158.chkpt
+2025-12-01 22:38:44,072 INFO Inference config: config.yaml.ABAG-AF3
+2025-12-01 22:38:44,110 INFO Verified graph metadata compatibility (/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data/graph_metadata.json).
+2025-12-01 22:38:44,111 INFO Inference schema summary written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/schema_summary.json
+2025-12-01 22:38:44,111 INFO Loading graphs from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/ABAG-AF3/graph_data
+Traceback (most recent call last):
+  File "/Volumes/PData/Data/Users/kn/.pyenv/versions/3.10.11/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Volumes/PData/Data/Users/kn/.pyenv/versions/3.10.11/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 1086, in <module>
+    raise SystemExit(main())
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 1081, in main
+    run_inference(cfg, final_schema, checkpoint_meta)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 789, in run_inference
+    model = load_model(cfg, final_schema["edge_schema"])
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/inference_topoqa_cpu.py", line 743, in load_model
+    missing, unexpected = model.load_state_dict(state_dict, strict=False)
+  File "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2153, in load_state_dict
+    raise RuntimeError('Error(s) in loading state_dict for {}:\n\t{}'.format(
+RuntimeError: Error(s) in loading state_dict for GNN_edge1_edgepooling:
+	size mismatch for embed.0.weight: copying a param with shape torch.Size([32, 204]) from checkpoint, the shape in current model is torch.Size([32, 172]).
+     2388.84 real     10206.36 user      1141.92 sys
+Stage2 precheck: BM55-AF2 with val-0.04732_epoch210
+Graph dir missing: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/lapl_edge_pool_lean_10A/work/BM55-AF2/graph_data
+Stage2 blocked for BM55-AF2 with val-0.04732_epoch210: reuse precheck failed (would rebuild). Fix schema/match before rerunning.
+     2391.15 real     18918.00 user      2165.11 sys

@@ -162,6 +162,44 @@ edge:
 #   module: custom/mol_stage/v1
 #   params: {}
 
+# Lean Laplacian moments (MoL) modules (new):
+# topology:
+#   module: topology/lightweight_MoL/v1  # alias: 140D PH + 8D unweighted Lap moments (mu1-4, kappa2-4) = Topology 148D (lean MoL)
+#   params:
+#     neighbor_distance: 8.0
+#     filtration_cutoff: 8.0
+#     min_persistence: 0.01
+#     dedup_sort: false
+#     element_filters:
+#       - [C]
+#       - [N]
+#       - [O]
+#       - [C, N]
+#       - [C, O]
+#       - [N, O]
+#       - [C, N, O]
+#     lap_k_neighbors: null
+#     lap_max_neighbors: 128
+#     lap_size_threshold: 80    # exact eigs when nodes <= threshold, else SLQ
+#     lap_estimator: exact      # exact or slq
+#     lap_slq_probes: 8
+#     lap_slq_steps: 32
+#     lap_profile: false
+#     jobs: 16
+# edge:
+#   module: edge/edge_plus_lightweight_MoL/v1  # alias: Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)
+#   params:
+#     distance_min: 0.0
+#     distance_max: 10.0
+#     scale_histogram: true
+#     lap_size_threshold: 80   # exact eigs when nodes <= threshold, else SLQ
+#     lap_estimator: exact     # exact or slq
+#     lap_slq_probes: 8
+#     lap_slq_steps: 32
+#     lap_max_neighbors: 128
+#     lap_profile: false
+#     jobs: 16
+
 # Example pairing with hybrid topology:
 # topology:
 #   module: topology/persistence_laplacian_hybrid/v1

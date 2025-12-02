@@ -132,6 +132,13 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
   - edge_plus_bal_agg_lap_hybrid: lean 702 dims (11 + 4×172 + norms+cosine); heavy 1,046 dims (+min/max).
   - edge_plus_pool_agg_lap_hybrid: lean 1,393 dims (11 + endpoint agg + pooled agg); heavy 2,081 dims (+min/max in both blocks).
 
+## Upcoming lean Laplacian-moment modules (MoL)
+- Topology/lightweight_MoL/v1 (planned): keep 140D PH, add +8D unweighted Laplacian moments on cross-chain bipartite neighborhoods (cutoff default 8 A). Moments: mu1-4 and kappa2-4 (no per-eigen outputs; heat trace deferred). Unweighted normalized Laplacian; exact eigs when node_count <= size_threshold (default 80), otherwise SLQ (probes=8, steps=32). Metadata/feature_dim captured; deterministic sorting preserved. Suggested config template strings: alias "140D PH + 8D unweighted Lap moments (mu1-4, kappa2-4) = Topology 148D (lean MoL)"; summary "Persistent homology plus lean unweighted Laplacian moments per interface residue (no per-eigen outputs)"; description outlining cutoff 8 A, unweighted normalized Laplacian, exact→SLQ policy, and no heat trace in v1; # dim: 148.
+- Node passthrough: reuse `node/dssp_topo_merge_passthrough/v1` for arbitrary topology dims (no new alias planned).
+- Edge/edge_plus_lightweight_MoL/v1 (planned): prepend legacy 11D histogram; add +5D unweighted Laplacian moments on induced bipartite neighborhood of the residue pair (reuse 0-10 A window). Moments: mu1-3, kappa2, kappa3. Same exact→SLQ policy with size_threshold/probes/steps params; deterministic ordering and optional CSV dumps. Suggested config template strings: alias "Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)"; summary "Legacy histogram plus lean Laplacian moment context on the induced bipartite pair neighborhood (unweighted)"; description covering 0-10 A window, unweighted normalized Laplacian, exact→SLQ policy; # dim: 16.
+- Estimators: CBNE omitted in v1; SLQ/exact only. Size threshold and SLQ probes/steps are configurable params. Keep unweighted adjacency for stability/consistency.
+- Schema/metadata: ensure `feature_dim`, estimator params, and module ids surface in `graph_metadata.json` and `schema_summary.json` so training/inference auto-adapt; update feature-config templates to include defaults/comments for size thresholds and SLQ settings.
+
 ## Aggregated-topology edge modules
 - Implemented: `edge_plus_min_agg_topo`, `edge_plus_bal_agg_topo`, `edge_plus_pool_agg_topo` (lean + heavy variants). Each prepends the legacy 11‑D histogram and keeps deterministic edge ordering; heavy variants add min/max blocks.
 - Preserve deterministic interface/topology/node ordering; don’t reintroduce nondeterminism.
