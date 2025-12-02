@@ -206,7 +206,8 @@ ckpt = torch.load(ckpt_path, map_location="cpu")
 meta = ckpt.get("feature_metadata") or {}
 edge = meta.get("edge_schema") or {}
 topo = meta.get("topology_schema") or {}
-final = {"edge_schema": edge, "topology_schema": topo}
+node = meta.get("node_schema") or {}
+final = {"edge_schema": edge, "topology_schema": topo, "node_schema": node}
 
 ok, reason = br._graph_metadata_matches(graph_dir, final)  # reuse-friendly check
 if ok:

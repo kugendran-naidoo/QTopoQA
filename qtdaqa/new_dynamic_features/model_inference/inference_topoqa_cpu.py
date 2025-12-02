@@ -49,6 +49,7 @@ class InferenceConfig:
     builder: BuilderConfig = dataclasses.field(default_factory=BuilderConfig)
     reuse_existing_graphs: bool = False
     use_checkpoint_schema: bool = True
+    force_node_dim: Optional[int] = None
     interface_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     topology_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
     node_schema: Dict[str, object] = dataclasses.field(default_factory=dict)
@@ -126,18 +127,23 @@ def _uses_legacy_edge_encoder(state_dict: Dict[str, torch.Tensor]) -> bool:
 def resolve_feature_schema(cfg: InferenceConfig, checkpoint_meta: Dict[str, object]) -> Dict[str, Dict[str, object]]:
     edge_schema: Dict[str, object] = {}
     topo_schema: Dict[str, object] = {}
+    node_schema: Dict[str, object] = {}
     if cfg.use_checkpoint_schema:
         edge_schema.update(checkpoint_meta.get("edge_schema") or {})
         topo_schema.update(checkpoint_meta.get("topology_schema") or {})
+        node_schema.update(checkpoint_meta.get("node_schema") or {})
     edge_schema.update(cfg.edge_schema or {})
     topo_schema.update(cfg.topology_schema or {})
+    node_schema.update(cfg.node_schema or {})
+    if cfg.force_node_dim is not None:
+        node_schema["dim"] = int(cfg.force_node_dim)
     if not edge_schema:
         raise ValueError("Edge schema unavailable. Provide one in the checkpoint or config.yaml")
     final: Dict[str, Dict[str, object]] = {"edge_schema": edge_schema, "topology_schema": topo_schema}
+    if node_schema:
+        final["node_schema"] = node_schema
     if cfg.interface_schema:
         final["interface_schema"] = cfg.interface_schema
-    if cfg.node_schema:
-        final["node_schema"] = cfg.node_schema
     return final
 
 
@@ -159,8 +165,10 @@ def _guard_schema_overrides(cfg: InferenceConfig, checkpoint_meta: Dict[str, obj
     topo_override = cfg.topology_schema or {}
     edge_meta = checkpoint_meta.get("edge_schema") or {}
     topo_meta = checkpoint_meta.get("topology_schema") or {}
+    node_meta = checkpoint_meta.get("node_schema") or {}
     _check("edge_schema", edge_override, edge_meta)
     _check("topology_schema", topo_override, topo_meta)
+    _check("node_schema", cfg.node_schema or {}, node_meta)
 
 
 def _default_training_root() -> Path:
@@ -350,6 +358,14 @@ def load_config(raw_path: Path) -> InferenceConfig:
     use_checkpoint_schema = options_cfg.get("use_checkpoint_schema", True)
     use_checkpoint_schema = bool(use_checkpoint_schema)
     check_schema = bool(options_cfg.get("check_schema", False)) if options_cfg else False
+    force_node_dim = options_cfg.get("force_node_dim")
+    if force_node_dim is not None:
+        try:
+            force_node_dim = int(force_node_dim)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("options.force_node_dim must be an integer when provided.") from exc
+        if force_node_dim <= 0:
+            raise ValueError("options.force_node_dim must be greater than zero.")
 
     interface_schema_cfg = data.get("interface_schema") or {}
     if interface_schema_cfg and not isinstance(interface_schema_cfg, dict):
@@ -388,6 +404,7 @@ def load_config(raw_path: Path) -> InferenceConfig:
         builder=builder_cfg,
         reuse_existing_graphs=reuse_existing,
         use_checkpoint_schema=use_checkpoint_schema,
+        force_node_dim=force_node_dim,
         interface_schema=interface_schema_cfg or {},
         topology_schema=topology_schema_cfg or {},
         node_schema=node_schema_cfg or {},
@@ -713,12 +730,19 @@ def gather_graphs(graph_dir: Path) -> List[Tuple[str, Path]]:
     return entries
 
 
-def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]):
+def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object], node_schema: Dict[str, object]):
     from qtdaqa.new_dynamic_features.model_training.model.gat_5_edge1 import (  # noqa: WPS433
         GNN_edge1_edgepooling,
     )
 
     edge_dim = int(edge_schema.get("dim", 24))
+    node_dim = node_schema.get("dim")
+    if node_dim is None:
+        raise RuntimeError("Node schema is missing 'dim'; cannot construct model. Ensure checkpoint or config supplies node_dim.")
+    try:
+        node_dim_int = int(node_dim)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError(f"Node schema 'dim' must be an integer, got {node_dim!r}") from exc
     checkpoint = torch.load(cfg.checkpoint_path, map_location="cpu")
     state_dict = checkpoint.get("state_dict", checkpoint)
     edge_encoder_variant = edge_schema.get("encoder_variant")
@@ -736,6 +760,7 @@ def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object]):
         n_output=1,
         heads=8,
         edge_schema=edge_schema,
+        node_dim=node_dim_int,
         edge_encoder_variant=edge_encoder_variant,
     )
     if edge_encoder_variant != "legacy_linear":
@@ -786,7 +811,8 @@ def run_inference(
         persistent_workers=False,
     )
 
-    model = load_model(cfg, final_schema["edge_schema"])
+    node_schema = final_schema.get("node_schema") or {}
+    model = load_model(cfg, final_schema["edge_schema"], node_schema)
 
     results: List[Dict[str, object]] = []
 

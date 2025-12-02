@@ -116,8 +116,9 @@ Optional logging; disable if you don’t need remote tracking.
 Throughout the process, each run stores:
 
 - `config/` – `config.yaml`, `original_config.yaml`, and `applied_overrides.yaml`.
-- `feature_metadata.json` – copied from `graph_metadata.json`; also embedded in
-  every `.ckpt` under `checkpoint["feature_metadata"]`.
+- `feature_metadata.json` – copied from `graph_metadata.json` (includes edge_schema
+  and node_schema with dims/columns); also embedded in every `.ckpt` under
+  `checkpoint["feature_metadata"]` so inference can enforce matching node/edge dims.
 - `model_checkpoints/` – `best.ckpt`, `second_best.ckpt`, `third_best.ckpt`
   symlinks plus full checkpoint files.
 - `train_cli summarise/leaderboard` include a `builder_advisory` line (edge module,

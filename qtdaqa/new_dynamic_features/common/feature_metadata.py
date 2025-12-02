@@ -387,6 +387,12 @@ def load_graph_feature_metadata(
         note_label="node feature columns",
         metadata=metadata,
     )
+    node_dim_entry = _collect_consistent(
+        entries,
+        ("node_feature_dim",),
+        note_label="node feature_dim",
+        metadata=metadata,
+    )
 
     if edge_dim is not None:
         try:
@@ -403,6 +409,12 @@ def load_graph_feature_metadata(
     node_dim = None
     if isinstance(node_columns, list):
         node_dim = len(node_columns)
+    if node_dim is None and node_dim_entry is not None:
+        try:
+            node_dim = int(node_dim_entry)
+        except (TypeError, ValueError):
+            metadata.notes.append(f"Unable to coerce node dimension {node_dim_entry!r} to int.")
+            node_dim = None
 
     metadata.edge_schema.update(
         {
@@ -422,6 +434,7 @@ def load_graph_feature_metadata(
 
     if node_columns is not None:
         metadata.node_schema["columns"] = node_columns
+        metadata.node_feature_columns = list(node_columns)  # type: ignore[attr-defined]
     if node_dim is not None:
         metadata.node_schema["dim"] = node_dim
     if metadata.metadata_path:
