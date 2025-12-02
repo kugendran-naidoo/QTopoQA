@@ -1,4 +1,4 @@
-export GRAPH_DIR=lapl_edge_min_lean_10A
+export GRAPH_DIR=MoL_edge_10A
 
 echo "Generating graph-dir manifest for ${GRAPH_DIR} ..."
 
