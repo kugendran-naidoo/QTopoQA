@@ -224,3 +224,26 @@ def test_schema_summary_populates_registry_even_if_loader_empty(tmp_path: Path, 
     schema_summary.write_schema_summary(graph_dir)
     data = json.loads((graph_dir / "schema_summary.json").read_text())
     assert data["module_registry"].get("edge", {}).get("id") == "edge/test"
+
+
+def test_schema_summary_captures_lightweight_mol_registry(tmp_path: Path) -> None:
+    graph_dir = tmp_path / "graph_data"
+    graph_dir.mkdir()
+    (graph_dir / "graph_metadata.json").write_text("{}", encoding="utf-8")
+
+    summary_payload = {
+        "modules": {
+            "interface": {"id": "interface/polar_cutoff/v1"},
+            "topology": {"id": "topology/lightweight_MoL/v1"},
+            "node": {"id": "node/dssp_topo_merge_passthrough/v1"},
+            "edge": {"id": "edge/edge_plus_lightweight_MoL/v1"},
+        },
+        "edge": {"output_dir": str(graph_dir)},
+    }
+    (graph_dir / "graph_builder_summary.json").write_text(json.dumps(summary_payload), encoding="utf-8")
+
+    schema_summary.write_schema_summary(graph_dir)
+    data = json.loads((graph_dir / "schema_summary.json").read_text())
+    registry = data.get("module_registry", {})
+    assert registry.get("topology", {}).get("id") == "topology/lightweight_MoL/v1"
+    assert registry.get("edge", {}).get("id") == "edge/edge_plus_lightweight_MoL/v1"

@@ -41,3 +41,16 @@ def test_config_templates_have_alias_and_desc():
     assert "alias" in edge_template and "Edge 16D" in edge_template["alias"]
     assert "summary" in edge_template and "Laplacian" in edge_template["summary"]
     assert "description" in edge_template and "0-10 A" in edge_template["description"]
+
+
+def test_laplacian_moments_slq_path_with_seed():
+    adj = np.array([[0.0, 1.0], [1.0, 0.0]], dtype=float)
+    config = LaplacianMomentConfig(size_threshold=0, estimator="slq", slq_probes=16, seed=123)
+    raw, centered = compute_laplacian_moments(adj, moment_orders=(1, 2, 3), config=config)
+    # SLQ estimates should be finite and roughly near exact values (1,2,4 for this graph)
+    assert all(np.isfinite(raw))
+    assert raw[0] > 0.5 and raw[0] < 1.5
+    assert raw[1] > 1.0 and raw[1] < 3.5
+    assert raw[2] > 2.0 and raw[2] < 7.0
+    # centered moments should be finite
+    assert all(np.isfinite(centered))
