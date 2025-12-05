@@ -56,12 +56,22 @@ Each module defines `_metadata = build_metadata(...)` with:
 Each module implements `validate_params` to coerce types/check ranges. `describe()` exposes metadata for listing/README generation. Registration is via `@register_feature_module` and `module_id`.
 
 ## Current Examples (by kind)
-- Interface: `interface/polar_cutoff/v1` – polar interface finder; params: `cutoff`, `coordinate_decimals`, `jobs`. Interface files include coordinates and are deterministically sorted; PDB warnings can be toggled via CLI (`--pdb-warnings`).
-- Topology: `topology/persistence_basic/v1` – per-residue persistent homology; params: `neighbor_distance`, `filtration_cutoff`, `min_persistence`, `dedup_sort`, `element_filters`, `jobs`. Can sort output; default element_filters tuples mirror the baseline (C/N/O combos).
-- Node: `node/dssp_topo_merge/v1` – merges DSSP with topology; params: `drop_na`, `jobs`. Depends on external `mkdssp`; node IDs are canonicalized/sorted; `drop_na` may remove rows.
+- Interface: `interface/polar_cutoff/v1` – polar interface finder; params: `cutoff`, `coordinate_decimals`, `jobs`. Interface files include coordinates and are deterministically sorted; PDB warnings can be toggled via CLI (`--pdb-warnings`). Cost grows with cutoff/residue count; jobs precedence: CLI --jobs > config default_jobs > module default.
+- Topology: `topology/persistence_basic/v1` – per-residue persistent homology; params: `neighbor_distance`, `filtration_cutoff`, `min_persistence`, `dedup_sort`, `element_filters`, `jobs`. Can sort output; default element_filters tuples mirror the baseline (C/N/O combos).  
+- Cost drivers: PH cost increases with larger `neighbor_distance`/`filtration_cutoff` and additional `element_filters`. `dedup_sort` improves determinism with minor overhead.  
+- Topology: `topology/persistence_laplacian_hybrid/v1` – PH 140D + Laplacian spectral block (default 32D). Params extend persistence_basic with Lap options (`lap_graph_mode`, `lap_distance_cutoff`/`lap_k_neighbors`/`lap_max_neighbors`, `lap_edge_weight` gaussian/inverse/binary with sigma, `lap_eigs_count`, `lap_heat_times`, `lap_moment_orders`, `lap_normalize`). Cost drivers: PH element_filters + Lap eigs_count/weights/normalize and neighborhood size (cutoff/kNN/max_neighbors).  
+- Topology: `topology/lightweight_MoL/v1` – PH 140D + 8D unweighted Lap moments (mu1-4, kappa2-4). Params: PH params plus `lap_k_neighbors`, `lap_max_neighbors`, `lap_size_threshold`, `lap_estimator` (exact/slq), `lap_slq_probes`, `lap_slq_steps` (compat), `lap_profile`. Cost drivers: PH filters/distances; Lap moment estimation depends on neighborhood size and estimator/SLQ probes. Default topo dim 148.  
+- Node: `node/dssp_topo_merge/v1` – merges DSSP with topology; params: `drop_na`, `jobs`. Depends on external `mkdssp`; node IDs are canonicalized/sorted; `drop_na` may remove rows. Default node_dim ≈ 32 DSSP + topology_dim (e.g., 172 with 140D PH); jobs precedence CLI --jobs > config default_jobs > module default.  
 - Edge:
+- Edge: `edge/legacy_band/v11` – 11D (distance + 10-bin histogram). Params: distance_min/max, scale_features, jobs. Cost: histogram per edge; scaling per graph. Dumps are resorted by edge_runner (src,dst,distance).
+- Edge: `edge/edge_plus_bal_agg_topo/v1` – legacy 11D histogram + topo concat/mean/abs-diff (+ optional norms/cosine/minmax). Params: distance_min/max, scale_histogram, include_norms/cosine, include_minmax, variant lean/heavy, jobs. Feature_dim scales with topology_dim; dumps resorted by edge_runner. Cost: histogram + aggregation proportional to topo_dim.  
+- Edge: `edge/edge_plus_min_agg_topo/v1` – legacy 11D histogram + topo concat/abs-diff (+ optional norms/cosine/minmax). Params: distance_min/max, scale_histogram, include_norms/cosine, include_minmax, variant lean/heavy, jobs. Feature_dim scales with topology_dim (default topo_dim≈140); dumps resorted by edge_runner.
+- Edge: `edge/edge_plus_pool_agg_topo/v1` – legacy 11D histogram + endpoint aggregation + pooled neighbor aggregation (k-nearest interface residues). Params: distance_min/max, scale_histogram (legacy block only), pool_k, include_norms/cosine, include_minmax, variant lean/heavy, jobs. Feature_dim scales with topology_dim; heavy adds min/max on endpoint+pooled blocks. Deterministic ordering (src,dst,distance); dumps resorted by edge_runner. Cost drivers: histogram + aggregation O(topo_dim) and pooled mean cost grows with pool_k and interface size.
+- Edge: `edge/edge_plus_lightweight_MoL/v1` – legacy 11D histogram + 5D Laplacian moments (mu1-3, kappa2, kappa3) on the induced bipartite pair neighborhood (0–10 Å window). Params: distance_min/max, scale_histogram, lap_size_threshold, lap_estimator exact/slq, lap_slq_probes/steps, lap_max_neighbors, lap_profile, jobs. Deterministic ordering; dumps resorted by edge_runner. Cost drivers: histogram + Lap moments on pair neighborhood; scales with interface size and lap_max_neighbors. Default dim: 16.
   - `edge/legacy_band/v11` – 11D histogram; params: `distance_min/max`, `scale_features`, `jobs`. Deterministic edge ordering by (src_idx, dst_idx, distance); optional edge CSV dumps.
   - Deregistered (reference only; not auto-registered): `edge/multi_scale_v24`, `edge/neo_v24`, `edge/legacy_plus_topo_pair` (relocated to `modules/edge/deregistered`).
+- Topology (new): `topology/standalone_MoL_replace_topology/v1` – PH-free Laplacian-only spectral topology; per-residue neighborhoods with unweighted/gaussian/inverse Laplacian, 24 eigs default (32 suggested richer), entropy, raw+centered moments, heat traces, Fiedler stats, Kirchhoff proxy; optional multi-scale radii (e.g., 6/8/10 Å) multiply the block. Defaults: unweighted, symmetric normalized, single-scale at neighbor_distance, size_threshold 80 for exact→SLQ.
+- Performance/guards: defaults to size_threshold 80 for exact→SLQ; `lap_max_neighbors` caps neighborhood size; degenerate/empty neighborhoods zero-fill. Add `lap_profile` if you want timing breadcrumbs.
 
 ## Pipeline Contract
 - Interface modules expose `extract_interfaces(...)`.
@@ -126,7 +136,8 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 
 ### Dimensionality guide (defaults)
 - Topology: `topology/persistence_basic/v1` → 140 dims; `topology/persistence_laplacian_hybrid/v1` → 172 dims (140 PH + 32 Laplacian).
-- Node: `node/dssp_topo_merge/v1` → 172 dims (32 DSSP/basic + 140 topology); `node/dssp_topo_merge_passthrough/v1` → 32 DSSP/basic + all topology columns (dynamic; e.g., 204 with hybrid topo).
+- Node: `node/dssp_topo_merge/v1` → 172 dims (32 DSSP/basic + 140 topology); `node/dssp_topo_merge_passthrough/v1` → 32 DSSP/basic + all topology columns (dynamic; e.g., 204 with hybrid topo). Sorting/determinism preserved; drop_na optional; jobs precedence: CLI --jobs > config default_jobs > module default.
+- Cost: DSSP + merge; sorting/determinism preserved; drop_na optional.  
 - Edge (assuming hybrid topology topo_dim=172; prepend 11D legacy histogram):
   - edge_plus_min_agg_lap_hybrid: lean 530 dims (11 + 3×172 + norms+cosine); heavy 874 dims (+min/max).
   - edge_plus_bal_agg_lap_hybrid: lean 702 dims (11 + 4×172 + norms+cosine); heavy 1,046 dims (+min/max).
@@ -134,10 +145,24 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 
 ## Upcoming lean Laplacian-moment modules (MoL)
 - Topology/lightweight_MoL/v1 (planned): keep 140D PH, add +8D unweighted Laplacian moments on cross-chain bipartite neighborhoods (cutoff default 8 A). Moments: mu1-4 and kappa2-4 (no per-eigen outputs; heat trace deferred). Unweighted normalized Laplacian; exact eigs when node_count <= size_threshold (default 80), otherwise SLQ (probes=8, steps=32). Metadata/feature_dim captured; deterministic sorting preserved. Suggested config template strings: alias "140D PH + 8D unweighted Lap moments (mu1-4, kappa2-4) = Topology 148D (lean MoL)"; summary "Persistent homology plus lean unweighted Laplacian moments per interface residue (no per-eigen outputs)"; description outlining cutoff 8 A, unweighted normalized Laplacian, exact→SLQ policy, and no heat trace in v1; # dim: 148.
-- Node passthrough: reuse `node/dssp_topo_merge_passthrough/v1` for arbitrary topology dims (no new alias planned).
+- Node passthrough: reuse `node/dssp_topo_merge_passthrough/v1` for arbitrary topology dims (no new alias planned). Cost: DSSP + merge + per-file scaling of topology columns.
 - Edge/edge_plus_lightweight_MoL/v1 (planned): prepend legacy 11D histogram; add +5D unweighted Laplacian moments on induced bipartite neighborhood of the residue pair (reuse 0-10 A window). Moments: mu1-3, kappa2, kappa3. Same exact→SLQ policy with size_threshold/probes/steps params; deterministic ordering and optional CSV dumps. Suggested config template strings: alias "Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)"; summary "Legacy histogram plus lean Laplacian moment context on the induced bipartite pair neighborhood (unweighted)"; description covering 0-10 A window, unweighted normalized Laplacian, exact→SLQ policy; # dim: 16.
 - Estimators: CBNE omitted in v1; SLQ/exact only. Size threshold and SLQ probes/steps are configurable params. Keep unweighted adjacency for stability/consistency.
 - Schema/metadata: ensure `feature_dim`, estimator params, and module ids surface in `graph_metadata.json` and `schema_summary.json` so training/inference auto-adapt; update feature-config templates to include defaults/comments for size thresholds and SLQ settings.
+
+## New module checklist
+- Register with clear `module_id`, alias, summary, description, defaults; keep params YAML-friendly with validation/coercion.
+- Ensure determinism: sorted IDs, lexicographic neighbor/edge ordering; respect `sort_artifacts` where applicable (interface/edge ordering always deterministic).
+- Populate metadata (feature_dim, params, variant) and ensure schema_summary/graph_metadata include new node/edge/topology dims/columns; topology columns are auto-extracted during edge stage and node_feature_columns mirrored.
+- Config templates: include alias/summary/description/# dim hints and helpful `param_comments` so `--create-feature-config --include-alternates` stays readable; ensure `--list-modules` (text/markdown/json) looks correct.
+- Edge dumps: honor `dump_path`; write src/dst/distance; let `edge_runner` sort dumps.
+- Dependencies/performance: document external deps (e.g., mkdssp), Bio.PDB warnings (`--pdb-warnings`), and cost drivers/tunable params for heavy modules.
+- Tests: cover param validation, feature_dim, deterministic ordering, branch behavior, CSV dumps (if any), metadata/listing/templates. Use `QTOPO_TEST_USE_REAL_DEPS`/`QTOPO_SKIP_MODULE_REGISTRY`/`QTOPO_ALLOW_MODULE_OVERRIDE` as needed.
+- Jobs precedence: leave `jobs` in params/defaults; framework resolves CLI `--jobs` > config `default_jobs` > module `jobs/auto`.
+- Determinism flag: `--no-sort-artifacts` only affects topology/node/edge CSV dumps; interface/edge ordering remains deterministic.
+- Logging/failure handling: wrap IO/parsing in try/except, record failures in stage `failures`, and use existing logging (avoid noisy prints).
+- CLI/config integration: wire new toggles through parser → feature selection → logging; document defaults vs overrides so users understand side effects.
+- Reuse/composition: prefer wrapping/extending existing modules and updating metadata/dims so downstream tools recognize new shapes.
 
 ## Aggregated-topology edge modules
 - Implemented: `edge_plus_min_agg_topo`, `edge_plus_bal_agg_topo`, `edge_plus_pool_agg_topo` (lean + heavy variants). Each prepends the legacy 11‑D histogram and keeps deterministic edge ordering; heavy variants add min/max blocks.

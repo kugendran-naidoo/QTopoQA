@@ -370,7 +370,7 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
         metadata: Dict[str, Any] = {
             "edge_count": int(edge_index.shape[0]),
             "feature_dim": feature_dim,
-            "edge_feature_variant": "edge_plus_pool_agg_topo/lean",
+            "edge_feature_variant": f"edge_plus_pool_agg_topo/{variant}",
             "variant": variant,
             "topology_feature_dim": topo_dim,
             "include_norms": bool(include_norms),
@@ -435,13 +435,20 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
     def config_template(cls) -> Dict[str, object]:
         base = super().config_template()
         param_comments = {
-            "variant": "lean or heavy",
+            "distance_min": "Cα distance window start; edges with distance <= min are skipped",
+            "distance_max": "Cα distance window end; edges with distance >= max are skipped",
+            "scale_histogram": "scale only the legacy 11D (distance + 10-bin) block across each graph",
+            "pool_k": "nearest interface residues pooled per endpoint (default 5); larger k increases cost/feature coupling",
+            "include_norms": "add L2 norms of endpoint and pooled topo vectors",
+            "include_cosine": "add cosine similarities for endpoint and pooled topo vectors",
+            "variant": "lean or heavy; heavy adds min/max blocks to both endpoint and pooled aggs",
             "include_minmax": "heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg",
-            "pool_k": "number of nearest interface residues to pool per endpoint (default 5)",
+            "jobs": "honors CLI --jobs > config defaults > module jobs; edge ordering deterministic (src,dst,distance); dumps resorted by edge_runner",
         }
         params = dict(cls._metadata.defaults)
         heavy_params = dict(params)
         heavy_params.update({"variant": "heavy", "include_minmax": True})
+        dim_hint = "# dim (lean): 11 + endpoint(4*topo_dim + norms + cosine) + pooled(4*topo_dim + norms + cosine); heavy adds +2*topo_dim per block"
         return {
             "module": cls.module_id,
             "alias": cls.default_alias,
@@ -449,6 +456,7 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
             "description": cls._metadata.description,
             "params": params,
             "param_comments": param_comments,
+            "dim_hint": dim_hint,
             "alternates": [
                 {
                     "module": cls.module_id,
@@ -457,6 +465,7 @@ class EdgePlusPoolAggTopoModule(EdgeFeatureModule):
                     "param_comments": param_comments,
                     "summary": cls._metadata.summary,
                     "description": cls._metadata.description,
+                    "dim_hint": "# dim (heavy): lean dim + 4*topo_dim (min/max on endpoint + pooled)",
                 }
             ],
         }

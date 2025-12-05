@@ -24,6 +24,10 @@ from ...lib.laplacian_moments import (
     compute_laplacian_moments,
 )
 
+PH_DIM_DEFAULT = 140  # 7 element filters * (f0 5 stats + f1 15 stats)
+LAP_DIM_DEFAULT = 8  # num_nodes + mu1-4 + kappa2-4
+FEATURE_DIM_DEFAULT = PH_DIM_DEFAULT + LAP_DIM_DEFAULT
+
 
 def _parse_interface_file(path: Path) -> List[InterfaceResidue]:
     residues: List[InterfaceResidue] = []
@@ -175,6 +179,14 @@ class TopologyLightweightMoLModule(TopologyFeatureModule):
         }
         template["summary"] = cls._metadata.summary
         template["description"] = cls._metadata.description
+        template.setdefault("notes", {})
+        template["notes"].update(
+            {
+                "feature_dim_ph_default": PH_DIM_DEFAULT,
+                "feature_dim_lap_default": LAP_DIM_DEFAULT,
+                "feature_dim_total_default": FEATURE_DIM_DEFAULT,
+            }
+        )
         return template
 
     @classmethod

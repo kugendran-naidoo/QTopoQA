@@ -81,6 +81,15 @@ class DefaultInterfaceModule(InterfaceFeatureModule):
     def config_template(cls) -> Dict[str, object]:
         template = super().config_template()
         comments = dict(template.get("param_comments", {}))
-        comments["coordinate_decimals"] = "skip rounding to keep raw coords"
+        comments["cutoff"] = "Distance cutoff in Å for interface detection (cost grows with larger cutoff)"
+        comments["jobs"] = "Optional override; CLI --jobs takes precedence"
+        comments["coordinate_decimals"] = "Decimal places for coords; set -1 to skip rounding"
         template["param_comments"] = comments
+        template.setdefault("notes", {})
+        template["notes"].update(
+            {
+                "determinism": "Interface ordering is deterministic; no randomness.",
+                "jobs_precedence": "CLI --jobs > config default_jobs > module default.",
+            }
+        )
         return template

@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 OUTPUT="output/MoL_edge_10A"
 FEATURE_FILE="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.MoL_edge_10A"
 
-DATASET_DIR="${REPO_ROOT}/datasets/training/adjusted/Dockground_MAF2"
+DATASET_DIR="${REPO_ROOT}/datasets/training/adjusted/smaller_pilot_batch_Dockground_MAF2"
 WORK_DIR="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/${OUTPUT}/work"
 GRAPH_DIR="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/${OUTPUT}/graph_data"
 LOG_DIR="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/logs_${OUTPUT}"

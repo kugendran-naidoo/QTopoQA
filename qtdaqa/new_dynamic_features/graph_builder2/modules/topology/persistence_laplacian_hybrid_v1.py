@@ -21,6 +21,10 @@ from ...lib.progress import StageProgress
 from ...lib.topology_runner import _INTERFACE_DESCRIPTOR_RE
 from ...lib.new_topological_features import compute_features_for_residues, ResidueDescriptor, TopologicalConfig
 
+PH_DIM_DEFAULT = 140  # 7 element filters * (f0 5 stats + f1 15 stats)
+LAP_DIM_DEFAULT = 32  # lap_num_nodes + eigs (16) + 7 stats + entropy + 4 moments + 3 heat traces
+FEATURE_DIM_DEFAULT = PH_DIM_DEFAULT + LAP_DIM_DEFAULT
+
 
 def _parse_interface_file(path: Path) -> List[InterfaceResidue]:
     residues: List[InterfaceResidue] = []
@@ -387,6 +391,14 @@ class PersistenceLaplacianHybridModule(TopologyFeatureModule):
         param_comments.setdefault("lap_max_neighbors", "cap neighborhood size (includes target residue)")
         template["param_comments"] = param_comments
         template["alias"] = cls.default_alias
+        template.setdefault("notes", {})
+        template["notes"].update(
+            {
+                "feature_dim_ph_default": PH_DIM_DEFAULT,
+                "feature_dim_lap_default": LAP_DIM_DEFAULT,
+                "feature_dim_total_default": FEATURE_DIM_DEFAULT,
+            }
+        )
         return template
 
     @classmethod

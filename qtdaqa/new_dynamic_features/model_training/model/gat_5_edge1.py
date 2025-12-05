@@ -218,6 +218,24 @@ class GNN_edge1_edgepooling(pl.LightningModule):
                 raise ValueError(f"Edge feature dimension mismatch: expected {self.edge_dim}, got {edge_attr.size(-1)}")
 
             edge_attr = edge_embed(edge_attr)
+
+            # Determine graph count for pooling/padding
+            num_graphs = int(batch.max().item()) + 1 if batch is not None and batch.numel() > 0 else 0
+            edge_size = num_graphs
+            # Pool with explicit size and pad to match node pools when edges are missing
+            def _pool_edges(tensor, index):
+                # tensor is edge_attr after embedding
+                if tensor.numel() == 0 or index.numel() == 0 or edge_size == 0:
+                    feat_dim = tensor.size(-1) if tensor.dim() >= 2 else self.edge_dim
+                    return torch.zeros((edge_size, feat_dim), dtype=x.dtype, device=x.device)
+                if self.pooling_type == 'add':
+                    return global_add_pool(tensor, index, size=edge_size)
+                if self.pooling_type == 'mean':
+                    return global_mean_pool(tensor, index, size=edge_size)
+                if self.pooling_type == 'max':
+                    return global_max_pool(tensor, index, size=edge_size)
+                return global_add_pool(tensor, index, size=edge_size)
+
             x,edge_attr=protein_gat1(x,edge_index,edge_attr)
             # print(edge_attr.shape)
             x=torch.nn.functional.elu(x)
@@ -226,21 +244,19 @@ class GNN_edge1_edgepooling(pl.LightningModule):
             x=torch.nn.functional.elu(x)
             edge_attr=torch.nn.functional.elu(edge_attr)
 
-            
-            
-            edge_batch_index = batch[edge_index[0]]
+            edge_batch_index = batch[edge_index[0]] if edge_index is not None else batch.new_zeros((edge_attr.size(0),), dtype=torch.long)
 
 
             if self.pooling_type == 'add':
-                x = global_add_pool(x,batch)
-                edge_attr = global_add_pool(edge_attr,edge_batch_index)
+                x = global_add_pool(x,batch,size=num_graphs)
+                edge_attr = _pool_edges(edge_attr,edge_batch_index)
             elif self.pooling_type == 'mean':
-                x = global_mean_pool(x,batch)
-                edge_attr = global_mean_pool(edge_attr,edge_batch_index)
+                x = global_mean_pool(x,batch,size=num_graphs)
+                edge_attr = _pool_edges(edge_attr,edge_batch_index)
 
             elif self.pooling_type == 'max':
-                x = global_max_pool(x,batch)
-                edge_attr = global_max_pool(edge_attr,edge_batch_index)
+                x = global_max_pool(x,batch,size=num_graphs)
+                edge_attr = _pool_edges(edge_attr,edge_batch_index)
                 return x,edge_attr
             
 
@@ -251,6 +267,20 @@ class GNN_edge1_edgepooling(pl.LightningModule):
                     dtype=x.dtype,
                     device=x.device,
                 )
+            # Pad or trim pooled edges to align with pooled node rows
+            if edge_attr.size(0) != x.size(0):
+                rows = x.size(0)
+                feat_dim = edge_attr.size(1) if edge_attr.dim() > 1 else self.fc_edge.in_features
+                if edge_attr.size(0) < rows:
+                    pad = torch.zeros(
+                        rows - edge_attr.size(0),
+                        feat_dim,
+                        dtype=edge_attr.dtype,
+                        device=edge_attr.device,
+                    )
+                    edge_attr = torch.cat([edge_attr, pad], dim=0)
+                else:
+                    edge_attr = edge_attr[:rows]
 
             edge_attr = self.fc_edge(edge_attr)
             x_edge = torch.cat((x,edge_attr),dim=1)

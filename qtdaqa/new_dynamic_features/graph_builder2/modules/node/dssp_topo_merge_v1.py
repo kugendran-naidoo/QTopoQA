@@ -7,6 +7,9 @@ from ..base import NodeFeatureModule, build_metadata, require_bool, require_posi
 from ..registry import register_feature_module
 from ...lib import node_runner
 
+NODE_BASE_DIM = 32  # DSSP/basic features
+TOPO_DIM_HINT = 140  # default PH topo_dim
+FEATURE_DIM_HINT = NODE_BASE_DIM + TOPO_DIM_HINT
 
 @register_feature_module
 class DSSPTopologyNodeModule(NodeFeatureModule):
@@ -65,10 +68,17 @@ class DSSPTopologyNodeModule(NodeFeatureModule):
     @classmethod
     def config_template(cls) -> Dict[str, object]:
         template = super().config_template()
-        comments = dict(template.get("param_comments", {}))
-        comments["drop_na"] = (
-            "matches fea_df_clean = fea_df.dropna() in both inference_model.py and "
-            "k_mac_inference_pca_tsne4.py"
-        )
+        comments = {
+            "drop_na": "Drop rows with NA after merge (default on); matches fea_df_clean behavior in inference.",
+            "jobs": "Optional worker override (CLI --jobs takes precedence over config/module default).",
+        }
         template["param_comments"] = comments
+        template.setdefault("notes", {})
+        template["notes"].update(
+            {
+                "feature_dim_hint": f"{NODE_BASE_DIM} DSSP + topo_dim (default topo_dim ~{TOPO_DIM_HINT} → node_dim ~{FEATURE_DIM_HINT})",
+                "determinism": "Merge preserves deterministic ordering when sort_artifacts is enabled.",
+                "jobs_precedence": "CLI --jobs > config default_jobs > module default.",
+            }
+        )
         return template

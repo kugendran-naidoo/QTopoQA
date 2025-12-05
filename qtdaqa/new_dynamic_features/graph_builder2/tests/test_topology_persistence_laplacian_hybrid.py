@@ -14,6 +14,11 @@ def test_metadata_and_defaults():
     assert meta.module_id == "topology/persistence_laplacian_hybrid/v1"
     assert module.default_alias == "140D topology + 32D Laplacian"
     assert module._feature_dim == 172
+    tmpl = PersistenceLaplacianHybridModule.config_template()
+    notes = tmpl.get("notes", {})
+    assert notes.get("feature_dim_total_default") == 172
+    assert notes.get("feature_dim_ph_default") == 140
+    assert notes.get("feature_dim_lap_default") == 32
 
 
 def test_validate_params_rejects_bad_graph_mode():
@@ -24,6 +29,22 @@ def test_validate_params_rejects_bad_graph_mode():
         pass
     else:
         raise AssertionError("Expected ValueError for invalid lap_graph_mode")
+
+
+def test_validate_params_rejects_bad_weight():
+    params = {"lap_edge_weight": "bad"}
+    try:
+        PersistenceLaplacianHybridModule.validate_params(params)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Expected ValueError for invalid lap_edge_weight")
+
+
+def test_validate_params_accepts_defaults():
+    params = dict(PersistenceLaplacianHybridModule._metadata.defaults)
+    # Should not raise
+    PersistenceLaplacianHybridModule.validate_params(params)
 
 
 def test_generate_topology_combines_ph_and_lap(monkeypatch, tmp_path):

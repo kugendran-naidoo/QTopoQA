@@ -18,6 +18,10 @@ from ..base import (
 )
 from ..registry import register_feature_module
 
+# For convenience in templates/notes; actual dim depends on topology_feature_dim and params.
+DEFAULT_TOPO_DIM_HINT = 140  # persistence_basic PH block
+HIST_DIM = 11  # distance + 10-bin histogram
+
 
 def _atom_coordinates(residue) -> np.ndarray:
     coords = []
@@ -309,13 +313,24 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
     def config_template(cls) -> Dict[str, object]:
         base = super().config_template()
         base_params = dict(base.get("params", {}))
-        param_comments = dict(base.get("param_comments", {}))
-        param_comments.setdefault("include_minmax", "heavy variant only; adds per-dimension min/max blocks")
-        param_comments.setdefault("variant", "lean or heavy")
-        base["param_comments"] = param_comments
+        param_comments = {
+            "distance_min": "Minimum Cα distance (Å); must be < distance_max",
+            "distance_max": "Maximum Cα distance (Å) to include an edge (default 10.0 Å)",
+            "scale_histogram": "MinMax scale only the legacy distance+histogram block (default on)",
+            "include_norms": "Include L2 norms of endpoint topology vectors (default on)",
+            "include_cosine": "Include cosine similarity between endpoint topology vectors (default on)",
+            "include_minmax": "heavy variant only; adds per-dimension min/max blocks",
+            "variant": "lean (default) or heavy (adds min/max block)",
+            "jobs": "Optional worker override (CLI --jobs takes precedence)",
+        }
 
         heavy_params = dict(base_params)
         heavy_params.update({"variant": "heavy", "include_minmax": True})
+        notes = {
+            "expected_topology_dim": DEFAULT_TOPO_DIM_HINT,
+            "feature_dim_formula": "hist=11 + agg=(3*topo_dim [+2*topo_dim if heavy & include_minmax] + (include_norms?2:0) + (include_cosine?1:0))",
+            "dump_sorting": "edge dumps are sorted by edge_runner (src,dst,distance)",
+        }
         return {
             "module": cls.module_id,
             "alias": cls.default_alias,
@@ -323,12 +338,14 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
             "description": cls._metadata.description,
             "params": base_params,
             "param_comments": param_comments,
+            "notes": notes,
             "alternates": [
                 {
                     "module": cls.module_id,
                     "alias": cls.default_alias,
                     "params": heavy_params,
                     "param_comments": param_comments,
+                    "notes": notes,
                     "summary": cls._metadata.summary,
                     "description": cls._metadata.description,
                 }

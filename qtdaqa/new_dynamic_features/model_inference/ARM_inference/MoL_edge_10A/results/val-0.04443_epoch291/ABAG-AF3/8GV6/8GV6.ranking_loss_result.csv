@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+8GV6 m* = 0.706
+8GV6 m^ = 0.586
+8GV6 ranking loss = 0.120
+
+8GV6,fold_8gv6_4_model_1,0.55862337,0.706
+8GV6,fold_8gv6_2_model_2,0.66519225,0.586

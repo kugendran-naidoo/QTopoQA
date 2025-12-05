@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+4M5Z hit rate =  10/10/0
+
+4M5Z,model_2_multimer_20220423_154353,0.63482153,0.554
+4M5Z,ranked_3,0.47370699,0.568
+4M5Z,model_4_multimer_20220423_928474,0.47370699,0.568
+4M5Z,model_5_multimer_20220423_154353,0.46907216,0.548
+4M5Z,model_2_multimer_20220423_746165,0.41312236,0.56
+4M5Z,model_5_multimer_20220423_746165,0.35622242,0.555
+4M5Z,ranked_4,0.30386257,0.669
+4M5Z,model_3_multimer_20220423_928474,0.30386257,0.669
+4M5Z,model_3_multimer_20220423_849432,0.29545653,0.776
+4M5Z,ranked_2,0.28530502,0.578

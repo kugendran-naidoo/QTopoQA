@@ -17,6 +17,8 @@ from ..base import (
 )
 from ..registry import register_feature_module
 
+FEATURE_DIM = 11  # distance + 10-bin histogram
+
 
 def _atom_coordinates(residue) -> np.ndarray:
     coords = []
@@ -63,6 +65,25 @@ class LegacyEdgeModuleV11(EdgeFeatureModule):
         },
         defaults={"distance_min": 0.0, "distance_max": 10.0, "scale_features": True, "jobs": 16},
     )
+
+    @classmethod
+    def config_template(cls) -> Dict[str, object]:
+        params = dict(cls._metadata.defaults)
+        param_comments = {
+            "distance_min": "Minimum Cα distance (Å) to include an edge; must be < distance_max",
+            "distance_max": "Maximum Cα distance (Å) to include an edge (default 10.0 Å)",
+            "scale_features": "MinMax scale distance+histogram columns per graph (default on)",
+            "jobs": "Optional override for worker count (CLI --jobs takes precedence)",
+        }
+        return {
+            "module": cls.module_id,
+            "alias": cls.default_alias,
+            "summary": cls._metadata.summary,
+            "description": cls._metadata.description,
+            "params": params,
+            "param_comments": param_comments,
+            "notes": {"feature_dim": FEATURE_DIM, "dump_sorting": "edge dumps are sorted by edge_runner"},
+        }
 
     def build_edges(
         self,
