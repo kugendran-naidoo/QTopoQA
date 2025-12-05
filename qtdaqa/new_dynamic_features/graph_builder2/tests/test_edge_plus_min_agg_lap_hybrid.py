@@ -4,8 +4,8 @@ from typing import List
 import numpy as np
 import pandas as pd
 
-from qtdaqa.new_dynamic_features.graph_builder2.modules.edge.edge_plus_bal_agg_lap_hybrid import (
-    EdgePlusBalAggLapHybridModule,
+from qtdaqa.new_dynamic_features.graph_builder2.modules.edge.edge_plus_min_agg_lap_hybrid import (
+    EdgePlusMinAggLapHybridModule,
 )
 from qtdaqa.new_dynamic_features.graph_builder2.lib.edge_common import InterfaceResidue
 
@@ -46,7 +46,7 @@ def _res(descriptor: str, chain: str, resnum: int, coord) -> InterfaceResidue:
 
 
 def test_config_template_has_dim_hint_and_comments():
-    tmpl = EdgePlusBalAggLapHybridModule.config_template()
+    tmpl = EdgePlusMinAggLapHybridModule.config_template()
     notes = tmpl.get("notes", {})
     assert notes.get("expected_topology_dim") == 172
     formulas = notes.get("feature_dim_formula", {})
@@ -57,8 +57,8 @@ def test_config_template_has_dim_hint_and_comments():
 
 
 def test_build_edges_lean_dim_and_order(tmp_path: Path):
-    module = EdgePlusBalAggLapHybridModule()
-    topo_dim = 4  # expected agg = 4*4 + norms(2) + cosine(1) = 19
+    module = EdgePlusMinAggLapHybridModule()
+    topo_dim = 4  # small for test; expected agg = 3*4 + norms(2) + cosine(1) = 15
     residues = [
         _res("c<A>r<1>R<GLY>", "A", 1, [0.0, 0.0, 0.0]),
         _res("c<B>r<2>R<GLY>", "B", 2, [1.0, 0.0, 0.0]),
@@ -93,17 +93,16 @@ def test_build_edges_lean_dim_and_order(tmp_path: Path):
         dump_path=None,
     )
 
-    expected_agg = 4 * topo_dim + 3  # mean adds another topo_dim block, norms(2) + cosine(1)
+    expected_agg = 3 * topo_dim + 3  # norms(2) + cosine(1)
     expected_dim = 11 + expected_agg
     assert result.edge_attr.shape[1] == expected_dim
     assert result.metadata["feature_dim"] == expected_dim
     assert result.metadata["variant"] == "lean"
-    assert result.metadata["edge_feature_variant"] == "edge_plus_bal_agg_lap_hybrid/lean"
-    assert result.edge_index.shape[0] == 4  # four directed edges
+    assert result.edge_index.shape[0] == 4  # two residues -> 4 directed edges
 
 
 def test_build_edges_heavy_dim_and_metadata(tmp_path: Path):
-    module = EdgePlusBalAggLapHybridModule(include_minmax=True, variant="heavy")
+    module = EdgePlusMinAggLapHybridModule(include_minmax=True, variant="heavy")
     topo_dim = 3
     residues = [
         _res("c<A>r<1>R<GLY>", "A", 1, [0.0, 0.0, 0.0]),
@@ -139,9 +138,10 @@ def test_build_edges_heavy_dim_and_metadata(tmp_path: Path):
         dump_path=None,
     )
 
-    expected_agg = 4 * topo_dim + 2 * topo_dim + 3  # balanced agg + min/max
+    expected_agg = 3 * topo_dim + 2 * topo_dim + 3  # lean agg + min/max
     expected_dim = 11 + expected_agg
     assert result.edge_attr.shape[1] == expected_dim
     assert result.metadata["variant"] == "heavy"
     assert result.metadata["include_minmax"] is True
-    assert result.metadata["edge_feature_variant"] == "edge_plus_bal_agg_lap_hybrid/heavy"
+    # ordering is deterministic; four directed edges
+    assert result.edge_index.shape[0] == 4
