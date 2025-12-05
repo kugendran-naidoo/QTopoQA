@@ -255,7 +255,7 @@ class EdgePlusMinAggTopoModule(EdgeFeatureModule):
         metadata: Dict[str, Any] = {
             "edge_count": int(edge_index.shape[0]),
             "feature_dim": feature_dim,
-            "edge_feature_variant": "edge_plus_min_agg_topo/lean",
+            "edge_feature_variant": f"edge_plus_min_agg_topo/{variant}",
             "variant": variant,
             "topology_feature_dim": topo_dim,
             "include_norms": bool(include_norms),

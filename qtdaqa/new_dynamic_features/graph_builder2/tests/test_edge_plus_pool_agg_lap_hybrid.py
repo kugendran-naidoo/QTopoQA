@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from qtdaqa.new_dynamic_features.graph_builder2.lib.edge_common import InterfaceResidue
 from qtdaqa.new_dynamic_features.graph_builder2.modules.edge.edge_plus_pool_agg_lap_hybrid import (
@@ -151,3 +152,38 @@ def test_edge_plus_pool_agg_lap_hybrid_heavy_minmax(tmp_path):
     assert result.metadata["variant"] == "heavy"
     assert result.metadata["include_minmax"] is True
     assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_lap_hybrid/heavy"
+
+
+def test_edge_plus_pool_agg_lap_hybrid_param_validation():
+    with pytest.raises(ValueError):
+        EdgePlusPoolAggLapHybridModule.validate_params({"variant": "bogus"})
+
+
+def test_edge_plus_pool_agg_lap_hybrid_dim_expected_topo172(tmp_path):
+    # build two residues with topology vectors length 172 to check dim math
+    topo_dim = 172
+    residues, id_to_index = _build_residues()
+    structure = _DummyStructure()
+    node_df = pd.DataFrame({"ID": [res.descriptor for res in residues], "feat": [1.0, 2.0, 3.0]})
+    # simple topo vectors of length 172
+    vec = list(range(1, topo_dim + 1))
+    topo_vectors = [vec, vec, vec]
+    topology_path = _write_topology(tmp_path, node_df["ID"].tolist(), topo_vectors)
+
+    module = EdgePlusPoolAggLapHybridModule(scale_histogram=False, pool_k=1, variant="heavy", include_minmax=True)
+    result = module.build_edges(
+        model_key="test_model",
+        residues=residues,
+        id_to_index=id_to_index,
+        structure=structure,
+        node_df=node_df,
+        interface_path=Path("iface"),
+        topology_path=topology_path,
+        node_path=Path("node"),
+        pdb_path=Path("pdb"),
+        dump_path=None,
+    )
+    expected_dim = 11 + (12 * topo_dim + 6)  # heavy: two blocks each (6*topo_dim + 3)
+    assert result.edge_attr.shape[1] == expected_dim
+    assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_lap_hybrid/heavy"
+    assert result.edge_index.shape[0] == result.edge_attr.shape[0]

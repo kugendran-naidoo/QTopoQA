@@ -60,6 +60,7 @@ class EdgePlusPoolAggLapHybridModule(EdgePlusPoolAggTopoModule):
             "Legacy 11D Edge + 1382D {(hist + endpoint agg + pooled agg) from 172D laplacian_hybrid} = Edge 1393D (Lean) | "
             "Legacy 11D Edge + 2070D {(hist + endpoint agg + pooled agg + minmax) from laplacian_hybrid} = Edge 2081D (Heavy)"
         )
+        dim_hint = "# dim (lean): 11 + endpoint(4*topo_dim + norms + cosine) + pooled(4*topo_dim + norms + cosine); heavy adds +2*topo_dim per block. E.g., topo_dim=172 -> lean 1393, heavy 2081."
         return {
             "module": cls.module_id,
             "alias": cls.default_alias,
@@ -67,6 +68,7 @@ class EdgePlusPoolAggLapHybridModule(EdgePlusPoolAggTopoModule):
             "description": cls._metadata.description,
             "params": params,
             "param_comments": param_comments,
+            "dim_hint": dim_hint,
             "notes": {
                 "expected_topology_dim": 172,
                 "feature_dim_formula": {
@@ -80,6 +82,7 @@ class EdgePlusPoolAggLapHybridModule(EdgePlusPoolAggTopoModule):
                 "alias": heavy_alias,
                 "params": heavy_params,
                 "param_comments": param_comments,
+                "dim_hint": dim_hint,
                 "summary": cls._metadata.summary,
                 "description": cls._metadata.description,
                 "notes": {
