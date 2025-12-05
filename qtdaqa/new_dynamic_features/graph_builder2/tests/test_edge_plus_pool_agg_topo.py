@@ -158,3 +158,30 @@ def test_edge_plus_pool_agg_topo_heavy_includes_minmax(tmp_path):
     assert result.edge_attr.shape[1] == expected_dim
     assert result.metadata["variant"] == "heavy"
     assert result.metadata["include_minmax"] is True
+    assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_topo/heavy"
+    # Sorted by (src, dst, distance)
+    assert result.edge_index.tolist() == [[0, 1], [0, 2], [1, 0], [2, 0]]
+
+
+def test_edge_plus_pool_agg_topo_template_has_dim_hint_and_comments():
+    template = EdgePlusPoolAggTopoModule.config_template()
+    comments = template["param_comments"]
+    required_comments = [
+        "distance_min",
+        "distance_max",
+        "scale_histogram",
+        "pool_k",
+        "include_norms",
+        "include_cosine",
+        "variant",
+        "include_minmax",
+        "jobs",
+    ]
+    for key in required_comments:
+        assert key in comments
+    assert "dim_hint" in template
+    # heavy alternate should carry dim hint and variant flag
+    alternates = template.get("alternates", [])
+    assert alternates, "expected heavy alternate in template"
+    assert "dim_hint" in alternates[0]
+    assert alternates[0]["params"]["variant"] == "heavy"

@@ -14,6 +14,8 @@ from ..base import (
 from ..registry import register_feature_module
 from ...lib import topology_runner
 
+FEATURE_DIM = 140  # persistent homology block (f0/f1 stats across element filters)
+
 
 @register_feature_module
 class PersistenceTopologyModule(TopologyFeatureModule):
@@ -121,3 +123,24 @@ class PersistenceTopologyModule(TopologyFeatureModule):
         jobs = params.get("jobs")
         if jobs is not None:
             params["jobs"] = require_positive_int(jobs, "topology.params.jobs")
+
+    @classmethod
+    def config_template(cls) -> Dict[str, object]:
+        params = dict(cls._metadata.defaults)
+        param_comments = {
+            "neighbor_distance": "Neighbourhood radius (Å) for building complexes; default 8.0",
+            "filtration_cutoff": "Max filtration value (Å); cost grows with larger cutoff (default 8.0)",
+            "min_persistence": "Minimum persistence to keep (default 0.01)",
+            "dedup_sort": "Deduplicate/sort persistence pairs for determinism; may add slight cost",
+            "element_filters": "List of element subsets (e.g., C/N/O combos); more filters = higher cost",
+            "jobs": "Optional override for worker count",
+        }
+        return {
+            "module": cls.module_id,
+            "alias": cls.default_alias,
+            "summary": cls._metadata.summary,
+            "description": cls._metadata.description,
+            "params": params,
+            "param_comments": param_comments,
+            "notes": {"feature_dim": FEATURE_DIM},
+        }

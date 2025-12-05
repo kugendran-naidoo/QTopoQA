@@ -321,6 +321,10 @@ def load_graph_feature_metadata(
             builder_block = _extract_builder_info(payload)
             if _should_update_builder(metadata.builder, builder_block):
                 metadata.builder = builder_block
+            # Inline module registry (newer graph_metadata) for summary/schema reconstruction
+            inline_registry = payload.get("_module_registry")
+            if isinstance(inline_registry, dict) and inline_registry:
+                metadata.module_registry = inline_registry
             raw_entries = {
                 key: value
                 for key, value in payload.items()

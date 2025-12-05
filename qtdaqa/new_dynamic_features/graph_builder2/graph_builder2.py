@@ -1097,6 +1097,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         edge_dump_dir=edge_dump_dir,
         builder_info=builder_info,
         sort_artifacts=sort_artifacts,
+        module_registry=summary.get("modules"),
     )
     summary["edge"] = edge_result
     graph_stage_elapsed = time.perf_counter() - graph_stage_start

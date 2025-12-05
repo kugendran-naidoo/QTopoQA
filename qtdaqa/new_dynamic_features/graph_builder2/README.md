@@ -186,6 +186,26 @@ edge:
 #     lap_slq_steps: 32
 #     lap_profile: false
 #     jobs: 16
+# topology (PH-free Laplacian-only replacement):
+#   module: topology/standalone_MoL_replace_topology/v1  # alias: Laplacian-only spectral topology (32 eigs, entropy+Fiedler+Kirchhoff, multi-scale 6/8/10 Å)
+#   params:
+#     neighbor_distance: 8.0        # single-scale when lap_multi_radii=null
+#     lap_multi_radii: [6.0, 8.0, 10.0]  # default multi-scale; set null for single-scale
+#     lap_weight: unweighted        # or gaussian (sigma=cutoff/2), inverse
+#     lap_normalize: sym            # or rw
+#     lap_eigs_count: 32            # 24 for leaner/faster
+#     lap_heat_times: [0.1, 1.0, 5.0]
+#     lap_include_entropy: true
+#     lap_include_fiedler: true
+#     lap_include_kirchhoff: true
+#     lap_use_centered_moments: true
+#     lap_k_neighbors: null
+#     lap_max_neighbors: 128
+#     lap_estimator: exact
+#     lap_size_threshold: 80
+#     lap_slq_probes: 8
+#     lap_slq_steps: 32
+#     jobs: 16
 # edge:
 #   module: edge/edge_plus_lightweight_MoL/v1  # alias: Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)
 #   params:
@@ -285,6 +305,7 @@ For each run you’ll find:
   - `edge_plus_min_agg_lap_hybrid` lean: 530 dims (11 hist + 3×172 + norms+cosine); heavy: 874 dims (+min/max).
   - `edge_plus_bal_agg_lap_hybrid` lean: 702 dims (11 hist + 4×172 + norms+cosine); heavy: 1,046 dims (+min/max).
   - `edge_plus_pool_agg_lap_hybrid` lean: 1,393 dims (11 hist + endpoint agg + pooled agg); heavy: 2,081 dims (+min/max in both blocks).
+- Laplacian-only topology (no PH): `topology/standalone_MoL_replace_topology/v1` → 55 dims single-scale (32 eigs, entropy, centered moments, Fiedler, Kirchhoff); multi-scale default [6/8/10 Å] → 165 dims (3× block). 24 eigs is a leaner/faster variant.
 - `log_dir/graph_builder_summary.json` – run summary (module selections, job
   counts, success/failure tallies) plus stage logs for debugging.
 
@@ -305,6 +326,10 @@ embedded in training checkpoints.
 - **Need to inspect modules/params** – use `--list-modules`. Each entry lists
   the default parameters and descriptions so you can craft custom configs
   without digging through the source.
+- **Laplacian modules (performance/guards)** – neighborhoods are capped by
+  `lap_max_neighbors`; size_threshold controls exact→SLQ; degenerate/empty
+  neighborhoods zero-fill. Enable `lap_profile` to log per-block timing if
+  needed.
 
 ---
 
@@ -326,6 +351,12 @@ modules or defaults change.
 
 - Keep outputs deterministic: sort rows when artifact sorting is enabled, and use lexicographic tie-breakers for any neighbor selection.
 - Provide sensible defaults, aliases, and clear summaries/descriptions so `--list-modules` and `--create-feature-config` remain informative.
-- Validate parameters and keep them YAML-friendly; expose param comments via `config_template`.
-- Record feature dimensions in metadata and keep CSV outputs ID-first; ensure new modules appear in listings/templates.
-- Add unit tests to lock in feature_dim, ordering, and validation before relying on new modules in pipelines.
+- Validate parameters and keep them YAML-friendly; expose param comments via `config_template`. Include `# dim` hints and alternates so `--include-alternates` output stays readable.
+- Record feature dimensions in metadata and keep CSV outputs ID-first; ensure new modules appear in listings/templates and in `schema_summary.json`/`graph_metadata.json`.
+- Edge dumps: honor `dump_path`; write src/dst/distance; `edge_runner` will sort dumps when enabled.
+- Sorting: interface/edge ordering is always deterministic; `--no-sort-artifacts` only affects topology/node/edge CSV dumps.
+- Dependencies/performance: document external deps (e.g., `mkdssp`), Bio.PDB warnings (`--pdb-warnings`), and cost drivers/tunable params for heavier modules.
+- Add unit tests to lock in feature_dim, ordering, branch behavior, and validation before relying on new modules in pipelines. Use `QTOPO_TEST_USE_REAL_DEPS`/`QTOPO_SKIP_MODULE_REGISTRY`/`QTOPO_ALLOW_MODULE_OVERRIDE` flags as needed in tests.
+- Jobs precedence: leave `jobs` in params/defaults; framework resolves CLI `--jobs` > config `default_jobs` > module `jobs/auto`.
+- Schema summary: topology columns are auto-extracted during the edge stage (when topology CSVs exist) and node_feature_columns are mirrored into `schema_summary.json`; if modules add explicit columns, ensure these surface consistently.
+- CLI/config integration: wire new toggles through parser → feature selection → logging; document defaults vs overrides so users understand side effects.

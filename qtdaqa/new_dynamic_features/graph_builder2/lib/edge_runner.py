@@ -180,6 +180,7 @@ def run_edge_stage(
     edge_dump_dir: Optional[Path] = None,
     builder_info: Optional[Dict[str, object]] = None,
     sort_artifacts: bool = True,
+    module_registry: Optional[Dict[str, object]] = None,
 ) -> Dict[str, object]:
     log_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -264,8 +265,30 @@ def run_edge_stage(
         metadata_records["_builder"] = builder_metadata_full
 
     metadata_path = output_dir / "graph_metadata.json"
-    metadata_path.write_text(json.dumps(metadata_records, indent=2, sort_keys=True), encoding="utf-8")
+    # Ensure topology_columns.json exists before capturing schema
     _write_topology_columns_file(topology_dir, output_dir)
+    # Populate optional registry/schema hints for downstream consumers
+    topo_columns_path = output_dir / "topology_columns.json"
+    topo_schema: Dict[str, object] = {}
+    if topo_columns_path.exists():
+        try:
+            topo_cols = json.loads(topo_columns_path.read_text(encoding="utf-8"))
+            if isinstance(topo_cols, list):
+                topo_schema["columns"] = topo_cols
+                topo_schema["dim"] = max(0, len(topo_cols) - 1)  # subtract ID column
+        except Exception:
+            topo_schema = {}
+    if topo_schema:
+        metadata_records["_topology_schema"] = topo_schema
+    # Surface edge schema/dim for downstream consumers (graph_metadata + schema_summary)
+    if edge_module is not None:
+        metadata_records["edge_module"] = edge_module.metadata().module_id
+    if edge_dim is not None:
+        metadata_records["edge_feature_dim"] = edge_dim
+        metadata_records["_edge_schema"] = {"dim": edge_dim, "module": metadata_records.get("edge_module")}
+    if module_registry:
+        metadata_records["_module_registry"] = module_registry
+    metadata_path.write_text(json.dumps(metadata_records, indent=2, sort_keys=True), encoding="utf-8")
     write_schema_summary(output_dir)
 
     elapsed = time.perf_counter() - start

@@ -214,6 +214,7 @@ class EdgePlusLightweightMoLModule(EdgeFeatureModule):
             "lap_estimator": estimator,
             "lap_slq_probes": slq_probes,
             "lap_slq_steps": slq_steps,
+            "lap_max_neighbors": max_neighbors,
         }
         if lap_profile:
             metadata["lap_profile"] = True
@@ -296,11 +297,16 @@ class EdgePlusLightweightMoLModule(EdgeFeatureModule):
         base["summary"] = cls._metadata.summary
         base["description"] = cls._metadata.description
         param_comments = dict(base.get("param_comments", {}))
+        param_comments.setdefault("distance_min", "Cα distance window start; edges with distance <= min are skipped")
+        param_comments.setdefault("distance_max", "Cα distance window end; edges with distance >= max are skipped")
+        param_comments.setdefault("scale_histogram", "Scale only the legacy 11D (distance + 10-bin) block across each graph")
         param_comments.setdefault("lap_size_threshold", "Node-count threshold for switching from exact eigs to SLQ (default 80)")
         param_comments.setdefault("lap_estimator", "exact (default) or slq")
         param_comments.setdefault("lap_slq_probes", "Probe vectors for SLQ (default 8)")
         param_comments.setdefault("lap_slq_steps", "Lanczos steps placeholder (default 32; kept for compatibility)")
         param_comments.setdefault("lap_max_neighbors", "Cap neighborhood size for Laplacian context (includes endpoints)")
         param_comments.setdefault("lap_profile", "Profile Laplacian moment wall time (writes to metadata)")
+        param_comments.setdefault("jobs", "Honors CLI --jobs > config default_jobs > module jobs; edge ordering deterministic; dumps resorted by edge_runner")
         base["param_comments"] = param_comments
+        base["dim_hint"] = "# dim: 11 legacy histogram + 5 Lap moments = 16 (lean)"
         return base

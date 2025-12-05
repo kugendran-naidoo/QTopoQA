@@ -55,6 +55,18 @@ def write_schema_summary(graph_dir: Path) -> Path | None:
                 # Keep a breadcrumb to the graph metadata path for debugging.
                 metadata.metadata_path = str((graph_dir / "graph_metadata.json").resolve())
                 LOG.debug("schema_summary fallback traceback:\n%s", traceback.format_exc())
+        # Guard: if module_registry is missing or partial, try pulling it directly from graph_metadata.json
+        if metadata.metadata_path:
+            try:
+                raw = json.loads(Path(metadata.metadata_path).read_text(encoding="utf-8"))
+                inline_registry = raw.get("_module_registry")
+                if isinstance(inline_registry, dict) and inline_registry:
+                    if (not metadata.module_registry) or (
+                        len(inline_registry) > len(metadata.module_registry)
+                    ):
+                        metadata.module_registry = inline_registry
+            except Exception as exc:  # pragma: no cover - best effort
+                LOG.warning("Unable to read _module_registry from %s: %s", metadata.metadata_path, exc)
         # Fallback: if module_registry is empty, try to load co-located graph_builder_summary.json
         if not metadata.module_registry:
             builder_summary = graph_dir / "graph_builder_summary.json"
@@ -94,6 +106,15 @@ def write_schema_summary(graph_dir: Path) -> Path | None:
         topo_cols = _load_topology_columns(graph_dir)
         if topo_cols is not None:
             payload["topology_columns"] = topo_cols
+        # Mirror edge dim if available
+        edge_dim = None
+        try:
+            edge_dim = metadata.edge_schema.get("dim") if hasattr(metadata, "edge_schema") else None
+        except Exception:
+            edge_dim = None
+        if edge_dim is not None:
+            payload.setdefault("edge_schema", {}).setdefault("dim", edge_dim)
+            payload["edge_feature_dim"] = edge_dim
         summary_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         LOG.info("Schema summary written to %s", summary_path)
         return summary_path

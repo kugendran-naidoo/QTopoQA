@@ -1,4 +1,4 @@
-export GRAPH_DIR=MoL_edge_10A
+export GRAPH_DIR=topoqa_10A
 
 echo "Generating graph-dir manifest for ${GRAPH_DIR} ..."
 

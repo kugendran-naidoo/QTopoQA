@@ -1,0 +1,65 @@
+# Auto-generated feature-config template
+# Pick one module per required stage. Edit parameter values as needed.
+# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.
+defaults:
+  jobs: 16  # Optional global worker override; remove if unused.
+
+# REQUIRED stage: interface
+interface:
+  module: interface/polar_cutoff/v1  # alias: n x 3D TopoQA default 10A cutoff
+  alias: "residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA"
+  summary: "Polar interface detection using distance cutoff."
+  description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1  # skip rounding to keep raw coords
+    jobs: 16
+
+
+# OPTIONAL stage: topology
+topology:
+  module: topology/standalone_MoL_replace_topology/v1  # alias: Laplacian-only spectral topology (32 eigs, entropy+Fiedler+Kirchhoff, multi-scale 6/8/10 Å)
+  alias: "Laplacian-only spectral topology (32 eigs, entropy+Fiedler+Kirchhoff, multi-scale 6/8/10 \u00c5)"
+  summary: "Per-residue Laplacian spectral features (no PH): eigen blocks, stats, moments, heat traces, Fiedler, Kirchhoff; multi-scale defaults to 6/8/10 \u00c5."
+  description: "Builds Laplacian neighborhoods on interface residues and emits spectral summaries only (no persistent homology). Defaults to unweighted symmetric normalized Laplacian, 32 smallest nonzero eigenvalues, entropy, raw+centered moments, heat traces, Fiedler stats, and a Kirchhoff proxy. Defaults to multi-scale radii (6/8/10 \u00c5) to match or exceed PH richness; set lap_multi_radii=null for single-scale."
+  params:
+    neighbor_distance: 8.0  # single-scale cutoff (Å) when lap_multi_radii is null; default 8.0
+    lap_multi_radii: [6.0, 8.0, 10.0]  # multi-scale cutoffs; default [6.0, 8.0, 10.0] to concatenate 3 blocks; set null for single-scale
+    lap_k_neighbors: null  # optional deterministic k-NN cap; null uses distance cutoff only
+    lap_max_neighbors: 128  # hard cap on neighborhood size (includes target); guards cost
+    lap_estimator: exact  # exact for small neighborhoods; slq for faster moments when node_count > size_threshold
+    lap_size_threshold: 80  # switch to SLQ when node_count exceeds this
+    lap_slq_probes: 8  # SLQ probes (higher = more accurate, slower)
+    lap_slq_steps: 32  # SLQ Lanczos steps (higher = more accurate, slower)
+    lap_weight: unweighted  # unweighted (stable) default; gaussian uses sigma=cutoff/2; inverse = 1/d
+    lap_sigma: null  # only for gaussian weight; default to cutoff/2 when unset
+    lap_normalize: sym  # sym (default) or rw Laplacian
+    lap_eigs_count: 32  # default 32 for richness; 24 for leaner/faster
+    lap_heat_times: [0.1, 1.0, 5.0]  # heat trace times; shorter=local, longer=global
+    lap_include_entropy: true  # add spectral entropy (on by default)
+    lap_include_fiedler: true  # add Fiedler vector stats (on by default)
+    lap_include_kirchhoff: true  # add Kirchhoff/effective resistance proxy (on by default)
+    lap_use_centered_moments: true  # include centered moments k2-4 (on by default)
+    jobs: 16
+
+# REQUIRED stage: node
+node:
+  module: node/dssp_topo_merge_passthrough/v1  # alias: Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims
+  alias: "Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims"
+  summary: "DSSP/basic features merged with all topology columns (passthrough)."
+  description: "Runs DSSP/basic feature extraction and merges with the provided topology CSV using all non-ID topology columns (no hardcoded list). Topology columns are MinMax scaled per file; output columns ordered as ID, DSSP/basic 32D, then topology columns in file order. Suitable for hybrid topology (PH+Lap) or any dynamic topo layout."
+  params:
+    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 16
+
+# REQUIRED stage: edge
+edge:
+  module: edge/legacy_band/v11
+  alias: "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA"
+  summary: "11D legacy edge features (distance + atom distance histogram)."
+  description: "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1]."
+  params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_features: true
+    jobs: 16

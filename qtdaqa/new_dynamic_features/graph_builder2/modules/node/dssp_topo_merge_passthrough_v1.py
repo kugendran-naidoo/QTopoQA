@@ -13,6 +13,8 @@ from ...lib.progress import StageProgress
 from ...lib.node_utils import canonical_id_order
 from ...lib import node_features
 
+NODE_BASE_DIM = 32  # DSSP/basic block
+TOPO_DIM_HINT = 140  # default PH topo dim (dynamic in practice)
 
 @register_feature_module
 class DSSPTopologyMergePassthrough(NodeFeatureModule):
@@ -207,10 +209,16 @@ class DSSPTopologyMergePassthrough(NodeFeatureModule):
     def config_template(cls) -> Dict[str, object]:
         template = super().config_template()
         template["alias"] = cls.default_alias
-        param_comments = dict(template.get("param_comments", {}))
-        param_comments.setdefault(
-            "drop_na",
-            "matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py",
+        template["param_comments"] = {
+            "drop_na": "Drop rows with NA after merge (default on); aligns with inference cleaning.",
+            "jobs": "Optional worker override (CLI --jobs takes precedence).",
+        }
+        template.setdefault("notes", {})
+        template["notes"].update(
+            {
+                "feature_dim_hint": f"dynamic: {NODE_BASE_DIM} DSSP + topo_dim (e.g., ~{NODE_BASE_DIM + TOPO_DIM_HINT} with 140D PH)",
+                "determinism": "Merge preserves deterministic ordering when sort_artifacts is enabled.",
+                "jobs_precedence": "CLI --jobs > config default_jobs > module default.",
+            }
         )
-        template["param_comments"] = param_comments
         return template

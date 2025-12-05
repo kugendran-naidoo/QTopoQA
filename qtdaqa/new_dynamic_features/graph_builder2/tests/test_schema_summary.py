@@ -247,3 +247,84 @@ def test_schema_summary_captures_lightweight_mol_registry(tmp_path: Path) -> Non
     registry = data.get("module_registry", {})
     assert registry.get("topology", {}).get("id") == "topology/lightweight_MoL/v1"
     assert registry.get("edge", {}).get("id") == "edge/edge_plus_lightweight_MoL/v1"
+
+
+def test_schema_summary_captures_persistence_laplacian_hybrid(tmp_path: Path) -> None:
+    graph_dir = tmp_path / "graph_data"
+    graph_dir.mkdir()
+    (graph_dir / "graph_metadata.json").write_text("{}", encoding="utf-8")
+
+    summary_payload = {
+        "modules": {
+            "interface": {"id": "interface/polar_cutoff/v1"},
+            "topology": {"id": "topology/persistence_laplacian_hybrid/v1"},
+            "node": {"id": "node/dssp_topo_merge_passthrough/v1"},
+            "edge": {"id": "edge/legacy_band/v11"},
+        },
+        "edge": {"output_dir": str(graph_dir)},
+    }
+    (graph_dir / "graph_builder_summary.json").write_text(json.dumps(summary_payload), encoding="utf-8")
+
+    schema_summary.write_schema_summary(graph_dir)
+    data = json.loads((graph_dir / "schema_summary.json").read_text())
+    registry = data.get("module_registry", {})
+    assert registry.get("topology", {}).get("id") == "topology/persistence_laplacian_hybrid/v1"
+    assert registry.get("edge", {}).get("id") == "edge/legacy_band/v11"
+
+
+def test_schema_summary_merges_inline_module_registry(tmp_path: Path, monkeypatch) -> None:
+    graph_dir = tmp_path / "graph_data"
+    graph_dir.mkdir()
+
+    # graph_metadata carries a complete _module_registry, loader returns partial
+    inline_registry = {
+        "interface": {"id": "interface/polar_cutoff/v1"},
+        "topology": {"id": "topology/standalone_MoL_replace_topology/v1"},
+        "node": {"id": "node/dssp_topo_merge_passthrough/v1"},
+        "edge": {"id": "edge/legacy_band/v11"},
+    }
+    graph_meta = {"_module_registry": inline_registry}
+    meta_path = graph_dir / "graph_metadata.json"
+    meta_path.write_text(json.dumps(graph_meta), encoding="utf-8")
+
+    class PartialMeta:
+        def __init__(self):
+            self.edge_schema = {}
+            self.node_schema = {}
+            self.module_registry = {"edge": {"id": "edge/legacy_band/v11"}}
+            self.metadata_path = str(meta_path)
+            self.summary_path = None
+            self.notes = []
+            self.sample_graph = None
+            self.sample_edge_count = None
+            self.sample_node_count = None
+            self.builder = None
+
+        def to_dict(self):
+            return {
+                "edge_schema": self.edge_schema,
+                "node_schema": self.node_schema,
+                "module_registry": self.module_registry,
+                "metadata_path": self.metadata_path,
+                "summary_path": self.summary_path,
+                "notes": self.notes,
+                "sample_graph": self.sample_graph,
+                "sample_edge_count": self.sample_edge_count,
+                "sample_node_count": self.sample_node_count,
+                "builder": self.builder,
+            }
+
+    def fake_loader(path: Path, **kwargs):
+        assert path == graph_dir
+        return PartialMeta()
+
+    monkeypatch.setattr(schema_summary, "load_graph_feature_metadata", fake_loader)
+
+    schema_summary.write_schema_summary(graph_dir)
+    data = json.loads((graph_dir / "schema_summary.json").read_text())
+    registry = data.get("module_registry", {})
+    # Should be upgraded from edge-only to full inline registry
+    assert registry.get("interface", {}).get("id") == "interface/polar_cutoff/v1"
+    assert registry.get("topology", {}).get("id") == "topology/standalone_MoL_replace_topology/v1"
+    assert registry.get("node", {}).get("id") == "node/dssp_topo_merge_passthrough/v1"
+    assert registry.get("edge", {}).get("id") == "edge/legacy_band/v11"
