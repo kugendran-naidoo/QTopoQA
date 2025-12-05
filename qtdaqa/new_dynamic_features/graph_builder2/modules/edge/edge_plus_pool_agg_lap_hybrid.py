@@ -44,9 +44,15 @@ class EdgePlusPoolAggLapHybridModule(EdgePlusPoolAggTopoModule):
         params = dict(cls._metadata.defaults)
         param_comments = {
             "note": "Use with topology/persistence_laplacian_hybrid/v1 (172D PH+Lap).",
-            "variant": "lean or heavy",
+            "distance_min": "Cα distance window start; edges with distance <= min are skipped",
+            "distance_max": "Cα distance window end; edges with distance >= max are skipped",
+            "scale_histogram": "Scale only the legacy 11D (distance + 10-bin) block across each graph",
+            "pool_k": "Nearest interface residues pooled per endpoint (default 5); larger k increases cost",
+            "include_norms": "Add L2 norms of endpoint and pooled topology vectors (PH+Lap 172D)",
+            "include_cosine": "Add cosine similarities for endpoint and pooled topology vectors",
+            "variant": "lean or heavy; heavy adds per-dimension min/max blocks to endpoint and pooled agg",
             "include_minmax": "heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg",
-            "pool_k": "number of nearest interface residues to pool per endpoint (default 5)",
+            "jobs": "Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner",
         }
         heavy_params = dict(params)
         heavy_params.update({"variant": "heavy", "include_minmax": True})
@@ -61,6 +67,13 @@ class EdgePlusPoolAggLapHybridModule(EdgePlusPoolAggTopoModule):
             "description": cls._metadata.description,
             "params": params,
             "param_comments": param_comments,
+            "notes": {
+                "expected_topology_dim": 172,
+                "feature_dim_formula": {
+                    "lean": "11 + endpoint(4*topo_dim + norms + cosine) + pooled(4*topo_dim + norms + cosine) => 1393 when topo_dim=172",
+                    "heavy": "lean + 2*topo_dim per block (endpoint + pooled) => 2081 when topo_dim=172",
+                },
+            },
             "alternates": [
             {
                 "module": cls.module_id,
@@ -69,6 +82,20 @@ class EdgePlusPoolAggLapHybridModule(EdgePlusPoolAggTopoModule):
                 "param_comments": param_comments,
                 "summary": cls._metadata.summary,
                 "description": cls._metadata.description,
+                "notes": {
+                    "expected_topology_dim": 172,
+                    "feature_dim_formula": {
+                        "lean": "11 + endpoint(4*topo_dim + norms + cosine) + pooled(4*topo_dim + norms + cosine) => 1393 when topo_dim=172",
+                        "heavy": "lean + 2*topo_dim per block (endpoint + pooled) => 2081 when topo_dim=172",
+                    },
+                },
             }
         ]
         }
+
+    def build_edges(self, *args, **kwargs):
+        result = super().build_edges(*args, **kwargs)
+        variant = self.params.get("variant", "lean")
+        # clarify variant namespace for lap_hybrid
+        result.metadata["edge_feature_variant"] = f"edge_plus_pool_agg_lap_hybrid/{variant}"
+        return result

@@ -110,14 +110,14 @@ def test_edge_plus_pool_agg_lap_hybrid_shapes(tmp_path):
 
     assert result.edge_index.shape[0] == result.edge_attr.shape[0]
     assert result.edge_attr.shape[1] == expected_dim
-    assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_topo/lean"
+    assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_lap_hybrid/lean"
     assert result.metadata["variant"] == "lean"
     assert result.metadata["pool_k"] == 1
     assert result.metadata["feature_dim"] == expected_dim
     assert result.metadata["topology_feature_dim"] == topo_dim
     assert result.metadata["include_norms"] is True
     assert result.metadata["include_cosine"] is True
-    assert module.default_alias == "11D Legacy + hybrid topo (PH+Lap 172D)"
+    assert "Edge 1393D" in module.default_alias
 
 
 def test_edge_plus_pool_agg_lap_hybrid_heavy_minmax(tmp_path):
@@ -150,3 +150,4 @@ def test_edge_plus_pool_agg_lap_hybrid_heavy_minmax(tmp_path):
     assert result.edge_attr.shape[1] == expected_dim
     assert result.metadata["variant"] == "heavy"
     assert result.metadata["include_minmax"] is True
+    assert result.metadata["edge_feature_variant"] == "edge_plus_pool_agg_lap_hybrid/heavy"

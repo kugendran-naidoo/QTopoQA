@@ -379,6 +379,7 @@ def _process_task(
             "edge_module": module_id,
             "edge_params": edge_module.params,
             "edge_info": edge_metadata,
+            "edge_feature_dim": feature_dim,
         }
         if builder_metadata:
             data.metadata["builder"] = builder_metadata
