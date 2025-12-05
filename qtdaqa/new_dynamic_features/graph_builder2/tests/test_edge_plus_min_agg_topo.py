@@ -110,6 +110,7 @@ def test_build_edges_leans_variant_feature_dim_and_order(tmp_path: Path):
     # feature dim = hist 11 + agg (3*topo_dim + norms 2 + cosine 1) = 11 + (12+3)=26
     assert result.edge_attr.shape[1] == HIST_DIM + (3 * topo_dim + 3)
     assert result.metadata["feature_dim"] == result.edge_attr.shape[1]
+    assert result.metadata["edge_feature_variant"] == "edge_plus_min_agg_topo/lean"
     # deterministic ordering: two residues => 4 directed edges; distances identical
     assert result.edge_index.shape[0] == 4
     assert np.all(result.edge_attr[:, 0] == result.edge_attr[0, 0])
@@ -158,3 +159,4 @@ def test_build_edges_heavy_includes_minmax(tmp_path: Path):
     assert result.edge_attr.shape[1] == HIST_DIM + expected_agg
     assert result.metadata["variant"] == "heavy"
     assert result.metadata["include_minmax"] is True
+    assert result.metadata["edge_feature_variant"] == "edge_plus_min_agg_topo/heavy"

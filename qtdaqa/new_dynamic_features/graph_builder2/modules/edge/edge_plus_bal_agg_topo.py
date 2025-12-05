@@ -319,13 +319,14 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
             "include_cosine": "Include cosine similarity between endpoint topology vectors (default on)",
             "include_minmax": "heavy variant only; adds per-dimension min/max blocks",
             "variant": "Aggregation variant: lean (default) or heavy (adds min/max block)",
-            "jobs": "Optional worker override (CLI --jobs takes precedence)",
+            "jobs": "Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner",
         }
         notes = {
             "expected_topology_dim": DEFAULT_TOPO_DIM_HINT,
-            "feature_dim_formula": "hist=11 + agg=(4*topo_dim [+2*topo_dim if heavy & include_minmax] + (include_norms?2:0) + (include_cosine?1:0))",
+            "feature_dim_formula": "hist=11 + agg=(4*topo_dim [+2*topo_dim if heavy & include_minmax] + (include_norms?2:0) + (include_cosine?1:0)); e.g., topo_dim=140 -> lean 702, heavy 1046",
             "dump_sorting": "edge dumps are sorted by edge_runner (src,dst,distance)",
         }
+        dim_hint = "# dim (lean): 11 + 4*topo_dim + norms + cosine; heavy adds +2*topo_dim (min/max). E.g., topo_dim=140 -> lean 702, heavy 1046."
         heavy_params = dict(params)
         heavy_params.update({"variant": "heavy", "include_minmax": True})
         return {
@@ -335,6 +336,7 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
             "description": cls._metadata.description,
             "params": params,
             "param_comments": param_comments,
+            "dim_hint": dim_hint,
             "notes": notes,
             "alternates": [
                 {
@@ -342,6 +344,7 @@ class EdgePlusBalAggTopoModule(EdgeFeatureModule):
                     "alias": cls.default_alias,
                     "params": heavy_params,
                     "param_comments": param_comments,
+                    "dim_hint": dim_hint,
                     "notes": notes,
                     "summary": cls._metadata.summary,
                     "description": cls._metadata.description,

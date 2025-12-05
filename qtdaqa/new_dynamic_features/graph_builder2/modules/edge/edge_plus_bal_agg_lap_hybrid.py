@@ -66,6 +66,7 @@ class EdgePlusBalAggLapHybridModule(EdgePlusBalAggTopoModule):
             "description": cls._metadata.description,
             "params": params,
             "param_comments": param_comments,
+            "dim_hint": "# dim (lean): 11 + 4*topo_dim + norms + cosine; heavy adds +2*topo_dim (min/max). E.g., topo_dim=172 -> lean 702, heavy 1046.",
             "notes": {
                 "expected_topology_dim": 172,
                 "feature_dim_formula": {
@@ -79,6 +80,7 @@ class EdgePlusBalAggLapHybridModule(EdgePlusBalAggTopoModule):
                 "alias": heavy_alias,
                 "params": heavy_params,
                 "param_comments": param_comments,
+                "dim_hint": "# dim (lean): 11 + 4*topo_dim + norms + cosine; heavy adds +2*topo_dim (min/max). E.g., topo_dim=172 -> lean 702, heavy 1046.",
                 "summary": cls._metadata.summary,
                 "description": cls._metadata.description,
                 "notes": {
