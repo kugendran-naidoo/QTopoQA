@@ -226,7 +226,7 @@ total = 0
 min_edges = None
 max_edges = None
 for key, entry in data.items():
-    if key.startswith("_"):
+    if key.startswith("_") or not isinstance(entry, dict) or "edge_metadata" not in entry:
         continue
     total += 1
     cnt = (entry.get("edge_metadata") or {}).get("edge_count", 0)
