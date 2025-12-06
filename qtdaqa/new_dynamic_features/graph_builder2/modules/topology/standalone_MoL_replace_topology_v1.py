@@ -17,7 +17,7 @@ from ..base import (
 )
 from ..registry import register_feature_module
 from ...lib.progress import StageProgress
-from ...lib.topology_runner import _INTERFACE_DESCRIPTOR_RE
+from ...lib.topology_runner import _INTERFACE_DESCRIPTOR_RE, round_topology_frame
 from ...lib.edge_common import InterfaceResidue
 from ...lib.laplacian_moments import (
     LaplacianMomentConfig,
@@ -397,6 +397,7 @@ class StandaloneMoLReplaceTopologyModule(TopologyFeatureModule):
         work_dir: Path,
         log_dir: Path,
         sort_artifacts: bool = True,
+        round_decimals: Optional[int] = None,
     ):
         topology_dir = work_dir / "topology"
         topology_dir.mkdir(parents=True, exist_ok=True)
@@ -435,7 +436,7 @@ class StandaloneMoLReplaceTopologyModule(TopologyFeatureModule):
             if worker_count <= 1:
                 for pdb_path, iface_path, output_path, log_path in tasks:
                     ok, failure = self._process_single(
-                        pdb_path, iface_path, output_path, log_path, sort_artifacts=sort_artifacts
+                        pdb_path, iface_path, output_path, log_path, sort_artifacts=sort_artifacts, round_decimals=round_decimals
                     )
                     if ok:
                         success += 1
@@ -447,7 +448,15 @@ class StandaloneMoLReplaceTopologyModule(TopologyFeatureModule):
 
                 with ProcessPoolExecutor(max_workers=worker_count) as executor:
                     future_map = {
-                        executor.submit(self._process_single, pdb_path, iface_path, output_path, log_path, sort_artifacts): (
+                        executor.submit(
+                            self._process_single,
+                            pdb_path,
+                            iface_path,
+                            output_path,
+                            log_path,
+                            sort_artifacts,
+                            round_decimals,
+                        ): (
                             pdb_path,
                             log_path,
                         )
@@ -484,6 +493,7 @@ class StandaloneMoLReplaceTopologyModule(TopologyFeatureModule):
         output_path: Path,
         log_path: Path,
         sort_artifacts: bool = True,
+        round_decimals: Optional[int] = None,
     ) -> Tuple[bool, Tuple[Path, Path, str] | None]:
         residues = _parse_interface_file(interface_path)
         if not residues:
@@ -498,6 +508,7 @@ class StandaloneMoLReplaceTopologyModule(TopologyFeatureModule):
             df.insert(0, "ID", df.index)
             if sort_artifacts and "ID" in df.columns:
                 df = df.sort_values(by=["ID"], kind="mergesort").reset_index(drop=True)
+            round_topology_frame(df, round_decimals)
             df.to_csv(output_path, index=False)
             log_lines = [
                 f"PDB: {pdb_path}",

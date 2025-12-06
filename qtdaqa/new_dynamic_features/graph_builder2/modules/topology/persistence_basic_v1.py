@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, Sequence, Tuple
+from typing import Any, Dict, Iterable, Sequence, Tuple, Optional
 
 from ..base import (
     TopologyFeatureModule,
@@ -67,6 +67,7 @@ class PersistenceTopologyModule(TopologyFeatureModule):
         work_dir: Path,
         log_dir: Path,
         sort_artifacts: bool = True,
+        round_decimals: Optional[int] = None,
     ):
         params = self.params
         element_filters: Sequence[Sequence[str]] = tuple(tuple(x) for x in params["element_filters"])
@@ -83,6 +84,7 @@ class PersistenceTopologyModule(TopologyFeatureModule):
             dedup_sort=bool(params["dedup_sort"]),
             jobs=params.get("jobs"),
             sort_artifacts=sort_artifacts,
+            round_decimals=round_decimals,
         )
 
     @classmethod

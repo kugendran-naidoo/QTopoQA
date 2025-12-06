@@ -13,6 +13,29 @@ from .new_topological_features import (
 )
 from .progress import StageProgress
 
+def round_topology_frame(frame, decimals: Optional[int]) -> None:
+    """
+    In-place rounding for topology DataFrames (keeps ID column untouched).
+
+    Args:
+        frame: pandas DataFrame with an ID column.
+        decimals: integer precision; None or negative disables rounding.
+    """
+    if decimals is None:
+        return
+    try:
+        dec = int(decimals)
+    except (TypeError, ValueError):
+        return
+    if dec < 0:
+        return
+    if "ID" not in frame.columns:
+        return
+    numeric_cols = [col for col in frame.columns if col != "ID"]
+    if not numeric_cols:
+        return
+    frame[numeric_cols] = frame[numeric_cols].round(dec)
+
 _INTERFACE_DESCRIPTOR_RE = re.compile(
     r"^c<(?P<chain>[^>]+)>r<(?P<res>-?\d+)>(?:i<(?P<ins>[^>]+)>)?R<(?P<resname>[^>]+)>$"
 )
@@ -62,6 +85,7 @@ def run_topology_stage(
     dedup_sort: bool = False,
     jobs: Optional[int] = None,
     sort_artifacts: bool = True,
+    round_decimals: Optional[int] = None,
 ) -> Dict[str, object]:
     topology_dir = work_dir / "topology"
     topology_dir.mkdir(parents=True, exist_ok=True)
@@ -106,7 +130,14 @@ def run_topology_stage(
         if worker_count <= 1:
             for pdb_path, interface_path, output_path, log_path in tasks:
                 success += _process_single_topology_task(
-                    pdb_path, interface_path, output_path, log_path, config, failures, sort_artifacts=sort_artifacts
+                    pdb_path,
+                    interface_path,
+                    output_path,
+                    log_path,
+                    config,
+                    failures,
+                    sort_artifacts=sort_artifacts,
+                    round_decimals=round_decimals,
                 )
                 progress.increment()
         else:
@@ -119,6 +150,7 @@ def run_topology_stage(
                         output_path,
                         config,
                         sort_artifacts,
+                        round_decimals,
                     ): (
                         pdb_path,
                         interface_path,
@@ -176,6 +208,7 @@ def _process_single_topology_task(
     config: TopologicalConfig,
     failures: List[Tuple[Path, Path, str]],
     sort_artifacts: bool = True,
+    round_decimals: Optional[int] = None,
 ) -> int:
     descriptors, error = _load_interface_descriptors(interface_path)
     if error:
@@ -187,6 +220,7 @@ def _process_single_topology_task(
         frame = compute_features_for_residues(pdb_path, descriptors, config)
         if sort_artifacts and "ID" in frame.columns:
             frame = frame.sort_values(by=["ID"], kind="mergesort").reset_index(drop=True)
+        round_topology_frame(frame, round_decimals)
         frame.to_csv(output_path, index=False)
         log_path.write_text(
             "\n".join(
@@ -213,6 +247,7 @@ def _process_topology_in_subprocess(
     output_path: Path,
     config: TopologicalConfig,
     sort_artifacts: bool = True,
+    round_decimals: Optional[int] = None,
 ) -> Dict[str, object]:
     descriptors, error = _load_interface_descriptors(interface_path)
     if error:
@@ -220,5 +255,6 @@ def _process_topology_in_subprocess(
     frame = compute_features_for_residues(pdb_path, descriptors, config)
     if sort_artifacts and "ID" in frame.columns:
         frame = frame.sort_values(by=["ID"], kind="mergesort").reset_index(drop=True)
+    round_topology_frame(frame, round_decimals)
     frame.to_csv(output_path, index=False)
     return {"residue_count": len(descriptors), "error": None}

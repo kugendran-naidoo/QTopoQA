@@ -65,6 +65,8 @@ _TEMPLATE_DEFAULTS = {
     "node": "node/dssp_topo_merge/v1",
     "edge": "edge/legacy_band/v11",
 }
+_ROUNDING_SENTINEL = -1
+_ROUNDING_MAX = 15
 
 def _json_default(obj):
     if isinstance(obj, Path):
@@ -112,6 +114,20 @@ def _resolve_edge_dump_dir(work_dir: Path, cli_dir: Optional[Path], config_dir: 
     else:
         candidate = work_dir / "edge_features"
     return candidate.expanduser().resolve()
+
+
+def _resolve_round_decimals(value: Optional[object]) -> Optional[int]:
+    if value is None:
+        return None
+    try:
+        dec = int(value)
+    except (TypeError, ValueError):
+        raise ValueError("options.topology_round_decimals must be an integer.")
+    if dec == _ROUNDING_SENTINEL:
+        return None
+    if dec < 0 or dec > _ROUNDING_MAX:
+        raise ValueError(f"options.topology_round_decimals must be between 0 and {_ROUNDING_MAX}, or {_ROUNDING_SENTINEL} to disable.")
+    return dec
 
 
 def _write_text_summary(
@@ -649,6 +665,11 @@ def _render_feature_config_template(
     lines.append("# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.")
     lines.append("defaults:")
     lines.append("  jobs: 16  # Optional global worker override; remove if unused.")
+    lines.append("")
+    lines.append("options:")
+    lines.append(
+        "  # topology_round_decimals: 12  # Round topology numeric columns to N decimals (0-15); -1 or omit to disable (recommended 12 when enabling)."
+    )
 
     kind_order = _ordered_kinds(modules_by_kind.keys())
 
@@ -904,9 +925,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     _setup_logging(run_info)
     configure_pdb_parser(bool(getattr(args, "pdb_warnings", False)))
 
+    round_decimals: Optional[int] = None
     try:
         selection = _resolve_feature_config(args)
         _validate_feature_selection(selection)
+        round_decimals = _resolve_round_decimals(selection.options.get("topology_round_decimals"))
+        if selection.options.get("topology_round_decimals") is not None:
+            selection.options["topology_round_decimals"] = (
+                _ROUNDING_SENTINEL if round_decimals is None else round_decimals
+            )
     except Exception as exc:
         message = f"Feature configuration invalid: {exc}"
         LOG.error(message)
@@ -968,6 +995,10 @@ def main(argv: Optional[List[str]] = None) -> int:
         "Artifact CSV sorting: %s (interface ordering always deterministic)",
         "enabled" if sort_artifacts else "disabled via --no-sort-artifacts",
     )
+    if round_decimals is None:
+        LOG.info("Topology rounding: disabled (set options.topology_round_decimals to enable)")
+    else:
+        LOG.info("Topology rounding: enabled (decimals=%d)", round_decimals)
 
     pdb_files = sorted(dataset_dir.rglob("*.pdb"))
     if not pdb_files:
@@ -1020,6 +1051,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     LOG.info("Interface feature extraction elapsed time: %.2f s", interface_result.get("elapsed", 0.0))
 
     LOG.info("Beginning topology stage (jobs=%s)", topology_jobs)
+    if round_decimals is not None:
+        LOG.info("Topology rounding: enabled (decimals=%d)", round_decimals)
     topology_result = topology_module.generate_topology(
         pdb_paths=pdb_files,
         dataset_dir=dataset_dir,
@@ -1027,6 +1060,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         work_dir=work_dir,
         log_dir=run_info.run_dir,
         sort_artifacts=sort_artifacts,
+        round_decimals=round_decimals,
     )
     summary["topology"] = topology_result
     LOG.info("Topology stage complete: %d success, %d failures", topology_result["success"], len(topology_result["failures"]))

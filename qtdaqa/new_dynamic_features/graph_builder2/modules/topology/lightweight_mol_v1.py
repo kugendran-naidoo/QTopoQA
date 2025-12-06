@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Sequence, Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -16,7 +16,7 @@ from ..base import (
 from ..registry import register_feature_module
 from ...lib.edge_common import InterfaceResidue
 from ...lib.progress import StageProgress
-from ...lib.topology_runner import _INTERFACE_DESCRIPTOR_RE
+from ...lib.topology_runner import _INTERFACE_DESCRIPTOR_RE, round_topology_frame
 from ...lib.new_topological_features import compute_features_for_residues, ResidueDescriptor, TopologicalConfig
 from ...lib.laplacian_moments import (
     LaplacianMomentConfig,
@@ -262,6 +262,7 @@ class TopologyLightweightMoLModule(TopologyFeatureModule):
         work_dir: Path,
         log_dir: Path,
         sort_artifacts: bool = True,
+        round_decimals: Optional[int] = None,
     ):
         topology_dir = work_dir / "topology"
         topology_dir.mkdir(parents=True, exist_ok=True)
@@ -305,6 +306,7 @@ class TopologyLightweightMoLModule(TopologyFeatureModule):
                         output_path,
                         log_path,
                         sort_artifacts=sort_artifacts,
+                        round_decimals=round_decimals,
                     )
                     if ok:
                         success += 1
@@ -323,6 +325,7 @@ class TopologyLightweightMoLModule(TopologyFeatureModule):
                             output_path,
                             log_path,
                             sort_artifacts,
+                            round_decimals,
                         ): (pdb_path, log_path)
                         for pdb_path, interface_path, output_path, log_path in tasks
                     }
@@ -357,6 +360,7 @@ class TopologyLightweightMoLModule(TopologyFeatureModule):
         output_path: Path,
         log_path: Path,
         sort_artifacts: bool = True,
+        round_decimals: Optional[int] = None,
     ) -> Tuple[bool, Tuple[Path, Path, str] | None]:
         residues = _parse_interface_file(interface_path)
         if not residues:
@@ -406,6 +410,7 @@ class TopologyLightweightMoLModule(TopologyFeatureModule):
                 if col not in combined.columns:
                     combined[col] = 0.0
             combined = combined[["ID", *self._ph_columns, *self._lap_columns]]
+            round_topology_frame(combined, round_decimals)
             combined.to_csv(output_path, index=False)
             log_lines = [
                 f"PDB: {pdb_path}",

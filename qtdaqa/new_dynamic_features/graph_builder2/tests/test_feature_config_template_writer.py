@@ -103,6 +103,9 @@ def test_write_feature_config_uses_live_module_templates(tmp_path: Path, monkeyp
     graph_builder.write_feature_config(output_path)
     text = output_path.read_text()
 
+    assert "options:" in text
+    assert "topology_round_decimals" in text
+
     assert "interface:\n  module: interface/polar_cutoff/v1" in text
     assert "cutoff: 10.0" in text
     assert "coordinate_decimals: -1  # skip rounding to keep raw coords" in text
