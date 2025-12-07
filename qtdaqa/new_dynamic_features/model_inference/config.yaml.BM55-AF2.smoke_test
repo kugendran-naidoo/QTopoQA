@@ -1,0 +1,24 @@
+# Smoke test inference configuration
+
+paths:
+  # Point to the small smoke dataset used to build smoke graphs
+  data_dir: ../../../datasets/training/adjusted/smaller_pilot_batch_Dockground_MAF2
+  # Use the smoke validation labels (small set)
+  label_file: ../model_training/smoke_test.validate.csv
+  # work/results will be set via CLI; dataset_name fixed below
+  work_dir: null
+  results_dir: null
+  dataset_name: smoke
+  checkpoint: null
+
+batch_size: 32
+num_workers: 0
+
+builder:
+  # Rely on checkpoint metadata for schema; just set jobs
+  sort_artifacts: false
+  jobs: 8
+  # If you want to reuse prebuilt smoke graphs, pass --reuse-existing-graphs
+
+options:
+  reuse_existing_graphs: true
