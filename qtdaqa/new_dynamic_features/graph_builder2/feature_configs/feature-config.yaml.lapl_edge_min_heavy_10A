@@ -4,6 +4,9 @@
 defaults:
   jobs: 16  # Optional global worker override; remove if unused.
 
+options:
+  topology_round_decimals: 12  # Round topology numeric columns to N decimals (0-15); -1 or omit to disable (recommended 12 when enabling).
+
 # REQUIRED stage: interface
 interface:
   module: interface/polar_cutoff/v1  # alias: n x 3D TopoQA default 10A cutoff

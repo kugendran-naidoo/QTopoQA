@@ -211,11 +211,13 @@ def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str,
     if isinstance(feature_metadata, GraphFeatureMetadata):
         modules = feature_metadata.module_registry
         edge_schema = feature_metadata.edge_schema
+        metadata_path = getattr(feature_metadata, "metadata_path", None)
     elif isinstance(feature_metadata, dict):
         modules = feature_metadata.get("module_registry")
         raw_edge_schema = feature_metadata.get("edge_schema")
         if isinstance(raw_edge_schema, dict):
             edge_schema = raw_edge_schema
+        metadata_path = feature_metadata.get("metadata_path")
     else:
         return None
 
@@ -261,7 +263,25 @@ def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str,
             stage_block["params"] = params
         payload[stage] = stage_block
 
-    payload["options"] = {}
+    # Attempt to populate options from builder block or underlying graph metadata
+    builder_block = _extract_builder_block(feature_metadata)
+    options_block: Dict[str, object] = {}
+    if isinstance(builder_block, dict):
+        builder_options = builder_block.get("options")
+        if isinstance(builder_options, dict):
+            options_block.update(copy.deepcopy(builder_options))
+    if not options_block and metadata_path:
+        try:
+            raw = json.loads(Path(metadata_path).read_text(encoding="utf-8"))
+            builder_meta = raw.get("_builder") if isinstance(raw, dict) else None
+            if isinstance(builder_meta, dict):
+                builder_options = builder_meta.get("options")
+                if isinstance(builder_options, dict):
+                    options_block.update(builder_options)
+        except Exception:
+            pass
+
+    payload["options"] = options_block
     return payload
 
 
@@ -381,6 +401,10 @@ def _write_metadata_feature_config(
 ) -> Optional[Path]:
     payload = _build_metadata_feature_payload(feature_metadata)
     if payload:
+        if not payload.get("options"):
+            logging.warning(
+                "Builder options were not available in checkpoint metadata; generated config will omit them."
+            )
         return _write_feature_config_payload(work_dir, payload, "features.from_metadata.yaml")
 
     snapshot_path = _write_builder_snapshot_config(_extract_builder_block(feature_metadata), work_dir)

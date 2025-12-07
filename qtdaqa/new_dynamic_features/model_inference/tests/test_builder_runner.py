@@ -119,6 +119,43 @@ def test_parse_builder_config_rejects_unknown_keys(tmp_path: Path) -> None:
     assert "unrecognized keys" in str(exc.value)
 
 
+def test_build_metadata_feature_config_includes_builder_options(tmp_path: Path) -> None:
+    meta = GraphFeatureMetadata()
+    meta.module_registry = {
+        "interface": {"id": "interface/polar_cutoff/v1"},
+        "topology": {"id": "topology/persistence_basic/v1"},
+        "node": {"id": "node/dssp_topo_merge/v1"},
+        "edge": {"id": "edge/legacy_band/v11"},
+    }
+    meta.edge_schema = {"module_params": {"distance_max": 10.0}}
+    meta.builder = {"options": {"topology_round_decimals": 12}}
+    path = _write_metadata_feature_config(meta, tmp_path)
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload.get("options", {}).get("topology_round_decimals") == 12
+
+
+def test_build_metadata_feature_config_fallback_reads_graph_metadata(tmp_path: Path) -> None:
+    # Simulate feature_metadata lacking builder but graph_metadata.json containing _builder.options
+    graph_meta = {
+        "_builder": {"options": {"topology_round_decimals": 12}},
+        "_module_registry": {
+            "interface": {"id": "interface/polar_cutoff/v1"},
+            "topology": {"id": "topology/persistence_basic/v1"},
+            "node": {"id": "node/dssp_topo_merge/v1"},
+            "edge": {"id": "edge/legacy_band/v11"},
+        },
+    }
+    graph_path = tmp_path / "graph_metadata.json"
+    graph_path.write_text(json.dumps(graph_meta), encoding="utf-8")
+    meta = GraphFeatureMetadata()
+    meta.module_registry = graph_meta["_module_registry"]
+    meta.edge_schema = {"module_params": {}}
+    meta.metadata_path = str(graph_path)
+    path = _write_metadata_feature_config(meta, tmp_path)
+    payload = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
+    assert payload.get("options", {}).get("topology_round_decimals") == 12
+
+
 def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> None:
     builder = BuilderConfig(dump_edges=False)
     cfg = _make_dummy_config(tmp_path, builder)
@@ -134,7 +171,7 @@ def test_run_graph_builder_invokes_cli_with_feature_config(tmp_path: Path) -> No
     assert generated_features.exists()
     invoked_cmd = mocked_run.call_args[0][0]
     assert invoked_cmd[0] == sys.executable
-    assert invoked_cmd[1:3] == ["-m", "qtdaqa.new_dynamic_features.graph_builder.graph_builder"]
+    assert invoked_cmd[1:3] == ["-m", "qtdaqa.new_dynamic_features.graph_builder2.graph_builder2"]
     assert "--feature-config" in invoked_cmd
 
 

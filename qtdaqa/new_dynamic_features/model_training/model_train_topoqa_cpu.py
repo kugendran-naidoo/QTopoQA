@@ -1377,6 +1377,28 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
     )
     _merge_defaults_into_edge_schema(feature_metadata)
 
+    def _fallback_builder_from_graph_metadata() -> Optional[Dict[str, object]]:
+        """Best-effort builder recovery when feature_metadata.builder is missing."""
+        from builder_metadata import load_builder_info_from_metadata  # type: ignore
+
+        builder_info = None
+        # First try the recorded metadata_path
+        builder_info = load_builder_info_from_metadata(feature_metadata.metadata_path)
+        if builder_info:
+            logger.warning(
+                "Recovered builder info from graph metadata path because checkpoint metadata lacked builder block."
+            )
+            return builder_info
+        # Fallback: if metadata_path is unset, attempt graph_dir/graph_metadata.json
+        candidate = cfg.graph_dir / "graph_metadata.json"
+        if candidate.exists():
+            builder_info = load_builder_info_from_metadata(str(candidate))
+            if builder_info:
+                logger.warning(
+                    "Recovered builder info from %s because checkpoint metadata lacked builder block.", candidate
+                )
+        return builder_info
+
     load_profiler = GraphLoadProfiler(cfg.graph_load_profiling, cfg.graph_load_top_k, cfg.num_workers, logger)
 
     cache_instance = None
@@ -1602,6 +1624,8 @@ def main() -> int:
     cfg.edge_schema = resolved_edge_schema
     feature_metadata.edge_schema = dict(resolved_edge_schema)
     builder_info = feature_metadata.builder or load_builder_info_from_metadata(feature_metadata.metadata_path)
+    if builder_info is None:
+        builder_info = _fallback_builder_from_graph_metadata()
     if builder_info:
         feature_metadata.builder = builder_info
 
@@ -1622,6 +1646,11 @@ def main() -> int:
         )
     else:
         logger.info("Secondary selection metric disabled; using val_loss only.")
+
+    if feature_metadata.builder is None:
+        logger.warning(
+            "Graph metadata did not contain a builder block; downstream runs will lack builder options (e.g., rounding)."
+        )
 
     node_schema_for_log: Dict[str, object] = dict(feature_metadata.node_schema)
     node_columns = node_schema_for_log.get("columns")
