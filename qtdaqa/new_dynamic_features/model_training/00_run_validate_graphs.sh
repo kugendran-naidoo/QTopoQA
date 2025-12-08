@@ -1,4 +1,4 @@
-export GRAPH_DIR=smoke_test
+export GRAPH_DIR=partial_lean_10A_no_rounding
 
 echo "Generating graph-dir manifest for ${GRAPH_DIR} ..."
 

@@ -19,16 +19,18 @@ interface:
     jobs: 16
 
 # OPTIONAL stage: topology
+
 topology:
-  module: topology/persistence_basic/v1  # alias: TopoQA default
-  alias: "Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA"
-  summary: "Persistent homology features with configurable distance thresholds."
-  description: "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input."
+  module: topology/persistence_partial_k_partite/v1  # alias: Part-aware PH minimal (base only) = 140D
+  alias: "Part-aware PH minimal (base only) = 140D"
+  summary: "Persistent homology with chain-aware blocks (cross-biased/cross-only) and optional per-chain/DSSP/polar blocks."
+  description: "Extends the basic PH module with part-aware variants: base PH (140D), cross-biased block (penalize intra-chain distances), cross-only block (inter-chain atoms only), optional per-chain PH (capped), optional DSSP-stratified block, and optional polar-only mini block. Presets: minimal (140D), lean (default, ~420D), heavy (adds opt-in blocks)."
+  # dim: 140
   params:
+    preset: minimal  # minimal=140D
     neighbor_distance: 8.0
     filtration_cutoff: 8.0
     min_persistence: 0.01
-    dedup_sort: false
     element_filters:
       - [C]
       - [N]
@@ -37,7 +39,19 @@ topology:
       - [C, O]
       - [N, O]
       - [C, N, O]
+    dedup_sort: false
     jobs: 16
+    enable_cross_bias: false
+    intra_penalty_mode: none  # none for minimal preset
+    intra_penalty_lambda: null  # Used only when intra_penalty_mode=custom; otherwise derived from neighbor_distance
+    enable_cross_only: false
+    enable_per_chain: false
+    max_chains: 2  # Only used when enable_per_chain=true; ignored otherwise
+    enable_dssp_block: false
+    enable_polar_block: false
+    polar_hbond_weight: false  # Reserved for future H-bond weighting in polar block; leave false
+    max_atoms: 25000  # Guardrail to skip heavy blocks; ignored for minimal/lean
+    max_block_seconds: 60.0  # Per-block time cap (s) for heavy blocks; ignored for minimal/lean
 
 # REQUIRED stage: node
 node:

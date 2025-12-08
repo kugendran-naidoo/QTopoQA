@@ -8,7 +8,7 @@ trap 'echo "Interrupted; aborting." >&2; exit 1' INT TERM
 DATASETS=("BM55-AF2" "HAF2" "ABAG-AF3")
 TOP_K=3                     # number of top checkpoints to use
 export TOP_K
-WORK_DIR="topoqa_10A_12_decimals"
+WORK_DIR="partial_lean_10A_no_rounding"
 APPEND_TIMESTAMP=false
 REUSE_ONLY=true
 export QTOPO_REUSE_ONLY="${REUSE_ONLY}"

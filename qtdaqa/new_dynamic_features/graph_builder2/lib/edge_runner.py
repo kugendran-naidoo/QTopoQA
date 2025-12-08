@@ -196,6 +196,8 @@ def run_edge_stage(
     formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
     handler.setFormatter(formatter)
     logger.handlers = [handler]
+    # Also log progress to the main graph_builder logger for stdout
+    gb_logger = logging.getLogger("graph_builder")
 
     success = 0
     failures: List[Tuple[str, str, Path]] = []
@@ -215,6 +217,7 @@ def run_edge_stage(
     start = time.perf_counter()
 
     progress = StageProgress("Graph assembly", len(tasks), dataset_name=dataset_dir.name)
+    total = len(tasks)
 
     if worker_count <= 1:
         for task in tasks:
@@ -235,6 +238,19 @@ def run_edge_stage(
                 total_edge_time += result.get("edge_time", 0.0) or 0.0
                 total_save_time += result.get("save_time", 0.0) or 0.0
             progress.increment()
+            if success % 5 == 0 and total > 0:
+                elapsed = time.perf_counter() - start
+                pct = (success / total) * 100
+                rate = success / elapsed if elapsed > 0 else 0.0
+                remaining = (total - success) / rate if rate > 0 else 0.0
+                gb_logger.info(
+                    "[Graph assembly - %s] %.1f%% complete (%d/%d) ETA %.1f min",
+                    dataset_dir.name,
+                    pct,
+                    success,
+                    total,
+                    remaining / 60.0,
+                )
     else:
         with ThreadPoolExecutor(max_workers=worker_count) as executor:
             future_map = {
@@ -260,6 +276,19 @@ def run_edge_stage(
                     total_edge_time += result.get("edge_time", 0.0) or 0.0
                     total_save_time += result.get("save_time", 0.0) or 0.0
                 progress.increment()
+                if success % 5 == 0 and total > 0:
+                    elapsed = time.perf_counter() - start
+                    pct = (success / total) * 100
+                    rate = success / elapsed if elapsed > 0 else 0.0
+                    remaining = (total - success) / rate if rate > 0 else 0.0
+                    gb_logger.info(
+                        "[Graph assembly - %s] %.1f%% complete (%d/%d) ETA %.1f min",
+                        dataset_dir.name,
+                        pct,
+                        success,
+                        total,
+                        remaining / 60.0,
+                    )
 
     if builder_metadata_full:
         metadata_records["_builder"] = builder_metadata_full
@@ -267,8 +296,10 @@ def run_edge_stage(
     metadata_path = output_dir / "graph_metadata.json"
     # Ensure topology_columns.json exists before capturing schema
     _write_topology_columns_file(topology_dir, output_dir)
-    # Populate optional registry/schema hints for downstream consumers
     topo_columns_path = output_dir / "topology_columns.json"
+    if not topo_columns_path.exists():
+        raise RuntimeError(f"Topology columns file not found: {topo_columns_path}")
+    # Populate optional registry/schema hints for downstream consumers
     topo_schema: Dict[str, object] = {}
     if topo_columns_path.exists():
         try:
@@ -280,6 +311,18 @@ def run_edge_stage(
             topo_schema = {}
     if topo_schema:
         metadata_records["_topology_schema"] = topo_schema
+        # Surface topology dim for downstream consumers
+        if topo_schema.get("dim") is not None:
+            metadata_records["topology_feature_dim"] = topo_schema["dim"]
+        # Surface topology module if available
+        topo_entry = (module_registry or {}).get("topology") if module_registry else None
+        if isinstance(topo_entry, dict) and topo_entry.get("id"):
+            metadata_records.setdefault("_topology_schema", {})["module"] = topo_entry["id"]
+    # Also mirror topology dim into node_schema if present and not already set
+    if "_node_schema" in metadata_records and isinstance(metadata_records.get("_node_schema"), dict):
+        node_schema = metadata_records["_node_schema"]
+        if "topology_dim" not in node_schema and metadata_records.get("topology_feature_dim") is not None:
+            node_schema["topology_dim"] = metadata_records["topology_feature_dim"]
     # Surface edge schema/dim for downstream consumers (graph_metadata + schema_summary)
     if edge_module is not None:
         metadata_records["edge_module"] = edge_module.metadata().module_id
@@ -326,8 +369,8 @@ def _process_task(
     output_dir: Path,
     edge_dump_dir: Optional[Path],
     metadata_records: Dict[str, Dict[str, object]],
-        builder_metadata: Optional[Dict[str, object]],
-        sort_artifacts: bool,
+    builder_metadata: Optional[Dict[str, object]],
+    sort_artifacts: bool,
 ) -> Dict[str, object]:
     log_lines: List[str] = []
     edge_time = 0.0
@@ -396,6 +439,11 @@ def _process_task(
             "node_feature_columns": feature_cols,
             "node_feature_dim": node_feature_dim,
         }
+        # Record node schema/dim once for convenience
+        if "node_feature_dim" not in metadata_records:
+            metadata_records["node_feature_dim"] = node_feature_dim
+        if "_node_schema" not in metadata_records:
+            metadata_records["_node_schema"] = {"columns": feature_cols, "dim": node_feature_dim}
         if builder_metadata:
             entry["builder"] = builder_metadata
         metadata_records[task.model_key] = entry

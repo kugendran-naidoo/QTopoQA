@@ -139,6 +139,13 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Keep optional enhancements behind parameters and off by default to avoid unexpected regressions.
 - Schema summary: topology columns are auto-extracted during the edge stage (when topology CSVs exist) and node_feature_columns are mirrored into `schema_summary.json`; if modules add explicit column naming (e.g., edge), ensure these can be surfaced consistently.
 
+ Quick metadata sanity checklist (for new modules)
+ - After wiring a new module, run a 1–2 PDB smoke and verify:
+   * `graph_metadata.json` has `topology_feature_dim`, `node_feature_dim`, `edge_feature_dim`, `_topology_schema.columns`, `_node_schema.columns`, and `module_registry` (topology module ID should also appear in `_topology_schema` when registry is available).
+   * `schema_summary.json` mirrors topology columns and node_feature_columns.
+   * CSV spot-check: interface/topology/node/edge files have expected column counts; .pt loads with matching dims.
+ - Use a small script to assert the dims are non-null (see codex_new_module_handoff_guidance.md) before larger runs.
+
 ### Dimensionality guide (defaults)
 - Topology: `topology/persistence_basic/v1` → 140 dims; `topology/persistence_laplacian_hybrid/v1` → 172 dims (140 PH + 32 Laplacian).
 - Node: `node/dssp_topo_merge/v1` → 172 dims (32 DSSP/basic + 140 topology); `node/dssp_topo_merge_passthrough/v1` → 32 DSSP/basic + all topology columns (dynamic; e.g., 204 with hybrid topo). Sorting/determinism preserved; drop_na optional; jobs precedence: CLI --jobs > config default_jobs > module default.
