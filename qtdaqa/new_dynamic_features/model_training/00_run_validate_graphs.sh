@@ -1,4 +1,4 @@
-export GRAPH_DIR=partial_lean_10A_no_rounding
+export GRAPH_DIR=full_lean_10A
 
 echo "Generating graph-dir manifest for ${GRAPH_DIR} ..."
 
