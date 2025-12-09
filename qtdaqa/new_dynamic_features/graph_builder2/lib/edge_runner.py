@@ -318,6 +318,7 @@ def run_edge_stage(
         topo_entry = (module_registry or {}).get("topology") if module_registry else None
         if isinstance(topo_entry, dict) and topo_entry.get("id"):
             metadata_records.setdefault("_topology_schema", {})["module"] = topo_entry["id"]
+            metadata_records["topology_module"] = topo_entry["id"]
     # Also mirror topology dim into node_schema if present and not already set
     if "_node_schema" in metadata_records and isinstance(metadata_records.get("_node_schema"), dict):
         node_schema = metadata_records["_node_schema"]

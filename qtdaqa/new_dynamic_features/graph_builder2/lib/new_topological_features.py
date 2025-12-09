@@ -39,7 +39,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import gudhi
 import numpy as np
@@ -216,21 +216,44 @@ def _neighbors(residue_atom: Atom, search: NeighborSearch, radius: float) -> Lis
     return search.search(residue_atom.coord, radius)
 
 
-def _filter_atom_coordinates_with_chains(atoms: Iterable[Atom], element_filter: ElementFilter) -> Tuple[np.ndarray, List[str]]:
+def _filter_atom_coordinates_with_chains(
+    atoms: Iterable[Atom],
+    element_filter: ElementFilter,
+    hbond_residues: Optional[Set[Tuple[str, int, str]]] = None,
+    ref_chain: Optional[str] = None,
+    hbond_inter_only: bool = False,
+) -> Tuple[np.ndarray, List[str], List[bool]]:
     coords: List[np.ndarray] = []
     chains: List[str] = []
+    flags: List[bool] = []
+    def _is_hbonded(atom: Atom) -> bool:
+        if not hbond_residues:
+            return False
+        res = atom.get_parent()
+        chain_id = res.get_parent().id  # type: ignore[attr-defined]
+        res_id = res.get_id()
+        resnum = int(res_id[1])
+        icode = res_id[2] if len(res_id) > 2 else " "
+        if hbond_inter_only and ref_chain is not None and chain_id == ref_chain:
+            return False
+        return (chain_id, resnum, icode) in hbond_residues
+
     if element_filter.tokens is None:
         for atom in atoms:
             coords.append(atom.coord)
-            chains.append(atom.get_parent().get_parent().id)  # type: ignore[attr-defined]
+            chain_id = atom.get_parent().get_parent().id  # type: ignore[attr-defined]
+            chains.append(chain_id)
+            flags.append(_is_hbonded(atom))
     else:
         prefix_set = set(element_filter.tokens)
         for atom in atoms:
             atom_id = atom.get_id()
             if atom_id and atom_id[0].upper() in prefix_set:
                 coords.append(atom.coord)
-                chains.append(atom.get_parent().get_parent().id)  # type: ignore[attr-defined]
-    return (np.array(coords, dtype=float) if coords else np.empty((0, 3), dtype=float), chains)
+                chain_id = atom.get_parent().get_parent().id  # type: ignore[attr-defined]
+                chains.append(chain_id)
+                flags.append(_is_hbonded(atom))
+    return (np.array(coords, dtype=float) if coords else np.empty((0, 3), dtype=float), chains, flags)
 
 
 def _persistence_summary_zero_dim(
@@ -300,6 +323,9 @@ def _compute_features_for_atoms(
     bias_value: Optional[float] = None,
     config: TopologicalConfig,
     logger: Optional[logging.Logger] = None,
+    hbond_flags: Optional[List[bool]] = None,
+    hbond_factor: Optional[float] = None,
+    hbond_inter_only: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     log = logger or LOGGER
     coords = np.asarray(coord_set, dtype=float)
@@ -319,29 +345,39 @@ def _compute_features_for_atoms(
         coords = unique_coords[order]
         if chains is not None:
             chains = [chains[idx] for idx in order]
+        if hbond_flags is not None:
+            hbond_flags = [hbond_flags[idx] for idx in order]
 
     if coords.shape[0] < 2:
         log.debug("Insufficient unique points (%d) for topological features", coords.shape[0])
         return np.zeros(5), np.zeros(15)
 
     try:
+        dist_matrix = np.linalg.norm(coords[:, None, :] - coords[None, :, :], axis=2)
+        penalty = float(bias_value) if (bias_mode == "intra_penalty" and bias_value) else 0.0
         if bias_mode == "intra_penalty" and chains and bias_value:
             n = coords.shape[0]
-            dist_matrix = np.linalg.norm(coords[:, None, :] - coords[None, :, :], axis=2)
-            penalty = float(bias_value)
             for i in range(n):
                 for j in range(i + 1, n):
                     if chains[i] == chains[j]:
                         dist_matrix[i, j] += penalty
                         dist_matrix[j, i] += penalty
+        if hbond_flags and hbond_factor and hbond_factor > 0:
+            n = dist_matrix.shape[0]
+            for i in range(n):
+                for j in range(i + 1, n):
+                    if hbond_flags[i] or hbond_flags[j]:
+                        if not hbond_inter_only or (chains and chains[i] != chains[j]):
+                            dist_matrix[i, j] *= hbond_factor
+                            dist_matrix[j, i] *= hbond_factor
+        if penalty > 0:
             rips_complex = gudhi.RipsComplex(
                 distance_matrix=dist_matrix.tolist(),
                 max_edge_length=config.filtration_cutoff + penalty,
             )
-            simplex_tree = rips_complex.create_simplex_tree(max_dimension=config.max_rips_dimension)
         else:
-            rips_complex = gudhi.RipsComplex(points=coords)
-            simplex_tree = rips_complex.create_simplex_tree(max_dimension=config.max_rips_dimension)
+            rips_complex = gudhi.RipsComplex(distance_matrix=dist_matrix.tolist())
+        simplex_tree = rips_complex.create_simplex_tree(max_dimension=config.max_rips_dimension)
         rips_persistence = simplex_tree.persistence()
     except Exception as exc:
         raise RuntimeError(f"Failed to construct Rips complex: {exc}") from exc
@@ -420,6 +456,9 @@ def compute_features_for_residue(
     sse_mode: bool = False,
     polar_mode: bool = False,
     hbond_weight: bool = False,
+    hbond_residues: Optional[Set[Tuple[str, int, str]]] = None,
+    hbond_factor: Optional[float] = None,
+    hbond_inter_only: bool = False,
 ) -> List[float]:
     log = logger or LOGGER
 
@@ -440,7 +479,13 @@ def compute_features_for_residue(
     feature_1d: List[float] = []
 
     for element_filter in config.element_filters:
-        coords, chains = _filter_atom_coordinates_with_chains(neighbors, element_filter)
+        coords, chains, hbond_flags = _filter_atom_coordinates_with_chains(
+            neighbors,
+            element_filter,
+            hbond_residues=hbond_residues if (polar_mode and hbond_weight) else None,
+            ref_chain=residue.chain_id,
+            hbond_inter_only=hbond_inter_only,
+        )
         try:
             zero_dim, one_dim = _compute_features_for_atoms(
                 coords,
@@ -449,6 +494,9 @@ def compute_features_for_residue(
                 bias_value=bias_value,
                 config=config,
                 logger=log if config.log_progress else None,
+                hbond_flags=hbond_flags if (polar_mode and hbond_weight) else None,
+                hbond_factor=hbond_factor if (polar_mode and hbond_weight) else None,
+                hbond_inter_only=hbond_inter_only,
             )
         except Exception as exc:  # pragma: no cover - surfaced to caller
             raise RuntimeError(
@@ -472,6 +520,9 @@ def compute_features_for_residues(
     sse_mode: bool = False,
     polar_mode: bool = False,
     hbond_weight: bool = False,
+    hbond_residues: Optional[Set[Tuple[str, int, str]]] = None,
+    hbond_factor: Optional[float] = None,
+    hbond_inter_only: bool = False,
 ) -> pd.DataFrame:
     log = logger or LOGGER
 
@@ -493,7 +544,21 @@ def compute_features_for_residues(
             future_to_index = {
                 executor.submit(
                     _compute_features_worker,
-                    (index, pdb_path, descriptor, config, bias_mode, bias_value, chain_filter, sse_mode, polar_mode, hbond_weight),
+                    (
+                        index,
+                        pdb_path,
+                        descriptor,
+                        config,
+                        bias_mode,
+                        bias_value,
+                        chain_filter,
+                        sse_mode,
+                        polar_mode,
+                        hbond_weight,
+                        hbond_residues,
+                        hbond_factor,
+                        hbond_inter_only,
+                    ),
                 ): index
                 for index, descriptor in enumerate(residues)
             }
@@ -530,6 +595,9 @@ def compute_features_for_residues(
                 sse_mode=sse_mode,
                 polar_mode=polar_mode,
                 hbond_weight=hbond_weight,
+                hbond_residues=hbond_residues,
+                hbond_factor=hbond_factor,
+                hbond_inter_only=hbond_inter_only,
             )
             feature_map[index] = feature_values
             id_map[index] = desc_str
@@ -547,9 +615,23 @@ def compute_features_for_residues(
 
 
 def _compute_features_worker(
-    task: Tuple[int, Path, ResidueDescriptor, TopologicalConfig, Optional[str], Optional[float], Optional[str], bool, bool, bool]
+    task: Tuple[int, Path, ResidueDescriptor, TopologicalConfig, Optional[str], Optional[float], Optional[str], bool, bool, bool, Optional[Set[Tuple[str, int, str]]], Optional[float], bool]
 ) -> Tuple[int, str, List[float]]:
-    index, pdb_path, descriptor, config, bias_mode, bias_value, chain_filter, sse_mode, polar_mode, hbond_weight = task
+    (
+        index,
+        pdb_path,
+        descriptor,
+        config,
+        bias_mode,
+        bias_value,
+        chain_filter,
+        sse_mode,
+        polar_mode,
+        hbond_weight,
+        hbond_residues,
+        hbond_factor,
+        hbond_inter_only,
+    ) = task
     features = compute_features_for_residue(
         pdb_path,
         descriptor,
@@ -560,6 +642,9 @@ def _compute_features_worker(
         sse_mode=sse_mode,
         polar_mode=polar_mode,
         hbond_weight=hbond_weight,
+        hbond_residues=hbond_residues,
+        hbond_factor=hbond_factor,
+        hbond_inter_only=hbond_inter_only,
     )
     return index, descriptor.to_string(), features
 

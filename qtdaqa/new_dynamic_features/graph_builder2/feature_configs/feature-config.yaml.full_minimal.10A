@@ -19,15 +19,14 @@ interface:
     jobs: 16
 
 # OPTIONAL stage: topology
-
 topology:
-  module: topology/persistence_partial_k_partite/v1  # alias: Part-aware PH minimal (base only) = 140D
-  alias: "Part-aware PH minimal (base only) = 140D"
-  summary: "Persistent homology with chain-aware blocks (cross-biased/cross-only) and optional per-chain/DSSP/polar blocks."
-  description: "Extends the basic PH module with part-aware variants: base PH (140D), cross-biased block (penalize intra-chain distances), cross-only block (inter-chain atoms only), optional per-chain PH (capped), optional DSSP-stratified block, and optional polar-only mini block. Presets: minimal (140D), lean (default, ~420D), heavy (adds opt-in blocks)."
+  module: topology/persistence_full_k_partite/v1  # alias: Fully k-partite PH minimal (base only) = 140D
+  alias: "Fully k-partite PH minimal (base only) = 140D"
+  summary: "Persistent homology with partition-aware blocks (primary partitions and optional secondary stratification)."
+  description: "Extends partial k-partite PH to arbitrary primary partitions (chains by default) and an optional secondary layer (DSSP or chemotype). Builds per-partition and per-pair PH blocks, with stratified variants in the heavy_stratified preset. Emits dims/schemas for downstream adaptation."
   # dim: 140
   params:
-    preset: minimal  # minimal=140D
+    preset: minimal  # standard topoqa = 140D = topology/persistence_basic/v1
     neighbor_distance: 8.0
     filtration_cutoff: 8.0
     min_persistence: 0.01
@@ -39,19 +38,22 @@ topology:
       - [C, O]
       - [N, O]
       - [C, N, O]
+    element_filters_stratified:
+      - - C
+        - N
+        - O
     dedup_sort: false
     jobs: 16
-    enable_cross_bias: false
-    intra_penalty_mode: none  # none for minimal preset
-    intra_penalty_lambda: null  # Used only when intra_penalty_mode=custom; otherwise derived from neighbor_distance
-    enable_cross_only: false
-    enable_per_chain: false
-    max_chains: 2  # Only used when enable_per_chain=true; ignored otherwise
-    enable_dssp_block: false
-    enable_polar_block: false
-    polar_hbond_weight: false  # Reserved for future H-bond weighting in polar block; leave false
-    max_atoms: 25000  # Guardrail to skip heavy blocks; ignored for minimal/lean
-    max_block_seconds: 60.0  # Per-block time cap (s) for heavy blocks; ignored for minimal/lean
+    secondary_partition: none  # ignored for minimal preset
+    k_max: 4  # ignored for minimal preset
+    secondary_k_max: 4  # ignored for minimal preset
+    enable_cross_bias: false  # ignored for minimal preset
+    intra_penalty_mode: default  # ignored for minimal preset
+    intra_penalty_lambda: null  # ignored for minimal preset
+    max_atoms: 25000  # ignored for minimal preset
+    max_block_seconds: 60.0  # ignored for minimal preset
+    enable_polar_block: false  # ignored for minimal preset
+    polar_hbond_weight: false  # ignored for minimal preset
 
 # REQUIRED stage: node
 node:

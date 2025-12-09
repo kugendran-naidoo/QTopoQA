@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Any, Dict, Iterable, List, Set, Tuple
 import time
 import traceback
 
@@ -71,6 +71,16 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
             # polar
             "enable_polar_block": "Toggle polar-only mini block.",
             "polar_hbond_weight": "Weight polar atoms in DSSP H-bonds lower for polar block.",
+            "polar_hbond_weight_factor": "Distance multiplier for H-bonded polar atoms (default=0.5).",
+            "polar_hbond_energy_cutoff": "DSSP H-bond energy cutoff (kcal/mol) to consider bonded (default=-0.5).",
+            "polar_hbond_inter_only": "If true, only weight inter-chain H-bonded atoms in polar block.",
+            "dssp_timeout_seconds": "Per-PDB timeout for DSSP call (skip on exceed).",
+            "dssp_slow_threshold": "Log a note if DSSP exceeds this time (seconds).",
+            "polar_hbond_weight_factor": "Distance multiplier for H-bonded polar atoms (default=0.5).",
+            "polar_hbond_energy_cutoff": "DSSP H-bond energy cutoff (kcal/mol) to consider bonded (default=-0.5).",
+            "polar_hbond_inter_only": "If true, only weight inter-chain H-bonded atoms in polar block.",
+            "dssp_timeout_seconds": "Per-PDB timeout for DSSP call (skip on exceed).",
+            "dssp_slow_threshold": "Log a note if DSSP exceeds this time (seconds).",
             # guardrails
             "max_atoms": "Atom-count cap to skip heavy blocks.",
             "max_block_seconds": "Time cap (s) per heavy block to skip remainder.",
@@ -105,6 +115,16 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
             # polar
             "enable_polar_block": False,
             "polar_hbond_weight": False,
+            "polar_hbond_weight_factor": 0.5,
+            "polar_hbond_energy_cutoff": -0.5,
+            "polar_hbond_inter_only": False,
+            "dssp_timeout_seconds": 10.0,
+            "dssp_slow_threshold": 2.0,
+            "polar_hbond_weight_factor": 0.5,
+            "polar_hbond_energy_cutoff": -0.5,
+            "polar_hbond_inter_only": False,
+            "dssp_timeout_seconds": 10.0,
+            "dssp_slow_threshold": 2.0,
             # guardrails
             "max_atoms": 25000,
             "max_block_seconds": 60.0,
@@ -163,6 +183,11 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
         max_atoms = int(params.get("max_atoms") or 25000)
         max_block_seconds = float(params.get("max_block_seconds") or 60.0)
         polar_hbond_weight = bool(params.get("polar_hbond_weight", False))
+        polar_hbond_weight_factor = float(params.get("polar_hbond_weight_factor") or 0.5)
+        polar_hbond_energy_cutoff = float(params.get("polar_hbond_energy_cutoff") or -0.5)
+        polar_hbond_inter_only = bool(params.get("polar_hbond_inter_only", False))
+        dssp_timeout_seconds = float(params.get("dssp_timeout_seconds") or 10.0)
+        dssp_slow_threshold = float(params.get("dssp_slow_threshold") or 2.0)
 
         base_config = new_topological_features.TopologicalConfig(
             neighbor_distance=neighbor_distance,
@@ -225,14 +250,19 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
                         penalty_value=penalty_value,
                         intra_penalty_lambda=intra_penalty_lambda,
                         max_chains=max_chains,
-                        max_atoms=max_atoms,
-                        max_block_seconds=max_block_seconds,
-                        polar_hbond_weight=polar_hbond_weight,
-                        sort_artifacts=sort_artifacts,
-                        round_decimals=round_decimals,
-                        slow_threshold=slow_threshold,
-                        output_path=output_path,
-                        log_path=log_path,
+                    max_atoms=max_atoms,
+                    max_block_seconds=max_block_seconds,
+                    polar_hbond_weight=polar_hbond_weight,
+                    polar_hbond_weight_factor=polar_hbond_weight_factor,
+                    polar_hbond_energy_cutoff=polar_hbond_energy_cutoff,
+                    polar_hbond_inter_only=polar_hbond_inter_only,
+                    dssp_timeout_seconds=dssp_timeout_seconds,
+                    dssp_slow_threshold=dssp_slow_threshold,
+                    sort_artifacts=sort_artifacts,
+                    round_decimals=round_decimals,
+                    slow_threshold=slow_threshold,
+                    output_path=output_path,
+                    log_path=log_path,
                     )
                     successes += 1
                     if successes % 5 == 0:
@@ -255,6 +285,11 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
                 "max_atoms": max_atoms,
                 "max_block_seconds": max_block_seconds,
                 "polar_hbond_weight": polar_hbond_weight,
+                "polar_hbond_weight_factor": polar_hbond_weight_factor,
+                "polar_hbond_energy_cutoff": polar_hbond_energy_cutoff,
+                "polar_hbond_inter_only": polar_hbond_inter_only,
+                "dssp_timeout_seconds": dssp_timeout_seconds,
+                "dssp_slow_threshold": dssp_slow_threshold,
                 "sort_artifacts": sort_artifacts,
                 "round_decimals": round_decimals,
                 "slow_threshold": slow_threshold,
@@ -313,6 +348,11 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
         max_atoms: int,
         max_block_seconds: float,
         polar_hbond_weight: bool,
+        polar_hbond_weight_factor: float,
+        polar_hbond_energy_cutoff: float,
+        polar_hbond_inter_only: bool,
+        dssp_timeout_seconds: float,
+        dssp_slow_threshold: float,
         sort_artifacts: bool,
         round_decimals: int | None,
         slow_threshold: float,
@@ -334,6 +374,11 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
             max_atoms=max_atoms,
             max_block_seconds=max_block_seconds,
             polar_hbond_weight=polar_hbond_weight,
+            polar_hbond_weight_factor=polar_hbond_weight_factor,
+            polar_hbond_energy_cutoff=polar_hbond_energy_cutoff,
+            polar_hbond_inter_only=polar_hbond_inter_only,
+            dssp_timeout_seconds=dssp_timeout_seconds,
+            dssp_slow_threshold=dssp_slow_threshold,
             slow_threshold=slow_threshold,
         )
         if sort_artifacts and "ID" in df.columns:
@@ -373,7 +418,7 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
         jobs = params.get("jobs")
         if jobs is not None:
             params["jobs"] = require_positive_int(jobs, "topology.params.jobs")
-        for key in ("enable_cross_bias", "enable_cross_only", "enable_per_chain", "enable_dssp_block", "enable_polar_block", "polar_hbond_weight"):
+        for key in ("enable_cross_bias", "enable_cross_only", "enable_per_chain", "enable_dssp_block", "enable_polar_block", "polar_hbond_weight", "polar_hbond_inter_only"):
             val = params.get(key)
             if val is not None:
                 params[key] = require_bool(val, f"topology.params.{key}")
@@ -395,6 +440,10 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
         max_block_seconds = params.get("max_block_seconds")
         if max_block_seconds is not None:
             params["max_block_seconds"] = require_positive_float(max_block_seconds, "topology.params.max_block_seconds", allow_zero=True)
+        for key in ("polar_hbond_weight_factor", "polar_hbond_energy_cutoff", "dssp_timeout_seconds", "dssp_slow_threshold"):
+            val = params.get(key)
+            if val is not None:
+                params[key] = require_float(val, f"topology.params.{key}")
 
     @classmethod
     def list_params(cls) -> Dict[str, str]:
@@ -424,12 +473,27 @@ class PersistencePartialKPartiteModule(TopologyFeatureModule):
             "max_chains": "Only used when enable_per_chain=true; ignored otherwise",
             "max_atoms": "Guardrail to skip heavy blocks; ignored for minimal/lean",
             "max_block_seconds": "Per-block time cap (s) for heavy blocks; ignored for minimal/lean",
-            "polar_hbond_weight": "Reserved for future H-bond weighting in polar block; leave false",
+            "polar_hbond_weight": "Toggle H-bond weighting for polar block (heavy only)",
+            "polar_hbond_weight_factor": "Distance multiplier for H-bonded polar atoms (default=0.5)",
+            "polar_hbond_energy_cutoff": "DSSP H-bond energy cutoff (kcal/mol) to consider bonded (default=-0.5)",
+            "polar_hbond_inter_only": "If true, only weight inter-chain H-bonded atoms in polar block",
+            "dssp_timeout_seconds": "Per-PDB timeout for DSSP call (skip on exceed)",
+            "dssp_slow_threshold": "Log a note if DSSP exceeds this time (seconds)",
         }
         base["params"] = params
         base["param_comments"] = param_comments
         minimal_comments = dict(param_comments)
         minimal_comments["intra_penalty_mode"] = "none for minimal preset"
+        minimal_comments.update(
+            {
+                "polar_hbond_weight": "ignored for minimal preset",
+                "polar_hbond_weight_factor": "ignored for minimal preset",
+                "polar_hbond_energy_cutoff": "ignored for minimal preset",
+                "polar_hbond_inter_only": "ignored for minimal preset",
+                "dssp_timeout_seconds": "ignored for minimal preset",
+                "dssp_slow_threshold": "ignored for minimal preset",
+            }
+        )
         alternates = [
             {
                 "module": cls.module_id,
@@ -482,6 +546,11 @@ def _run_partial_single(
     max_atoms: int,
     max_block_seconds: float,
     polar_hbond_weight: bool,
+    polar_hbond_weight_factor: float,
+    polar_hbond_energy_cutoff: float,
+    polar_hbond_inter_only: bool,
+    dssp_timeout_seconds: float,
+    dssp_slow_threshold: float,
     slow_threshold: float,
 ) -> Tuple[pd.DataFrame, List[str]]:
     notes: List[str] = []
@@ -620,6 +689,18 @@ def _run_partial_single(
             heavy_allowed = False
 
     if enable_polar_block and heavy_allowed:
+        # Optional DSSP-derived H-bond weighting for polar atoms
+        hbond_residues: Optional[Set[Tuple[str, int, str]]] = None
+        if polar_hbond_weight:
+            hbond_residues, dssp_note = _compute_dssp_hbond_residues(
+                pdb_path,
+                residues,
+                energy_cutoff=polar_hbond_energy_cutoff,
+                timeout_seconds=dssp_timeout_seconds,
+                slow_threshold=dssp_slow_threshold,
+            )
+            if dssp_note:
+                notes.append(dssp_note)
         def polar_fn():
             cfg = new_topological_features.TopologicalConfig(
                 neighbor_distance=base_config.neighbor_distance,
@@ -630,8 +711,15 @@ def _run_partial_single(
                 workers=base_config.workers,
             )
             return new_topological_features.compute_features_for_residues(
-                pdb_path, residues, cfg, polar_mode=True, hbond_weight=polar_hbond_weight
-                )
+                pdb_path,
+                residues,
+                cfg,
+                polar_mode=True,
+                hbond_weight=polar_hbond_weight,
+                hbond_residues=hbond_residues,
+                hbond_factor=polar_hbond_weight_factor,
+                hbond_inter_only=polar_hbond_inter_only,
+            )
         try:
             pol_start = time.perf_counter()
             pol_df = _timed_block(lambda: _compute_block("polar_block", polar_fn, expected_cols_override="auto"), "polar_block")
@@ -649,6 +737,52 @@ def _run_partial_single(
         raise RuntimeError(f"Concatenation failed: {exc}") from exc
     combined.insert(0, "ID", id_col)
     return combined, notes
+
+
+def _compute_dssp_hbond_residues(
+    pdb_path: Path,
+    residues: List[new_topological_features.ResidueDescriptor],
+    *,
+    energy_cutoff: float,
+    timeout_seconds: float,
+    slow_threshold: float,
+) -> Tuple[Optional[Set[Tuple[str, int, str]]], Optional[str]]:
+    note: Optional[str] = None
+    start = time.perf_counter()
+    try:
+        from Bio.PDB import DSSP, PDBParser  # type: ignore
+    except Exception as exc:  # pragma: no cover
+        return None, f"DSSP skipped: Bio.PDB not available ({exc})"
+    try:
+        parser = PDBParser(QUIET=True)
+        structure = parser.get_structure("pdb", pdb_path)
+        model = structure[0]
+        dssp = DSSP(model, str(pdb_path))
+    except Exception as exc:  # pragma: no cover
+        return None, f"DSSP skipped: {exc}"
+    elapsed = time.perf_counter() - start
+    if elapsed > timeout_seconds:
+        return None, f"DSSP skipped: {elapsed:.2f}s exceeded timeout {timeout_seconds:.2f}s"
+    if slow_threshold and elapsed > slow_threshold:
+        note = f"DSSP slow: {elapsed:.2f}s"
+
+    bonded: Set[Tuple[str, int, str]] = set()
+    for res in residues:
+        key = (res.chain_id, res.bio_id)
+        try:
+            entry = dssp[key]
+        except KeyError:
+            continue
+        energies = []
+        for idx, val in enumerate(entry):
+            if idx >= 5:
+                try:
+                    energies.append(float(val))
+                except Exception:
+                    continue
+        if any(e <= energy_cutoff for e in energies):
+            bonded.add((res.chain_id, res.residue_number, res.insertion_code or " "))
+    return bonded if bonded else set(), note
 
 
 def _process_partial_task(
@@ -674,6 +808,11 @@ def _process_partial_task(
             max_atoms=options["max_atoms"],
             max_block_seconds=options["max_block_seconds"],
             polar_hbond_weight=options["polar_hbond_weight"],
+            polar_hbond_weight_factor=options["polar_hbond_weight_factor"],
+            polar_hbond_energy_cutoff=options["polar_hbond_energy_cutoff"],
+            polar_hbond_inter_only=options["polar_hbond_inter_only"],
+            dssp_timeout_seconds=options["dssp_timeout_seconds"],
+            dssp_slow_threshold=options["dssp_slow_threshold"],
             slow_threshold=options["slow_threshold"],
         )
         if options["sort_artifacts"] and "ID" in df.columns:
