@@ -5,7 +5,7 @@ defaults:
   jobs: 16  # Optional global worker override; remove if unused.
 
 options:
-  topology_round_decimals: 13  # Round topology numeric columns to N decimals (0-15); -1 or omit to disable (recommended 12 when enabling).
+  topology_round_decimals: -1  # Round topology numeric columns to N decimals (0-15); -1 or omit (recommended 12).
 
 # REQUIRED stage: interface
 interface:

@@ -1,0 +1,9 @@
+paths.graph: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/partial_lean_10A_no_rounding/graph_data
+trainer.num_epochs: 360
+early_stopping.patience: 50
+scheduler.patience: 25
+scheduler.factor: 0.3
+optimizer.learning_rate: 2e-3
+dataloader.batch_size: 12
+trainer.accumulate_grad_batches: 48
+dataloader.seed: 101
