@@ -20,13 +20,13 @@ interface:
 
 # OPTIONAL stage: topology
 topology:
-  module: topology/persistence_k_partite_advanced/v1  # alias: Advanced k-partite PH (heavy) ≈ 700D (bias+polar+typed)
-  alias: "Advanced k-partite PH (heavy) \u2248 700D (bias+polar+typed)"
+  module: topology/persistence_k_partite_advanced/v1  # alias: Advanced k-partite PH (heavy stratified) ≈ 900D (chemotype + polar + typed)
+  alias: "Advanced k-partite PH (heavy stratified) \u2248 900D (chemotype + polar + typed)"
   summary: "Advanced k-partite persistent homology with optional typed-contact and weighted/polar blocks."
   description: "Extends the full k-partite module with optional typed-contact blocks and hooks for weighted filtrations, power/landmark modes. Primary partitions are chains; optional secondary stratification (chemotype/DSSP). Presets keep backward compatibility while allowing richer chemistry-aware variants."
-  # dim: 700
+  # dim: 900
   params:
-    preset: heavy  # minimal=140D, lean=base+cross-pair+per-partition, heavy=~700D (bias+polar+typed, no secondary), heavy_stratified=~900D (adds secondary strat)
+    preset: heavy_stratified  # minimal=140D, lean=base+cross-pair+per-partition, heavy=~700D (bias+polar+typed, no secondary), heavy_stratified=~900D (adds secondary strat)
     neighbor_distance: 8.0
     filtration_cutoff: 8.0
     min_persistence: 0.01
@@ -44,7 +44,7 @@ topology:
         - O
     dedup_sort: false
     jobs: 16
-    secondary_partition: none  # none|dssp|chemotype (ignored by minimal/lean/heavy; used by heavy_stratified)
+    secondary_partition: chemotype  # none|dssp|chemotype (ignored by minimal/lean/heavy; used by heavy_stratified)
     k_max: 4  # Cap on number of primary partitions; blocks beyond cap are skipped (lean/heavy/stratified)
     secondary_k_max: 4  # Cap on number of secondary partitions (stratified only); ignored otherwise
     enable_cross_bias: true  # Used in heavy/heavy_stratified; ignored by lean/minimal even if true

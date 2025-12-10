@@ -68,7 +68,7 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
 
     module_id = "topology/persistence_k_partite_advanced/v1"
     module_kind = "topology"
-    default_alias = "Advanced k-partite PH with typed contacts/optional weights"
+    default_alias = "Advanced k-partite PH with typed contacts"
     _metadata = build_metadata(
         module_id=module_id,
         module_kind=module_kind,
@@ -81,7 +81,7 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
         inputs=("pdb_file", "interface_file"),
         outputs=("topology_csv",),
         parameters={
-            "preset": "minimal|lean|heavy|heavy_stratified|rich",
+            "preset": "minimal|lean|heavy|heavy_stratified",
             "neighbor_distance": "Neighbourhood radius in Å for PH computation.",
             "filtration_cutoff": "Maximum filtration value in Å (applies to β0).",
             "min_persistence": "Minimum persistence threshold for features.",
@@ -105,11 +105,8 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
             "polar_hbond_weight_factor": "Distance multiplier for H-bonded polar atoms (default=0.5).",
             "polar_hbond_energy_cutoff": "DSSP H-bond energy cutoff (kcal/mol) to consider bonded (default=-0.5).",
             "polar_hbond_inter_only": "If true, only weight inter-chain H-bonded atoms in polar block.",
-            # typed/weighted/power/landmark toggles
+            # typed block
             "enable_typed_block": "Enable typed-contact PH blocks (hydrophobic/salt/H-bond).",
-            "enable_weighted_filtration": "Enable distance scaling by chemistry/energetics (fallback to note if unsupported).",
-            "enable_power_block": "Enable vdW-aware power/alpha mini-block (placeholder).",
-            "enable_landmark_mode": "Enable landmark/witness approximation (placeholder).",
             # dssp stratified
             "dssp_timeout_seconds": "Per-PDB timeout for DSSP call (skip if exceeded).",
             "dssp_slow_threshold": "Log a note if DSSP exceeds this time (seconds).",
@@ -145,9 +142,6 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
             "polar_hbond_energy_cutoff": -0.5,
             "polar_hbond_inter_only": False,
             "enable_typed_block": False,
-            "enable_weighted_filtration": False,
-            "enable_power_block": False,
-            "enable_landmark_mode": False,
             "dssp_timeout_seconds": 10.0,
             "dssp_slow_threshold": 2.0,
         },
@@ -187,12 +181,12 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
                 return fallback
             return bool(value)
 
-        enable_cross_bias = _flag(params.get("enable_cross_bias"), preset in {"heavy", "heavy_stratified", "rich"})
-        enable_polar_block = _flag(params.get("enable_polar_block"), preset in {"heavy", "heavy_stratified", "rich"})
-        enable_typed_block = _flag(params.get("enable_typed_block"), preset in {"heavy", "heavy_stratified", "rich"})
-        enable_weighted_filtration = _flag(params.get("enable_weighted_filtration"), preset == "rich")
-        enable_power_block = bool(params.get("enable_power_block", False))
-        enable_landmark_mode = bool(params.get("enable_landmark_mode", False))
+        enable_cross_bias = _flag(params.get("enable_cross_bias"), preset in {"heavy", "heavy_stratified"})
+        enable_polar_block = _flag(params.get("enable_polar_block"), preset in {"heavy", "heavy_stratified"})
+        enable_typed_block = _flag(params.get("enable_typed_block"), preset in {"heavy", "heavy_stratified"})
+        enable_weighted_filtration = False
+        enable_power_block = False
+        enable_landmark_mode = False
 
         penalty_mode = (params.get("intra_penalty_mode") or "default").strip().lower()
         if penalty_mode not in {"default", "light", "heavy", "none", "custom"}:
@@ -294,9 +288,6 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
                         polar_hbond_energy_cutoff=polar_hbond_energy_cutoff,
                         polar_hbond_inter_only=polar_hbond_inter_only,
                         enable_typed_block=enable_typed_block,
-                        enable_weighted_filtration=enable_weighted_filtration,
-                        enable_power_block=enable_power_block,
-                        enable_landmark_mode=enable_landmark_mode,
                         slow_threshold=slow_threshold,
                         dssp_timeout_seconds=dssp_timeout_seconds,
                         dssp_slow_threshold=dssp_slow_threshold,
@@ -339,9 +330,6 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
                 "polar_hbond_energy_cutoff": polar_hbond_energy_cutoff,
                 "polar_hbond_inter_only": polar_hbond_inter_only,
                 "enable_typed_block": enable_typed_block,
-                "enable_weighted_filtration": enable_weighted_filtration,
-                "enable_power_block": enable_power_block,
-                "enable_landmark_mode": enable_landmark_mode,
                 "slow_threshold": slow_threshold,
                 "dssp_timeout_seconds": dssp_timeout_seconds,
                 "dssp_slow_threshold": dssp_slow_threshold,
@@ -402,17 +390,14 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
         max_block_seconds: float,
         enable_polar_block: bool,
         polar_hbond_weight: bool,
-        polar_hbond_weight_factor: float,
-        polar_hbond_energy_cutoff: float,
-        polar_hbond_inter_only: bool,
-        enable_typed_block: bool,
-        enable_weighted_filtration: bool,
-        enable_power_block: bool,
-        enable_landmark_mode: bool,
-        slow_threshold: float,
-        dssp_timeout_seconds: float,
-        dssp_slow_threshold: float,
-    ) -> Tuple[pd.DataFrame, List[str]]:
+    polar_hbond_weight_factor: float,
+    polar_hbond_energy_cutoff: float,
+    polar_hbond_inter_only: bool,
+    enable_typed_block: bool,
+    slow_threshold: float,
+    dssp_timeout_seconds: float,
+    dssp_slow_threshold: float,
+) -> Tuple[pd.DataFrame, List[str]]:
         return _run_adv_single(
             pdb_path=pdb_path,
             interface_path=interface_path,
@@ -445,8 +430,8 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
         preset = params.get("preset")
         if preset is not None:
             preset_norm = str(preset).strip().lower()
-            if preset_norm not in {"minimal", "lean", "heavy", "heavy_stratified", "rich"}:
-                raise ValueError("preset must be minimal|lean|heavy|heavy_stratified|rich.")
+            if preset_norm not in {"minimal", "lean", "heavy", "heavy_stratified"}:
+                raise ValueError("preset must be minimal|lean|heavy|heavy_stratified.")
             params["preset"] = preset_norm
         for key in ("neighbor_distance", "filtration_cutoff"):
             val = params.get(key)
@@ -473,9 +458,6 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
             "polar_hbond_weight",
             "polar_hbond_inter_only",
             "enable_typed_block",
-            "enable_weighted_filtration",
-            "enable_power_block",
-            "enable_landmark_mode",
         ):
             val = params.get(key)
             if val is not None:
@@ -531,31 +513,25 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
                 "enable_cross_bias": False,
                 "enable_polar_block": False,
                 "enable_typed_block": False,
-                "enable_weighted_filtration": False,
-                "enable_power_block": False,
-                "enable_landmark_mode": False,
             }
         )
         param_comments = {
-            "preset": "minimal=140D, lean=base+cross-pair+per-partition, heavy=~700D (bias+polar+typed, no secondary), heavy_stratified=~900D (adds secondary strat), rich=heavy_stratified + weighted on (power/landmark opt-in)",
-            "secondary_partition": "none|dssp|chemotype (ignored by minimal/lean/heavy; used by heavy_stratified/rich)",
-            "k_max": "Cap on number of primary partitions; blocks beyond cap are skipped (lean/heavy/stratified/rich)",
+            "preset": "minimal=140D, lean=base+cross-pair+per-partition, heavy=~700D (bias+polar+typed, no secondary), heavy_stratified=~900D (adds secondary strat)",
+            "secondary_partition": "none|dssp|chemotype (ignored by minimal/lean/heavy; used by heavy_stratified)",
+            "k_max": "Cap on number of primary partitions; blocks beyond cap are skipped (lean/heavy/stratified)",
             "secondary_k_max": "Cap on number of secondary partitions (stratified only); ignored otherwise",
-            "element_filters_stratified": "Reduced filters for stratified blocks (default C/N/O); used only in heavy_stratified/rich",
-            "enable_cross_bias": "Used in heavy/heavy_stratified/rich; ignored by lean/minimal even if true",
+            "element_filters_stratified": "Reduced filters for stratified blocks (default C/N/O); used only in heavy_stratified",
+            "enable_cross_bias": "Used in heavy/heavy_stratified; ignored by lean/minimal even if true",
             "intra_penalty_mode": "default(=nd/2), light(=nd/4), heavy(=nd/1.34), none(=0), custom(use intra_penalty_lambda numeric); ignored by lean/minimal",
-            "intra_penalty_lambda": "Used only when intra_penalty_mode=custom; otherwise derived from neighbor_distance; heavy/heavy_stratified/rich only",
+            "intra_penalty_lambda": "Used only when intra_penalty_mode=custom; otherwise derived from neighbor_distance; heavy/heavy_stratified only",
             "max_atoms": "Guardrail to skip heavy blocks; ignored by lean/minimal",
-            "max_block_seconds": "Per-block time cap (s) for lean/heavy/stratified/rich; ignored by minimal",
-            "enable_polar_block": "Used in heavy/heavy_stratified/rich; ignored by lean/minimal",
-            "polar_hbond_weight": "Toggle H-bond weighting for polar block (heavy/heavy_stratified/rich); ignored by lean/minimal",
-            "polar_hbond_weight_factor": "Distance multiplier for H-bonded polar atoms (default=0.5); heavy/heavy_stratified/rich",
-            "polar_hbond_energy_cutoff": "DSSP H-bond energy cutoff (kcal/mol) (default=-0.5); heavy/heavy_stratified/rich",
-            "polar_hbond_inter_only": "If true, only weight inter-chain H-bonded atoms; heavy/heavy_stratified/rich",
-            "enable_typed_block": "Enable typed-contact PH (hydrophobic/salt/H-bond); heavy/heavy_stratified/rich default ON",
-            "enable_weighted_filtration": "Enable distance scaling by chemistry/energetics (simple scalar); rich default ON; off elsewhere",
-            "enable_power_block": "vdW-aware power/alpha mini-block; default OFF (opt-in due to cost)",
-            "enable_landmark_mode": "Landmark/witness approximation; default OFF (opt-in to allow approximation/speed)",
+            "max_block_seconds": "Per-block time cap (s) for lean/heavy/stratified; ignored by minimal",
+            "enable_polar_block": "Used in heavy/heavy_stratified; ignored by lean/minimal",
+            "polar_hbond_weight": "Toggle H-bond weighting for polar block (heavy/heavy_stratified); ignored by lean/minimal",
+            "polar_hbond_weight_factor": "Distance multiplier for H-bonded polar atoms (default=0.5); heavy/heavy_stratified",
+            "polar_hbond_energy_cutoff": "DSSP H-bond energy cutoff (kcal/mol) (default=-0.5); heavy/heavy_stratified",
+            "polar_hbond_inter_only": "If true, only weight inter-chain H-bonded atoms; heavy/heavy_stratified",
+            "enable_typed_block": "Enable typed-contact PH (hydrophobic/salt/H-bond); heavy/heavy_stratified default ON",
             "dssp_timeout_seconds": "Per-PDB timeout for DSSP call (skip if exceeded).",
             "dssp_slow_threshold": "Log a note if DSSP exceeds this time (seconds).",
         }
@@ -578,9 +554,6 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
                 "polar_hbond_energy_cutoff": "ignored for minimal preset",
                 "polar_hbond_inter_only": "ignored for minimal preset",
                 "enable_typed_block": "ignored for minimal preset",
-                "enable_weighted_filtration": "ignored for minimal preset",
-                "enable_power_block": "ignored for minimal preset",
-                "enable_landmark_mode": "ignored for minimal preset",
                 "preset": "standard topoqa = 140D",
             }
         )
@@ -618,21 +591,6 @@ class PersistenceKPartiteAdvancedModule(TopologyFeatureModule):
                 },
                 "param_comments": param_comments,
             },
-            {
-                "module": cls.module_id,
-                "alias": "Advanced k-partite PH (rich) ≈ 1000D+ (adds weighted; power/landmark opt-in)",
-                "params": {
-                    **params,
-                    "preset": "rich",
-                    "secondary_partition": "chemotype",
-                    "enable_cross_bias": True,
-                    "enable_polar_block": True,
-                    "polar_hbond_weight": True,
-                    "enable_typed_block": True,
-                    "enable_weighted_filtration": True,
-                },
-                "param_comments": param_comments,
-            },
         ]
         base["alternates"] = alternates
         return base
@@ -658,9 +616,6 @@ def _run_adv_single(
     polar_hbond_energy_cutoff: float,
     polar_hbond_inter_only: bool,
     enable_typed_block: bool,
-    enable_weighted_filtration: bool,
-    enable_power_block: bool,
-    enable_landmark_mode: bool,
     slow_threshold: float,
     dssp_timeout_seconds: float,
     dssp_slow_threshold: float,
@@ -710,7 +665,7 @@ def _run_adv_single(
                 aligned[pos, :] = features[idx]
         return pd.DataFrame(aligned, columns=raw_df.columns.drop("ID"))
 
-    if preset in {"lean", "heavy", "heavy_stratified", "rich"}:
+    if preset in {"lean", "heavy", "heavy_stratified"}:
         for a, b in itertools.combinations(primary_labels, 2):
             pair_res = prim_map.get(a, []) + prim_map.get(b, [])
             if not pair_res:
@@ -722,7 +677,7 @@ def _run_adv_single(
             raw_df = _timed(pair_fn, f"cross_only_{a}_{b}")
             blocks.append(_align_block(raw_df, f"cross_only_{a}_{b}"))
 
-    if preset in {"lean", "heavy", "heavy_stratified", "rich"}:
+    if preset in {"lean", "heavy", "heavy_stratified"}:
         for a in primary_labels:
             res_list = prim_map.get(a, [])
             if not res_list:
@@ -734,7 +689,7 @@ def _run_adv_single(
             raw_df = _timed(per_fn, f"per_primary_{a}")
             blocks.append(_align_block(raw_df, f"per_primary_{a}"))
 
-    if preset in {"heavy", "heavy_stratified", "rich"} and enable_cross_bias:
+    if preset in {"heavy", "heavy_stratified"} and enable_cross_bias:
         def bias_fn():
             return new_topological_features.compute_features_for_residues(
                 pdb_path, residues, base_config, bias_mode="intra_penalty", bias_value=penalty_value
@@ -743,7 +698,7 @@ def _run_adv_single(
         raw_df = _timed(bias_fn, "cross_bias")
         blocks.append(raw_df.drop(columns=["ID"]))
 
-    if preset == "heavy_stratified" or preset == "rich":
+    if preset == "heavy_stratified":
         if secondary_partition != "none" and heavy_allowed:
             dssp_labels: Dict[Tuple[str, int, str], str] = {}
             if secondary_partition == "dssp":
@@ -789,7 +744,7 @@ def _run_adv_single(
                 raw_df = _timed(strat_pair_fn, f"strat_pair_{a}_{b}")
                 blocks.append(_align_block(raw_df, f"strat_pair_{a}_{b}"))
 
-    if preset in {"heavy", "heavy_stratified", "rich"} and enable_polar_block and heavy_allowed:
+    if preset in {"heavy", "heavy_stratified"} and enable_polar_block and heavy_allowed:
         hbond_residues: Optional[Set[Tuple[str, int, str]]] = None
         if polar_hbond_weight:
             hbond_residues, dssp_note = _compute_dssp_hbond_residues(
@@ -825,7 +780,7 @@ def _run_adv_single(
         raw_df = _timed(polar_fn, "polar_block")
         blocks.append(raw_df.drop(columns=["ID"]))
 
-    if preset in {"heavy", "heavy_stratified", "rich"} and enable_typed_block and heavy_allowed:
+    if preset in {"heavy", "heavy_stratified"} and enable_typed_block and heavy_allowed:
         type_map: Dict[str, List[new_topological_features.ResidueDescriptor]] = {}
         for res in residues:
             t = _typed_class(res.residue_name or "")
@@ -851,15 +806,6 @@ def _run_adv_single(
 
             raw_df = _timed(typed_pair_fn, f"typed_pair_{a}_{b}")
             blocks.append(_align_block(raw_df, f"typed_pair_{a}_{b}"))
-
-    if enable_weighted_filtration and heavy_allowed:
-        notes.append("Weighted filtration toggle is enabled but not yet implemented; falling back to unweighted distances.")
-
-    if enable_power_block and heavy_allowed:
-        notes.append("Power/alpha mini-block not yet implemented; skipping.")
-
-    if enable_landmark_mode and heavy_allowed:
-        notes.append("Landmark/witness mode not yet implemented; skipping.")
 
     combined = pd.concat(blocks, axis=1)
     combined.insert(0, "ID", id_list)
@@ -1001,9 +947,6 @@ def _process_adv_task(
             polar_hbond_energy_cutoff=options["polar_hbond_energy_cutoff"],
             polar_hbond_inter_only=options["polar_hbond_inter_only"],
             enable_typed_block=options["enable_typed_block"],
-            enable_weighted_filtration=options["enable_weighted_filtration"],
-            enable_power_block=options["enable_power_block"],
-            enable_landmark_mode=options["enable_landmark_mode"],
             slow_threshold=options["slow_threshold"],
             dssp_timeout_seconds=options["dssp_timeout_seconds"],
             dssp_slow_threshold=options["dssp_slow_threshold"],
