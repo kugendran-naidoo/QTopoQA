@@ -4,7 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../.." && pwd)"
 
 OUTPUT="output/partial_minimal_10A_smaller"
-FEATURE_FILE="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.partial_minimal.10A"
+FEATURE_FILE="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/partial_k_partite/feature-config.yaml.partial_minimal.10A"
 
 DATASET_DIR="${REPO_ROOT}/datasets/training/adjusted/smaller_pilot_batch_Dockground_MAF2"
 WORK_DIR="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/${OUTPUT}/work"

@@ -360,3 +360,13 @@ modules or defaults change.
 - Jobs precedence: leave `jobs` in params/defaults; framework resolves CLI `--jobs` > config `default_jobs` > module `jobs/auto`.
 - Schema summary: topology columns are auto-extracted during the edge stage (when topology CSVs exist) and node_feature_columns are mirrored into `schema_summary.json`; if modules add explicit columns, ensure these surface consistently.
 - CLI/config integration: wire new toggles through parser → feature selection → logging; document defaults vs overrides so users understand side effects.
+
+## Advanced k-partite topology presets (quick guide)
+- Module: `topology/persistence_k_partite_advanced/v1`
+- Presets:
+  - minimal: base 140D.
+  - lean: base + cross-only + per-primary (no bias/polar/typed/secondary).
+  - heavy: bias + polar H-bond + typed contacts; no secondary strat.
+  - heavy_stratified: heavy + secondary strat (chemotype default); polar/typed on.
+  - rich: heavy_stratified + weighted filtration ON by default; power/landmark stay opt-in to avoid unexpected cost/approximation.
+- Defaults: polar/typed ON in heavy/heavy_stratified/rich; weighted ON only in rich; power/landmark OFF unless explicitly enabled. Generated configs include inline comments reflecting these choices.
