@@ -1,0 +1,380 @@
+{
+  "edge_schema": {
+    "dim": 11,
+    "module": "edge/legacy_band/v11",
+    "variant": "legacy_v11",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "jobs": 16,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data/graph_metadata.json",
+    "alias": "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA",
+    "jobs": 16,
+    "summary": "11-D legacy edge features (distance + atom distance histogram)."
+  },
+  "node_schema": {
+    "columns": [
+      "rasa",
+      "phi",
+      "psi",
+      "SS8_0",
+      "SS8_1",
+      "SS8_2",
+      "SS8_3",
+      "SS8_4",
+      "SS8_5",
+      "SS8_6",
+      "SS8_7",
+      "AA_0",
+      "AA_1",
+      "AA_2",
+      "AA_3",
+      "AA_4",
+      "AA_5",
+      "AA_6",
+      "AA_7",
+      "AA_8",
+      "AA_9",
+      "AA_10",
+      "AA_11",
+      "AA_12",
+      "AA_13",
+      "AA_14",
+      "AA_15",
+      "AA_16",
+      "AA_17",
+      "AA_18",
+      "AA_19",
+      "AA_20",
+      "f0_C_death_sum",
+      "f0_C_death_min",
+      "f0_C_death_max",
+      "f0_C_death_mean",
+      "f0_C_death_std",
+      "f0_N_death_sum",
+      "f0_N_death_min",
+      "f0_N_death_max",
+      "f0_N_death_mean",
+      "f0_N_death_std",
+      "f0_O_death_sum",
+      "f0_O_death_min",
+      "f0_O_death_max",
+      "f0_O_death_mean",
+      "f0_O_death_std",
+      "f0_CN_death_sum",
+      "f0_CN_death_min",
+      "f0_CN_death_max",
+      "f0_CN_death_mean",
+      "f0_CN_death_std",
+      "f0_CO_death_sum",
+      "f0_CO_death_min",
+      "f0_CO_death_max",
+      "f0_CO_death_mean",
+      "f0_CO_death_std",
+      "f0_NO_death_sum",
+      "f0_NO_death_min",
+      "f0_NO_death_max",
+      "f0_NO_death_mean",
+      "f0_NO_death_std",
+      "f0_CNO_death_sum",
+      "f0_CNO_death_min",
+      "f0_CNO_death_max",
+      "f0_CNO_death_mean",
+      "f0_CNO_death_std",
+      "f1_C_len_sum",
+      "f1_C_len_min",
+      "f1_C_len_max",
+      "f1_C_len_mean",
+      "f1_C_len_std",
+      "f1_C_birth_sum",
+      "f1_C_birth_min",
+      "f1_C_birth_max",
+      "f1_C_birth_mean",
+      "f1_C_birth_std",
+      "f1_C_death_sum",
+      "f1_C_death_min",
+      "f1_C_death_max",
+      "f1_C_death_mean",
+      "f1_C_death_std",
+      "f1_N_len_sum",
+      "f1_N_len_min",
+      "f1_N_len_max",
+      "f1_N_len_mean",
+      "f1_N_len_std",
+      "f1_N_birth_sum",
+      "f1_N_birth_min",
+      "f1_N_birth_max",
+      "f1_N_birth_mean",
+      "f1_N_birth_std",
+      "f1_N_death_sum",
+      "f1_N_death_min",
+      "f1_N_death_max",
+      "f1_N_death_mean",
+      "f1_N_death_std",
+      "f1_O_len_sum",
+      "f1_O_len_min",
+      "f1_O_len_max",
+      "f1_O_len_mean",
+      "f1_O_len_std",
+      "f1_O_birth_sum",
+      "f1_O_birth_min",
+      "f1_O_birth_max",
+      "f1_O_birth_mean",
+      "f1_O_birth_std",
+      "f1_O_death_sum",
+      "f1_O_death_min",
+      "f1_O_death_max",
+      "f1_O_death_mean",
+      "f1_O_death_std",
+      "f1_CN_len_sum",
+      "f1_CN_len_min",
+      "f1_CN_len_max",
+      "f1_CN_len_mean",
+      "f1_CN_len_std",
+      "f1_CN_birth_sum",
+      "f1_CN_birth_min",
+      "f1_CN_birth_max",
+      "f1_CN_birth_mean",
+      "f1_CN_birth_std",
+      "f1_CN_death_sum",
+      "f1_CN_death_min",
+      "f1_CN_death_max",
+      "f1_CN_death_mean",
+      "f1_CN_death_std",
+      "f1_CO_len_sum",
+      "f1_CO_len_min",
+      "f1_CO_len_max",
+      "f1_CO_len_mean",
+      "f1_CO_len_std",
+      "f1_CO_birth_sum",
+      "f1_CO_birth_min",
+      "f1_CO_birth_max",
+      "f1_CO_birth_mean",
+      "f1_CO_birth_std",
+      "f1_CO_death_sum",
+      "f1_CO_death_min",
+      "f1_CO_death_max",
+      "f1_CO_death_mean",
+      "f1_CO_death_std",
+      "f1_NO_len_sum",
+      "f1_NO_len_min",
+      "f1_NO_len_max",
+      "f1_NO_len_mean",
+      "f1_NO_len_std",
+      "f1_NO_birth_sum",
+      "f1_NO_birth_min",
+      "f1_NO_birth_max",
+      "f1_NO_birth_mean",
+      "f1_NO_birth_std",
+      "f1_NO_death_sum",
+      "f1_NO_death_min",
+      "f1_NO_death_max",
+      "f1_NO_death_mean",
+      "f1_NO_death_std",
+      "f1_CNO_len_sum",
+      "f1_CNO_len_min",
+      "f1_CNO_len_max",
+      "f1_CNO_len_mean",
+      "f1_CNO_len_std",
+      "f1_CNO_birth_sum",
+      "f1_CNO_birth_min",
+      "f1_CNO_birth_max",
+      "f1_CNO_birth_mean",
+      "f1_CNO_birth_std",
+      "f1_CNO_death_sum",
+      "f1_CNO_death_min",
+      "f1_CNO_death_max",
+      "f1_CNO_death_mean",
+      "f1_CNO_death_std"
+    ],
+    "dim": 172,
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data/graph_metadata.json"
+  },
+  "module_registry": {
+    "edge": {
+      "alias": "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA",
+      "defaults": {
+        "distance_max": 10.0,
+        "distance_min": 0.0,
+        "jobs": 16,
+        "scale_features": true
+      },
+      "description": "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1].",
+      "id": "edge/legacy_band/v11",
+      "inputs": [
+        "interface_residues",
+        "pdb_structure"
+      ],
+      "jobs": 16,
+      "kind": "edge",
+      "notes": {},
+      "outputs": [
+        "edge_index",
+        "edge_attr"
+      ],
+      "parameters": {
+        "distance_max": "Maximum interface C\u03b1 distance (\u00c5) to include an edge.",
+        "distance_min": "Minimum interface C\u03b1 distance (\u00c5) to include an edge.",
+        "jobs": "Optional override for edge assembly worker count.",
+        "scale_features": "Apply MinMax scaling across edge features."
+      },
+      "summary": "11-D legacy edge features (distance + atom distance histogram)."
+    },
+    "interface": {
+      "alias": "residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA",
+      "defaults": {
+        "coordinate_decimals": -1,
+        "cutoff": 10.0,
+        "jobs": 16
+      },
+      "description": "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding.",
+      "id": "interface/polar_cutoff/v1",
+      "inputs": [
+        "pdb_file"
+      ],
+      "jobs": 16,
+      "kind": "interface",
+      "notes": {},
+      "outputs": [
+        "interface_file"
+      ],
+      "parameters": {
+        "coordinate_decimals": "Decimal places for coordinate rounding in output files (-1 skips rounding).",
+        "cutoff": "Distance cutoff in \u00c5 for interface residue detection.",
+        "jobs": "Optional override for parallel worker count."
+      },
+      "summary": "Polar interface detection using distance cutoff. ID + coords for downstream stages"
+    },
+    "node": {
+      "alias": "140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA",
+      "defaults": {
+        "drop_na": true,
+        "jobs": 16
+      },
+      "description": "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs.",
+      "id": "node/dssp_topo_merge/v1",
+      "inputs": [
+        "pdb_file",
+        "interface_file",
+        "topology_csv"
+      ],
+      "jobs": 16,
+      "kind": "node",
+      "notes": {},
+      "outputs": [
+        "node_csv"
+      ],
+      "parameters": {
+        "drop_na": "Drop rows containing NA values after merging.",
+        "jobs": "Optional override for thread worker count."
+      },
+      "summary": "DSSP-derived node features merged with topology statistics."
+    },
+    "topology": {
+      "alias": "Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA",
+      "defaults": {
+        "dedup_sort": false,
+        "element_filters": [
+          [
+            "C"
+          ],
+          [
+            "N"
+          ],
+          [
+            "O"
+          ],
+          [
+            "C",
+            "N"
+          ],
+          [
+            "C",
+            "O"
+          ],
+          [
+            "N",
+            "O"
+          ],
+          [
+            "C",
+            "N",
+            "O"
+          ]
+        ],
+        "filtration_cutoff": 8.0,
+        "jobs": 16,
+        "min_persistence": 0.01,
+        "neighbor_distance": 8.0
+      },
+      "description": "Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input.",
+      "id": "topology/persistence_basic/v1",
+      "inputs": [
+        "pdb_file",
+        "interface_file"
+      ],
+      "jobs": 16,
+      "kind": "topology",
+      "notes": {},
+      "outputs": [
+        "topology_csv"
+      ],
+      "parameters": {
+        "dedup_sort": "Enable deduplication & sorting of persistence pairs.",
+        "element_filters": "Sequence of element subsets considered for statistics.",
+        "filtration_cutoff": "Maximum filtration value in \u00c5.",
+        "jobs": "Optional override for parallel worker count.",
+        "min_persistence": "Minimum persistence threshold for features.",
+        "neighbor_distance": "Neighbourhood radius in \u00c5 for complex filtration."
+      },
+      "summary": "Persistent homology features with configurable distance thresholds."
+    }
+  },
+  "metadata_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data/graph_metadata.json",
+  "summary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed888_2025-12-11_21-29-03/schema_summary.json",
+  "notes": [],
+  "sample_graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data/19HC/19HC.pt",
+  "sample_edge_count": 40,
+  "sample_node_count": 10,
+  "builder": {
+    "command": [
+      "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/graph_builder2.py",
+      "--pdb-warnings",
+      "--no-sort-artifacts",
+      "--dataset-dir",
+      "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/Dockground_MAF2",
+      "--work-dir",
+      "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/work",
+      "--graph-dir",
+      "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data",
+      "--log-dir",
+      "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/logs_output/topoqa_10A_normal",
+      "--jobs",
+      "16",
+      "--feature-config",
+      "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.topoqa.10A"
+    ],
+    "edge_dumps": {
+      "configured_directory": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/work/edge_features",
+      "enabled": true,
+      "output_directory": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/work/edge_features"
+    },
+    "feature_config": {
+      "path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/feature-config.yaml.topoqa.10A",
+      "sha256": "5c62898155179232a565e24d9fbd7b208f9ce480d1a19d6139de19454e173ff0",
+      "text": "# Auto-generated feature-config template\n# Pick one module per required stage. Edit parameter values as needed.\n# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.\ndefaults:\n  jobs: 16  # Optional global worker override; remove if unused.\n\noptions:\n  topology_round_decimals: -1  # Round topology numeric columns to N decimals (0-15); -1 or omit to disable (recommended 12 when enabling).\n\n# REQUIRED stage: interface\ninterface:\n  module: interface/polar_cutoff/v1  # alias: TopoQA default 10A cut-off\n  alias: \"residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA\"\n  summary: \"Polar interface detection using distance cutoff.\"\n  description: \"Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding.\"\n  params:\n    cutoff: 10.0\n    coordinate_decimals: -1  # skip rounding to keep raw coords\n    jobs: 16\n\n# OPTIONAL stage: topology\ntopology:\n  module: topology/persistence_basic/v1  # alias: TopoQA default\n  alias: \"Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA\"\n  summary: \"Persistent homology features with configurable distance thresholds.\"\n  description: \"Generates per-residue topological descriptors using the persistent homology pipeline from new_topological_features. Interface residues are required as input.\"\n  params:\n    neighbor_distance: 8.0\n    filtration_cutoff: 8.0\n    min_persistence: 0.01\n    dedup_sort: false\n    element_filters:\n      - [C]\n      - [N]\n      - [O]\n      - [C, N]\n      - [C, O]\n      - [N, O]\n      - [C, N, O]\n    jobs: 16\n\n# REQUIRED stage: node\nnode:\n  module: node/dssp_topo_merge/v1  # alias: TopoQA default\n  alias: \"140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA\"\n  summary: \"DSSP-derived node features merged with topology statistics.\"\n  description: \"Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs.\"\n  params:\n    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py\n    jobs: 16\n\n# REQUIRED stage: edge\nedge:\n  module: edge/legacy_band/v11\n  alias: \"10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA\"\n  summary: \"11D legacy edge features (distance + atom distance histogram).\"\n  description: \"Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1].\"\n  params:\n    distance_min: 0.0\n    distance_max: 10.0\n    scale_features: true\n    jobs: 16\n"
+    },
+    "id": "graph_builder2",
+    "module": "qtdaqa.new_dynamic_features.graph_builder2.graph_builder2",
+    "options": {
+      "default_jobs": 16,
+      "edge_dump": true,
+      "topology_round_decimals": -1
+    },
+    "schema_version": 1,
+    "version": "2.0.0"
+  },
+  "topology_schema": {}
+}

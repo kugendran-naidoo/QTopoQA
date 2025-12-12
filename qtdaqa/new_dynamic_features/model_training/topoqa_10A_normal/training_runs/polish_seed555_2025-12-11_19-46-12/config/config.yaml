@@ -1,0 +1,38 @@
+paths:
+  train_labels: ./data.train.csv
+  val_labels: ./data.validate.csv
+  save_dir: ./training_runs
+  graph: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data
+model:
+  pooling_type: mean
+  attention_head: 8
+dataloader:
+  batch_size: 32
+  num_workers: 0
+  seed: 555
+selection:
+  primary_metric: val_loss
+trainer:
+  accelerator: cpu
+  devices: 1
+  precision: 32
+  num_epochs: 320
+  accumulate_grad_batches: 8
+  use_val_spearman_as_secondary: true
+  spearman_secondary_weight: 1.0
+optimizer:
+  learning_rate: 3e-3
+scheduler:
+  factor: 0.3
+  patience: 20
+  type: reduce_on_plateau
+early_stopping:
+  patience: 40
+mlflow:
+  enabled: true
+  tracking_uri: ./qtdaqa/new_dynamic_features/model_training/ml_runs
+  experiment: dynamic_topoqa
+  log_artifacts: true
+coverage:
+  fail_on_missing: false
+  minimum_percent: 0

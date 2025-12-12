@@ -1031,6 +1031,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     selection_top: List[Dict[str, Any]] = []
     selection_best: Optional[Dict[str, Any]] = None
     selection_candidates = [entry for entry in val_history if entry.get("selection_metric") is not None]
+    sorted_by_selection: List[Dict[str, Any]] = []
     if selection_candidates:
         sorted_by_selection = sorted(selection_candidates, key=lambda item: item["selection_metric"])
         for idx, entry in enumerate(sorted_by_selection[:3]):
@@ -1043,7 +1044,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
                     "epoch": entry["epoch"],
                 }
             )
-    selection_best = sorted_by_selection[0]
+        selection_best = sorted_by_selection[0] if sorted_by_selection else None
 
     selection_alternates: List[Dict[str, Any]] = []
     selection_alt_checkpoint = alternate_checkpoint_meta.get("selection_metric")

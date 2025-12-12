@@ -1,0 +1,106 @@
+{
+  "run_name": "polish_seed888_2025-12-11_21-29-03_phase2_seed888",
+  "created": "2025-12-11T23:18:54.383087",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed888.yaml",
+  "overrides": {
+    "paths.graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_normal/graph_data"
+  },
+  "notes": null,
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed888_2025-12-11_21-29-03_phase2_seed888/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed888_2025-12-11_21-29-03_phase2_seed888",
+    "--git-commit",
+    "28afdb7e1",
+    "--git-dirty",
+    "--resume-from",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed888_2025-12-11_21-29-03_phase1/model_checkpoints/checkpoint.val-0.04604_epoch191.chkpt"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  },
+  "training_parameters": {
+    "trainer": {
+      "num_epochs": 320,
+      "accumulate_grad_batches": 16,
+      "precision": 32,
+      "accelerator": "cpu",
+      "devices": 1
+    },
+    "dataloader": {
+      "batch_size": 16,
+      "num_workers": 0,
+      "seed": 888
+    },
+    "fast_dev_run": false
+  },
+  "selection_primary_metric": "val_loss",
+  "selection": {
+    "primary_metric": "val_loss",
+    "use_val_spearman": true,
+    "spearman_weight": 1.0,
+    "spearman_min_delta": 0.0,
+    "secondary_metric": "val_spearman_corr"
+  },
+  "runtime": {
+    "training_seconds": 288,
+    "epochs_completed": 22,
+    "epochs_total": 320,
+    "epoch_seconds": [
+      13,
+      13,
+      13,
+      14,
+      13,
+      14,
+      14,
+      12,
+      12,
+      12,
+      13,
+      13,
+      12,
+      13,
+      16,
+      18,
+      14,
+      12,
+      11,
+      12,
+      12,
+      12
+    ],
+    "epoch_seconds_stats": {
+      "mean": 13.060652499880895,
+      "median": 12.78681289544329,
+      "min": 10.937832208815962,
+      "max": 17.67131012491882
+    }
+  },
+  "checkpoints": {
+    "primary_metric": "val_loss",
+    "primary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed888_2025-12-11_21-29-03_phase2_seed888/model_checkpoints/checkpoint.val-0.04575_epoch203.chkpt",
+    "alternates": {
+      "selection_metric": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_seed888_2025-12-11_21-29-03_phase2_seed888/model_checkpoints/selection_metric_checkpoints/alt_selection.sel--0.69396_val-0.04825_epoch200.ckpt"
+    }
+  },
+  "mlflow": {
+    "run_id": "dce521625ca3420dac34a02c588e2df8",
+    "experiment": "dynamic_topoqa",
+    "experiment_id": "686301252057198949",
+    "run_name": "polish_seed888_2025-12-11_21-29-03_phase2_seed888",
+    "tracking_uri": "./qtdaqa/new_dynamic_features/model_training/ml_runs"
+  },
+  "completed": "2025-12-11T23:23:49.495954",
+  "artifacts": {
+    "logs_dir": "logs",
+    "metrics_dir": "metrics"
+  }
+}

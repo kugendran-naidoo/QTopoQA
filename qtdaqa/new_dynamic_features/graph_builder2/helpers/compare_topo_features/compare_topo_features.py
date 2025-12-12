@@ -23,12 +23,17 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+try:
+    import psutil
+except ImportError:  # pragma: no cover
+    psutil = None
 
 class HelpOnErrorArgumentParser(argparse.ArgumentParser):
     """ArgumentParser that prints full help (with defaults) on error."""
@@ -92,6 +97,18 @@ def parse_args(argv: Iterable[str]) -> argparse.Namespace:
         type=Path,
         default=Path("topo_run.log"),
         help="Write console output to this log file (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--flush-every",
+        type=int,
+        default=50,
+        help="Flush diff/same files to disk after this many comparisons to reduce memory spikes",
+    )
+    parser.add_argument(
+        "--progress-interval",
+        type=float,
+        default=30.0,
+        help="Seconds between progress reports showing percentage and ETA",
     )
     return parser.parse_args(list(argv))
 
@@ -264,6 +281,8 @@ def main(argv: Iterable[str]) -> int:
         log_print(f"  same_report: {args.same_report}")
         log_print(f"  missing_report: {args.missing_report}")
         log_print(f"  run_report: {args.run_report}")
+        log_print(f"  flush_every: {args.flush_every}")
+        log_print(f"  progress_interval: {args.progress_interval}s")
         log_print(f"  Reference root: {reference_dir}")
         log_print(f"  Candidate root: {candidate_dir}")
 
@@ -274,30 +293,166 @@ def main(argv: Iterable[str]) -> int:
             log_print(f"Candidate directory not found: {candidate_dir}", file=sys.stderr)
             return 2
 
-        results, missing_candidate, missing_reference = compare_directories(
-            reference_dir,
-            candidate_dir,
-            tolerance=args.tolerance,
-        )
+        reference_csvs = collect_csvs(reference_dir)
+        candidate_csvs = collect_csvs(candidate_dir)
+
+        ref_keys = set(reference_csvs.keys())
+        cand_keys = set(candidate_csvs.keys())
+
+        shared_keys = sorted(ref_keys & cand_keys)
+        missing_in_candidate_keys = sorted(ref_keys - cand_keys)
+        missing_in_reference_keys = sorted(cand_keys - ref_keys)
+
+        def rel_path(base: Path, path: Path) -> Path:
+            try:
+                return path.relative_to(base)
+            except ValueError:
+                return Path(path.name)
+
+        missing_candidate: List[Path] = []
+        for key in missing_in_candidate_keys:
+            ref_paths = reference_csvs[key]
+            if len(ref_paths) != 1:
+                raise ValueError(
+                    f"Encountered multiple files matching canonical name '{key}' in reference directory; please disambiguate."
+                )
+            path = ref_paths[0]
+            missing_candidate.append(rel_path(reference_dir, path))
+
+        missing_reference: List[Path] = []
+        for key in missing_in_reference_keys:
+            cand_paths = candidate_csvs[key]
+            if len(cand_paths) != 1:
+                raise ValueError(
+                    f"Encountered multiple files matching canonical name '{key}' in candidate directory; please disambiguate."
+                )
+            path = cand_paths[0]
+            missing_reference.append(rel_path(candidate_dir, path))
+
+        flush_every = max(1, args.flush_every)
+        diff_path = args.diff_report.resolve()
+        same_path = args.same_report.resolve()
+        missing_path = args.missing_report.resolve()
+
+        diff_handle = None
+        same_handle = None
+        diff_written = False
+        same_written = False
+
+        def write_diff(lines: Iterable[str]) -> None:
+            nonlocal diff_handle, diff_written
+            if diff_handle is None:
+                diff_path.parent.mkdir(parents=True, exist_ok=True)
+                diff_handle = diff_path.open("w", encoding="utf-8")
+            for line in lines:
+                diff_handle.write(line.rstrip("\n") + "\n")
+            diff_written = True
+
+        def write_same(lines: Iterable[str]) -> None:
+            nonlocal same_handle, same_written
+            if same_handle is None:
+                same_path.parent.mkdir(parents=True, exist_ok=True)
+                same_handle = same_path.open("w", encoding="utf-8")
+            for line in lines:
+                same_handle.write(line.rstrip("\n") + "\n")
+            same_written = True
 
         mismatches = 0
         different_files = 0
         identical_files = 0
-        diff_lines: List[str] = []
-        same_lines: List[str] = []
-        for rel_path in missing_candidate:
-            diff_lines.append(f"MISSING in candidate: {reference_dir / rel_path}")
-        for rel_path in missing_reference:
-            diff_lines.append(f"MISSING in reference: {candidate_dir / rel_path}")
-        for result in results:
+
+        missing_lines: List[str] = []
+        if missing_candidate:
+            missing_lines.append("Missing in candidate:")
+            missing_lines.extend([f"  {reference_dir / rel_path}" for rel_path in missing_candidate])
+        if missing_reference:
+            missing_lines.append("Missing in baseline:")
+            missing_lines.extend([f"  {candidate_dir / rel_path}" for rel_path in missing_reference])
+
+        if missing_lines:
+            missing_path.parent.mkdir(parents=True, exist_ok=True)
+            with missing_path.open("w", encoding="utf-8") as missing_file:
+                for line in missing_lines:
+                    missing_file.write(line.rstrip("\n") + "\n")
+            write_diff(missing_lines)
+            log_print(f"Missing files written to {args.missing_report}")
+        else:
+            log_print("No missing files detected; no missing report written.")
+
+        total_shared = len(shared_keys)
+        log_print(f"Shared files to compare: {total_shared}")
+        progress_interval = max(1.0, args.progress_interval)
+
+        def format_duration(seconds: float) -> str:
+            seconds = max(0, int(seconds))
+            mins, sec = divmod(seconds, 60)
+            hrs, mins = divmod(mins, 60)
+            if hrs:
+                return f"{hrs:d}h{mins:02d}m{sec:02d}s"
+            if mins:
+                return f"{mins:d}m{sec:02d}s"
+            return f"{sec:d}s"
+
+        def format_bytes(num_bytes: int) -> str:
+            if num_bytes >= 1024 ** 3:
+                return f"{num_bytes / (1024 ** 3):.2f} GB"
+            if num_bytes >= 1024 ** 2:
+                return f"{num_bytes / (1024 ** 2):.2f} MB"
+            if num_bytes >= 1024:
+                return f"{num_bytes / 1024:.2f} KB"
+            return f"{num_bytes} B"
+
+        def current_mem_bytes() -> Optional[int]:
+            if psutil is None:
+                return None
+            try:
+                return psutil.Process().memory_info().rss
+            except Exception:
+                return None
+
+        start_time = time.monotonic()
+        last_progress = start_time
+        processed = 0
+        processed_since_flush = 0
+        for key in shared_keys:
+            ref_paths = reference_csvs[key]
+            cand_paths = candidate_csvs[key]
+            if len(ref_paths) != 1 or len(cand_paths) != 1:
+                raise ValueError(
+                    f"Encountered multiple files named '{key}' in one of the directories; please disambiguate."
+                )
+            reference_path = ref_paths[0]
+            candidate_path = cand_paths[0]
+            df_ref = load_dataframe(reference_path)
+            df_new = load_dataframe(candidate_path)
+            try:
+                max_diff, exceeded = compare_dataframes(df_ref, df_new, args.tolerance)
+                error: Optional[str] = None
+            except ValueError as exc:
+                max_diff = float("nan")
+                exceeded = []
+                error = str(exc)
+
+            relative = rel_path(reference_dir, reference_path)
+            result = ComparisonResult(
+                relative_path=relative,
+                reference_path=reference_path,
+                candidate_path=candidate_path,
+                max_abs_diff=max_diff,
+                exceeded=exceeded,
+                error=error,
+            )
+
             if result.error:
                 mismatches += 1
                 different_files += 1
-                diff_lines.append(
-                    f"ERROR: {result.relative_path}\n"
-                    f"  reference: {result.reference_path}\n"
-                    f"  candidate: {result.candidate_path}\n"
-                    f"  detail: {result.error}"
+                write_diff(
+                    [
+                        f"ERROR: {result.relative_path}",
+                        f"  reference: {result.reference_path}",
+                        f"  candidate: {result.candidate_path}",
+                        f"  detail: {result.error}",
+                    ]
                 )
             elif result.exceeded:
                 mismatches += 1
@@ -307,55 +462,80 @@ def main(argv: Iterable[str]) -> int:
                     f"  reference: {result.reference_path}\n"
                     f"  candidate: {result.candidate_path}"
                 )
-                diff_lines.append(header)
+                diff_block = [header]
                 for row_id, column, diff in result.exceeded:
-                    diff_lines.append(
-                        f"    row={row_id}, column='{column}', diff={diff:.3e}"
-                    )
+                    diff_block.append(f"    row={row_id}, column='{column}', diff={diff:.3e}")
+                write_diff(diff_block)
             else:
                 identical_files += 1
-                same_lines.append(
-                    f"SAME: {result.relative_path}\n"
-                    f"  reference: {result.reference_path}\n"
-                    f"  candidate: {result.candidate_path}"
+                write_same(
+                    [
+                        f"SAME: {result.relative_path}",
+                        f"  reference: {result.reference_path}",
+                        f"  candidate: {result.candidate_path}",
+                    ]
                 )
 
-        log_print(f"Shared files compared: {len(results)}")
+            processed += 1
+            processed_since_flush += 1
+            if processed_since_flush >= flush_every:
+                if diff_handle:
+                    diff_handle.flush()
+                if same_handle:
+                    same_handle.flush()
+                processed_since_flush = 0
+
+            now = time.monotonic()
+            if now - last_progress >= progress_interval:
+                elapsed = now - start_time
+                pct = (processed / total_shared * 100) if total_shared else 100.0
+                rate = (processed / elapsed) if elapsed > 0 else 0.0
+                remaining = total_shared - processed
+                eta = remaining / rate if rate > 0 else 0.0
+                # Estimate diff file size upper bound by linear projection of current size.
+                if diff_handle:
+                    diff_handle.flush()
+                    diff_size = diff_handle.tell()
+                elif diff_path.exists():
+                    diff_size = diff_path.stat().st_size
+                else:
+                    diff_size = 0
+                projected_size = int(diff_size / processed * total_shared) if processed else 0
+                mem_bytes = current_mem_bytes()
+                mem_clause = f"(mem {format_bytes(mem_bytes)})" if mem_bytes is not None else ""
+                log_print(
+                    f"Progress: {processed}/{total_shared} ({pct:.2f}%) "
+                    f"(elapsed {format_duration(elapsed)} eta {format_duration(eta)}) "
+                    f"(diff ~{format_bytes(diff_size)} projected <= {format_bytes(projected_size)}) "
+                    f"{mem_clause}".rstrip()
+                )
+                last_progress = now
+
+        if diff_handle:
+            diff_handle.flush()
+            diff_handle.close()
+        if same_handle:
+            same_handle.flush()
+            same_handle.close()
+
+        log_print(f"Shared files compared: {len(shared_keys)}")
         log_print(f"  Identical files:     {identical_files}")
         log_print(f"  Different files:     {different_files}")
         log_print(f"Missing in candidate:  {len(missing_candidate)}")
         log_print(f"Missing in baseline:   {len(missing_reference)}")
+        log_print(f"Total elapsed:        {format_duration(time.monotonic() - start_time)}")
+        if diff_path.exists():
+            log_print(f"Diff report size:     {format_bytes(diff_path.stat().st_size)}")
 
-        if diff_lines:
-            diff_path = args.diff_report.resolve()
-            diff_path.parent.mkdir(parents=True, exist_ok=True)
-            diff_path.write_text("\n".join(diff_lines) + "\n", encoding="utf-8")
+        if diff_written:
             log_print(f"Detailed differences written to {args.diff_report}")
         else:
             log_print("No differences detected; no diff report written.")
 
-        if same_lines:
-            same_path = args.same_report.resolve()
-            same_path.parent.mkdir(parents=True, exist_ok=True)
-            same_path.write_text("\n".join(same_lines) + "\n", encoding="utf-8")
+        if same_written:
             log_print(f"Identical file pairs written to {args.same_report}")
         else:
             log_print("No identical file pairs recorded; no same report written.")
-
-        missing_lines: List[str] = []
-        if missing_candidate:
-            missing_lines.append("Missing in candidate:")
-            missing_lines.extend([f"  {reference_dir / rel_path}" for rel_path in missing_candidate])
-        if missing_reference:
-            missing_lines.append("Missing in baseline:")
-            missing_lines.extend([f"  {candidate_dir / rel_path}" for rel_path in missing_reference])
-        if missing_lines:
-            missing_path = args.missing_report.resolve()
-            missing_path.parent.mkdir(parents=True, exist_ok=True)
-            missing_path.write_text("\n".join(missing_lines) + "\n", encoding="utf-8")
-            log_print(f"Missing files written to {args.missing_report}")
-        else:
-            log_print("No missing files detected; no missing report written.")
 
         log_print(f"Run log written to {args.run_report}")
 
