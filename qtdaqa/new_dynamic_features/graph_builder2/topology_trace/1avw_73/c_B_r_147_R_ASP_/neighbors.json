@@ -1,0 +1,16 @@
+{
+  "count": 101,
+  "ids_hash": "12e336bd2207d5025d539bfce5d555f7d5cdf0df76908e91dfd89cd1688fa163",
+  "coords_hash": "c533e34ed4defa84bf9961c9b2841e67783ae98b8124b8747f901acdc56dc755",
+  "coords_stats": {
+    "shape": [
+      101,
+      3
+    ],
+    "size": 303,
+    "min": -11.635000228881836,
+    "max": 49.1349983215332,
+    "mean": 24.97885802240655,
+    "std": 20.508025458477107
+  }
+}

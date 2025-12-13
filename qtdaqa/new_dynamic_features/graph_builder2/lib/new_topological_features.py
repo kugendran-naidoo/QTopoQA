@@ -38,6 +38,9 @@ import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from functools import lru_cache
+import hashlib
+import json
+import os
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
@@ -55,6 +58,9 @@ except ImportError:  # pragma: no cover
     from pdb_utils import create_pdb_parser  # type: ignore
 
 LOGGER = logging.getLogger(__name__)
+TRACE_ENV_FLAG = "QTOPO_TOPO_TRACE"
+TRACE_ENV_FILTER = "QTOPO_TOPO_TRACE_FILTER"
+TRACE_ENV_DIR = "QTOPO_TOPO_TRACE_DIR"
 
 
 # --------------------------------------------------------------------------- #
@@ -109,6 +115,89 @@ class ResidueDescriptor:
         if self.residue_name:
             base += f"R<{self.residue_name}>"
         return base
+
+@dataclass(frozen=True)
+class _TraceConfig:
+    enabled: bool
+    trace_dir: Path
+    filters: Tuple[str, ...]
+
+    @classmethod
+    def from_env(cls, pdb_path: Path) -> "_TraceConfig":
+        if os.environ.get(TRACE_ENV_FLAG, "").strip() not in {"1", "true", "TRUE", "yes", "Yes"}:
+            return cls(enabled=False, trace_dir=Path("."), filters=())
+        raw_dir = os.environ.get(TRACE_ENV_DIR)
+        if raw_dir:
+            trace_dir = Path(raw_dir).expanduser()
+        else:
+            trace_dir = Path(".") / "topology_trace"
+        raw_filter = os.environ.get(TRACE_ENV_FILTER, "")
+        filters = tuple(token.strip() for token in raw_filter.split(",") if token.strip())
+        return cls(enabled=True, trace_dir=trace_dir, filters=filters)
+
+
+def _hash_array(arr: np.ndarray) -> Optional[str]:
+    if arr is None:
+        return None
+    try:
+        view = np.asarray(arr)
+        return hashlib.sha256(view.tobytes()).hexdigest()
+    except Exception:
+        return None
+
+
+def _array_stats(arr: np.ndarray) -> Dict[str, object]:
+    view = np.asarray(arr)
+    if view.size == 0:
+        return {"shape": list(view.shape), "size": 0}
+    return {
+        "shape": list(view.shape),
+        "size": int(view.size),
+        "min": float(np.min(view)),
+        "max": float(np.max(view)),
+        "mean": float(np.mean(view)),
+        "std": float(np.std(view)),
+    }
+
+
+def _safe_label(text: str) -> str:
+    return re.sub(r"[^A-Za-z0-9._-]+", "_", text)
+
+
+class TopologyTracer:
+    """Opt-in tracing for topology drift debugging (no-op when disabled)."""
+
+    def __init__(self, config: _TraceConfig, pdb_path: Path):
+        self.config = config
+        self.pdb_path = Path(pdb_path)
+        self.pdb_token = _safe_label(self.pdb_path.stem)
+
+    @classmethod
+    def from_env(cls, pdb_path: Path) -> "TopologyTracer":
+        return cls(_TraceConfig.from_env(pdb_path), pdb_path)
+
+    @property
+    def enabled(self) -> bool:
+        return self.config.enabled
+
+    def _matches_filter(self, residue_label: str) -> bool:
+        if not self.config.filters:
+            return True
+        target = residue_label + " " + self.pdb_token
+        return any(token in target for token in self.config.filters)
+
+    def record(self, residue_label: str, stage: str, payload: Dict[str, object]) -> None:
+        if not self.enabled or not self._matches_filter(residue_label):
+            return
+        try:
+            root = self.config.trace_dir / self.pdb_token / _safe_label(residue_label)
+            root.mkdir(parents=True, exist_ok=True)
+            output_path = root / f"{stage}.json"
+            serializable = dict(payload)
+            with output_path.open("w", encoding="utf-8") as handle:
+                json.dump(serializable, handle, indent=2)
+        except Exception:
+            LOGGER.exception("Topology tracing failed for %s stage %s", residue_label, stage)
 
 @dataclass(frozen=True)
 class ElementFilter:
@@ -326,6 +415,8 @@ def _compute_features_for_atoms(
     hbond_flags: Optional[List[bool]] = None,
     hbond_factor: Optional[float] = None,
     hbond_inter_only: bool = False,
+    tracer: Optional[TopologyTracer] = None,
+    residue_label: Optional[str] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     log = logger or LOGGER
     coords = np.asarray(coord_set, dtype=float)
@@ -334,6 +425,12 @@ def _compute_features_for_atoms(
 
     if coords.size == 0:
         log.debug("No neighbor coordinates available; returning zero features")
+        if tracer and tracer.enabled and residue_label:
+            tracer.record(
+                residue_label,
+                "neighbors",
+                {"coords_hash": _hash_array(coords), "coords_stats": _array_stats(coords)},
+            )
         return np.zeros(5), np.zeros(15)
 
     # Remove duplicate coordinates (if any)
@@ -397,6 +494,23 @@ def _compute_features_for_atoms(
             config.max_alpha_dimension,
         )
 
+    if tracer and tracer.enabled and residue_label:
+        tracer.record(
+            residue_label,
+            "distance_matrix",
+            {"hash": _hash_array(dist_matrix), "stats": _array_stats(dist_matrix)},
+        )
+        tracer.record(
+            residue_label,
+            "persistence",
+            {
+                "rips_hash": _hash_array(np.asarray(rips_persistence, dtype=object)),
+                "alpha_hash": _hash_array(np.asarray(alpha_persistence, dtype=object)),
+                "rips_len": len(rips_persistence),
+                "alpha_len": len(alpha_persistence),
+            },
+        )
+
     feature_0d = _persistence_summary_zero_dim(
         rips_persistence,
         cutoff=config.filtration_cutoff,
@@ -406,6 +520,17 @@ def _compute_features_for_atoms(
         alpha_persistence,
         min_persistence=config.min_persistence,
     )
+    if tracer and tracer.enabled and residue_label:
+        tracer.record(
+            residue_label,
+            "features",
+            {
+                "f0_hash": _hash_array(feature_0d),
+                "f1_hash": _hash_array(feature_1d),
+                "f0_stats": _array_stats(feature_0d),
+                "f1_stats": _array_stats(feature_1d),
+            },
+        )
     return feature_0d, feature_1d
 
 
@@ -459,6 +584,7 @@ def compute_features_for_residue(
     hbond_residues: Optional[Set[Tuple[str, int, str]]] = None,
     hbond_factor: Optional[float] = None,
     hbond_inter_only: bool = False,
+    tracer: Optional[TopologyTracer] = None,
 ) -> List[float]:
     log = logger or LOGGER
 
@@ -474,6 +600,30 @@ def compute_features_for_residue(
             neighbors = [atom for atom in neighbors if atom.get_parent().get_parent().id != ref_chain]  # type: ignore[attr-defined]
         else:
             neighbors = [atom for atom in neighbors if atom.get_parent().get_parent().id == ref_chain]  # type: ignore[attr-defined]
+
+    residue_label = residue.to_string()
+    if tracer and tracer.enabled:
+        neighbor_descriptors: List[str] = []
+        neighbor_coords: List[List[float]] = []
+        for atom in neighbors:
+            res = atom.get_parent()
+            chain_id = res.get_parent().id  # type: ignore[attr-defined]
+            res_id = res.get_id()
+            resnum = int(res_id[1])
+            icode = res_id[2] if len(res_id) > 2 else " "
+            neighbor_descriptors.append(f"{chain_id}:{resnum}:{icode}:{atom.get_id()}")
+            coord = atom.coord
+            neighbor_coords.append([float(coord[0]), float(coord[1]), float(coord[2])])
+        tracer.record(
+            residue_label,
+            "neighbors",
+            {
+                "count": len(neighbor_descriptors),
+                "ids_hash": _hash_array(np.asarray(neighbor_descriptors, dtype=object)),
+                "coords_hash": _hash_array(np.asarray(neighbor_coords, dtype=float)),
+                "coords_stats": _array_stats(np.asarray(neighbor_coords, dtype=float)),
+            },
+        )
 
     feature_0d: List[float] = []
     feature_1d: List[float] = []
@@ -497,6 +647,8 @@ def compute_features_for_residue(
                 hbond_flags=hbond_flags if (polar_mode and hbond_weight) else None,
                 hbond_factor=hbond_factor if (polar_mode and hbond_weight) else None,
                 hbond_inter_only=hbond_inter_only,
+                tracer=tracer,
+                residue_label=residue_label,
             )
         except Exception as exc:  # pragma: no cover - surfaced to caller
             raise RuntimeError(
@@ -523,6 +675,7 @@ def compute_features_for_residues(
     hbond_residues: Optional[Set[Tuple[str, int, str]]] = None,
     hbond_factor: Optional[float] = None,
     hbond_inter_only: bool = False,
+    tracer: Optional[TopologyTracer] = None,
 ) -> pd.DataFrame:
     log = logger or LOGGER
 
@@ -535,6 +688,11 @@ def compute_features_for_residues(
         len(residues),
         worker_count,
     )
+
+    trace_cfg = tracer or TopologyTracer.from_env(pdb_path)
+    active_tracer = trace_cfg if trace_cfg.enabled and worker_count == 1 else None
+    if trace_cfg.enabled and worker_count > 1:
+        log.warning("Topology tracing enabled but workers > 1; tracing disabled for this run.")
 
     feature_map: Dict[int, List[float]] = {}
     id_map: Dict[int, str] = {}
@@ -598,6 +756,7 @@ def compute_features_for_residues(
                 hbond_residues=hbond_residues,
                 hbond_factor=hbond_factor,
                 hbond_inter_only=hbond_inter_only,
+                tracer=active_tracer,
             )
             feature_map[index] = feature_values
             id_map[index] = desc_str
@@ -653,6 +812,7 @@ __all__ = [
     "ResidueDescriptor",
     "ElementFilter",
     "TopologicalConfig",
+    "TopologyTracer",
     "compute_features_for_residue",
     "compute_features_for_residues",
 ]

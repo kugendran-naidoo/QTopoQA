@@ -1,0 +1,24 @@
+{
+  "f0_hash": "afbdac35aee3e3a7ae4a57a1bb9b5bb0e73a2cf08ddaa8a84f7c25cc31b0b2ab",
+  "f1_hash": "bcce37ab80a9f2c9def5ba9cbaa4f67b2a2aa3fc5de81746accd75fcba82cc2e",
+  "f0_stats": {
+    "shape": [
+      5
+    ],
+    "size": 5,
+    "min": 0.4561139704629557,
+    "max": 113.03312236884652,
+    "mean": 24.029021774726296,
+    "std": 44.516950158644065
+  },
+  "f1_stats": {
+    "shape": [
+      15
+    ],
+    "size": 15,
+    "min": 0.012070997249643334,
+    "max": 286.7038723380811,
+    "mean": 40.244364038057036,
+    "std": 90.91556876630032
+  }
+}
