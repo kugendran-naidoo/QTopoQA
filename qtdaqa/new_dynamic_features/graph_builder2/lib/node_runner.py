@@ -31,20 +31,22 @@ def _hash_array(arr) -> str:
     """
     Hash a numeric view in a way that mirrors what flows into the model:
     - Preserve canonical row order on ID if present
-    - Cast to float32 to discard sub-ULP float64 noise across platforms
+    - Hash only numeric columns cast to float32 to avoid object-array noise and
+      sub-ULP float64 differences across platforms.
     """
     if isinstance(arr, pd.DataFrame):
-        view = arr.copy()
+        df = arr.copy()
+        if "ID" in df.columns:
+            try:
+                order = canonical_id_order(list(df["ID"]))
+                df = df.iloc[order].reset_index(drop=True)
+            except Exception:
+                df = df.sort_values("ID").reset_index(drop=True)
+        numeric = df.select_dtypes(include=[np.number])
+        data = numeric.to_numpy(dtype=np.float32, copy=True)
     else:
-        view = pd.DataFrame(arr)
-    if "ID" in view.columns:
-        view = view.sort_values("ID").reset_index(drop=True)
-    try:
-        numeric = view.to_numpy(dtype=np.float32, copy=True)
-    except Exception:
-        # Fall back to the raw bytes if coercion fails for any reason
-        numeric = view.to_numpy(copy=True)
-    return hashlib.sha256(numeric.tobytes()).hexdigest()
+        data = pd.DataFrame(arr).to_numpy(dtype=np.float32, copy=True)
+    return hashlib.sha256(data.tobytes()).hexdigest()
 
 
 def _hash_file(path: Path) -> str:
