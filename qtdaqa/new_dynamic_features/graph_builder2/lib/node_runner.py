@@ -72,6 +72,14 @@ def _stats_frame(df: pd.DataFrame) -> dict:
     }
 
 
+def _quantize_numeric_to_float32(df: pd.DataFrame) -> pd.DataFrame:
+    """Cast numeric columns to float32 to match downstream tensor dtype."""
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    if len(numeric_cols):
+        df.loc[:, numeric_cols] = df[numeric_cols].astype(np.float32)
+    return df
+
+
 class NodeTracer:
     FLAG = "QTOPO_NODE_TRACE"
     FILTER = "QTOPO_NODE_TRACE_FILTER"
@@ -201,6 +209,7 @@ def _process_task(task: NodeTask, drop_na: bool, sort_artifacts: bool) -> Tuple[
             fea_df.replace("NA", pd.NA, inplace=True)
             fea_df = fea_df.dropna()
         fea_df = _canonicalise_node_df(fea_df, sort_artifacts=sort_artifacts)
+        fea_df = _quantize_numeric_to_float32(fea_df)
         if tracer.enabled:
             tracer.record(
                 task.model_key,
