@@ -423,6 +423,14 @@ def _compute_features_for_atoms(
     if coords.ndim != 2 or coords.shape[1] != 3:
         raise ValueError("Coordinate arrays must have shape (N, 3)")
 
+    # Enforce deterministic ordering to avoid platform-dependent neighbor order
+    if coords.size > 0 and chains:
+        order = sorted(range(len(coords)), key=lambda idx: (chains[idx], coords[idx, 0], coords[idx, 1], coords[idx, 2]))
+        coords = coords[order]
+        chains = [chains[idx] for idx in order]
+        if hbond_flags is not None:
+            hbond_flags = [hbond_flags[idx] for idx in order]
+
     if coords.size == 0:
         log.debug("No neighbor coordinates available; returning zero features")
         if tracer and tracer.enabled and residue_label:

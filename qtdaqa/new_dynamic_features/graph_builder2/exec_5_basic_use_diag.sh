@@ -18,11 +18,12 @@ mkdir -p "${GRAPH_DIR}"
 cd "${SCRIPT_DIR}"
 
 export QTOPO_TOPO_TRACE=1
+export QTOPO_TOPO_TRACE_DIR="${REPO_ROOT}/qtdaqa/new_dynamic_features/graph_builder2/${OUTPUT}/trace"
 
 time ./run_graph_builder2.sh --pdb-warnings --no-sort-artifacts \
   --dataset-dir "${DATASET_DIR}" \
   --work-dir "${WORK_DIR}" \
   --graph-dir "${GRAPH_DIR}" \
   --log-dir "${LOG_DIR}" \
-  --jobs 16 \
+  --jobs 1 \
   --feature-config "${FEATURE_FILE}"
