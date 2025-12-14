@@ -33,6 +33,7 @@ qtdaqa/new_global_metrics/output*
 qtdaqa/graph_builder2/output*
 qtdaqa/graph_builder2_before_edge_dumping/qtdaqa/graph_builder2/output/
 qtdaqa/graph_builder2_with_graph_edge_dump/qtdaqa/graph_builder2/output/
+qtdaqa/new_dynamic_features/graph_builder2/helpers/compare_node_features/node_feature_diff_report.txt
 
 # keep empty directories although ignored
 topoqa_train/graph_data/*
