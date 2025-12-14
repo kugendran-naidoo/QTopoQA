@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import json
 import logging
+import hashlib
+import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -42,6 +44,62 @@ except ImportError:  # pragma: no cover
     from builder_info import sanitize_builder_info  # type: ignore
 
 LOG = logging.getLogger(__name__)
+
+
+def _hash_array(arr) -> str:
+    return hashlib.sha256(np.asarray(arr).tobytes()).hexdigest()
+
+
+def _stats_array(arr) -> dict:
+    view = np.asarray(arr)
+    # Handle object/mixed arrays by attempting numeric coercion; otherwise return shape/size only.
+    if view.dtype == object:
+        try:
+            view = view.astype(float)
+        except Exception:
+            return {"shape": list(view.shape), "size": int(view.size)}
+    if view.size == 0:
+        return {"shape": list(view.shape), "size": 0}
+    return {
+        "shape": list(view.shape),
+        "size": int(view.size),
+        "min": float(view.min()),
+        "max": float(view.max()),
+        "mean": float(view.mean()),
+        "std": float(view.std()),
+    }
+
+
+class EdgeTracer:
+    FLAG = "QTOPO_EDGE_TRACE"
+    FILTER = "QTOPO_EDGE_TRACE_FILTER"
+    DIR = "QTOPO_EDGE_TRACE_DIR"
+
+    def __init__(self, enabled: bool, trace_dir: Path, filters: tuple[str, ...]):
+        self.enabled = enabled
+        self.trace_dir = trace_dir
+        self.filters = filters
+
+    @classmethod
+    def from_env(cls, model_key: str) -> "EdgeTracer":
+        enabled = os.environ.get(cls.FLAG, "").lower() in {"1", "true", "yes"}
+        trace_dir = Path(os.environ.get(cls.DIR, "./edge_trace")).expanduser()
+        raw = os.environ.get(cls.FILTER, "")
+        filters = tuple(token.strip() for token in raw.split(",") if token.strip())
+        if filters and not any(token in model_key for token in filters):
+            enabled = False
+        return cls(enabled, trace_dir, filters)
+
+    def record(self, model_key: str, stage: str, payload: dict) -> None:
+        if not self.enabled:
+            return
+        try:
+            target = self.trace_dir / model_key / f"{stage}.json"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("w", encoding="utf-8") as handle:
+                json.dump(payload, handle, indent=2)
+        except Exception:
+            LOG.warning("Edge tracing failed for %s:%s", model_key, stage)
 
 
 def _write_topology_columns_file(topology_dir: Path, graph_dir: Path) -> None:
@@ -376,6 +434,7 @@ def _process_task(
     log_lines: List[str] = []
     edge_time = 0.0
     save_time = 0.0
+    tracer = EdgeTracer.from_env(task.model_key)
     try:
         node_df, feature_cols = _load_node_features(task.node_path)
         residues = _parse_interface_file(task.interface_path)
@@ -388,6 +447,19 @@ def _process_task(
         if edge_dump_dir is not None:
             dump_path = (edge_dump_dir / Path(task.model_key).with_suffix(".edges.csv")).resolve()
             dump_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if tracer.enabled:
+            tracer.record(
+                task.model_key,
+                "inputs",
+                {
+                    "interface_hash": _hash_array(np.asarray(residues, dtype=object)),
+                    "topology_hash": _hash_array(pd.read_csv(task.topology_path).to_numpy()),
+                    "node_hash": _hash_array(node_df.select_dtypes(include=["number"]).to_numpy()),
+                    "node_stats": _stats_array(node_df.select_dtypes(include=["number"]).to_numpy()),
+                    "feature_cols": feature_cols,
+                },
+            )
 
         edge_start = time.perf_counter()
         edge_result: EdgeBuildResult = edge_module.build_edges(
@@ -419,6 +491,18 @@ def _process_task(
             edge_index=torch.tensor(edge_result.edge_index.T if edge_result.edge_index.size else np.empty((2, 0), dtype=np.int64), dtype=torch.long),
             edge_attr=torch.tensor(edge_result.edge_attr, dtype=torch.float32),
         )
+        if tracer.enabled:
+            tracer.record(
+                task.model_key,
+                "graph",
+                {
+                    "x_hash": _hash_array(x),
+                    "edge_index_hash": _hash_array(edge_result.edge_index),
+                    "edge_attr_hash": _hash_array(edge_result.edge_attr),
+                    "x_stats": _stats_array(x),
+                    "edge_attr_stats": _stats_array(edge_result.edge_attr),
+                },
+            )
         data.metadata = {
             "edge_module": module_id,
             "edge_params": edge_module.params,

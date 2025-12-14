@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import inspect
+import hashlib
+import json
+import os
 import time
 import tempfile
 import warnings
@@ -21,6 +24,66 @@ from .stage_common import (
     normalise_node_name,
     relative_key,
 )
+
+
+def _hash_array(arr) -> str:
+    view = pd.DataFrame(arr)
+    return hashlib.sha256(view.to_numpy().tobytes()).hexdigest()
+
+
+def _hash_file(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _stats_frame(df: pd.DataFrame) -> dict:
+    numeric = df.select_dtypes(include=["number"])
+    if numeric.empty:
+        return {"rows": len(df), "cols": len(df.columns)}
+    values = numeric.to_numpy()
+    return {
+        "rows": int(values.shape[0]),
+        "cols": int(values.shape[1]),
+        "min": float(values.min()),
+        "max": float(values.max()),
+        "mean": float(values.mean()),
+        "std": float(values.std()),
+    }
+
+
+class NodeTracer:
+    FLAG = "QTOPO_NODE_TRACE"
+    FILTER = "QTOPO_NODE_TRACE_FILTER"
+    DIR = "QTOPO_NODE_TRACE_DIR"
+
+    def __init__(self, enabled: bool, trace_dir: Path, filters: tuple[str, ...]):
+        self.enabled = enabled
+        self.trace_dir = trace_dir
+        self.filters = filters
+
+    @classmethod
+    def from_env(cls, model_key: str) -> "NodeTracer":
+        enabled = os.environ.get(cls.FLAG, "").lower() in {"1", "true", "yes"}
+        trace_dir = Path(os.environ.get(cls.DIR, "./node_trace")).expanduser()
+        raw = os.environ.get(cls.FILTER, "")
+        filters = tuple(token.strip() for token in raw.split(",") if token.strip())
+        if filters and not any(token in model_key for token in filters):
+            enabled = False
+        return cls(enabled, trace_dir, filters)
+
+    def record(self, model_key: str, stage: str, payload: dict) -> None:
+        if not self.enabled:
+            return
+        try:
+            target = self.trace_dir / model_key / f"{stage}.json"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with target.open("w", encoding="utf-8") as handle:
+                json.dump(payload, handle, indent=2)
+        except Exception:
+            warnings.warn(f"Node tracing failed for {model_key}:{stage}", RuntimeWarning)
 
 
 @dataclass
@@ -76,6 +139,7 @@ def _process_task(task: NodeTask, drop_na: bool, sort_artifacts: bool) -> Tuple[
     log_lines: List[str] = []
     temp: Optional[tempfile.TemporaryDirectory] = None
     task.log_path.parent.mkdir(parents=True, exist_ok=True)
+    tracer = NodeTracer.from_env(task.model_key)
     try:
         temp, iface_dir, topo_dir = _stage_inputs(task)
         extractor = _initialise_node_fea(task, iface_dir, topo_dir)
@@ -96,11 +160,39 @@ def _process_task(task: NodeTask, drop_na: bool, sort_artifacts: bool) -> Tuple[
             fea_df = result[0]
         else:
             fea_df = result
+        if tracer.enabled:
+            tracer.record(
+                task.model_key,
+                "inputs",
+                {
+                    "interface_hash": _hash_file(task.interface_path),
+                    "topology_hash": _hash_file(task.topology_path),
+                },
+            )
+            tracer.record(
+                task.model_key,
+                "pre_drop",
+                {
+                    "hash": _hash_array(fea_df.to_numpy()),
+                    "stats": _stats_frame(fea_df),
+                    "columns": list(fea_df.columns),
+                },
+            )
         if drop_na:
             pd.set_option("future.no_silent_downcasting", True)
             fea_df.replace("NA", pd.NA, inplace=True)
             fea_df = fea_df.dropna()
         fea_df = _canonicalise_node_df(fea_df, sort_artifacts=sort_artifacts)
+        if tracer.enabled:
+            tracer.record(
+                task.model_key,
+                "post_drop",
+                {
+                    "hash": _hash_array(fea_df.to_numpy()),
+                    "stats": _stats_frame(fea_df),
+                    "columns": list(fea_df.columns),
+                },
+            )
         fea_df.to_csv(task.output_path, index=False)
         if captured:
             log_lines.append("Warnings:")
