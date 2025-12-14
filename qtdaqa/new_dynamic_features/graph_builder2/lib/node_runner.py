@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import pandas as pd
+import numpy as np
 
 from .node_features import node_fea
 from .node_utils import canonical_id_order
@@ -27,8 +28,23 @@ from .stage_common import (
 
 
 def _hash_array(arr) -> str:
-    view = pd.DataFrame(arr)
-    return hashlib.sha256(view.to_numpy().tobytes()).hexdigest()
+    """
+    Hash a numeric view in a way that mirrors what flows into the model:
+    - Preserve canonical row order on ID if present
+    - Cast to float32 to discard sub-ULP float64 noise across platforms
+    """
+    if isinstance(arr, pd.DataFrame):
+        view = arr.copy()
+    else:
+        view = pd.DataFrame(arr)
+    if "ID" in view.columns:
+        view = view.sort_values("ID").reset_index(drop=True)
+    try:
+        numeric = view.to_numpy(dtype=np.float32, copy=True)
+    except Exception:
+        # Fall back to the raw bytes if coercion fails for any reason
+        numeric = view.to_numpy(copy=True)
+    return hashlib.sha256(numeric.tobytes()).hexdigest()
 
 
 def _hash_file(path: Path) -> str:
@@ -173,7 +189,7 @@ def _process_task(task: NodeTask, drop_na: bool, sort_artifacts: bool) -> Tuple[
                 task.model_key,
                 "pre_drop",
                 {
-                    "hash": _hash_array(fea_df.to_numpy()),
+                    "hash": _hash_array(fea_df),
                     "stats": _stats_frame(fea_df),
                     "columns": list(fea_df.columns),
                 },
@@ -188,7 +204,7 @@ def _process_task(task: NodeTask, drop_na: bool, sort_artifacts: bool) -> Tuple[
                 task.model_key,
                 "post_drop",
                 {
-                    "hash": _hash_array(fea_df.to_numpy()),
+                    "hash": _hash_array(fea_df),
                     "stats": _stats_frame(fea_df),
                     "columns": list(fea_df.columns),
                 },
