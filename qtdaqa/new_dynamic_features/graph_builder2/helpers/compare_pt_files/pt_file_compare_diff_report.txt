@@ -1,0 +1,245 @@
+=== Tensor differences ===
+DIFFERENT: 1LQL
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1LQL/1LQL.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1LQL/1LQL.pt
+  tensor 'x' differs
+
+DIFFERENT: 1U6L
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1U6L/1U6L.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1U6L/1U6L.pt
+  tensor 'x' differs
+
+DIFFERENT: 1XEQ
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1XEQ/1XEQ.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1XEQ/1XEQ.pt
+  tensor 'x' differs
+
+DIFFERENT: 1Y2O
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1Y2O/1Y2O.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1Y2O/1Y2O.pt
+  tensor 'x' differs
+
+DIFFERENT: 1bui_6
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1bui/1bui_6.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1bui/1bui_6.pt
+  tensor 'x' differs
+
+DIFFERENT: 1g6v_99
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1g6v/1g6v_99.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1g6v/1g6v_99.pt
+  tensor 'x' differs
+
+DIFFERENT: 1gpq_25
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1gpq/1gpq_25.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1gpq/1gpq_25.pt
+  tensor 'x' differs
+
+DIFFERENT: 1gpw_39
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1gpw/1gpw_39.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1gpw/1gpw_39.pt
+  tensor 'x' differs
+
+DIFFERENT: 1jps_92
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1jps/1jps_92.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1jps/1jps_92.pt
+  tensor 'x' differs
+
+DIFFERENT: 1ku6_14
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1ku6/1ku6_14.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1ku6/1ku6_14.pt
+  tensor 'x' differs
+
+DIFFERENT: 1ma9_1
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1ma9/1ma9_1.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1ma9/1ma9_1.pt
+  tensor 'x' differs
+
+DIFFERENT: 1tmq_58
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1tmq/1tmq_58.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1tmq/1tmq_58.pt
+  tensor 'x' differs
+
+DIFFERENT: 1tx6_5
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1tx6/1tx6_5.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1tx6/1tx6_5.pt
+  tensor 'x' differs
+
+DIFFERENT: 1wej_41
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1wej/1wej_41.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1wej/1wej_41.pt
+  tensor 'x' differs
+
+DIFFERENT: 1xx9_20
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1xx9/1xx9_20.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1xx9/1xx9_20.pt
+  tensor 'x' differs
+
+DIFFERENT: 1yvb_87
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/1yvb/1yvb_87.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/1yvb/1yvb_87.pt
+  tensor 'x' differs
+
+DIFFERENT: 2DM9_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/2DM9/2DM9_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/2DM9/2DM9_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 2VSG
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/2VSG/2VSG.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/2VSG/2VSG.pt
+  tensor 'x' differs
+
+DIFFERENT: 2fi4_29
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/2fi4/2fi4_29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/2fi4/2fi4_29.pt
+  tensor 'x' differs
+
+DIFFERENT: 3CET_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3CET/3CET_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3CET/3CET_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3CPT_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3CPT/3CPT_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3CPT/3CPT_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3DP7
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3DP7/3DP7.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3DP7/3DP7.pt
+  tensor 'x' differs
+
+DIFFERENT: 3H3M
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3H3M/3H3M.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3H3M/3H3M.pt
+  tensor 'x' differs
+
+DIFFERENT: 3HA2
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3HA2/3HA2.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3HA2/3HA2.pt
+  tensor 'x' differs
+
+DIFFERENT: 3M1C
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3M1C/3M1C.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3M1C/3M1C.pt
+  tensor 'x' differs
+
+DIFFERENT: 3MVP_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3MVP/3MVP_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3MVP/3MVP_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3N29
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3N29/3N29.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3N29/3N29.pt
+  tensor 'x' differs
+
+DIFFERENT: 3OI8_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3OI8/3OI8_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3OI8/3OI8_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3PAJ_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3PAJ/3PAJ_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3PAJ/3PAJ_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3PAS_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3PAS/3PAS_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3PAS/3PAS_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3WYF_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3WYF/3WYF_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3WYF/3WYF_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 3ZGX_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/3ZGX/3ZGX_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/3ZGX/3ZGX_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 4EO3_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/4EO3/4EO3_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/4EO3/4EO3_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 4HBE
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/4HBE/4HBE.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/4HBE/4HBE.pt
+  tensor 'x' differs
+
+DIFFERENT: 4NOC_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/4NOC/4NOC_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/4NOC/4NOC_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 4RI2_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/4RI2/4RI2_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/4RI2/4RI2_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 4YNH
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/4YNH/4YNH.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/4YNH/4YNH.pt
+  tensor 'x' differs
+
+DIFFERENT: 4ZM8_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/4ZM8/4ZM8_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/4ZM8/4ZM8_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 5C7Q_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/5C7Q/5C7Q_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/5C7Q/5C7Q_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 5D1P
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/5D1P/5D1P.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/5D1P/5D1P.pt
+  tensor 'x' differs
+
+DIFFERENT: 5G4I
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/5G4I/5G4I.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/5G4I/5G4I.pt
+  tensor 'x' differs
+
+DIFFERENT: 5HKE
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/5HKE/5HKE.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/5HKE/5HKE.pt
+  tensor 'x' differs
+
+DIFFERENT: 5YGE_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/5YGE/5YGE_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/5YGE/5YGE_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 5ZKT
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/5ZKT/5ZKT.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/5ZKT/5ZKT.pt
+  tensor 'x' differs
+
+DIFFERENT: 6FV8_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/6FV8/6FV8_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/6FV8/6FV8_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 6I6M_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/6I6M/6I6M_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/6I6M/6I6M_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 6MP4_af2m
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/6MP4/6MP4_af2m.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/6MP4/6MP4_af2m.pt
+  tensor 'x' differs
+
+DIFFERENT: 6NKF
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/6NKF/6NKF.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/6NKF/6NKF.pt
+  tensor 'x' differs
+
+DIFFERENT: 6RK0
+  baseline: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift/graph_data/6RK0/6RK0.pt
+  candidate: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_AMD/graph_data/6RK0/6RK0.pt
+  tensor 'x' differs

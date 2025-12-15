@@ -120,15 +120,17 @@ class node_fea:
         )
 
         scaler_phi = MinMaxScaler()
-        phi_array = np.array(phi_list).reshape(-1, 1)
-        phi_list_norm = scaler_phi.fit_transform(phi_array).flatten()
+        phi_array = np.round(np.array(phi_list, dtype=np.float32), 4).reshape(-1, 1)
+        phi_list_norm = scaler_phi.fit_transform(phi_array).astype(np.float32).flatten()
 
         scaler_psi = MinMaxScaler()
-        psi_array = np.array(psi_list).reshape(-1, 1)
-        psi_list_norm = scaler_psi.fit_transform(psi_array).flatten()
+        psi_array = np.round(np.array(psi_list, dtype=np.float32), 4).reshape(-1, 1)
+        psi_list_norm = scaler_psi.fit_transform(psi_array).astype(np.float32).flatten()
+
+        rasa_array = np.round(np.array(rasa_list, dtype=np.float32), 4)
 
         feature_df = pd.DataFrame(
-            list(zip(descriptor_list, rasa_list, phi_list_norm, psi_list_norm)),
+            list(zip(descriptor_list, rasa_array, phi_list_norm, psi_list_norm)),
             columns=["ID", "rasa", "phi", "psi"],
         )
         result_df = pd.concat([feature_df, ss8_df, one_hot_df], axis=1)
