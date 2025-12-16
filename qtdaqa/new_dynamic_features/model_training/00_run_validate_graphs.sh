@@ -1,4 +1,4 @@
-export GRAPH_DIR=topoqa_10A_no_drift
+export GRAPH_DIR=null_topology_10A_ARM
 
 echo "Generating graph-dir manifest for ${GRAPH_DIR} ..."
 

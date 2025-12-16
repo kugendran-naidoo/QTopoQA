@@ -139,6 +139,7 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Provide sensible defaults, aliases, and clear param comments via `config_template`; document feature_dim in metadata and keep CSV outputs ID-first.
 - Keep optional enhancements behind parameters and off by default to avoid unexpected regressions.
 - Schema summary: topology columns are auto-extracted during the edge stage (when topology CSVs exist) and node_feature_columns are mirrored into `schema_summary.json`; if modules add explicit column naming (e.g., edge), ensure these can be surfaced consistently.
+- Ablations: modules like `topology/persistence_null/v1` should preserve the expected schema/dimensions (e.g., 140D) and still emit `topology_columns.json` and correct metadata so downstream stages keep working.
 
  Quick metadata sanity checklist (for new modules)
  - After wiring a new module, run a 1–2 PDB smoke and verify:

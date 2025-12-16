@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7NKZ m* = 0.937
+7NKZ m^ = 0.773
+7NKZ ranking loss = 0.164
+
+7NKZ,string_interact_uniprot_sto_0,0.84734392,0.937
+7NKZ,uniprot_distance_uniref_a3m_3,0.85039628,0.773

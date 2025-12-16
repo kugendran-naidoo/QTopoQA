@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7AMV m* = 0.888
+7AMV m^ = 0.823
+7AMV ranking loss = 0.065
+
+7AMV,structure_temp_dimer_2,0.76681381,0.888
+7AMV,ori_temp_pipeline_with_alphafold_models_3,0.79901123,0.823

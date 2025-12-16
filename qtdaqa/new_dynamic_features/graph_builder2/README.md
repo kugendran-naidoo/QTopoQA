@@ -137,6 +137,23 @@ topology:           # optional, but common
 #     lap_moment_orders: [1, 2, 3, 4]
 #     lap_heat_times: [0.1, 1.0, 5.0]
 
+# Null topology (ablation control; keeps 140D shape but no signal)
+# topology:
+#   module: topology/persistence_null/v1
+#   alias: "Null topology (constant zeros) = 140D ablation"
+#   summary: "Topology ablation: constant features with PH-compatible schema."
+#   params:
+#     element_filters:
+#       - [C]
+#       - [N]
+#       - [O]
+#       - [C, N]
+#       - [C, O]
+#       - [N, O]
+#       - [C, N, O]
+#     constant_value: 0.0
+#     jobs: 16
+
 node:
   module: node/dssp_topo_merge/v1  # alias: TopoQA default
   alias: "TopoQA default"

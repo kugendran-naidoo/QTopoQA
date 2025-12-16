@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+8GV6 hit rate =  10/5/0
+
+8GV6,fold_8gv6_4_model_3,0.62443531,0.572
+8GV6,fold_8gv6_5_model_3,0.6016385,0.449
+8GV6,fold_8gv6_3_model_2,0.59541917,0.47
+8GV6,fold_8gv6_4_model_0,0.58309048,0.528
+8GV6,fold_8gv6_2_model_4,0.57621956,0.53
+8GV6,fold_8gv6_5_model_4,0.57481939,0.479
+8GV6,fold_8gv6_4_model_1,0.56338137,0.706
+8GV6,fold_8gv6_2_model_1,0.55746484,0.488
+8GV6,fold_8gv6_2_model_2,0.53515792,0.586
+8GV6,fold_8gv6_3_model_1,0.47363093,0.472
