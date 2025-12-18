@@ -9,7 +9,7 @@ options:
 
 # REQUIRED stage: interface
 interface:
-  module: interface/polar_cutoff/v1
+  module: interface/polar_cutoff/v1  # alias: TopoQA default 10A cut-off
   alias: "residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA"
   summary: "Polar interface detection using distance cutoff."
   description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
@@ -21,7 +21,7 @@ interface:
 # OPTIONAL stage: topology
 
 topology:
-  module: topology/persistence_partial_k_partite/v1
+  module: topology/persistence_partial_k_partite/v1  # alias: Part-aware PH minimal (base only) = 140D
   alias: "Part-aware PH minimal (base only) = 140D"
   summary: "Persistent homology with chain-aware blocks (cross-biased/cross-only) and optional per-chain/DSSP/polar blocks."
   description: "Extends the basic PH module with part-aware variants: base PH (140D), cross-biased block (penalize intra-chain distances), cross-only block (inter-chain atoms only), optional per-chain PH (capped), optional DSSP-stratified block, and optional polar-only mini block. Presets: minimal (140D), lean (default, ~420D), heavy (adds opt-in blocks)."
@@ -55,10 +55,10 @@ topology:
 
 # REQUIRED stage: node
 node:
-  module: node/dssp_topo_merge_passthrough/v1
-  alias: "Passthrough (all dims from topology module) = Node Dynamic Dims"
-  summary: "DSSP/basic features merged with all topology columns (passthrough)."
-  description: "Runs DSSP/basic feature extraction and merges with the provided topology CSV using all non-ID topology columns (no hardcoded list). Topology columns are MinMax scaled per file; output columns ordered as ID, DSSP/basic 32D, then topology columns in file order. Suitable for hybrid topology (PH+Lap) or any dynamic topo layout."
+  module: node/dssp_topo_merge/v1  # alias: TopoQA default
+  alias: "140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA"
+  summary: "DSSP-derived node features merged with topology statistics."
+  description: "Runs the DSSP-based node feature extractor (node_fea) and merges results with persistent homology statistics aligned by residue IDs."
   params:
     drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
     jobs: 16

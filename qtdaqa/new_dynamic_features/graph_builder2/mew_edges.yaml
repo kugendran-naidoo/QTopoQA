@@ -1,137 +1,150 @@
-# Topological Edges
-
-edge:
-  module: edge/edge_plus_min_agg_topo/v1  # alias: Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)
-  alias: "Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)"
-  summary: "Legacy 11D histogram plus per-residue topology concat+abs-diff+cosine (lean)."
-  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
-  # dim: 434
+# Advanced 2
+topology:
+  module: topology/persistence_k_partite_advanced/v2  # alias: Advanced k-partite PH (v2 lean) ≈ topo_dim 596
+  alias: "Advanced k-partite PH (v2 lean) topo_dim 596"
+  summary: "Fixed-width k-partite persistent homology with slot padding + missingness channels."
+  description: "Produces a fixed-width topology CSV per structure by padding missing chain/pair/typed/stratified slots up to configured caps and prefixing every feature column with a block identifier. Always appends slot-level missingness channels (present/size/reason) so padded zeros are not ambiguous."
   params:
-    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
-    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
-    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
-    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
-    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
-    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
-    variant: lean  # lean (default) or heavy (adds min/max block)
-    jobs: 16  # Optional worker override (CLI --jobs takes precedence)
+    preset: lean  # minimal=base only; lean=base+per-primary+per-pair (fixed slots); heavy=lean+cross-bias+polar+typed; heavy_stratified=heavy+secondary stratification
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    element_filters_stratified:
+      - - C
+        - N
+        - O
+    dedup_sort: false
+    jobs: 16
+    secondary_partition: none  # none|dssp|chemotype (heavy_stratified only)
+    k_max: 2  # Number of primary slots (chains) in fixed schema; missing slots padded with reason_missing_slot
+    secondary_k_max: 4  # Max secondary classes used (DSSP fixed 3-state H/E/C; chemotype fixed 4-class POS/NEG/POLAR/HYDRO); extra classes truncated deterministically
+    enable_cross_bias: false
+    intra_penalty_mode: default
+    intra_penalty_lambda: null
+    max_atoms: 25000  # Guardrail: if atom_count > max_atoms, heavy blocks are padded with reason_guardrail_skip
+    max_block_seconds: 60.0  # Time cap per block; on timeout, slot is padded with reason_timeout
+    enable_polar_block: false
+    polar_hbond_weight: false
+    polar_hbond_weight_factor: 0.5
+    polar_hbond_energy_cutoff: -0.5
+    polar_hbond_inter_only: false
+    enable_typed_block: false
+    dssp_timeout_seconds: 10.0
+    dssp_slow_threshold: 2.0
+    write_slot_maps: false  # If true, write work/topology_slot_maps/<pdb_id>.slot_map.json for debugging
+    max_topology_dim_allowed: null  # Optional safety: warn/fail if expected worst-case topo_dim exceeds this limit
+    fail_fast_topology_dim: false  # If true, raise error when expected worst-case topo_dim exceeds limit; otherwise warn only
 
-edge:
-  module: edge/edge_plus_min_agg_topo/v1  # alias: Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)
-  alias: "Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)"
-  summary: "Legacy 11D histogram plus per-residue topology concat+abs-diff+cosine (lean)."
-  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
-  # dim: 714
+# Advanced 2
+topology:
+  module: topology/persistence_k_partite_advanced/v2  # alias: Advanced k-partite PH (v2 heavy) ≈ topo_dim 1688
+  alias: "Advanced k-partite PH (v2 heavy) topo_dim 1688"
+  summary: "Fixed-width k-partite persistent homology with slot padding + missingness channels."
+  description: "Produces a fixed-width topology CSV per structure by padding missing chain/pair/typed/stratified slots up to configured caps and prefixing every feature column with a block identifier. Always appends slot-level missingness channels (present/size/reason) so padded zeros are not ambiguous."
   params:
-    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
-    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
-    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
-    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
-    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
-    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
-    variant: heavy  # lean (default) or heavy (adds min/max block)
-    jobs: 16  # Optional worker override (CLI --jobs takes precedence)
+    preset: heavy  # minimal=base only; lean=base+per-primary+per-pair (fixed slots); heavy=lean+cross-bias+polar+typed; heavy_stratified=heavy+secondary stratification
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    element_filters_stratified:
+      - - C
+        - N
+        - O
+    dedup_sort: false
+    jobs: 16
+    secondary_partition: none  # none|dssp|chemotype (heavy_stratified only)
+    k_max: 2  # Number of primary slots (chains) in fixed schema; missing slots padded with reason_missing_slot
+    secondary_k_max: 4  # Max secondary classes used (DSSP fixed 3-state H/E/C; chemotype fixed 4-class POS/NEG/POLAR/HYDRO); extra classes truncated deterministically
+    enable_cross_bias: true
+    intra_penalty_mode: default
+    intra_penalty_lambda: null
+    max_atoms: 25000  # Guardrail: if atom_count > max_atoms, heavy blocks are padded with reason_guardrail_skip
+    max_block_seconds: 60.0  # Time cap per block; on timeout, slot is padded with reason_timeout
+    enable_polar_block: true
+    polar_hbond_weight: true
+    polar_hbond_weight_factor: 0.5
+    polar_hbond_energy_cutoff: -0.5
+    polar_hbond_inter_only: false
+    enable_typed_block: true
+    dssp_timeout_seconds: 10.0
+    dssp_slow_threshold: 2.0
+    write_slot_maps: false  # If true, write work/topology_slot_maps/<pdb_id>.slot_map.json for debugging
+    max_topology_dim_allowed: null  # Optional safety: warn/fail if expected worst-case topo_dim exceeds this limit
+    fail_fast_topology_dim: false  # If true, raise error when expected worst-case topo_dim exceeds limit; otherwise warn only
 
-edge:
-  module: edge/edge_plus_bal_agg_topo/v1  # alias: Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)
-  alias: "Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)"
-  summary: "Legacy 11D histogram plus balanced topo concat+mean+abs-diff+cosine (lean)."
-  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, mean(u,v), |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
-  # dim: 574
+# Advanced 2
+topology:
+  module: topology/persistence_k_partite_advanced/v2  # alias: Advanced k-partite PH (v2 heavy_stratified) ≈ topo_dim 2036
+  alias: "Advanced k-partite PH (v2 heavy_stratified) topo_dim 2036"
+  summary: "Fixed-width k-partite persistent homology with slot padding + missingness channels."
+  description: "Produces a fixed-width topology CSV per structure by padding missing chain/pair/typed/stratified slots up to configured caps and prefixing every feature column with a block identifier. Always appends slot-level missingness channels (present/size/reason) so padded zeros are not ambiguous."
   params:
-    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
-    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
-    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
-    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
-    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
-    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
-    variant: lean  # Aggregation variant: lean (default) or heavy (adds min/max block)
-    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+    preset: heavy_stratified  # minimal=base only; lean=base+per-primary+per-pair (fixed slots); heavy=lean+cross-bias+polar+typed; heavy_stratified=heavy+secondary stratification
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    element_filters_stratified:
+      - - C
+        - N
+        - O
+    dedup_sort: false
+    jobs: 16
+    secondary_partition: chemotype  # none|dssp|chemotype (heavy_stratified only)
+    k_max: 2  # Number of primary slots (chains) in fixed schema; missing slots padded with reason_missing_slot
+    secondary_k_max: 4  # Max secondary classes used (DSSP fixed 3-state H/E/C; chemotype fixed 4-class POS/NEG/POLAR/HYDRO); extra classes truncated deterministically
+    enable_cross_bias: true
+    intra_penalty_mode: default
+    intra_penalty_lambda: null
+    max_atoms: 25000  # Guardrail: if atom_count > max_atoms, heavy blocks are padded with reason_guardrail_skip
+    max_block_seconds: 60.0  # Time cap per block; on timeout, slot is padded with reason_timeout
+    enable_polar_block: true
+    polar_hbond_weight: true
+    polar_hbond_weight_factor: 0.5
+    polar_hbond_energy_cutoff: -0.5
+    polar_hbond_inter_only: false
+    enable_typed_block: true
+    dssp_timeout_seconds: 10.0
+    dssp_slow_threshold: 2.0
+    write_slot_maps: false  # If true, write work/topology_slot_maps/<pdb_id>.slot_map.json for debugging
+    max_topology_dim_allowed: null  # Optional safety: warn/fail if expected worst-case topo_dim exceeds this limit
+    fail_fast_topology_dim: false  # If true, raise error when expected worst-case topo_dim exceeds limit; otherwise warn only
 
-edge:
-  module: edge/edge_plus_bal_agg_topo/v1  # alias: Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)
-  alias: "Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)"
-  summary: "Legacy 11D histogram plus balanced topo concat+mean+abs-diff+cosine (lean)."
-  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, mean(u,v), |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
-  # dim: 854
+# Node - Passthrough
+node:
+  module: node/dssp_topo_merge_passthrough/v1  # alias: Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims
+  alias: "Passthrough (all dims from topology module) = Node Dynamic Dims"
+  summary: "DSSP/basic features merged with all topology columns (passthrough)."
+  description: "Runs DSSP/basic feature extraction and merges with the provided topology CSV using all non-ID topology columns (no hardcoded list). Topology columns are MinMax scaled per file; output columns ordered as ID, DSSP/basic 32D, then topology columns in file order. Suitable for hybrid topology (PH+Lap) or any dynamic topo layout."
   params:
-    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
-    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
-    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
-    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
-    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
-    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
-    variant: heavy  # Aggregation variant: lean (default) or heavy (adds min/max block)
-    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+    drop_na: true  # Drop rows with NA after merge (default on); aligns with inference cleaning.
+    jobs: 16  # Optional worker override (CLI --jobs takes precedence).
+#
 
-edge:
-  module: edge/edge_plus_pool_agg_topo/v1  # alias: Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)
-  alias: "Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)"
-  summary: "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
-  description: "Extends balanced aggregation by adding pooled neighbor topology means per endpoint (k-nearest), then computing mean/abs-diff/cosine (and optional norms) on both endpoints and pooled summaries. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
-  # dim: 1137
-  params:
-    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
-    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
-    scale_histogram: true  # scale only the legacy 11D (distance + 10-bin) block across each graph
-    include_norms: true  # add L2 norms of endpoint and pooled topo vectors
-    include_cosine: true  # add cosine similarities for endpoint and pooled topo vectors
-    pool_k: 5  # nearest interface residues pooled per endpoint (default 5); larger k increases cost/feature coupling
-    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg
-    variant: lean  # lean or heavy; heavy adds min/max blocks to both endpoint and pooled aggs
-    jobs: 16  # honors CLI --jobs > config defaults > module jobs; edge ordering deterministic (src,dst,distance); dumps resorted by edge_runner
-
-edge:
-  module: edge/edge_plus_pool_agg_topo/v1  # alias: Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)
-  alias: "Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)"
-  summary: "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
-  description: "Extends balanced aggregation by adding pooled neighbor topology means per endpoint (k-nearest), then computing mean/abs-diff/cosine (and optional norms) on both endpoints and pooled summaries. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
-  # dim: 1697
-  params:
-    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
-    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
-    scale_histogram: true  # scale only the legacy 11D (distance + 10-bin) block across each graph
-    include_norms: true  # add L2 norms of endpoint and pooled topo vectors
-    include_cosine: true  # add cosine similarities for endpoint and pooled topo vectors
-    pool_k: 5  # nearest interface residues pooled per endpoint (default 5); larger k increases cost/feature coupling
-    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg
-    variant: heavy  # lean or heavy; heavy adds min/max blocks to both endpoint and pooled aggs
-    jobs: 16  # honors CLI --jobs > config defaults > module jobs; edge ordering deterministic (src,dst,distance); dumps resorted by edge_runner
-
-# Laplacian Edges
-
-edge:
-  module: edge/edge_plus_min_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)
-  alias: "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)"
-  summary: "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
-  description: "Same aggregation as edge_plus_min_agg_topo/v1, intended for use with topology/persistence_laplacian_hybrid/v1 (per-residue PH + Laplacian vectors, expected topo_dim\u2248172). Concatenates (u_topo, v_topo, |u-v|) and optional norms/cosine; heavy variant adds min/max. Prepends the legacy 11D distance histogram and preserves deterministic edge ordering (src_idx, dst_idx, distance)."
-  # dim: 530
-  params:
-    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
-    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
-    scale_histogram: true  # Scale only the legacy 11D (distance + 10-bin) block across each graph
-    include_norms: true  # Add L2 norms of endpoint topology vectors (PH+Lap 172D)
-    include_cosine: true  # Add cosine similarity between endpoint topology vectors
-    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
-    variant: lean  # lean or heavy; heavy adds per-dimension min/max blocks
-    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
-
-edge:
-  module: edge/edge_plus_min_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)
-  alias: "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)"
-  summary: "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
-  description: "Same aggregation as edge_plus_min_agg_topo/v1, intended for use with topology/persistence_laplacian_hybrid/v1 (per-residue PH + Laplacian vectors, expected topo_dim\u2248172). Concatenates (u_topo, v_topo, |u-v|) and optional norms/cosine; heavy variant adds min/max. Prepends the legacy 11D distance histogram and preserves deterministic edge ordering (src_idx, dst_idx, distance)."
-  # dim: 874
-  params:
-    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
-    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
-    scale_histogram: true  # Scale only the legacy 11D (distance + 10-bin) block across each graph
-    include_norms: true  # Add L2 norms of endpoint topology vectors (PH+Lap 172D)
-    include_cosine: true  # Add cosine similarity between endpoint topology vectors
-    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
-    variant: heavy  # lean or heavy; heavy adds per-dimension min/max blocks
-    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
-
+# Edges - Laplacian Bal
 edge:
   module: edge/edge_plus_bal_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 691D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 702D (Lean) | Legacy 11D Edge + 1035D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 1046D (Heavy)
   alias: "Legacy 11D Edge + 691D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 702D (Lean) | Legacy 11D Edge + 1035D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 1046D (Heavy)"
@@ -147,7 +160,9 @@ edge:
     include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
     variant: lean  # lean or heavy; heavy adds per-dimension min/max blocks
     jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
 
+# Edges - Laplacian Bal
 edge:
   module: edge/edge_plus_bal_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 691D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 702D (Lean) | Legacy 11D Edge + 1035D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 1046D (Heavy)
   alias: "Legacy 11D Edge + 691D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 702D (Lean) | Legacy 11D Edge + 1035D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 1046D (Heavy)"
@@ -163,7 +178,117 @@ edge:
     include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
     variant: heavy  # lean or heavy; heavy adds per-dimension min/max blocks
     jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
 
+# Edges - Topo Bal
+edge:
+  module: edge/edge_plus_bal_agg_topo/v1  # alias: Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)
+  alias: "Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)"
+  summary: "Legacy 11D histogram plus balanced topo concat+mean+abs-diff+cosine (lean)."
+  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, mean(u,v), |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+  # dim: 574
+  params:
+    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
+    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
+    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
+    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
+    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
+    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
+    variant: lean  # Aggregation variant: lean (default) or heavy (adds min/max block)
+    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
+
+# Edges - Topo Bal
+edge:
+  module: edge/edge_plus_bal_agg_topo/v1  # alias: Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)
+  alias: "Legacy 11D Edge + 563D {(norm + cosine) from 140D PH} = Edge 574D (Lean) | Legacy 11D Edge + 843D {(norm + cosine + minmax) from 140D PH} = Edge 854D (Heavy)"
+  summary: "Legacy 11D histogram plus balanced topo concat+mean+abs-diff+cosine (lean)."
+  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, mean(u,v), |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+  # dim: 854
+  params:
+    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
+    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
+    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
+    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
+    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
+    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
+    variant: heavy  # Aggregation variant: lean (default) or heavy (adds min/max block)
+    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
+
+# Edges - Laplacian Min
+edge:
+  module: edge/edge_plus_min_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)
+  alias: "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)"
+  summary: "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
+  description: "Same aggregation as edge_plus_min_agg_topo/v1, intended for use with topology/persistence_laplacian_hybrid/v1 (per-residue PH + Laplacian vectors, expected topo_dim\u2248172). Concatenates (u_topo, v_topo, |u-v|) and optional norms/cosine; heavy variant adds min/max. Prepends the legacy 11D distance histogram and preserves deterministic edge ordering (src_idx, dst_idx, distance)."
+  # dim: 530
+  params:
+    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
+    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
+    scale_histogram: true  # Scale only the legacy 11D (distance + 10-bin) block across each graph
+    include_norms: true  # Add L2 norms of endpoint topology vectors (PH+Lap 172D)
+    include_cosine: true  # Add cosine similarity between endpoint topology vectors
+    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
+    variant: lean  # lean or heavy; heavy adds per-dimension min/max blocks
+    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
+
+# Edges - Laplacian Min
+edge:
+  module: edge/edge_plus_min_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)
+  alias: "Legacy 11D Edge + 519D {(hist + agg + norms + cosine) from 172D laplacian_hybrid} = Edge 530D (Lean) | Legacy 11D Edge + 863D {(hist + agg + norms + cosine + minmax) from laplacian_hybrid} = Edge 874D (Heavy)"
+  summary: "Legacy 11D histogram + hybrid topo concat/abs-diff (PH+Lap 172D)."
+  description: "Same aggregation as edge_plus_min_agg_topo/v1, intended for use with topology/persistence_laplacian_hybrid/v1 (per-residue PH + Laplacian vectors, expected topo_dim\u2248172). Concatenates (u_topo, v_topo, |u-v|) and optional norms/cosine; heavy variant adds min/max. Prepends the legacy 11D distance histogram and preserves deterministic edge ordering (src_idx, dst_idx, distance)."
+  # dim: 874
+  params:
+    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
+    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
+    scale_histogram: true  # Scale only the legacy 11D (distance + 10-bin) block across each graph
+    include_norms: true  # Add L2 norms of endpoint topology vectors (PH+Lap 172D)
+    include_cosine: true  # Add cosine similarity between endpoint topology vectors
+    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
+    variant: heavy  # lean or heavy; heavy adds per-dimension min/max blocks
+    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
+
+# Edges - Topo Min
+edge:
+  module: edge/edge_plus_min_agg_topo/v1  # alias: Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)
+  alias: "Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)"
+  summary: "Legacy 11D histogram plus per-residue topology concat+abs-diff+cosine (lean)."
+  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+  # dim: 434
+  params:
+    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
+    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
+    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
+    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
+    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
+    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks
+    variant: lean  # lean (default) or heavy (adds min/max block)
+    jobs: 16  # Optional worker override (CLI --jobs takes precedence)
+#
+
+# Edges - Topo Min
+edge:
+  module: edge/edge_plus_min_agg_topo/v1  # alias: Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)
+  alias: "Legacy 11D Edge + 423D {(norm + cosine) from 140D PH} = Edge 434D (Lean) | Legacy 11D Edge + 703D {(norm + cosine + minmax) from 140D PH} = Edge 714D (Heavy)"
+  summary: "Legacy 11D histogram plus per-residue topology concat+abs-diff+cosine (lean)."
+  description: "Reuses per-residue topology vectors to build edge features without rerunning persistence. For each cross-chain edge, concatenates (u_topo, v_topo, |u-v|) and appends cosine similarity and optional endpoint norms. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+  # dim: 714
+  params:
+    distance_min: 0.0  # Minimum Cα distance (Å); must be < distance_max
+    distance_max: 10.0  # Maximum Cα distance (Å) to include an edge (default 10.0 Å)
+    scale_histogram: true  # MinMax scale only the legacy distance+histogram block (default on)
+    include_norms: true  # Include L2 norms of endpoint topology vectors (default on)
+    include_cosine: true  # Include cosine similarity between endpoint topology vectors (default on)
+    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks
+    variant: heavy  # lean (default) or heavy (adds min/max block)
+    jobs: 16  # Optional worker override (CLI --jobs takes precedence)
+#
+
+# Edges - Laplacian Pool
 edge:
   module: edge/edge_plus_pool_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 1382D {(hist + endpoint agg + pooled agg) from 172D laplacian_hybrid} = Edge 1393D (Lean) | Legacy 11D Edge + 2070D {(hist + endpoint agg + pooled agg + minmax) from laplacian_hybrid} = Edge 2081D (Heavy)
   alias: "Legacy 11D Edge + 1382D {(hist + endpoint agg + pooled agg) from 172D laplacian_hybrid} = Edge 1393D (Lean) | Legacy 11D Edge + 2070D {(hist + endpoint agg + pooled agg + minmax) from laplacian_hybrid} = Edge 2081D (Heavy)"
@@ -180,7 +305,9 @@ edge:
     include_minmax: false  # heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg
     variant: lean  # lean or heavy; heavy adds per-dimension min/max blocks to endpoint and pooled agg
     jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
 
+# Edges - Laplacian Pool
 edge:
   module: edge/edge_plus_pool_agg_lap_hybrid/v1  # alias: Legacy 11D Edge + 1382D {(hist + endpoint agg + pooled agg) from 172D laplacian_hybrid} = Edge 1393D (Lean) | Legacy 11D Edge + 2070D {(hist + endpoint agg + pooled agg + minmax) from laplacian_hybrid} = Edge 2081D (Heavy)
   alias: "Legacy 11D Edge + 1382D {(hist + endpoint agg + pooled agg) from 172D laplacian_hybrid} = Edge 1393D (Lean) | Legacy 11D Edge + 2070D {(hist + endpoint agg + pooled agg + minmax) from laplacian_hybrid} = Edge 2081D (Heavy)"
@@ -197,26 +324,42 @@ edge:
     include_minmax: true  # heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg
     variant: heavy  # lean or heavy; heavy adds per-dimension min/max blocks to endpoint and pooled agg
     jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; deterministic ordering; dumps resorted by edge_runner
+#
 
-
-
-# Other Edges
-
+# Edges - Topo Pool
 edge:
-  module: edge/edge_plus_lightweight_MoL/v1  # alias: Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)
-  alias: "Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)"
-  summary: "Legacy histogram plus lean Laplacian moment context on the induced bipartite pair neighborhood (unweighted)."
-  description: "Prepends the legacy 11D distance histogram, then adds 5D unweighted normalized-Laplacian moments (mu1-3, kappa2, kappa3) on the induced bipartite neighborhood of each inter-chain edge (0-10 A window). Uses exact eigs when nodes <= size_threshold (80), otherwise SLQ (probes=8, steps=32). Deterministic ordering; optional CSV dumps."
-  # dim: 16
+  module: edge/edge_plus_pool_agg_topo/v1  # alias: Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)
+  alias: "Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)"
+  summary: "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  description: "Extends balanced aggregation by adding pooled neighbor topology means per endpoint (k-nearest), then computing mean/abs-diff/cosine (and optional norms) on both endpoints and pooled summaries. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+  # dim: 1137
   params:
     distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
     distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
-    scale_histogram: true  # Scale only the legacy 11D (distance + 10-bin) block across each graph
-    lap_size_threshold: 80  # Node-count threshold for switching from exact eigs to SLQ (default 80)
-    lap_estimator: exact  # exact (default) or slq
-    lap_slq_probes: 8  # Probe vectors for SLQ (default 8)
-    lap_slq_steps: 32  # Lanczos steps placeholder (default 32; kept for compatibility)
-    lap_max_neighbors: 128  # Cap neighborhood size for Laplacian context (includes endpoints)
-    lap_profile: false  # Profile Laplacian moment wall time (writes to metadata)
-    jobs: 16  # Honors CLI --jobs > config default_jobs > module jobs; edge ordering deterministic; dumps resorted by edge_runner
+    scale_histogram: true  # scale only the legacy 11D (distance + 10-bin) block across each graph
+    include_norms: true  # add L2 norms of endpoint and pooled topo vectors
+    include_cosine: true  # add cosine similarities for endpoint and pooled topo vectors
+    pool_k: 5  # nearest interface residues pooled per endpoint (default 5); larger k increases cost/feature coupling
+    include_minmax: false  # heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg
+    variant: lean  # lean or heavy; heavy adds min/max blocks to both endpoint and pooled aggs
+    jobs: 16  # honors CLI --jobs > config defaults > module jobs; edge ordering deterministic (src,dst,distance); dumps resorted by edge_runner
+#
 
+# Edges - Topo Pool
+edge:
+  module: edge/edge_plus_pool_agg_topo/v1  # alias: Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)
+  alias: "Legacy 11D Edge + 1126D {(hist + endpoint agg + pooled agg) from 140D PH} = Edge 1137D (Lean) | Legacy 11D Edge + 1686D {(hist + endpoint agg + pooled agg + minmax) from 140D PH} = Edge 1697D (Heavy)"
+  summary: "Legacy 11D histogram plus balanced topo agg with pooled neighbor means (lean)."
+  description: "Extends balanced aggregation by adding pooled neighbor topology means per endpoint (k-nearest), then computing mean/abs-diff/cosine (and optional norms) on both endpoints and pooled summaries. Legacy 11D histogram (distance + 10-bin atom distance histogram) is prepended. Deterministic edge ordering is preserved (src_idx, dst_idx, distance)."
+  # dim: 1697
+  params:
+    distance_min: 0.0  # Cα distance window start; edges with distance <= min are skipped
+    distance_max: 10.0  # Cα distance window end; edges with distance >= max are skipped
+    scale_histogram: true  # scale only the legacy 11D (distance + 10-bin) block across each graph
+    include_norms: true  # add L2 norms of endpoint and pooled topo vectors
+    include_cosine: true  # add cosine similarities for endpoint and pooled topo vectors
+    pool_k: 5  # nearest interface residues pooled per endpoint (default 5); larger k increases cost/feature coupling
+    include_minmax: true  # heavy variant only; adds per-dimension min/max blocks to endpoint and pooled agg
+    variant: heavy  # lean or heavy; heavy adds min/max blocks to both endpoint and pooled aggs
+    jobs: 16  # honors CLI --jobs > config defaults > module jobs; edge ordering deterministic (src,dst,distance); dumps resorted by edge_runner
+#
