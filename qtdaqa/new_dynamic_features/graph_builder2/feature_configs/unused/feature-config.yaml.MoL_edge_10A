@@ -1,0 +1,77 @@
+# Auto-generated feature-config template
+# Pick one module per required stage. Edit parameter values as needed.
+# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.
+defaults:
+  jobs: 16  # Optional global worker override; remove if unused.
+
+options:
+  topology_round_decimals: 12  # Round topology numeric columns to N decimals (0-15); -1 or omit to disable (recommended 12 when enabling).
+
+# REQUIRED stage: interface
+interface:
+  module: interface/polar_cutoff/v1
+  alias: "residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA"
+  summary: "Polar interface detection using distance cutoff."
+  description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1  # skip rounding to keep raw coords
+    jobs: 16
+
+# OPTIONAL stage: topology
+topology:
+  module: topology/lightweight_MoL/v1
+  alias: "140D PH + 8D unweighted Lap moments (mu1-4, kappa2-4) = Topology 148D (lean MoL)"
+  summary: "Persistent homology plus lean unweighted Laplacian moments per interface residue (no per-eigen outputs)."
+  description: "Keeps the 140D persistent homology block and adds 8D unweighted normalized-Laplacian moments (mu1-4, kappa2-4) on local cross-chain bipartite neighborhoods (cutoff 8 A by default). Uses exact eigenvalues when node_count <= size_threshold (80), otherwise SLQ (probes=8, steps=32). Deterministic; no heat trace in v1."
+  # dim: 148
+  params:
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    dedup_sort: false
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    lap_k_neighbors: null  # Optional deterministic k-NN cap; otherwise cutoff-based
+    lap_max_neighbors: 128  # Cap neighborhood size (includes target residue)
+    lap_size_threshold: 80  # Node-count threshold for switching from exact eigs to SLQ (default 80)
+    lap_estimator: exact  # exact (default) or slq
+    lap_slq_probes: 8  # Probe vectors for SLQ (default 8)
+    lap_slq_steps: 32  # Lanczos steps placeholder (default 32; kept for compatibility)
+    lap_profile: false  # Profile Laplacian moment wall time (writes to log)
+    jobs: 16
+
+# REQUIRED stage: node
+node:
+  module: node/dssp_topo_merge_passthrough/v1
+  alias: "Passthrough (all dims from topology module) = Node Dynamic Dims"
+  summary: "DSSP/basic features merged with all topology columns (passthrough)."
+  description: "Runs DSSP/basic feature extraction and merges with the provided topology CSV using all non-ID topology columns (no hardcoded list). Topology columns are MinMax scaled per file; output columns ordered as ID, DSSP/basic 32D, then topology columns in file order. Suitable for hybrid topology (PH+Lap) or any dynamic topo layout."
+  params:
+    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 16
+
+# REQUIRED stage: edge
+edge:
+  module: edge/edge_plus_lightweight_MoL/v1
+  alias: "Legacy 11D Edge + 5D unweighted Lap moments (mu1-3, kappa2, kappa3) on pair neighborhood = Edge 16D (lean MoL)"
+  summary: "Legacy histogram plus lean Laplacian moment context on the induced bipartite pair neighborhood (unweighted)."
+  description: "Prepends the legacy 11D distance histogram, then adds 5D unweighted normalized-Laplacian moments (mu1-3, kappa2, kappa3) on the induced bipartite neighborhood of each inter-chain edge (0-10 A window). Uses exact eigs when nodes <= size_threshold (80), otherwise SLQ (probes=8, steps=32). Deterministic ordering; optional CSV dumps."
+  # dim: 16
+  params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_histogram: true
+    lap_size_threshold: 80  # Node-count threshold for switching from exact eigs to SLQ (default 80)
+    lap_estimator: exact  # exact (default) or slq
+    lap_slq_probes: 8  # Probe vectors for SLQ (default 8)
+    lap_slq_steps: 32  # Lanczos steps placeholder (default 32; kept for compatibility)
+    lap_max_neighbors: 128  # Cap neighborhood size for Laplacian context (includes endpoints)
+    lap_profile: false  # Profile Laplacian moment wall time (writes to metadata)
+    jobs: 16

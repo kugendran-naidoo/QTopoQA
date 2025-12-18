@@ -1,0 +1,169 @@
+2025-12-17 17:27:53 INFO PDB warnings enabled (Bio.PDB.PDBConstructionWarning will be logged).
+2025-12-17 17:27:53 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/feature_configs/null_topology/feature-config.yaml.null.10A
+2025-12-17 17:27:54 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/logs_output/null_topology_10A_ARM_small/graph_builder.2025-12-17_17-27-53
+2025-12-17 17:27:54 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/training/adjusted/smaller_pilot_batch_Dockground_MAF2
+2025-12-17 17:27:54 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM_small/work
+2025-12-17 17:27:54 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM_small/graph_data
+2025-12-17 17:27:54 INFO Jobs: 16 (from CLI)
+2025-12-17 17:27:54 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2025-12-17 17:27:54 INFO Topology module : topology/persistence_null/v1 [alias: Null topology (constant zeros) = 140D ablation] (jobs=16)
+2025-12-17 17:27:54 INFO Node module     : node/dssp_topo_merge_passthrough/v1 [alias: Passthrough (all dims from topology module) = Node Dynamic Dims] (jobs=16)
+2025-12-17 17:27:54 INFO Edge module     : edge/legacy_band/v11 [alias: 10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA] (jobs=16)
+2025-12-17 17:27:54 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2025-12-17 17:27:54 INFO Topology rounding: disabled (set options.topology_round_decimals to enable)
+2025-12-17 17:27:54 INFO Identified 107 PDB files for processing.
+2025-12-17 17:27:54 INFO Beginning interface stage (jobs=16)
+2025-12-17 17:27:57 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (5/107)
+2025-12-17 17:27:57 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 9.3% complete (10/107)
+2025-12-17 17:27:58 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 14.0% complete (15/107)
+2025-12-17 17:27:59 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 18.7% complete (20/107)
+2025-12-17 17:27:59 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 23.4% complete (25/107)
+2025-12-17 17:28:00 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 28.0% complete (30/107)
+2025-12-17 17:28:00 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 32.7% complete (35/107)
+2025-12-17 17:28:00 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 37.4% complete (40/107)
+2025-12-17 17:28:01 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 42.1% complete (45/107)
+2025-12-17 17:28:02 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 46.7% complete (50/107)
+2025-12-17 17:28:02 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 51.4% complete (55/107)
+2025-12-17 17:28:02 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 56.1% complete (60/107)
+2025-12-17 17:28:04 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 60.7% complete (65/107)
+2025-12-17 17:28:04 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 65.4% complete (70/107)
+2025-12-17 17:28:04 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 70.1% complete (75/107)
+2025-12-17 17:28:05 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 74.8% complete (80/107)
+2025-12-17 17:28:06 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 79.4% complete (85/107)
+2025-12-17 17:28:06 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 84.1% complete (90/107)
+2025-12-17 17:28:06 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 88.8% complete (95/107)
+2025-12-17 17:28:07 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 93.5% complete (100/107)
+2025-12-17 17:28:07 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 98.1% complete (105/107)
+2025-12-17 17:28:07 INFO [Interface - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (107/107)
+2025-12-17 17:28:07 INFO Interface stage complete: 107 success, 0 failures
+2025-12-17 17:28:07 INFO Interface feature extraction elapsed time: 13.43 s
+2025-12-17 17:28:07 INFO Beginning topology stage (jobs=16)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (5/107) ETA 1.3 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (5/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 9.3% complete (10/107) ETA 0.6 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 9.3% complete (10/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 14.0% complete (15/107) ETA 0.4 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 14.0% complete (15/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 18.7% complete (20/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 18.7% complete (20/107) ETA 0.3 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 23.4% complete (25/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 23.4% complete (25/107) ETA 0.2 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 28.0% complete (30/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 28.0% complete (30/107) ETA 0.2 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 32.7% complete (35/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 32.7% complete (35/107) ETA 0.1 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 37.4% complete (40/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 37.4% complete (40/107) ETA 0.1 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 42.1% complete (45/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 42.1% complete (45/107) ETA 0.1 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 46.7% complete (50/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 46.7% complete (50/107) ETA 0.1 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 51.4% complete (55/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 51.4% complete (55/107) ETA 0.1 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 56.1% complete (60/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 56.1% complete (60/107) ETA 0.1 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 60.7% complete (65/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 60.7% complete (65/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 65.4% complete (70/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 65.4% complete (70/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 70.1% complete (75/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 70.1% complete (75/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 74.8% complete (80/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 74.8% complete (80/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 79.4% complete (85/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 79.4% complete (85/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 84.1% complete (90/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 84.1% complete (90/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 88.8% complete (95/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 88.8% complete (95/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 93.5% complete (100/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 93.5% complete (100/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 98.1% complete (105/107)
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 98.1% complete (105/107) ETA 0.0 min
+2025-12-17 17:28:11 INFO [Topology - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (107/107)
+2025-12-17 17:28:11 INFO Topology stage complete: 106 success, 1 failures
+2025-12-17 17:28:11 INFO Topology feature extraction elapsed time: 4.32 s
+2025-12-17 17:28:11 INFO Beginning node stage (jobs=16)
+2025-12-17 17:28:13 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (5/106)
+2025-12-17 17:28:14 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 9.4% complete (10/106)
+2025-12-17 17:28:15 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 14.2% complete (15/106)
+2025-12-17 17:28:16 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 18.9% complete (20/106)
+2025-12-17 17:28:16 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 23.6% complete (25/106)
+2025-12-17 17:28:17 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 28.3% complete (30/106)
+2025-12-17 17:28:17 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 33.0% complete (35/106)
+2025-12-17 17:28:18 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 37.7% complete (40/106)
+2025-12-17 17:28:19 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 42.5% complete (45/106)
+2025-12-17 17:28:20 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 47.2% complete (50/106)
+2025-12-17 17:28:20 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 51.9% complete (55/106)
+2025-12-17 17:28:21 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 56.6% complete (60/106)
+2025-12-17 17:28:21 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 61.3% complete (65/106)
+2025-12-17 17:28:22 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 66.0% complete (70/106)
+2025-12-17 17:28:23 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 70.8% complete (75/106)
+2025-12-17 17:28:24 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 75.5% complete (80/106)
+2025-12-17 17:28:24 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 80.2% complete (85/106)
+2025-12-17 17:28:25 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 84.9% complete (90/106)
+2025-12-17 17:28:26 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 89.6% complete (95/106)
+2025-12-17 17:28:26 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 94.3% complete (100/106)
+2025-12-17 17:28:26 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 99.1% complete (105/106)
+2025-12-17 17:28:26 INFO [Node (passthrough) - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (106/106)
+2025-12-17 17:28:26 INFO Node stage complete: 106 success, 0 failures
+2025-12-17 17:28:26 INFO Node feature extraction elapsed time: 14.21 s
+2025-12-17 17:28:26 INFO Edge dumps enabled; writing CSVs to:
+2025-12-17 17:28:26 INFO   /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM_small/work/edge_features
+2025-12-17 17:28:26 INFO Edge dump preparation elapsed time: 0.00 s
+2025-12-17 17:28:26 INFO Beginning graph assembly (.pt output) stage (jobs=16)
+2025-12-17 17:28:44 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (5/106)
+2025-12-17 17:28:44 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 4.7% complete (5/106) ETA 5.7 min
+2025-12-17 17:28:44 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 9.4% complete (10/106)
+2025-12-17 17:28:44 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 9.4% complete (10/106) ETA 2.7 min
+2025-12-17 17:28:44 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 14.2% complete (15/106)
+2025-12-17 17:28:44 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 14.2% complete (15/106) ETA 1.7 min
+2025-12-17 17:28:56 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 18.9% complete (20/106)
+2025-12-17 17:28:56 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 18.9% complete (20/106) ETA 2.1 min
+2025-12-17 17:28:59 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 23.6% complete (25/106)
+2025-12-17 17:28:59 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 23.6% complete (25/106) ETA 1.8 min
+2025-12-17 17:28:59 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 28.3% complete (30/106)
+2025-12-17 17:28:59 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 28.3% complete (30/106) ETA 1.4 min
+2025-12-17 17:29:08 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 33.0% complete (35/106)
+2025-12-17 17:29:08 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 33.0% complete (35/106) ETA 1.4 min
+2025-12-17 17:29:12 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 37.7% complete (40/106)
+2025-12-17 17:29:12 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 37.7% complete (40/106) ETA 1.2 min
+2025-12-17 17:29:14 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 42.5% complete (45/106)
+2025-12-17 17:29:14 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 42.5% complete (45/106) ETA 1.1 min
+2025-12-17 17:29:23 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 47.2% complete (50/106)
+2025-12-17 17:29:23 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 47.2% complete (50/106) ETA 1.1 min
+2025-12-17 17:29:26 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 51.9% complete (55/106)
+2025-12-17 17:29:26 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 51.9% complete (55/106) ETA 0.9 min
+2025-12-17 17:29:29 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 56.6% complete (60/106)
+2025-12-17 17:29:29 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 56.6% complete (60/106) ETA 0.8 min
+2025-12-17 17:29:32 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 61.3% complete (65/106)
+2025-12-17 17:29:32 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 61.3% complete (65/106) ETA 0.7 min
+2025-12-17 17:29:41 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 66.0% complete (70/106)
+2025-12-17 17:29:41 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 66.0% complete (70/106) ETA 0.6 min
+2025-12-17 17:29:43 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 70.8% complete (75/106)
+2025-12-17 17:29:43 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 70.8% complete (75/106) ETA 0.5 min
+2025-12-17 17:29:46 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 75.5% complete (80/106)
+2025-12-17 17:29:46 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 75.5% complete (80/106) ETA 0.4 min
+2025-12-17 17:29:56 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 80.2% complete (85/106)
+2025-12-17 17:29:56 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 80.2% complete (85/106) ETA 0.4 min
+2025-12-17 17:29:58 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 84.9% complete (90/106)
+2025-12-17 17:29:58 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 84.9% complete (90/106) ETA 0.3 min
+2025-12-17 17:30:00 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 89.6% complete (95/106)
+2025-12-17 17:30:00 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 89.6% complete (95/106) ETA 0.2 min
+2025-12-17 17:30:02 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 94.3% complete (100/106)
+2025-12-17 17:30:02 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 94.3% complete (100/106) ETA 0.1 min
+2025-12-17 17:30:02 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 99.1% complete (105/106)
+2025-12-17 17:30:02 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 99.1% complete (105/106) ETA 0.0 min
+2025-12-17 17:30:02 INFO [Graph assembly - smaller_pilot_batch_Dockground_MAF2] 100.0% complete (106/106)
+2025-12-17 17:30:06 INFO Graph assembly (.pt output) complete: 106 success, 0 failures
+2025-12-17 17:30:06 INFO Graph (.pt) generation elapsed time: 98.77 s (edge stage: 98.79 s)
+2025-12-17 17:30:06 INFO Summary written to graph_builder.2025-12-17_17-27-53/graph_builder_summary.json
+2025-12-17 17:30:06 INFO Summary log written to graph_builder.2025-12-17_17-27-53/graph_builder_summary.log
+2025-12-17 17:30:06 INFO Copied graph builder summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM_small/graph_data/graph_builder_summary.json
+2025-12-17 17:30:06 INFO Copied graph builder text summary to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM_small/graph_data/graph_builder_summary.log
+2025-12-17 17:30:06 INFO Dynamic graph builder completed successfully.
+
+real	2m13.800s
+user	4m7.155s
+sys	4m12.072s
+      133.81 real       247.15 user       252.07 sys

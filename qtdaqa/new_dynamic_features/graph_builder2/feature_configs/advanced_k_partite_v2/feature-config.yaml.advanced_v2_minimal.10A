@@ -1,0 +1,59 @@
+# Feature-config for topology/persistence_k_partite_advanced/v2 (fixed-width schema) — minimal preset.
+defaults:
+  jobs: 16
+
+options:
+  topology_round_decimals: -1
+
+interface:
+  module: interface/polar_cutoff/v1
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1
+    jobs: 16
+
+topology:
+  module: topology/persistence_k_partite_advanced/v2
+  alias: "Advanced k-partite PH (v2) minimal"
+  params:
+    preset: minimal
+    neighbor_distance: 8.0
+    filtration_cutoff: 8.0
+    min_persistence: 0.01
+    element_filters:
+      - [C]
+      - [N]
+      - [O]
+      - [C, N]
+      - [C, O]
+      - [N, O]
+      - [C, N, O]
+    element_filters_stratified:
+      - - C
+        - N
+        - O
+    dedup_sort: false
+    jobs: 16
+    # Fixed-width logic applies when lean/heavy blocks are enabled; minimal only emits base block (still namespaced + missingness).
+    k_max: 2
+    secondary_partition: none
+    secondary_k_max: 4
+    enable_cross_bias: false
+    enable_polar_block: false
+    enable_typed_block: false
+    write_slot_maps: false
+
+node:
+  module: node/dssp_topo_merge_passthrough/v1
+  params:
+    drop_na: true
+    jobs: 16
+
+edge:
+  module: edge/legacy_band/v11
+  params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_features: true
+    jobs: 16
+
