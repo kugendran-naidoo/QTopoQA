@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 import torch
+import json
 
 
 @dataclass
@@ -20,6 +21,8 @@ class GraphFeatureMetadata:
     sample_edge_count: Optional[int] = None
     sample_node_count: Optional[int] = None
     builder: Optional[Dict[str, object]] = None
+    topology_schema: Dict[str, object] = field(default_factory=dict)
+    feature_config: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
         return {
@@ -33,6 +36,8 @@ class GraphFeatureMetadata:
             "sample_edge_count": self.sample_edge_count,
             "sample_node_count": self.sample_node_count,
             "builder": self.builder,
+            "topology_schema": self.topology_schema,
+            "feature_config": self.feature_config,
         }
 
     def builder_id(self) -> Optional[str]:
@@ -321,6 +326,9 @@ def load_graph_feature_metadata(
             builder_block = _extract_builder_info(payload)
             if _should_update_builder(metadata.builder, builder_block):
                 metadata.builder = builder_block
+                fc = builder_block.get("feature_config") if isinstance(builder_block, dict) else None
+                if isinstance(fc, dict):
+                    metadata.feature_config = fc
             # Inline module registry (newer graph_metadata) for summary/schema reconstruction
             inline_registry = payload.get("_module_registry")
             if isinstance(inline_registry, dict) and inline_registry:

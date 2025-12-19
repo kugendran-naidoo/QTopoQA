@@ -21,6 +21,8 @@ from qtdaqa.new_dynamic_features.graph_builder2.lib.features_config import DEFAU
 from qtdaqa.new_dynamic_features.graph_builder2.modules import instantiate_module
 
 GRAPH_BUILDER2_MODULE = "qtdaqa.new_dynamic_features.graph_builder2.graph_builder2"
+# Legacy alias retained for compatibility with tests/configs
+LEGACY_BUILDER_MODULE = GRAPH_BUILDER2_MODULE
 _BUILDER_MODULES = {
     "graph_builder2": GRAPH_BUILDER2_MODULE,
 }
@@ -207,6 +209,54 @@ def _params_equivalent(expected: Optional[Dict[str, object]], observed: Optional
 
 
 def _build_metadata_feature_payload(feature_metadata: Any) -> Optional[Dict[str, object]]:
+    # If a full feature-config snapshot is available in the checkpoint metadata, prefer it.
+    builder_block: Optional[Dict[str, object]] = None
+    feature_config_snapshot: Optional[Dict[str, object]] = None
+    if isinstance(feature_metadata, GraphFeatureMetadata):
+        builder_block = feature_metadata.builder if isinstance(feature_metadata.builder, dict) else None
+        if isinstance(feature_metadata.feature_config, dict):
+            feature_config_snapshot = feature_metadata.feature_config
+    elif isinstance(feature_metadata, dict):
+        builder_block = feature_metadata.get("builder") if isinstance(feature_metadata.get("builder"), dict) else None
+        if isinstance(feature_metadata.get("feature_config"), dict):
+            feature_config_snapshot = feature_metadata.get("feature_config")
+    if builder_block and not feature_config_snapshot:
+        fc = builder_block.get("feature_config")
+        if isinstance(fc, dict):
+            feature_config_snapshot = fc
+
+    def _payload_from_snapshot(snapshot: Dict[str, object]) -> Optional[Dict[str, object]]:
+        payload = None
+        text = snapshot.get("text")
+        if isinstance(text, str) and text.strip():
+            try:
+                payload = yaml.safe_load(text) or {}
+            except Exception:
+                payload = None
+        if payload is None:
+            path_val = snapshot.get("path")
+            if path_val:
+                try:
+                    payload = yaml.safe_load(Path(str(path_val)).read_text()) or {}
+                except Exception:
+                    payload = None
+        if payload is None:
+            return None
+        # Merge builder options if present
+        options: Dict[str, object] = {}
+        if isinstance(builder_block, dict):
+            builder_opts = builder_block.get("options")
+            if isinstance(builder_opts, dict):
+                options.update(builder_opts)
+        if options:
+            payload.setdefault("options", {}).update(options)
+        return payload
+
+    if isinstance(feature_config_snapshot, dict):
+        payload = _payload_from_snapshot(feature_config_snapshot)
+        if payload:
+            return payload
+
     edge_schema: Optional[Dict[str, object]] = None
     if isinstance(feature_metadata, GraphFeatureMetadata):
         modules = feature_metadata.module_registry
@@ -476,10 +526,12 @@ def _preflight_registry_support(final_schema: Dict[str, Dict[str, object]]) -> N
     try:
         instantiate_module(module_id, **params)
     except KeyError as exc:
-        raise RuntimeError(
-            f"Requested edge module '{module_id}' is not available in this environment. "
-            "Install/upgrade graph_builder2 to a version that provides this module/variant."
-        ) from exc
+        logging.warning(
+            "Requested edge module '%s' is not registered locally; skipping preflight check. "
+            "Ensure graph_builder2 with this module is available at runtime.",
+            module_id,
+        )
+        return
     except Exception as exc:
         raise RuntimeError(
             f"Edge module '{module_id}' rejected parameters {params}: {exc}. "
@@ -550,8 +602,11 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
         return False, f"metadata load failed ({exc})"
 
     actual_edge = metadata.edge_schema or {}
-    actual_node = metadata.node_schema or {}
-    defaults = _extract_module_defaults(metadata.module_registry, expected_edge.get("module") or actual_edge.get("module"))
+    actual_node = getattr(metadata, "node_schema", {}) or {}
+    defaults = _extract_module_defaults(
+        getattr(metadata, "module_registry", {}) or {},
+        expected_edge.get("module") or actual_edge.get("module"),
+    )
     for key, expected_value in expected_edge.items():
         actual_value = actual_edge.get(key)
         if key == "module_params":
@@ -684,6 +739,8 @@ def ensure_graph_dir(
             fallback_metadata_path=metadata_source,
         )
     if metadata_feature_config is None:
+        if os.environ.get("QTOPO_STRICT_BUILDER", "").strip().lower() in {"1", "true", "yes"}:
+            raise RuntimeError("Checkpoint metadata lacked feature_config snapshot; strict builder mode is enabled.")
         schema_payload = _build_schema_feature_payload(final_schema)
         if schema_payload:
             metadata_feature_config = _write_feature_config_payload(

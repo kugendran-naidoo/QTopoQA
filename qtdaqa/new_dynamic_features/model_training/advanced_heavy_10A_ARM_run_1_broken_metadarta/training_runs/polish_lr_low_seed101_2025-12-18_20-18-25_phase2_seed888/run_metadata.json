@@ -1,0 +1,134 @@
+{
+  "run_name": "polish_lr_low_seed101_2025-12-18_20-18-25_phase2_seed888",
+  "created": "2025-12-19T04:20:45.191598",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/configs/sched_boost_finetune_seed888.yaml",
+  "overrides": {
+    "paths.graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/advanced_heavy_10A/graph_data"
+  },
+  "notes": null,
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-12-18_20-18-25_phase2_seed888/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-12-18_20-18-25_phase2_seed888",
+    "--git-commit",
+    "a8ea012133",
+    "--git-dirty",
+    "--resume-from",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-12-18_20-18-25_phase1/model_checkpoints/checkpoint.val-0.03859_epoch173.chkpt"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  },
+  "training_parameters": {
+    "trainer": {
+      "num_epochs": 320,
+      "accumulate_grad_batches": 16,
+      "precision": 32,
+      "accelerator": "cpu",
+      "devices": 1
+    },
+    "dataloader": {
+      "batch_size": 16,
+      "num_workers": 0,
+      "seed": 888
+    },
+    "fast_dev_run": false
+  },
+  "selection_primary_metric": "val_loss",
+  "selection": {
+    "primary_metric": "val_loss",
+    "use_val_spearman": true,
+    "spearman_weight": 1.0,
+    "spearman_min_delta": 0.0,
+    "secondary_metric": "val_spearman_corr"
+  },
+  "runtime": {
+    "training_seconds": 742,
+    "epochs_completed": 50,
+    "epochs_total": 320,
+    "epoch_seconds": [
+      13,
+      13,
+      14,
+      15,
+      15,
+      16,
+      14,
+      14,
+      15,
+      15,
+      15,
+      15,
+      14,
+      15,
+      15,
+      15,
+      15,
+      14,
+      15,
+      14,
+      16,
+      15,
+      15,
+      15,
+      15,
+      16,
+      15,
+      16,
+      15,
+      15,
+      15,
+      15,
+      14,
+      14,
+      15,
+      15,
+      15,
+      15,
+      15,
+      15,
+      15,
+      15,
+      16,
+      15,
+      15,
+      15,
+      15,
+      16,
+      14,
+      15
+    ],
+    "epoch_seconds_stats": {
+      "mean": 14.83150924500078,
+      "median": 14.855564228957519,
+      "min": 12.913989500142634,
+      "max": 15.793194332858548
+    }
+  },
+  "checkpoints": {
+    "primary_metric": "val_loss",
+    "primary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-12-18_20-18-25_phase2_seed888/model_checkpoints/checkpoint.val-0.03860_epoch216.chkpt",
+    "alternates": {
+      "selection_metric": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training/training_runs/polish_lr_low_seed101_2025-12-18_20-18-25_phase2_seed888/model_checkpoints/selection_metric_checkpoints/alt_selection.sel--0.75063_val-0.03927_epoch215.ckpt"
+    }
+  },
+  "mlflow": {
+    "run_id": "899f2e7d43cb4204a55063bea8062f4b",
+    "experiment": "dynamic_topoqa",
+    "experiment_id": "384024837216329171",
+    "run_name": "polish_lr_low_seed101_2025-12-18_20-18-25_phase2_seed888",
+    "tracking_uri": "./qtdaqa/new_dynamic_features/model_training/ml_runs"
+  },
+  "completed": "2025-12-19T04:33:16.953811",
+  "artifacts": {
+    "logs_dir": "logs",
+    "metrics_dir": "metrics"
+  }
+}

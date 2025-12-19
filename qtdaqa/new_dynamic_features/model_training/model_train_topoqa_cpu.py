@@ -1377,6 +1377,86 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
     )
     _merge_defaults_into_edge_schema(feature_metadata)
 
+    def _load_feature_config_payload() -> Tuple[Optional[Dict[str, object]], Optional[Dict[str, object]]]:
+        fc_snapshot = None
+        fc_payload = None
+        builder = feature_metadata.builder if isinstance(feature_metadata.builder, dict) else {}
+        if builder and isinstance(builder.get("feature_config"), dict):
+            fc_snapshot = builder["feature_config"]
+        if feature_metadata.feature_config:
+            fc_snapshot = feature_metadata.feature_config
+        if isinstance(fc_snapshot, dict):
+            text = fc_snapshot.get("text")
+            if isinstance(text, str) and text.strip():
+                try:
+                    fc_payload = yaml.safe_load(text) or {}
+                except Exception:
+                    fc_payload = None
+            if fc_payload is None:
+                path_val = fc_snapshot.get("path")
+                if path_val:
+                    try:
+                        fc_payload = yaml.safe_load(Path(str(path_val)).read_text()) or {}
+                    except Exception:
+                        fc_payload = None
+        return fc_snapshot, fc_payload
+
+    fc_snapshot, fc_payload = _load_feature_config_payload()
+
+    topology_dim: Optional[int] = None
+    if feature_metadata.metadata_path:
+        try:
+            meta_raw = json.loads(Path(feature_metadata.metadata_path).read_text())
+            topo_val = meta_raw.get("topology_feature_dim")
+            if topo_val is not None:
+                topology_dim = int(topo_val)
+        except Exception:
+            topology_dim = None
+
+    registry: Dict[str, object] = feature_metadata.module_registry if isinstance(feature_metadata.module_registry, dict) else {}
+
+    def _update_stage(stage: str, schema: Optional[Dict[str, object]]) -> None:
+        nonlocal registry
+        entry = registry.get(stage, {}) if isinstance(registry, dict) else {}
+        if not isinstance(entry, dict):
+            entry = {}
+        fc_stage = fc_payload.get(stage) if isinstance(fc_payload, dict) else {}
+        fc_params = fc_stage.get("params") if isinstance(fc_stage, dict) else {}
+        module_id = None
+        if isinstance(fc_stage, dict):
+            module_id = fc_stage.get("module")
+        if not module_id:
+            module_id = entry.get("module") or entry.get("id")
+        params: Dict[str, object] = {}
+        defaults = entry.get("defaults")
+        if isinstance(defaults, dict):
+            params.update(defaults)
+        if isinstance(entry.get("params"), dict):
+            params.update(entry["params"])
+        if isinstance(fc_params, dict):
+            params.update(fc_params)
+        entry["module"] = module_id
+        if params:
+            entry["params"] = params
+        registry[stage] = entry
+        if schema is not None:
+            if module_id:
+                schema["module"] = module_id
+            if params:
+                schema["module_params"] = params
+            schema.setdefault("source", feature_metadata.metadata_path)
+
+    topology_schema: Dict[str, object] = {}
+    _update_stage("edge", feature_metadata.edge_schema)
+    _update_stage("node", feature_metadata.node_schema)
+    _update_stage("topology", topology_schema)
+    if topology_dim is not None:
+        topology_schema["dim"] = topology_dim
+    feature_metadata.topology_schema = topology_schema
+    feature_metadata.module_registry = registry
+    if fc_snapshot:
+        feature_metadata.feature_config = fc_snapshot
+
     def _fallback_builder_from_graph_metadata() -> Optional[Dict[str, object]]:
         """Best-effort builder recovery when feature_metadata.builder is missing."""
         from builder_metadata import load_builder_info_from_metadata  # type: ignore
@@ -1630,7 +1710,13 @@ def main() -> int:
         feature_metadata.builder = builder_info
 
     feature_metadata_dict = feature_metadata.to_dict()
-    feature_metadata_dict["topology_schema"] = cfg.topology_schema
+    # Prefer enriched topology schema with resolved params/dim
+    feature_metadata_dict["topology_schema"] = feature_metadata.topology_schema or cfg.topology_schema
+    if feature_metadata.feature_config:
+        feature_metadata_dict["feature_config"] = feature_metadata.feature_config
+        sha = feature_metadata.feature_config.get("sha256")  # type: ignore[arg-type]
+        if sha:
+            feature_metadata_dict["feature_config_sha256"] = sha
 
     metadata_path, schema_summary_path = write_feature_metadata_artifacts(
         cfg.save_dir, feature_metadata, feature_metadata_dict, logger
