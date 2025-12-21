@@ -1,0 +1,24 @@
+1. latest_phase2_seed888
+   primary_metric: val_loss = 0.038893043994903564
+   secondary_metric: val_spearman_corr = 0.7700098752975464
+   val_loss: 0.038893043994903564
+   selection_metric: 0.038893043994903564
+   checkpoint: training_runs/latest_phase2_seed888/model_checkpoints/checkpoint.val-0.03889_epoch187.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+2. latest_phase2_seed101
+   primary_metric: val_loss = 0.039565376937389374
+   secondary_metric: val_spearman_corr = 0.7667670249938965
+   val_loss: 0.039565376937389374
+   selection_metric: 0.039565376937389374
+   checkpoint: training_runs/latest_phase2_seed101/model_checkpoints/checkpoint.val-0.03957_epoch228.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+3. latest_phase2_seed555
+   primary_metric: val_loss = 0.040711041539907455
+   secondary_metric: val_spearman_corr = 0.7580273151397705
+   val_loss: 0.040711041539907455
+   selection_metric: 0.040711041539907455
+   checkpoint: training_runs/latest_phase2_seed555/model_checkpoints/checkpoint.val-0.04071_epoch176.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+

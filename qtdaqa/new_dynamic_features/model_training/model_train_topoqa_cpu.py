@@ -97,8 +97,7 @@ except ImportError:  # pragma: no cover
         load_builder_info_from_metadata,
         log_builder_provenance,
     )
-
-
+from common.resume_guard import validate_resume_checkpoint  # type: ignore  # noqa: E402
 
 @dataclasses.dataclass
 class MlflowConfig:
@@ -1712,6 +1711,8 @@ def main() -> int:
     feature_metadata_dict = feature_metadata.to_dict()
     # Prefer enriched topology schema with resolved params/dim
     feature_metadata_dict["topology_schema"] = feature_metadata.topology_schema or cfg.topology_schema
+    if feature_metadata.topology_schema_spec:
+        feature_metadata_dict["topology_schema_spec"] = feature_metadata.topology_schema_spec
     if feature_metadata.feature_config:
         feature_metadata_dict["feature_config"] = feature_metadata.feature_config
         sha = feature_metadata.feature_config.get("sha256")  # type: ignore[arg-type]
@@ -1802,6 +1803,13 @@ def main() -> int:
 
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    resume_ckpt_path = validate_resume_checkpoint(
+        cfg.save_dir,
+        checkpoint_dir,
+        args.resume_from,
+        cfg.num_epochs,
+        logger,
+    )
 
     primary_metric = (cfg.selection_primary_metric or "val_loss").lower()
     if primary_metric == "selection_metric" and not cfg.use_val_spearman_as_secondary:
@@ -1969,7 +1977,7 @@ def main() -> int:
         model,
         train_dataloaders=train_loader,
         val_dataloaders=val_loader,
-        ckpt_path=args.resume_from,
+        ckpt_path=resume_ckpt_path,
     )
     fit_duration = max(0.0, time.perf_counter() - fit_start_time)
 

@@ -594,6 +594,7 @@ def run_graph_builder(
 def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, object]]) -> Tuple[bool, str]:
     expected_edge = final_schema.get("edge_schema") or {}
     expected_node = final_schema.get("node_schema") or {}
+    expected_topology = final_schema.get("topology_schema") or {}
     if not expected_edge:
         return True, ""
     try:
@@ -634,6 +635,26 @@ def _graph_metadata_matches(graph_dir: Path, final_schema: Dict[str, Dict[str, o
                 return False, f"node schema dim in graph metadata is not an integer: {obs_node_dim!r}"
             if obs_node_dim_int != exp_node_dim:
                 return False, f"node schema dim mismatch (expected {exp_node_dim}, found {obs_node_dim_int})"
+    if expected_topology:
+        exp_topo_dim = expected_topology.get("dim")
+        if exp_topo_dim is not None:
+            try:
+                exp_topo_dim = int(exp_topo_dim)
+            except (TypeError, ValueError):
+                return False, f"topology schema dim is not an integer: {exp_topo_dim!r}"
+            observed_topology = getattr(metadata, "topology_schema", {}) or {}
+            obs_topo_dim = observed_topology.get("dim")
+            if obs_topo_dim is None:
+                # fall back to spec if present
+                obs_topo_dim = (getattr(metadata, "topology_schema_spec", {}) or {}).get("dim")
+            if obs_topo_dim is None:
+                return False, "topology schema dim missing in graph metadata"
+            try:
+                obs_topo_dim_int = int(obs_topo_dim)
+            except (TypeError, ValueError):
+                return False, f"topology schema dim in graph metadata is not an integer: {obs_topo_dim!r}"
+            if obs_topo_dim_int != exp_topo_dim:
+                return False, f"topology schema dim mismatch (expected {exp_topo_dim}, found {obs_topo_dim_int})"
     return True, ""
 
 
@@ -669,7 +690,10 @@ def validate_graph_metadata(
 
     expected_edge = final_schema.get("edge_schema") or {}
     observed_edge = metadata.edge_schema or {}
-    defaults = _extract_module_defaults(metadata.module_registry, expected_edge.get("module") or observed_edge.get("module"))
+    defaults = _extract_module_defaults(
+        getattr(metadata, "module_registry", {}) or {},
+        expected_edge.get("module") or observed_edge.get("module"),
+    )
 
     mismatches: List[str] = []
     for key in ("module", "variant", "dim", "bands", "module_params"):
@@ -703,6 +727,35 @@ def validate_graph_metadata(
         if actual_node_module != expected_node_module:
             mismatches.append(
                 f"node_schema.module: expected {expected_node_module!r}, observed {actual_node_module!r}"
+            )
+
+    expected_topology = final_schema.get("topology_schema") or {}
+    observed_topology = getattr(metadata, "topology_schema", {}) or {}
+    if "dim" in expected_topology:
+        expected_dim_raw = expected_topology.get("dim")
+        actual_dim_raw = observed_topology.get("dim") or (getattr(metadata, "topology_schema_spec", {}) or {}).get("dim")
+        try:
+            expected_dim_int = int(expected_dim_raw) if expected_dim_raw is not None else None
+        except (TypeError, ValueError):
+            mismatches.append(f"topology_schema.dim is not an integer: {expected_dim_raw!r}")
+            expected_dim_int = None
+        try:
+            actual_dim_int = int(actual_dim_raw) if actual_dim_raw is not None else None
+        except (TypeError, ValueError):
+            mismatches.append(f"topology_schema.dim in graph metadata is not an integer: {actual_dim_raw!r}")
+            actual_dim_int = None
+        if expected_dim_int is not None and actual_dim_int is None:
+            mismatches.append("topology dim missing in graph metadata")
+        elif expected_dim_int is not None and actual_dim_int is not None and actual_dim_int != expected_dim_int:
+            mismatches.append(
+                f"topology dim: expected {expected_dim_int!r}, observed {actual_dim_int!r}"
+            )
+    if "module" in expected_topology:
+        expected_topology_module = expected_topology.get("module")
+        actual_topology_module = observed_topology.get("module")
+        if actual_topology_module != expected_topology_module:
+            mismatches.append(
+                f"topology_schema.module: expected {expected_topology_module!r}, observed {actual_topology_module!r}"
             )
 
     if mismatches:

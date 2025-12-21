@@ -69,6 +69,27 @@ def test_load_and_validate_metadata_success(tmp_path: Path) -> None:
     metadata_obj = SimpleNamespace(
         edge_schema={"module": "edge/multi_scale/v24", "dim": 24, "variant": "multi_scale_v24"},
         node_schema={"dim": 140},
+        topology_schema={"dim": 140, "module": "topology/persistence_basic/v1"},
+        metadata_path=str(tmp_path / "graph_metadata.json"),
+    )
+    final_schema = {
+        "edge_schema": {"module": "edge/multi_scale/v24", "dim": 24, "variant": "multi_scale_v24"},
+        "topology_schema": {"dim": 140, "module": "topology/persistence_basic/v1"},
+    }
+    with mock.patch(
+        "qtdaqa.new_dynamic_features.model_inference.builder_runner.load_graph_feature_metadata",
+        return_value=metadata_obj,
+    ):
+        result = builder_runner.validate_graph_metadata(tmp_path, final_schema)
+    assert result is metadata_obj
+
+
+def test_validate_metadata_topology_dim_from_spec(tmp_path: Path) -> None:
+    metadata_obj = SimpleNamespace(
+        edge_schema={"module": "edge/multi_scale/v24", "dim": 24, "variant": "multi_scale_v24"},
+        node_schema={"dim": 140},
+        topology_schema={},
+        topology_schema_spec={"dim": 140},
         metadata_path=str(tmp_path / "graph_metadata.json"),
     )
     final_schema = {
@@ -87,6 +108,7 @@ def test_load_and_validate_metadata_edge_mismatch(tmp_path: Path) -> None:
     metadata_obj = SimpleNamespace(
         edge_schema={"module": "edge/legacy_band/v11", "dim": 24},
         node_schema={"dim": 140},
+        topology_schema={"dim": 140},
         metadata_path=str(tmp_path / "graph_metadata.json"),
     )
     final_schema = {
@@ -105,7 +127,8 @@ def test_load_and_validate_metadata_edge_mismatch(tmp_path: Path) -> None:
 def test_load_and_validate_metadata_topology_mismatch(tmp_path: Path) -> None:
     metadata_obj = SimpleNamespace(
         edge_schema={"module": "edge/multi_scale/v24", "dim": 24},
-        node_schema={"dim": 128},
+        node_schema={"dim": 140},
+        topology_schema={"dim": 128},
         metadata_path=str(tmp_path / "graph_metadata.json"),
     )
     final_schema = {
@@ -118,7 +141,7 @@ def test_load_and_validate_metadata_topology_mismatch(tmp_path: Path) -> None:
     ):
         with pytest.raises(RuntimeError) as exc:
             builder_runner.validate_graph_metadata(tmp_path, final_schema)
-    assert "topology/node dim" in str(exc.value)
+    assert "topology dim" in str(exc.value)
 
 
 def test_load_and_validate_metadata_load_error(tmp_path: Path) -> None:
@@ -138,6 +161,7 @@ def test_validate_metadata_allows_defaulted_params(tmp_path: Path) -> None:
     metadata_obj = SimpleNamespace(
         edge_schema={"module": "edge/edge_plus_pool_agg_topo/v1", "dim": 854, "module_params": {}},
         node_schema={"dim": 140},
+        topology_schema={"dim": 140},
         module_registry={
             "edge": {
                 "id": "edge/edge_plus_pool_agg_topo/v1",
@@ -162,16 +186,16 @@ def test_validate_metadata_allows_defaulted_params(tmp_path: Path) -> None:
     assert result is metadata_obj
 
 
-def test_preflight_registry_missing_module(monkeypatch) -> None:
+def test_preflight_registry_missing_module(monkeypatch, caplog) -> None:
     final_schema = {"edge_schema": {"module": "edge/does_not_exist/v1", "module_params": {}}}
 
     def _raise_missing(module_id: str, **params):
         raise KeyError(module_id)
 
     monkeypatch.setattr(builder_runner, "instantiate_module", _raise_missing)
-    with pytest.raises(RuntimeError) as exc:
+    with caplog.at_level("WARNING"):
         builder_runner._preflight_registry_support(final_schema)
-    assert "not available" in str(exc.value)
+    assert "not registered locally" in caplog.text
 
 
 def test_preflight_registry_rejects_params(monkeypatch) -> None:

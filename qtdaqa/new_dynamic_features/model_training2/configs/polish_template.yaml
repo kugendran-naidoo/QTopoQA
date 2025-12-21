@@ -1,0 +1,48 @@
+# Polish “slow LR” template.
+# Copy (or edit) this file after a sweep finishes, update `dataloader.seed`
+# to match the winning run, and tweak any knobs before launching with
+# manifests/run_polish_template.yaml.
+paths:
+  train_labels: ./data.train.csv
+  val_labels: ./data.validate.csv
+  save_dir: ./training_runs2
+model:
+  pooling_type: mean
+  attention_head: 8
+dataloader:
+  batch_size: 16
+  num_workers: 0
+  seed: 1337              # TODO: set to the seed/run you want to polish.
+selection:
+  primary_metric: val_loss
+trainer:
+  accelerator: cpu
+  devices: 1
+  precision: 32
+  num_epochs: 360        # longer schedule for fine-grained convergence
+  accumulate_grad_batches: 16
+  use_val_spearman_as_secondary: false
+  spearman_secondary_weight: 0.0
+optimizer:
+  learning_rate: 0.001   # slower LR = careful polishing
+scheduler:
+  factor: 0.2
+  patience: 4
+  type: reduce_on_plateau
+early_stopping:
+  patience: 20
+mlflow:
+  enabled: true
+  tracking_uri: ./qtdaqa/new_dynamic_features/model_training2/ml_runs2
+  experiment: dynamic_topoqa
+  log_artifacts: true
+
+# edge/topology overrides are optional: the loader already consumes the recorded metadata from graph_metadata.json
+# (see feature_metadata.module_registry). Only define this block when you deliberately need to override the stored values.
+# Tip: run `python -m qtdaqa.new_dynamic_features.common.feature_inspector <graph_dir> --emit-override-block`
+# or `python qtdaqa/new_dynamic_features/model_training2/tools/emit_override_block.py <graph_dir>` to print a ready-to-paste snippet.
+# edge_schema:  # edge metadata override (uncomment and tweak only the keys you need)
+# topology_schema:  # topology metadata override
+coverage:
+  fail_on_missing: false
+  minimum_percent: 0

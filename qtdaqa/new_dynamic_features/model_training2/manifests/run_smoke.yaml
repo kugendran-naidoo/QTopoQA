@@ -1,0 +1,8 @@
+shared:
+  notes: "Smoke test: tiny dataset using smoke_test graphs/labels for end-to-end checks."
+  log_lr: false
+  fast_dev_run: false
+jobs:
+  - name: smoke_sched_boost_seed222
+    config: configs/smoke_sched_boost_seed222.yaml
+continue_on_error: false

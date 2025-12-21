@@ -22,6 +22,7 @@ class GraphFeatureMetadata:
     sample_node_count: Optional[int] = None
     builder: Optional[Dict[str, object]] = None
     topology_schema: Dict[str, object] = field(default_factory=dict)
+    topology_schema_spec: Dict[str, object] = field(default_factory=dict)
     feature_config: Optional[Dict[str, object]] = None
 
     def to_dict(self) -> Dict[str, object]:
@@ -37,6 +38,7 @@ class GraphFeatureMetadata:
             "sample_node_count": self.sample_node_count,
             "builder": self.builder,
             "topology_schema": self.topology_schema,
+            "topology_schema_spec": self.topology_schema_spec,
             "feature_config": self.feature_config,
         }
 
@@ -329,10 +331,19 @@ def load_graph_feature_metadata(
                 fc = builder_block.get("feature_config") if isinstance(builder_block, dict) else None
                 if isinstance(fc, dict):
                     metadata.feature_config = fc
+            topo_spec = payload.get("_topology_schema_spec")
+            if isinstance(topo_spec, dict):
+                metadata.topology_schema_spec = topo_spec
             # Inline module registry (newer graph_metadata) for summary/schema reconstruction
             inline_registry = payload.get("_module_registry")
             if isinstance(inline_registry, dict) and inline_registry:
                 metadata.module_registry = inline_registry
+            topo_dim_val = payload.get("topology_feature_dim")
+            if topo_dim_val is not None:
+                try:
+                    metadata.topology_schema["dim"] = int(topo_dim_val)
+                except Exception:
+                    pass
             raw_entries = {
                 key: value
                 for key, value in payload.items()
@@ -474,6 +485,11 @@ def load_graph_feature_metadata(
                 summary_text = edge_info.get("summary")
                 if summary_text:
                     metadata.edge_schema.setdefault("summary", summary_text)
+            topo_info = modules.get("topology")
+            if isinstance(topo_info, dict):
+                topo_module = topo_info.get("id") or topo_info.get("module")
+                if topo_module and "module" not in metadata.topology_schema:
+                    metadata.topology_schema["module"] = topo_module
     # Fallback: if module_registry is still empty, derive minimal entries from metadata
     if not metadata.module_registry:
         derived: Dict[str, Dict[str, object]] = {}
