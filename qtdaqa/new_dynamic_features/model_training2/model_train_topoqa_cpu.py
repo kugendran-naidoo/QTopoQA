@@ -45,7 +45,7 @@ from pytorch_lightning.callbacks import (
 from pytorch_lightning.loggers import CSVLogger
 
 try:  # Prefer absolute import so script execution still works
-    from qtdaqa.new_dynamic_features.model_training.run_metadata import (
+    from qtdaqa.new_dynamic_features.model_training2.run_metadata import (
         record_checkpoint_paths,
         record_selection_metadata,
         resolve_checkpoint_path,
@@ -82,8 +82,8 @@ try:
 except ImportError as exc:  # pragma: no cover - helpful hint for misconfigured launches
     raise ImportError(
         "Unable to import the GNN model. If you are running this script directly, ensure "
-        "you launch it from the repository root (so PYTHONPATH includes qtdaqa/new_dynamic_features/model_training) "
-        "or run it as a module: 'python -m qtdaqa.new_dynamic_features.model_training.model_train_topoqa_cpu ...'."
+        "you launch it from the repository root (so PYTHONPATH includes qtdaqa/new_dynamic_features/model_training2) "
+        "or run it as a module: 'python -m qtdaqa.new_dynamic_features.model_training2.model_train_topoqa_cpu ...'."
     ) from exc
 try:
     from common.graph_cache import GraphTensorCache  # type: ignore  # noqa: E402
@@ -93,10 +93,14 @@ from common.metadata_artifacts import write_feature_metadata_artifacts  # type: 
 try:
     from builder_metadata import load_builder_info_from_metadata, log_builder_provenance  # type: ignore  # noqa: E402
 except ImportError:  # pragma: no cover
-    from qtdaqa.new_dynamic_features.model_training.builder_metadata import (  # type: ignore  # noqa: E402
+    from qtdaqa.new_dynamic_features.model_training2.builder_metadata import (  # type: ignore  # noqa: E402
         load_builder_info_from_metadata,
         log_builder_provenance,
     )
+try:
+    from common.ranking_metrics import compute_grouped_ranking_metrics  # type: ignore  # noqa: E402
+except Exception:  # pragma: no cover - optional helper
+    compute_grouped_ranking_metrics = None
 from common.resume_guard import validate_resume_checkpoint  # type: ignore  # noqa: E402
 
 @dataclasses.dataclass
@@ -115,12 +119,16 @@ class TrainingConfig:
     train_label_file: Path
     val_label_file: Path
     save_dir: Path
+    tuning_label_file: Optional[Path] = None
     metadata_path: Optional[Path] = None
     summary_path: Optional[Path] = None
     accelerator: str = "cpu"
     devices: int = 1
     attention_head: int = 8
     pooling_type: str = "mean"
+    model_self_loops: bool = False
+    model_self_loop_fill: object = "mean"
+    model_residual: bool = False
     batch_size: int = 16
     learning_rate: float = 5e-3
     num_epochs: int = 200
@@ -142,6 +150,16 @@ class TrainingConfig:
     spearman_secondary_min_delta: float = 0.0
     spearman_secondary_weight: float = 1.0
     selection_primary_metric: str = "val_loss"
+    tuning_max_samples: Optional[int] = None
+    tuning_fraction: Optional[float] = None
+    tuning_eval_every: int = 1
+    rank_loss_weight: float = 0.0
+    rank_loss_margin: float = 0.0
+    rank_loss_mode: str = "hinge"
+    rank_loss_grouped: bool = True
+    variance_reduction_enabled: bool = False
+    variance_reduction_method: str = "topk_avg"
+    variance_reduction_top_k: int = 3
     coverage_minimum: float = 0.0
     coverage_fail_on_missing: bool = True
     graph_load_profiling: bool = False
@@ -166,6 +184,26 @@ def _normalise_ratio(value: float | int | str, default: float = 0.0) -> float:
     if numeric > 1.0:
         numeric = numeric / 100.0
     return min(max(numeric, 0.0), 1.0)
+
+
+PRIMARY_METRIC_CHOICES = {
+    "val_loss",
+    "selection_metric",
+    "val_rank_spearman",
+    "val_rank_regret",
+    "tuning_rank_spearman",
+    "tuning_rank_regret",
+}
+
+MAXIMIZE_METRICS = {
+    "val_spearman_corr",
+    "val_rank_spearman",
+    "tuning_rank_spearman",
+}
+
+
+def _metric_mode(metric_name: str) -> str:
+    return "max" if metric_name in MAXIMIZE_METRICS else "min"
 
 
 def _merge_defaults_into_edge_schema(feature_metadata: "GraphFeatureMetadata") -> None:
@@ -271,11 +309,54 @@ def load_config(path: Path) -> TrainingConfig:
         graph_load_top_k = max(1, graph_load_top_k)
         graph_load_profiling = bool(profiling_cfg.get("graph_load", False))
         canonicalize_on_load = bool(_get("canonicalize_on_load", False))
+        tuning_cfg = _get("tuning", {})
+        if not isinstance(tuning_cfg, dict):
+            tuning_cfg = {}
+        tuning_label_raw = (
+            tuning_cfg.get("labels")
+            or _get("tuning_label_file")
+            or _get("tuning_labels")
+        )
+        tuning_label_file = (
+            _resolve_path(tuning_label_raw, base_dir, fallbacks=(SCRIPT_DIR,))
+            if tuning_label_raw
+            else None
+        )
+        tuning_max_samples = tuning_cfg.get("max_samples")
+        try:
+            tuning_max_samples = int(tuning_max_samples) if tuning_max_samples is not None else None
+        except (TypeError, ValueError):
+            tuning_max_samples = None
+        tuning_fraction_raw = tuning_cfg.get("fraction")
+        tuning_fraction = _normalise_ratio(tuning_fraction_raw, default=0.0) if tuning_fraction_raw is not None else None
+        tuning_eval_every = tuning_cfg.get("eval_every", 1)
+        try:
+            tuning_eval_every = max(1, int(tuning_eval_every))
+        except (TypeError, ValueError):
+            tuning_eval_every = 1
+
+        ranking_cfg = _get("ranking_loss", {})
+        if not isinstance(ranking_cfg, dict):
+            ranking_cfg = {}
+        rank_loss_weight = float(ranking_cfg.get("weight", 0.0) or 0.0)
+        rank_loss_margin = float(ranking_cfg.get("margin", 0.0) or 0.0)
+        rank_loss_mode = str(ranking_cfg.get("mode", "hinge") or "hinge")
+        rank_loss_grouped = bool(ranking_cfg.get("grouped", True))
+        variance_cfg = _get("variance_reduction", {})
+        if not isinstance(variance_cfg, dict):
+            variance_cfg = {}
+        variance_reduction_enabled = bool(variance_cfg.get("enabled", False))
+        variance_reduction_method = str(variance_cfg.get("method", "topk_avg") or "topk_avg")
+        try:
+            variance_reduction_top_k = int(variance_cfg.get("top_k", 3))
+        except (TypeError, ValueError):
+            variance_reduction_top_k = 3
 
         cfg = TrainingConfig(
             graph_dir=graph_dir,
             train_label_file=train_label_file,
             val_label_file=val_label_file,
+            tuning_label_file=tuning_label_file,
             save_dir=save_dir,
             metadata_path=metadata_path,
             summary_path=summary_path,
@@ -283,6 +364,9 @@ def load_config(path: Path) -> TrainingConfig:
             devices=int(_get("devices", 1)),
             attention_head=int(_get("attention_head", 8)),
             pooling_type=str(_get("pooling_type", "mean")),
+            model_self_loops=bool(_get("self_loops", False)),
+            model_self_loop_fill=_get("self_loop_fill", "mean"),
+            model_residual=bool(_get("residual", False)),
             batch_size=int(_get("batch_size", 16)),
             learning_rate=float(_get("learning_rate", 5e-3)),
             num_epochs=int(_get("num_epochs", 200)),
@@ -307,6 +391,16 @@ def load_config(path: Path) -> TrainingConfig:
             edge_schema=dict(_get("edge_schema", {})),
             topology_schema=dict(_get("topology_schema", {})),
             canonicalize_on_load=canonicalize_on_load,
+            tuning_max_samples=tuning_max_samples,
+            tuning_fraction=tuning_fraction,
+            tuning_eval_every=tuning_eval_every,
+            rank_loss_weight=rank_loss_weight,
+            rank_loss_margin=rank_loss_margin,
+            rank_loss_mode=rank_loss_mode,
+            rank_loss_grouped=rank_loss_grouped,
+            variance_reduction_enabled=variance_reduction_enabled,
+            variance_reduction_method=variance_reduction_method,
+            variance_reduction_top_k=variance_reduction_top_k,
         )
         return cfg
 
@@ -343,6 +437,9 @@ def load_config(path: Path) -> TrainingConfig:
     model_cfg = _section("model")
     pooling_type = str(model_cfg.get("pooling_type", "mean"))
     attention_head = int(model_cfg.get("attention_head", 8))
+    model_self_loops = bool(model_cfg.get("self_loops", False))
+    model_self_loop_fill = model_cfg.get("self_loop_fill", "mean")
+    model_residual = bool(model_cfg.get("residual", False))
 
     dataloader_cfg = _section("dataloader")
     batch_size = int(dataloader_cfg.get("batch_size", 16))
@@ -377,8 +474,11 @@ def load_config(path: Path) -> TrainingConfig:
         selection_primary_metric = primary_metric_raw.strip().lower() or "val_loss"
     else:
         selection_primary_metric = "val_loss"
-    if selection_primary_metric not in {"val_loss", "selection_metric"}:
-        raise ValueError("selection.primary_metric must be 'val_loss' or 'selection_metric'.")
+    if selection_primary_metric not in PRIMARY_METRIC_CHOICES:
+        raise ValueError(
+            "selection.primary_metric must be one of: "
+            + ", ".join(sorted(PRIMARY_METRIC_CHOICES))
+        )
 
     logging_cfg = _section("logging")
     progress_bar_refresh_rate = int(logging_cfg.get("progress_bar_refresh_rate", 0))
@@ -417,10 +517,44 @@ def load_config(path: Path) -> TrainingConfig:
         graph_cache_size = 256
     graph_cache_size = max(1, graph_cache_size)
 
+    tuning_cfg = _section("tuning")
+    tuning_label_raw = tuning_cfg.get("labels") or paths_cfg.get("tuning_labels")
+    tuning_label_file = (
+        _resolve_path(tuning_label_raw, base_dir, fallbacks=(SCRIPT_DIR,))
+        if tuning_label_raw
+        else None
+    )
+    tuning_max_samples = tuning_cfg.get("max_samples")
+    try:
+        tuning_max_samples = int(tuning_max_samples) if tuning_max_samples is not None else None
+    except (TypeError, ValueError):
+        tuning_max_samples = None
+    tuning_fraction_raw = tuning_cfg.get("fraction")
+    tuning_fraction = _normalise_ratio(tuning_fraction_raw, default=0.0) if tuning_fraction_raw is not None else None
+    tuning_eval_every = tuning_cfg.get("eval_every", 1)
+    try:
+        tuning_eval_every = max(1, int(tuning_eval_every))
+    except (TypeError, ValueError):
+        tuning_eval_every = 1
+
+    ranking_cfg = _section("ranking_loss")
+    rank_loss_weight = float(ranking_cfg.get("weight", 0.0) or 0.0)
+    rank_loss_margin = float(ranking_cfg.get("margin", 0.0) or 0.0)
+    rank_loss_mode = str(ranking_cfg.get("mode", "hinge") or "hinge")
+    rank_loss_grouped = bool(ranking_cfg.get("grouped", True))
+    variance_cfg = _section("variance_reduction")
+    variance_reduction_enabled = bool(variance_cfg.get("enabled", False))
+    variance_reduction_method = str(variance_cfg.get("method", "topk_avg") or "topk_avg")
+    try:
+        variance_reduction_top_k = int(variance_cfg.get("top_k", 3))
+    except (TypeError, ValueError):
+        variance_reduction_top_k = 3
+
     cfg = TrainingConfig(
         graph_dir=graph_dir,
         train_label_file=train_label_file,
         val_label_file=val_label_file,
+        tuning_label_file=tuning_label_file,
         save_dir=save_dir,
         metadata_path=metadata_path,
         summary_path=summary_path,
@@ -428,6 +562,9 @@ def load_config(path: Path) -> TrainingConfig:
         devices=devices,
         attention_head=attention_head,
         pooling_type=pooling_type,
+        model_self_loops=model_self_loops,
+        model_self_loop_fill=model_self_loop_fill,
+        model_residual=model_residual,
         batch_size=batch_size,
         learning_rate=learning_rate,
         num_epochs=num_epochs,
@@ -445,6 +582,16 @@ def load_config(path: Path) -> TrainingConfig:
         spearman_secondary_min_delta=spearman_min_delta,
         spearman_secondary_weight=spearman_weight,
         selection_primary_metric=selection_primary_metric,
+        tuning_max_samples=tuning_max_samples,
+        tuning_fraction=tuning_fraction,
+        tuning_eval_every=tuning_eval_every,
+        rank_loss_weight=rank_loss_weight,
+        rank_loss_margin=rank_loss_margin,
+        rank_loss_mode=rank_loss_mode,
+        rank_loss_grouped=rank_loss_grouped,
+        variance_reduction_enabled=variance_reduction_enabled,
+        variance_reduction_method=variance_reduction_method,
+        variance_reduction_top_k=variance_reduction_top_k,
         coverage_minimum=coverage_minimum,
         coverage_fail_on_missing=coverage_fail_on_missing,
         graph_load_profiling=graph_load_profiling,
@@ -633,6 +780,9 @@ def collate_graphs(batch: List[Data]) -> List[Batch]:
     if not batch:
         raise ValueError("Received empty batch")
     merged = Batch.from_data_list(batch)
+    graph_names = [str(getattr(item, "name", "")) for item in batch]
+    merged.graph_names = graph_names
+    merged._graph_names = graph_names
     return [merged]
 
 
@@ -732,9 +882,23 @@ class CpuTopoQAModule(GNN_edge1_edgepooling):
         lr_scheduler_patience: int,
         edge_schema: Optional[Dict[str, object]] = None,
         feature_metadata: Optional[Dict[str, object]] = None,
+        rank_loss_weight: float = 0.0,
+        rank_loss_margin: float = 0.0,
+        rank_loss_mode: str = "hinge",
+        rank_loss_grouped: bool = True,
         **kwargs,
     ):
-        super().__init__(init_lr=lr, pooling_type=pooling_type, mode="zuhe", edge_schema=edge_schema, **kwargs)
+        super().__init__(
+            init_lr=lr,
+            pooling_type=pooling_type,
+            mode="zuhe",
+            edge_schema=edge_schema,
+            rank_loss_weight=rank_loss_weight,
+            rank_loss_margin=rank_loss_margin,
+            rank_loss_mode=rank_loss_mode,
+            rank_loss_grouped=rank_loss_grouped,
+            **kwargs,
+        )
         self.lr_scheduler_factor = lr_scheduler_factor
         self.lr_scheduler_patience = lr_scheduler_patience
         self.feature_metadata = feature_metadata or {}
@@ -743,8 +907,12 @@ class CpuTopoQAModule(GNN_edge1_edgepooling):
             "pooling_type": pooling_type,
             "lr_scheduler_factor": lr_scheduler_factor,
             "lr_scheduler_patience": lr_scheduler_patience,
+            "rank_loss_weight": rank_loss_weight,
+            "rank_loss_margin": rank_loss_margin,
+            "rank_loss_mode": rank_loss_mode,
+            "rank_loss_grouped": rank_loss_grouped,
         }
-        for key in ("heads", "edge_dim", "node_dim", "num_net"):
+        for key in ("heads", "edge_dim", "node_dim", "num_net", "self_loops", "self_loop_fill", "residual"):
             if key in kwargs:
                 self.model_hparams[key] = kwargs[key]
         if edge_schema is not None:
@@ -1100,6 +1268,7 @@ def _rank_checkpoints(
     checkpoint_dir: Path,
     limit: int = 3,
     scores: Optional[Dict[str, object]] = None,
+    mode: str = "min",
 ) -> List[Path]:
     if scores:
         ranked_score_list: List[Tuple[float, Path]] = []
@@ -1116,7 +1285,7 @@ def _rank_checkpoints(
                 else:
                     continue
             ranked_score_list.append((metric, path.resolve()))
-        ranked_score_list.sort(key=lambda item: item[0])
+        ranked_score_list.sort(key=lambda item: item[0], reverse=(mode == "max"))
         return [path for _, path in ranked_score_list[:limit]]
 
     ranked: List[Tuple[float, Path]] = []
@@ -1125,8 +1294,54 @@ def _rank_checkpoints(
         if score is None:
             continue
         ranked.append((score, candidate.resolve()))
-    ranked.sort(key=lambda item: item[0])
+    ranked.sort(key=lambda item: item[0], reverse=(mode == "max"))
     return [path for _, path in ranked[:limit]]
+
+
+def _average_checkpoints(
+    checkpoint_paths: Sequence[Path],
+    output_dir: Path,
+    logger: logging.Logger,
+) -> Optional[Path]:
+    if not checkpoint_paths:
+        return None
+    state_dicts = []
+    base_checkpoint = None
+    for path in checkpoint_paths:
+        try:
+            ckpt = torch.load(path, map_location="cpu")
+        except Exception as exc:
+            logger.warning("Skipping checkpoint %s during averaging: %s", path, exc)
+            continue
+        state = ckpt.get("state_dict") if isinstance(ckpt, dict) else None
+        if not isinstance(state, dict):
+            logger.warning("Checkpoint %s lacks state_dict; skipping.", path)
+            continue
+        if base_checkpoint is None:
+            base_checkpoint = ckpt
+        state_dicts.append(state)
+    if not state_dicts or base_checkpoint is None:
+        return None
+
+    keys = list(state_dicts[0].keys())
+    averaged: Dict[str, torch.Tensor] = {}
+    for key in keys:
+        tensors = [sd[key] for sd in state_dicts if key in sd]
+        if not tensors:
+            continue
+        stacked = torch.stack([t.detach().to(torch.float32) for t in tensors], dim=0)
+        averaged[key] = stacked.mean(dim=0)
+
+    base_checkpoint["state_dict"] = averaged
+    base_checkpoint["averaged_from"] = [str(p) for p in checkpoint_paths]
+    out_path = output_dir / f"checkpoint.avg_top{len(state_dicts)}.chkpt"
+    try:
+        torch.save(base_checkpoint, out_path)
+        logger.info("Saved averaged checkpoint to %s", out_path)
+        return out_path
+    except Exception as exc:
+        logger.warning("Failed to save averaged checkpoint: %s", exc)
+        return None
 
 
 def _create_checkpoint_symlinks(
@@ -1245,6 +1460,120 @@ class SelectionMetricLogger(Callback):
         )
 
 
+class TuningMetricsCallback(Callback):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        dataloader: Optional[DataLoader],
+        eval_every: int = 1,
+    ) -> None:
+        super().__init__()
+        self.logger = logger
+        self.dataloader = dataloader
+        self.eval_every = max(1, int(eval_every))
+
+    def _extract_names(self, batch) -> List[str]:
+        expected = getattr(batch, "num_graphs", None)
+        for attr in ("_graph_names", "graph_names", "name", "model_name"):
+            names = getattr(batch, attr, None)
+            if names is None:
+                continue
+            if torch.is_tensor(names):
+                names = names.detach().cpu().tolist()
+            elif hasattr(names, "tolist") and not isinstance(names, (list, tuple, str)):
+                try:
+                    names = names.tolist()
+                except Exception:
+                    names = [str(names)]
+            if isinstance(names, (list, tuple)):
+                flattened = []
+                for item in names:
+                    if isinstance(item, (list, tuple)):
+                        flattened.extend(item)
+                    else:
+                        flattened.append(item)
+                names_list = [str(x) for x in flattened if str(x)]
+            else:
+                names_list = [str(names)] if str(names) else []
+            if not names_list:
+                continue
+            if expected is None or expected <= 1 or len(names_list) == expected:
+                return names_list
+            # Mismatch: likely batch-level name; fall through to per-graph extraction.
+            break
+        if hasattr(batch, "to_data_list"):
+            try:
+                data_list = batch.to_data_list()
+                names_list = [str(getattr(item, "name", "")) for item in data_list]
+                names_list = [name for name in names_list if name]
+                if names_list:
+                    return names_list
+            except Exception:
+                pass
+        return []
+
+    def on_validation_epoch_end(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking:
+            return
+        if self.dataloader is None or compute_grouped_ranking_metrics is None:
+            return
+        if (trainer.current_epoch + 1) % self.eval_every != 0:
+            return
+
+        was_training = pl_module.training
+        pl_module.eval()
+
+        preds: List[float] = []
+        trues: List[float] = []
+        names: List[str] = []
+        with torch.no_grad():
+            for batch_list in self.dataloader:
+                raw_batch = batch_list[0] if isinstance(batch_list, (list, tuple)) else batch_list
+                names.extend(self._extract_names(raw_batch))
+                batch = raw_batch.to(pl_module.device)
+                scores = pl_module.forward([batch])
+                preds.extend(scores.detach().cpu().view(-1).tolist())
+                trues.extend(batch.y.detach().cpu().view(-1).tolist())
+
+        if not preds or not trues or not names:
+            self.logger.warning(
+                "Tuning metrics skipped due to missing data (preds=%d, trues=%d, names=%d).",
+                len(preds),
+                len(trues),
+                len(names),
+            )
+            if was_training:
+                pl_module.train()
+            return
+
+        aligned = min(len(preds), len(trues), len(names))
+        if aligned < len(preds) or aligned < len(trues) or aligned < len(names):
+            self.logger.warning(
+                "Tuning metrics length mismatch (preds=%d, trues=%d, names=%d); truncating to %d.",
+                len(preds),
+                len(trues),
+                len(names),
+                aligned,
+            )
+        preds = preds[:aligned]
+        trues = trues[:aligned]
+        names = names[:aligned]
+
+        summary = compute_grouped_ranking_metrics(names, preds, trues)
+        pl_module.log("tuning_rank_regret", summary.mean_regret, on_epoch=True, prog_bar=False, logger=True)
+        pl_module.log("tuning_rank_spearman", summary.mean_spearman, on_epoch=True, prog_bar=False, logger=True)
+        self.logger.info(
+            "Tuning ranking metrics: regret=%.6f spearman=%.6f (groups=%d, skipped=%d)",
+            summary.mean_regret,
+            summary.mean_spearman,
+            summary.group_count,
+            summary.skipped_groups,
+        )
+
+        if was_training:
+            pl_module.train()
+
+
 class EpochSummaryLogger(Callback):
     def __init__(self, logger: logging.Logger) -> None:
         super().__init__()
@@ -1332,16 +1661,23 @@ class TrainingProgressLogger(Callback):
 def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
     train_labels = load_label_map(cfg.train_label_file)
     val_labels = load_label_map(cfg.val_label_file)
+    tuning_labels = load_label_map(cfg.tuning_label_file) if cfg.tuning_label_file else None
 
     graph_lookup = _build_graph_lookup(cfg.graph_dir)
 
     train_samples, train_missing = _gather_samples(cfg.graph_dir, train_labels, graph_lookup)
     val_samples, val_missing = _gather_samples(cfg.graph_dir, val_labels, graph_lookup)
+    tuning_samples: List[Tuple[str, Path, torch.Tensor]] = []
+    tuning_missing: List[str] = []
+    if tuning_labels:
+        tuning_samples, tuning_missing = _gather_samples(cfg.graph_dir, tuning_labels, graph_lookup)
 
     if not train_samples:
         raise RuntimeError("No training graphs found; aborting.")
     if not val_samples:
         raise RuntimeError("No validation graphs found; aborting.")
+    if tuning_labels and not tuning_samples:
+        logger.warning("No tuning graphs found; tuning metrics will be skipped.")
 
     _summarise_coverage(
         logger,
@@ -1357,6 +1693,14 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         usable_graphs=len(val_samples),
         missing=val_missing,
     )
+    if tuning_labels:
+        _summarise_coverage(
+            logger,
+            "tuning",
+            total_labels=len(tuning_labels),
+            usable_graphs=len(tuning_samples),
+            missing=tuning_missing,
+        )
 
     ordered_models: List[str] = []
     seen_models = set()
@@ -1488,6 +1832,58 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
             cfg.graph_cache_size,
         )
 
+    def _sample_subset(
+        samples: List[Tuple[str, Path, torch.Tensor]],
+        *,
+        fraction: Optional[float],
+        max_samples: Optional[int],
+        seed: int,
+    ) -> List[Tuple[str, Path, torch.Tensor]]:
+        if not samples:
+            return samples
+        target = len(samples)
+        if fraction is not None:
+            target = max(1, int(round(len(samples) * fraction)))
+        if max_samples is not None:
+            target = min(target, int(max_samples))
+        if target >= len(samples):
+            return samples
+        rng = random.Random(seed)
+        subset = rng.sample(samples, target)
+        subset.sort(key=lambda item: item[0])
+        return subset
+
+    def _group_stats(samples: List[Tuple[str, Path, torch.Tensor]]) -> Dict[str, int]:
+        counts: Dict[str, int] = {}
+        for model, _, _ in samples:
+            key = model.split("_", 1)[0] if model else ""
+            counts[key] = counts.get(key, 0) + 1
+        groups_ge2 = sum(1 for size in counts.values() if size >= 2)
+        singletons = sum(1 for size in counts.values() if size == 1)
+        max_group = max(counts.values()) if counts else 0
+        return {
+            "groups": len(counts),
+            "groups_ge2": groups_ge2,
+            "singletons": singletons,
+            "max_group_size": max_group,
+        }
+
+    tuning_samples = _sample_subset(
+        tuning_samples,
+        fraction=cfg.tuning_fraction,
+        max_samples=cfg.tuning_max_samples,
+        seed=cfg.seed,
+    )
+    tuning_group_stats = _group_stats(tuning_samples) if tuning_samples else {}
+    if tuning_group_stats:
+        logger.info(
+            "Tuning group stats: groups=%d groups>=2=%d singletons=%d max_group=%d",
+            tuning_group_stats["groups"],
+            tuning_group_stats["groups_ge2"],
+            tuning_group_stats["singletons"],
+            tuning_group_stats["max_group_size"],
+        )
+
     train_dataset = GraphRegressionDataset(
         train_samples,
         profiler=load_profiler if load_profiler.enabled else None,
@@ -1499,6 +1895,16 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         profiler=load_profiler if load_profiler.enabled else None,
         cache=cache_instance,
         canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
+    )
+    tuning_dataset = (
+        GraphRegressionDataset(
+            tuning_samples,
+            profiler=load_profiler if load_profiler.enabled else None,
+            cache=cache_instance,
+            canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
+        )
+        if tuning_samples
+        else None
     )
 
     train_loader = DataLoader(
@@ -1517,6 +1923,16 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         collate_fn=collate_graphs,
         persistent_workers=False,
     )
+    tuning_loader = None
+    if tuning_dataset is not None:
+        tuning_loader = DataLoader(
+            tuning_dataset,
+            batch_size=cfg.batch_size,
+            shuffle=False,
+            num_workers=cfg.num_workers,
+            collate_fn=collate_graphs,
+            persistent_workers=False,
+        )
     coverage = {
         "train": {
             "total": len(train_labels),
@@ -1531,7 +1947,16 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
             "coverage": (len(val_samples) / len(val_labels)) if val_labels else 0.0,
         },
     }
-    return train_loader, val_loader, coverage, feature_metadata, load_profiler
+    if tuning_labels:
+        coverage["tuning"] = {
+            "total": len(tuning_labels),
+            "usable": len(tuning_samples),
+            "missing": list(tuning_missing),
+            "coverage": (len(tuning_samples) / len(tuning_labels)) if tuning_labels else 0.0,
+        }
+        if tuning_group_stats:
+            coverage["tuning"].update(tuning_group_stats)
+    return train_loader, val_loader, tuning_loader, coverage, feature_metadata, load_profiler
 
 
 def parse_args() -> argparse.Namespace:
@@ -1620,6 +2045,9 @@ def main() -> int:
         use_val_spearman=cfg.use_val_spearman_as_secondary,
         spearman_weight=cfg.spearman_secondary_weight,
         spearman_min_delta=cfg.spearman_secondary_min_delta,
+        primary_mode=_metric_mode(cfg.selection_primary_metric or "val_loss"),
+        tuning_enabled=bool(cfg.tuning_label_file),
+        tuning_eval_every=cfg.tuning_eval_every,
     )
 
     if args.trial_label:
@@ -1635,11 +2063,14 @@ def main() -> int:
     for field in dataclasses.fields(cfg):
         logger.info("  %s = %s", field.name, getattr(cfg, field.name))
 
-    for path in (
+    required_paths = [
         cfg.graph_dir,
         cfg.train_label_file,
         cfg.val_label_file,
-    ):
+    ]
+    if cfg.tuning_label_file is not None:
+        required_paths.append(cfg.tuning_label_file)
+    for path in required_paths:
         if not path.exists():
             raise FileNotFoundError(f"Required path does not exist: {path}")
 
@@ -1661,7 +2092,7 @@ def main() -> int:
         module="pytorch_lightning.trainer.connectors.data_connector",
     )
 
-    train_loader, val_loader, coverage, feature_metadata, load_profiler = build_dataloaders(cfg, logger)
+    train_loader, val_loader, tuning_loader, coverage, feature_metadata, load_profiler = build_dataloaders(cfg, logger)
     load_profile_summary: Optional[Dict[str, object]] = None
 
     resolved_edge_schema = dict(feature_metadata.edge_schema)
@@ -1797,8 +2228,15 @@ def main() -> int:
         edge_dim=edge_dim_value,
         node_dim=node_dim,
         heads=cfg.attention_head,
+        self_loops=cfg.model_self_loops,
+        self_loop_fill=cfg.model_self_loop_fill,
+        residual=cfg.model_residual,
         edge_schema=cfg.edge_schema,
         feature_metadata=feature_metadata_dict,
+        rank_loss_weight=cfg.rank_loss_weight,
+        rank_loss_margin=cfg.rank_loss_margin,
+        rank_loss_mode=cfg.rank_loss_mode,
+        rank_loss_grouped=cfg.rank_loss_grouped,
     )
 
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
@@ -1817,27 +2255,45 @@ def main() -> int:
             "selection.primary_metric=selection_metric requires use_val_spearman_as_secondary=true; enabling it for this run."
         )
         cfg.use_val_spearman_as_secondary = True
-    if primary_metric not in {"val_loss", "selection_metric"}:
+    tuning_groups_ge2 = 0
+    if isinstance(coverage.get("tuning"), dict):
+        try:
+            tuning_groups_ge2 = int(coverage["tuning"].get("groups_ge2", 0))
+        except (TypeError, ValueError):
+            tuning_groups_ge2 = 0
+    if primary_metric.startswith("tuning_") and tuning_groups_ge2 == 0:
+        logger.warning(
+            "selection.primary_metric=%s requested but tuning groups>=2 is 0; falling back to val_rank_spearman.",
+            primary_metric,
+        )
+        primary_metric = "val_rank_spearman"
+    if primary_metric.startswith("tuning_") and tuning_loader is None:
+        logger.warning(
+            "selection.primary_metric=%s requested but no tuning dataset is configured; falling back to val_rank_spearman.",
+            primary_metric,
+        )
+        primary_metric = "val_rank_spearman"
+    if primary_metric not in PRIMARY_METRIC_CHOICES:
         primary_metric = "val_loss"
 
-    monitor_metric_name = "selection_metric" if primary_metric == "selection_metric" else "val_loss"
-    alternate_metric_name: Optional[str] = None
-    if primary_metric == "val_loss":
-        alternate_metric_name = "selection_metric"
-    elif primary_metric == "selection_metric":
-        alternate_metric_name = "val_loss"
+    monitor_metric_name = primary_metric
+    monitor_mode = _metric_mode(monitor_metric_name)
+    alternate_metric_name: Optional[str] = "val_loss" if primary_metric != "val_loss" else "selection_metric"
+    alternate_mode = _metric_mode(alternate_metric_name) if alternate_metric_name else "min"
 
     if monitor_metric_name == "selection_metric":
         checkpoint_filename = "checkpoint.sel-{selection_metric:.5f}_val-{val_loss:.5f}_epoch{epoch:03d}"
-    else:
+    elif monitor_metric_name == "val_loss":
         checkpoint_filename = "checkpoint.val-{val_loss:.5f}_epoch{epoch:03d}"
+    else:
+        checkpoint_filename = f"checkpoint.{monitor_metric_name}-{{{monitor_metric_name}:.5f}}_val-{{val_loss:.5f}}_epoch{{epoch:03d}}"
 
     checkpoint_cb = ModelCheckpoint(
         dirpath=str(checkpoint_dir),
         filename=checkpoint_filename,
         auto_insert_metric_name=False,
         monitor=monitor_metric_name,
-        mode="min",
+        mode=monitor_mode,
         save_top_k=3,
         save_last=False,
     )
@@ -1848,21 +2304,23 @@ def main() -> int:
         alt_dir.mkdir(parents=True, exist_ok=True)
         if alternate_metric_name == "selection_metric":
             alt_filename = "alt_selection.sel-{selection_metric:.5f}_val-{val_loss:.5f}_epoch{epoch:03d}"
-        else:
+        elif alternate_metric_name == "val_loss":
             alt_filename = "alt_val.val-{val_loss:.5f}_epoch{epoch:03d}"
+        else:
+            alt_filename = f"alt_{alternate_metric_name}.metric-{{{alternate_metric_name}:.5f}}_epoch{{epoch:03d}}"
         alternate_checkpoint_cb = ModelCheckpoint(
             dirpath=str(alt_dir),
             filename=alt_filename,
             auto_insert_metric_name=False,
             monitor=alternate_metric_name,
-            mode="min",
+            mode=alternate_mode,
             save_top_k=1,
             save_last=False,
         )
         alternate_symlink_name = f"{alternate_metric_name}_best.ckpt"
     early_stop_cb = EarlyStopping(
         monitor=monitor_metric_name,
-        mode="min",
+        mode=monitor_mode,
         patience=cfg.early_stopping_patience,
         verbose=True,
     )
@@ -1876,6 +2334,13 @@ def main() -> int:
         weight=cfg.spearman_secondary_weight,
         min_delta=cfg.spearman_secondary_min_delta,
     )
+    tuning_callback = None
+    if tuning_loader is not None and compute_grouped_ranking_metrics is not None:
+        tuning_callback = TuningMetricsCallback(
+            logger,
+            tuning_loader,
+            eval_every=cfg.tuning_eval_every,
+        )
 
     progress_bar_cb = None
     enable_progress_bar = cfg.progress_bar_refresh_rate > 0
@@ -1883,6 +2348,8 @@ def main() -> int:
         progress_bar_cb = TQDMProgressBar(refresh_rate=cfg.progress_bar_refresh_rate)
 
     callback_list: List[Callback] = [selection_callback, checkpoint_cb, early_stop_cb, *lr_callbacks]
+    if tuning_callback is not None:
+        callback_list.append(tuning_callback)
     if alternate_checkpoint_cb is not None:
         callback_list.append(alternate_checkpoint_cb)
     if progress_bar_cb is not None:
@@ -2063,6 +2530,7 @@ def main() -> int:
         ranked_checkpoints = _rank_checkpoints(
             checkpoint_dir,
             scores={k: v for k, v in checkpoint_cb.best_k_models.items()} if checkpoint_cb.best_k_models else None,
+            mode=monitor_mode,
         )
         if not ranked_checkpoints:
             # Fall back to filesystem order if Lightning did not populate best_k_models.
@@ -2091,6 +2559,17 @@ def main() -> int:
         _create_checkpoint_symlinks(checkpoint_dir, ranked_checkpoints, logger)
 
     alternate_checkpoint_path: Optional[Path] = None
+    variance_checkpoint_path: Optional[Path] = None
+    if cfg.variance_reduction_enabled and cfg.variance_reduction_method == "topk_avg":
+        top_k = max(1, int(cfg.variance_reduction_top_k))
+        if ranked_checkpoints:
+            variance_checkpoint_path = _average_checkpoints(
+                ranked_checkpoints[:top_k],
+                checkpoint_dir,
+                logger,
+            )
+            if variance_checkpoint_path:
+                _create_named_symlink(checkpoint_dir / "averaged_topk.ckpt", variance_checkpoint_path, logger)
     if alternate_checkpoint_cb is not None:
         best_alt_path = alternate_checkpoint_cb.best_model_path
         if best_alt_path:
@@ -2111,6 +2590,8 @@ def main() -> int:
     alternates_meta: Dict[str, Optional[Path]] = {}
     if alternate_metric_name is not None:
         alternates_meta[alternate_metric_name] = alternate_checkpoint_path
+    if variance_checkpoint_path is not None:
+        alternates_meta["avg_topk"] = variance_checkpoint_path
     try:
         record_checkpoint_paths(
             cfg.save_dir,
@@ -2141,6 +2622,15 @@ def main() -> int:
             final_selection = _safe_scalar(trainer.callback_metrics.get("selection_metric"))
             if final_selection is not None:
                 metrics_to_log["selection_metric"] = final_selection
+            for metric_name in (
+                "val_rank_spearman",
+                "val_rank_regret",
+                "tuning_rank_spearman",
+                "tuning_rank_regret",
+            ):
+                metric_value = _safe_scalar(trainer.callback_metrics.get(metric_name))
+                if metric_value is not None:
+                    metrics_to_log[metric_name] = metric_value
 
             if val_metrics:
                 first_metrics = val_metrics[0]

@@ -6,7 +6,7 @@ from pathlib import Path
 import torch
 
 BASE_DIR = Path(__file__).resolve().parents[2]
-GRAPH_ROOT = BASE_DIR / "graph_builder" / "output" / "pilot_batch" / "graph_data"
+GRAPH_ROOT = BASE_DIR / "model_training2" / "tests" / "fixtures" / "graph_data"
 COMMON_DIR = BASE_DIR / "common"
 if COMMON_DIR.exists() and str(COMMON_DIR) not in sys.path:
     sys.path.insert(0, str(COMMON_DIR))
@@ -22,8 +22,14 @@ def _load_graph(path: Path) -> torch.Tensor:
     return edge_attr
 
 
-def test_feature_metadata_detects_edge_schema():
+def _require_graph_path() -> Path:
     graph_path = GRAPH_ROOT / "1a2k" / "1a2k_1.pt"
+    assert graph_path.exists(), f"Fixture graph not found at {graph_path}"
+    return graph_path
+
+
+def test_feature_metadata_detects_edge_schema():
+    graph_path = _require_graph_path()
     edge_attr = _load_graph(graph_path)
     metadata = load_graph_feature_metadata(GRAPH_ROOT, sample_models=["1a2k/1a2k_1"])
     assert metadata.edge_schema["dim"] == edge_attr.shape[1]
@@ -32,7 +38,7 @@ def test_feature_metadata_detects_edge_schema():
 
 
 def test_feature_metadata_fallback_without_json(tmp_path: Path):
-    graph_path = GRAPH_ROOT / "1a2k" / "1a2k_1.pt"
+    graph_path = _require_graph_path()
     temp_graph_dir = tmp_path / "graph_data"
     temp_graph_dir.mkdir(parents=True, exist_ok=True)
     copied = temp_graph_dir / "1a2k" / "1a2k_1.pt"

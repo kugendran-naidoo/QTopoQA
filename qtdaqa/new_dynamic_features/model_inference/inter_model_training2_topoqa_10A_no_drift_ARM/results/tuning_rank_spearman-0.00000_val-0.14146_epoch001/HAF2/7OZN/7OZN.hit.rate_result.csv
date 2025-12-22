@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+7OZN hit rate =  0/0/0
+
+7OZN,structure_temp_dimer_2,0.40259507,0.021
+7OZN,string_interact_uniref_sto_0,0.40256965,0.009
+7OZN,string_interact_uniprot_sto_2,0.40256816,0.022
+7OZN,sequence_based_template_4,0.40255243,0.22
+7OZN,string_interact_uniref_sto_2,0.40241918,0.015
+7OZN,custom_template_file_1,0.40241709,0.02
+7OZN,string_interact_uniref_sto_4,0.40239748,0.016
+7OZN,default_3,0.40237162,0.012
+7OZN,uniprot_distance_uniprot_sto_4,0.40235928,0.022
+7OZN,species_interact_uniref_sto_3,0.40235832,0.039

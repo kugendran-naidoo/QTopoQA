@@ -88,7 +88,7 @@ fi
 
 # Optional graph validation preflight
 if [[ "${VALIDATE_GRAPHS:-0}" != "0" ]]; then
-  VALIDATOR_CMD=(python -m qtdaqa.new_dynamic_features.model_training22.tools.validate_graphs --graph-dir "${GRAPH_DIR}")
+  VALIDATOR_CMD=(python -m qtdaqa.new_dynamic_features.model_training2.tools.validate_graphs --graph-dir "${GRAPH_DIR}")
   if [[ -n "${VALIDATE_GRAPHS_MANIFEST:-}" ]]; then
     VALIDATOR_CMD+=(--manifest "${VALIDATE_GRAPHS_MANIFEST}")
     if [[ "${VALIDATE_GRAPHS_CREATE_MANIFEST:-0}" != "0" && ! -f "${VALIDATE_GRAPHS_MANIFEST}" ]]; then
@@ -161,7 +161,7 @@ PY
 import sys
 from pathlib import Path
 
-from qtdaqa.new_dynamic_features.model_training22 import train_cli
+from qtdaqa.new_dynamic_features.model_training2 import train_cli
 
 run_dir = Path(sys.argv[1]).resolve()
 if not run_dir.exists():
@@ -204,7 +204,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-from qtdaqa.new_dynamic_features.model_training22 import train_cli
+from qtdaqa.new_dynamic_features.model_training2 import train_cli
 
 run_root = Path(sys.argv[2])
 start_arg = sys.argv[1]
@@ -315,7 +315,7 @@ if ! PHASE1_INFO_RAW="$(python - <<'PY' "${PHASE1_RUN_DIR}"
 import sys
 from pathlib import Path
 
-from qtdaqa.new_dynamic_features.model_training22 import train_cli
+from qtdaqa.new_dynamic_features.model_training2 import train_cli
 
 run_dir = Path(sys.argv[1]).resolve()
 if not run_dir.exists():
@@ -387,7 +387,7 @@ for seed in "${PHASE2_SEEDS[@]}"; do
 import sys
 from pathlib import Path
 
-from qtdaqa.new_dynamic_features.model_training22 import train_cli
+from qtdaqa.new_dynamic_features.model_training2 import train_cli
 
 run_dir = Path(sys.argv[1]).resolve()
 if not run_dir.exists():

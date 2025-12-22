@@ -52,9 +52,26 @@ ENV_SNAPSHOT_KEYS = frozenset(
 
 TIMESTAMP_FMT = "%Y-%m-%d_%H-%M-%S"
 RUN_PREFIX = "training_run"
-PRIMARY_METRICS = ("val_loss", "selection_metric")
+PRIMARY_METRICS = (
+    "val_loss",
+    "selection_metric",
+    "val_rank_spearman",
+    "val_rank_regret",
+    "tuning_rank_spearman",
+    "tuning_rank_regret",
+)
 DEFAULT_PRIMARY_METRIC = "val_loss"
 RankedRun = Tuple[str, float, Dict[str, Any]]
+
+MAXIMIZE_METRICS = {
+    "val_spearman_corr",
+    "val_rank_spearman",
+    "tuning_rank_spearman",
+}
+
+
+def _metric_direction(metric_name: str) -> str:
+    return "max" if metric_name in MAXIMIZE_METRICS else "min"
 
 
 def _normalise_primary_metric(value: Optional[str]) -> str:
@@ -68,6 +85,11 @@ def _normalise_primary_metric(value: Optional[str]) -> str:
 
 def _resolve_primary_metric_value(summary: Dict[str, Any]) -> Tuple[str, Optional[float]]:
     requested = _normalise_primary_metric(summary.get("selection_primary_metric"))
+    primary_name = summary.get("best_primary_metric_name")
+    primary_value = summary.get("best_primary_metric_value")
+    if primary_name and primary_value is not None:
+        return str(primary_name), float(primary_value)
+
     if requested == "selection_metric":
         value = summary.get("best_selection_metric")
         if value is None:
@@ -94,7 +116,13 @@ def rank_runs(root: Path) -> List[RankedRun]:
         if metric_value is None:
             continue
         ranked.append((metric_name, float(metric_value), summary))
-    ranked.sort(key=lambda item: item[1])
+    def _sort_key(item: RankedRun) -> float:
+        value = float(item[1])
+        if _metric_direction(item[0]) == "max":
+            return -value
+        return value
+
+    ranked.sort(key=_sort_key)
     return ranked
 
 
@@ -796,6 +824,34 @@ def _collect_val_history(
                         val_spearman = float(spearman_raw)
                     except ValueError:
                         val_spearman = None
+                rank_spearman = None
+                rank_regret = None
+                tuning_rank_spearman = None
+                tuning_rank_regret = None
+                rank_spearman_raw = row.get("val_rank_spearman")
+                if rank_spearman_raw not in (None, ""):
+                    try:
+                        rank_spearman = float(rank_spearman_raw)
+                    except ValueError:
+                        rank_spearman = None
+                rank_regret_raw = row.get("val_rank_regret")
+                if rank_regret_raw not in (None, ""):
+                    try:
+                        rank_regret = float(rank_regret_raw)
+                    except ValueError:
+                        rank_regret = None
+                tuning_rank_spearman_raw = row.get("tuning_rank_spearman")
+                if tuning_rank_spearman_raw not in (None, ""):
+                    try:
+                        tuning_rank_spearman = float(tuning_rank_spearman_raw)
+                    except ValueError:
+                        tuning_rank_spearman = None
+                tuning_rank_regret_raw = row.get("tuning_rank_regret")
+                if tuning_rank_regret_raw not in (None, ""):
+                    try:
+                        tuning_rank_regret = float(tuning_rank_regret_raw)
+                    except ValueError:
+                        tuning_rank_regret = None
                 selection_metric = None
                 if selection_enabled:
                     if val_spearman is None:
@@ -808,6 +864,10 @@ def _collect_val_history(
                         "epoch": epoch_idx,
                         "val_loss": value,
                         "val_spearman_corr": val_spearman,
+                        "val_rank_spearman": rank_spearman,
+                        "val_rank_regret": rank_regret,
+                        "tuning_rank_spearman": tuning_rank_spearman,
+                        "tuning_rank_regret": tuning_rank_regret,
                         "selection_metric": selection_metric,
                         "source": str(metrics_file),
                     }
@@ -1033,7 +1093,13 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     selection_candidates = [entry for entry in val_history if entry.get("selection_metric") is not None]
     sorted_by_selection: List[Dict[str, Any]] = []
     if selection_candidates:
-        sorted_by_selection = sorted(selection_candidates, key=lambda item: item["selection_metric"])
+        sorted_by_selection = sorted(
+            selection_candidates,
+            key=lambda item: (
+                item["selection_metric"],
+                item.get("epoch") if isinstance(item.get("epoch"), (int, float)) else float("inf"),
+            ),
+        )
         for idx, entry in enumerate(sorted_by_selection[:3]):
             selection_top.append(
                 {
@@ -1045,6 +1111,31 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
                 }
             )
         selection_best = sorted_by_selection[0] if sorted_by_selection else None
+
+    def _pick_best(metric: str) -> Tuple[Optional[Dict[str, Any]], List[Dict[str, Any]]]:
+        candidates = [entry for entry in val_history if entry.get(metric) is not None]
+        if not candidates:
+            return None, []
+        reverse = _metric_direction(metric) == "max"
+        def _key(item: Dict[str, Any]) -> Tuple[float, float]:
+            value = float(item.get(metric))
+            epoch = item.get("epoch") if isinstance(item.get("epoch"), (int, float)) else float("inf")
+            return ((-value if reverse else value), float(epoch))
+        ordered = sorted(candidates, key=_key)
+        top = []
+        for idx, entry in enumerate(ordered[:3]):
+            payload = {
+                "rank": idx + 1,
+                metric: entry.get(metric),
+                "val_loss": entry.get("val_loss"),
+                "val_spearman_corr": entry.get("val_spearman_corr"),
+                "epoch": entry.get("epoch"),
+            }
+            top.append(payload)
+        return ordered[0], top
+
+    primary_metric_name = selection_primary_metric
+    primary_best, primary_top = _pick_best(primary_metric_name)
 
     selection_alternates: List[Dict[str, Any]] = []
     selection_alt_checkpoint = alternate_checkpoint_meta.get("selection_metric")
@@ -1110,6 +1201,10 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
                 "epoch": entry.get("epoch"),
                 "val_loss": entry.get("val_loss"),
                 "val_spearman_corr": entry.get("val_spearman_corr"),
+                "val_rank_spearman": entry.get("val_rank_spearman"),
+                "val_rank_regret": entry.get("val_rank_regret"),
+                "tuning_rank_spearman": entry.get("tuning_rank_spearman"),
+                "tuning_rank_regret": entry.get("tuning_rank_regret"),
                 "selection_metric": entry.get("selection_metric"),
             }
             if entry.get("source"):
@@ -1131,6 +1226,7 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "feature_metadata": feature_info,
         "run_metadata": run_metadata,
         "top_val_losses": top_val_losses,
+        "top_primary_metrics": primary_top,
         "selection_metric_enabled": selection_enabled,
         "top_selection_metrics": selection_top,
         "selection_alternates": selection_alternates,
@@ -1139,6 +1235,9 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "best_selection_val_loss": selection_best.get("val_loss") if selection_best else None,
         "best_selection_val_spearman": selection_best.get("val_spearman_corr") if selection_best else None,
         "selection_primary_metric": selection_primary_metric,
+        "best_primary_metric_name": primary_metric_name,
+        "best_primary_metric_value": primary_best.get(primary_metric_name) if primary_best else None,
+        "best_primary_metric_epoch": primary_best.get("epoch") if primary_best else None,
         "builder_advisory": _make_builder_advisory(),
     }
     if alternate_checkpoint_meta:

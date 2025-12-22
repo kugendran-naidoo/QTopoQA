@@ -70,8 +70,37 @@ Key sections you’ll encounter:
   - `selection_metric` – uses the Spearman-aware metric logged by Lightning
     (val loss adjusted by Spearman corr). Useful when correlation matters more
     than absolute loss.
+  - `val_rank_spearman` / `val_rank_regret` – ranking metrics computed per-target
+    on the validation split (requires target IDs in model names).
+  - `tuning_rank_spearman` / `tuning_rank_regret` – ranking metrics computed on
+    an explicit tuning slice (set `tuning.labels`).
 - `use_val_spearman` / `spearman_*` – control the secondary metric fed to the
   checkpoint callback.
+
+### `model`
+- `self_loops` – enable explicit self-loop edges in attention (default false).
+- `self_loop_fill` – edge_attr fill policy for self loops (e.g., `mean` or `0.0`).
+- `residual` – enable residual connections inside GATv2 layers.
+
+### `tuning`
+Optional, separate tuning split used for ranking-style selection without
+touching the final eval sets.
+- `labels` – CSV with the same columns as train/val (MODEL,dockq,capri).
+- `eval_every` – compute tuning ranking metrics every N epochs.
+- `max_samples` / `fraction` – cap the tuning slice size for faster metrics.
+
+### `ranking_loss`
+Optional pairwise ranking loss added to MSE during training.
+- `weight` – 0 disables ranking loss (default).
+- `margin` – hinge margin (only for `mode: hinge`).
+- `mode` – `hinge` or `logistic`.
+- `grouped` – only compare models within the same target ID.
+
+### `variance_reduction`
+Optional variance-reduced checkpointing after training.
+- `enabled` – turn on top‑K averaging.
+- `method` – `topk_avg` (currently supported).
+- `top_k` – number of checkpoints to average.
 
 ### `dataloader`
 - `num_workers` – default `0` for macOS (spawning workers can hurt stability).

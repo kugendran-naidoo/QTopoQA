@@ -10,7 +10,7 @@ torch_stub = types.ModuleType("torch")
 torch_stub.load = lambda *_args, **_kwargs: {}
 sys.modules.setdefault("torch", torch_stub)
 
-from qtdaqa.new_dynamic_features.model_training.common import resume_guard as guard
+from qtdaqa.new_dynamic_features.model_training2.common import resume_guard as guard
 
 
 def _mock_ckpt(path: Path, epoch: int, monkeypatch: pytest.MonkeyPatch) -> Path:

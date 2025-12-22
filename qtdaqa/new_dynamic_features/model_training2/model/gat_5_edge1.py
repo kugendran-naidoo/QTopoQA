@@ -10,6 +10,7 @@ try:
     from torch_geometric.loader import DataLoader  # PyG >= 2.0
 except Exception:
     from torch_geometric.data import DataLoader  # fallback
+import torch.nn.functional as F
 import numpy as np
 import wandb
 import random
@@ -23,6 +24,10 @@ try:
 except ImportError:  # when module executed outside package context
     from model.gat_with_edge import GATv2ConvWithEdgeEmbedding1  # type: ignore
 
+try:
+    from qtdaqa.new_dynamic_features.model_training2.common.ranking_metrics import compute_grouped_ranking_metrics
+except Exception:  # pragma: no cover - optional helper
+    compute_grouped_ranking_metrics = None
 
 
 def _align_pair(a: np.ndarray, b: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -89,6 +94,13 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         edge_schema=None,
         node_dim: Optional[int] = None,
         edge_encoder_variant: str = "modern",
+        self_loops: bool = False,
+        self_loop_fill: object = "mean",
+        residual: bool = False,
+        rank_loss_weight: float = 0.0,
+        rank_loss_margin: float = 0.0,
+        rank_loss_mode: str = "hinge",
+        rank_loss_grouped: bool = True,
     ):
         super().__init__()
         self.mode=mode
@@ -101,6 +113,13 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
         self.heads = heads
+        self.rank_loss_weight = float(rank_loss_weight or 0.0)
+        self.rank_loss_margin = float(rank_loss_margin or 0.0)
+        self.rank_loss_mode = str(rank_loss_mode or "hinge").lower()
+        self.rank_loss_grouped = bool(rank_loss_grouped)
+        self.add_self_loops = bool(self_loops)
+        self.self_loop_fill = self_loop_fill
+        self.residual = bool(residual)
 
         self.num_net=num_net
         if self.mode=='ori':
@@ -138,11 +157,11 @@ class GNN_edge1_edgepooling(pl.LightningModule):
 
         self.edge_embed=nn.ModuleList([_edge_encoder() for _ in range(self.num_net)])
         self.embed=nn.ModuleList([torch.nn.Linear(num_feature_xd,hidden_dim) for _ in range(self.num_net)])
-        self.conv1=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False) \
+        self.conv1=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=self.add_self_loops, fill_value=self.self_loop_fill, residual=self.residual, dropout=0.25,concat=False) \
                                   for _ in range(self.num_net)])
-        self.conv2=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False) \
+        self.conv2=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=self.add_self_loops, fill_value=self.self_loop_fill, residual=self.residual, dropout=0.25,concat=False) \
                                   for _ in range(self.num_net)])       
-        self.conv3=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=False, dropout=0.25,concat=False) \
+        self.conv3=nn.ModuleList([GATv2ConvWithEdgeEmbedding1(hidden_dim, out_channels=hidden_dim, heads=self.heads, edge_dim=hidden_dim, add_self_loops=self.add_self_loops, fill_value=self.self_loop_fill, residual=self.residual, dropout=0.25,concat=False) \
                                   for _ in range(self.num_net)])
         
         self.fc_edge = nn.Linear(hidden_dim,hidden_dim//2)
@@ -155,6 +174,84 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         
         self.validation_step_outputs = {}
         self.test_step_outputs = {}
+
+    def _extract_names(self, batch) -> list[str]:
+        expected = getattr(batch, "num_graphs", None)
+        for attr in ("_graph_names", "graph_names", "name", "model_name"):
+            names = getattr(batch, attr, None)
+            if names is None:
+                continue
+            if isinstance(names, (list, tuple)):
+                flattened = []
+                for item in names:
+                    if isinstance(item, (list, tuple)):
+                        flattened.extend(item)
+                    else:
+                        flattened.append(item)
+                names_list = [str(x) for x in flattened if str(x)]
+            elif torch.is_tensor(names):
+                names_list = [str(x) for x in names.detach().cpu().tolist() if str(x)]
+            elif isinstance(names, np.ndarray):
+                names_list = [str(x) for x in names.tolist() if str(x)]
+            else:
+                names_list = [str(names)] if str(names) else []
+            if not names_list:
+                continue
+            if expected is None or expected <= 1 or len(names_list) == expected:
+                return names_list
+            break
+        if hasattr(batch, "to_data_list"):
+            try:
+                data_list = batch.to_data_list()
+                names_list = [str(getattr(item, "name", "")) for item in data_list]
+                names_list = [name for name in names_list if name]
+                if names_list:
+                    return names_list
+            except Exception:
+                pass
+        return []
+
+    def _compute_rank_loss(self, preds: torch.Tensor, targets: torch.Tensor, names: list[str]) -> torch.Tensor:
+        preds = preds.view(-1)
+        targets = targets.view(-1)
+        if preds.numel() < 2 or targets.numel() < 2:
+            return preds.new_tensor(0.0)
+
+        if self.rank_loss_grouped and names:
+            groups: dict[str, list[int]] = {}
+            for idx, name in enumerate(names):
+                key = name.split("_", 1)[0] if name else ""
+                groups.setdefault(key, []).append(idx)
+            group_indices = [idxs for idxs in groups.values() if len(idxs) > 1]
+        else:
+            group_indices = [list(range(preds.numel()))]
+
+        losses = []
+        for idxs in group_indices:
+            idxs_tensor = preds.new_tensor(idxs, dtype=torch.long)
+            p = preds.index_select(0, idxs_tensor)
+            t = targets.index_select(0, idxs_tensor)
+            if p.numel() < 2:
+                continue
+            diff = p.unsqueeze(0) - p.unsqueeze(1)
+            true_diff = t.unsqueeze(0) - t.unsqueeze(1)
+            sign = torch.sign(true_diff)
+            mask = sign != 0
+            if not mask.any():
+                continue
+            if self.rank_loss_mode == "logistic":
+                loss_mat = F.softplus(-sign * diff)
+            else:
+                margin = self.rank_loss_margin
+                loss_mat = torch.relu(margin - sign * diff)
+            triu = torch.triu(torch.ones_like(loss_mat, dtype=torch.bool), diagonal=1)
+            mask = mask & triu
+            if mask.any():
+                losses.append(loss_mat[mask].mean())
+
+        if not losses:
+            return preds.new_tensor(0.0)
+        return torch.stack(losses).mean()
 
     def forward(self, data_data):
 
@@ -316,19 +413,28 @@ class GNN_edge1_edgepooling(pl.LightningModule):
 
   
     def training_step(self, train_batch):
-        batch_targets = train_batch[0].y
+        batch = train_batch[0]
+        batch_targets = batch.y
         batch_scores = self.forward(train_batch)
         batch_targets = batch_targets.unsqueeze(1)
 
-        
         train_mse = self.criterion(batch_scores, batch_targets)
+        total_loss = train_mse
+
+        if self.rank_loss_weight > 0.0:
+            names = self._extract_names(batch)
+            rank_loss = self._compute_rank_loss(batch_scores, batch_targets, names)
+            total_loss = train_mse + self.rank_loss_weight * rank_loss
+            self.log('train_rank_loss', rank_loss, on_step=False, on_epoch=True, sync_dist=True, batch_size=16)
+            self.log('train_total_loss', total_loss, on_step=False, on_epoch=True, sync_dist=True, batch_size=16)
 
         self.log('train_mse', train_mse, on_step=False, on_epoch=True, sync_dist=True,batch_size=16)
 
-        return train_mse
+        return total_loss
     
     def validation_step(self, val_batch):
-        batch_targets = val_batch[0].y
+        batch = val_batch[0]
+        batch_targets = batch.y
         batch_scores = self.forward(val_batch)
         batch_targets = batch_targets.unsqueeze(1)
 
@@ -341,6 +447,11 @@ class GNN_edge1_edgepooling(pl.LightningModule):
         if 'true_scores' not in self.validation_step_outputs:
             self.validation_step_outputs['true_scores'] = []
         self.validation_step_outputs['true_scores'].append(batch_targets.detach())        
+        if 'names' not in self.validation_step_outputs:
+            self.validation_step_outputs['names'] = []
+        batch_names = self._extract_names(batch)
+        if batch_names:
+            self.validation_step_outputs['names'].append(batch_names)
         # return {'scores': batch_scores, 'true_score':batch_targets}
     def on_validation_epoch_end(self):
         scores = torch.cat([x for x in self.validation_step_outputs['scores']],dim=0)
@@ -353,6 +464,17 @@ class GNN_edge1_edgepooling(pl.LightningModule):
 
         self.log('val_pearson_corr', correlation)
         self.log('val_spearman_corr', spearman_corr)
+        if compute_grouped_ranking_metrics is not None:
+            names_nested = self.validation_step_outputs.get('names', [])
+            names = []
+            for group in names_nested:
+                if isinstance(group, (list, tuple)):
+                    names.extend([str(x) for x in group])
+                else:
+                    names.append(str(group))
+            summary = compute_grouped_ranking_metrics(names, scores, true_scores)
+            self.log('val_rank_regret', summary.mean_regret)
+            self.log('val_rank_spearman', summary.mean_spearman)
         self.validation_step_outputs.clear()
     def test_step(self, test_batch):
         batch_targets = test_batch[0].y

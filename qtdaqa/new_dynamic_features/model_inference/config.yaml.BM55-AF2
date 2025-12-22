@@ -11,6 +11,7 @@ paths:
   dataset_name: BM55-AF2
   # set at cli - use metadata from model_training to choose
   checkpoint: null
+  training_root: ../model_training2/training_runs2
 
 batch_size: 32
 num_workers: 0

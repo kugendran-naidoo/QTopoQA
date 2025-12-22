@@ -6,8 +6,8 @@ model:
   pooling_type: mean
   attention_head: 8
 dataloader:
-  batch_size: 32
-  num_workers: 0
+  batch_size: 96
+  num_workers: 12
   seed: 222
 selection:
   primary_metric: val_loss
@@ -16,9 +16,11 @@ trainer:
   devices: 1
   precision: 32
   num_epochs: 120
-  accumulate_grad_batches: 8
+  accumulate_grad_batches: 4
   use_val_spearman_as_secondary: true
   spearman_secondary_weight: 1.0
+cache:
+  graph_cache_size: 2048
 optimizer:
   learning_rate: 0.004
 scheduler:

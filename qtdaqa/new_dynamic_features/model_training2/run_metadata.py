@@ -24,15 +24,23 @@ def record_selection_metadata(
     use_val_spearman: bool,
     spearman_weight: float,
     spearman_min_delta: float,
+    primary_mode: Optional[str] = None,
+    tuning_enabled: bool = False,
+    tuning_eval_every: Optional[int] = None,
 ) -> None:
     def _mutate(metadata: Dict[str, object]) -> None:
         metadata["selection_primary_metric"] = primary_metric
         selection_section = metadata.setdefault("selection", {})
         selection_section["primary_metric"] = primary_metric
+        if primary_mode:
+            selection_section["primary_mode"] = primary_mode
         selection_section["use_val_spearman"] = use_val_spearman
         selection_section["spearman_weight"] = spearman_weight
         selection_section["spearman_min_delta"] = spearman_min_delta
         selection_section["secondary_metric"] = "val_spearman_corr" if use_val_spearman else None
+        selection_section["tuning_enabled"] = bool(tuning_enabled)
+        if tuning_eval_every is not None:
+            selection_section["tuning_eval_every"] = int(tuning_eval_every)
 
     update_run_metadata(save_dir, _mutate)
 

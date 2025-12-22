@@ -1,24 +1,30 @@
 paths:
   train_labels: ./data.train.csv
   val_labels: ./data.validate.csv
-  save_dir: ./training_runs2
+  save_dir: ../training_runs2
 model:
   pooling_type: mean
   attention_head: 8
 dataloader:
-  batch_size: 32
-  num_workers: 0
+  batch_size: 96
+  num_workers: 12
   seed: 222
 selection:
-  primary_metric: val_loss
+  primary_metric: tuning_rank_spearman
+tuning:
+  labels: ./stats_split_helper.tuning.csv
+  max_samples: 500
+  eval_every: 1
 trainer:
   accelerator: cpu
   devices: 1
   precision: 32
   num_epochs: 120
-  accumulate_grad_batches: 8
+  accumulate_grad_batches: 4
   use_val_spearman_as_secondary: true
   spearman_secondary_weight: 1.0
+cache:
+  graph_cache_size: 2048
 optimizer:
   learning_rate: 0.004
 scheduler:
@@ -29,7 +35,7 @@ early_stopping:
   patience: 20
 mlflow:
   enabled: true
-  tracking_uri: ./qtdaqa/new_dynamic_features/model_training2/ml_runs2
+  tracking_uri: ./ml_runs2
   experiment: dynamic_topoqa
   log_artifacts: true
 coverage:
