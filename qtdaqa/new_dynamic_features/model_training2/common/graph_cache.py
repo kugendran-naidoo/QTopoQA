@@ -11,6 +11,15 @@ class GraphTensorCache:
         self._lock = threading.Lock()
         self._order: "OrderedDict[str, Any]" = OrderedDict()
 
+    def __getstate__(self) -> Dict[str, Any]:
+        # Avoid pickling the lock or cached tensors when DataLoader uses spawn.
+        return {"max_items": self.max_items}
+
+    def __setstate__(self, state: Dict[str, Any]) -> None:
+        self.max_items = max(1, int(state.get("max_items", 128)))
+        self._lock = threading.Lock()
+        self._order = OrderedDict()
+
     def get(self, path: Path, loader: Callable[[Path], Any]) -> Any:
         key = str(path)
         with self._lock:
