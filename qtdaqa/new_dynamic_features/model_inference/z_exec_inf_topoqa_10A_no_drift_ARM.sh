@@ -8,6 +8,15 @@ trap 'echo "Interrupted; aborting." >&2; exit 1' INT TERM
 DATASETS=("BM55-AF2" "HAF2" "ABAG-AF3")
 TOP_K=3                     # number of top checkpoints to use
 export TOP_K
+# RANK_MODE controls how top-K runs are chosen:
+#   primary   = use each run's selection.primary_metric (default in training)
+#   val_loss  = sort by best validation loss (lowest)
+#   secondary = sort by val_spearman_corr (highest; see SECONDARY_METRIC below)
+RANK_MODE="val_loss"
+# When RANK_MODE=secondary, which metric to use:
+#   val_spearman_corr (recommended; uses best val Spearman from selection history)
+SECONDARY_METRIC="val_spearman_corr"
+export RANK_MODE SECONDARY_METRIC
 WORK_DIR="topoqa_10A_no_drift_ARM"
 APPEND_TIMESTAMP=false
 REUSE_ONLY=true
@@ -80,15 +89,99 @@ done < <("${PYTHON_BIN}" - <<'PY'
 from pathlib import Path
 from qtdaqa.new_dynamic_features.model_training2 import train_cli
 
-runs = train_cli.rank_runs(train_cli.RUN_ROOT)
 import os
 top_k = int(os.environ.get("TOP_K", "3"))
-top = runs[:top_k]
-for metric_name, score, summary in top:
-    ckpt = summary.get("best_checkpoint")
-    run_name = summary.get("run_name")
-    if ckpt:
-        print(f"{score}\t{ckpt}\t{run_name or ''}")
+rank_mode = os.environ.get("RANK_MODE", "primary").strip().lower()
+secondary_metric = os.environ.get("SECONDARY_METRIC", "val_spearman_corr").strip().lower()
+
+def _metric_direction(metric_name: str) -> str:
+    return "max" if metric_name in train_cli.MAXIMIZE_METRICS else "min"
+
+def _pick_alt_checkpoint(summary, run_dir: Path, metric_name: str):
+    alt_map = summary.get("alternate_checkpoints") or {}
+    alt_path = alt_map.get(metric_name)
+    if alt_path:
+        candidate = Path(alt_path)
+        if candidate.exists():
+            return str(candidate)
+    if metric_name == "val_loss":
+        best_link = run_dir / "model_checkpoints" / "val_loss_best.ckpt"
+        if best_link.exists():
+            return str(best_link.resolve())
+        alt_dir = run_dir / "model_checkpoints" / "val_loss_checkpoints"
+        if alt_dir.exists():
+            candidates = sorted(alt_dir.glob("*.ckpt")) + sorted(alt_dir.glob("*.chkpt"))
+            if candidates:
+                best = None
+                for path in candidates:
+                    name = path.name
+                    val = None
+                    try:
+                        marker = "val-"
+                        if marker in name:
+                            tail = name.split(marker, 1)[1]
+                            val_str = tail.split("_", 1)[0]
+                            val = float(val_str)
+                    except Exception:
+                        val = None
+                    if val is None:
+                        best = best or (float("inf"), path)
+                        continue
+                    if best is None or val < best[0]:
+                        best = (val, path)
+                if best:
+                    return str(best[1])
+    return None
+
+ranked = []
+for run_dir in sorted(train_cli.RUN_ROOT.iterdir()):
+    if run_dir.is_symlink():
+        continue
+    if not run_dir.is_dir() or not (run_dir / "run_metadata.json").exists():
+        continue
+    summary = train_cli._summarise_run(run_dir)
+    metric_name = None
+    metric_value = None
+    ckpt = None
+
+    if rank_mode == "primary":
+        metric_name, metric_value = train_cli._resolve_primary_metric_value(summary)
+        ckpt = summary.get("best_checkpoint")
+    elif rank_mode == "val_loss":
+        metric_name = "val_loss"
+        metric_value = summary.get("best_val_loss")
+        ckpt = _pick_alt_checkpoint(summary, run_dir, "val_loss") or summary.get("best_checkpoint")
+    elif rank_mode == "secondary":
+        metric_name = secondary_metric
+        if secondary_metric == "val_spearman_corr":
+            metric_value = summary.get("best_selection_val_spearman")
+        else:
+            metric_value = summary.get(f"best_{secondary_metric}")
+        ckpt = summary.get("best_checkpoint")
+    else:
+        metric_name, metric_value = train_cli._resolve_primary_metric_value(summary)
+        ckpt = summary.get("best_checkpoint")
+
+    if metric_value is None or not ckpt:
+        continue
+    ckpt_path = Path(ckpt)
+    if not ckpt_path.exists():
+        if rank_mode == "val_loss":
+            ckpt = _pick_alt_checkpoint(summary, run_dir, "val_loss")
+            ckpt_path = Path(ckpt) if ckpt else None
+        if not ckpt_path or not ckpt_path.exists():
+            continue
+    ranked.append((metric_name, float(metric_value), summary, ckpt))
+
+if not ranked:
+    raise SystemExit("No runs with usable metrics found.")
+
+direction = _metric_direction(ranked[0][0]) if ranked else "min"
+ranked.sort(key=lambda item: (-item[1] if direction == "max" else item[1]))
+
+for metric_name, score, summary, ckpt in ranked[:top_k]:
+    run_name = summary.get("run_name") or ""
+    print(f"{score}\t{ckpt}\t{run_name}")
 PY
 )
 

@@ -1,0 +1,42 @@
+paths:
+  train_labels: ./data.train.csv
+  val_labels: ./data.validate.csv
+  save_dir: ../training_runs2
+  graph: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_no_drift_ARM/graph_data
+model:
+  pooling_type: mean
+  attention_head: 8
+dataloader:
+  batch_size: 48
+  num_workers: 2
+  seed: 222
+selection:
+  primary_metric: tuning_rank_spearman
+tuning:
+  labels: ./stats_split_helper.tuning.csv
+  max_samples: 500
+  eval_every: 1
+trainer:
+  accelerator: cpu
+  devices: 1
+  precision: 32
+  num_epochs: 140
+  accumulate_grad_batches: 8
+  use_val_spearman_as_secondary: true
+  spearman_secondary_weight: 1.0
+optimizer:
+  learning_rate: 0.0035
+scheduler:
+  factor: 0.2
+  patience: 6
+  type: reduce_on_plateau
+early_stopping:
+  patience: 24
+mlflow:
+  enabled: true
+  tracking_uri: ./ml_runs2
+  experiment: dynamic_topoqa
+  log_artifacts: true
+coverage:
+  fail_on_missing: false
+  minimum_percent: 0
