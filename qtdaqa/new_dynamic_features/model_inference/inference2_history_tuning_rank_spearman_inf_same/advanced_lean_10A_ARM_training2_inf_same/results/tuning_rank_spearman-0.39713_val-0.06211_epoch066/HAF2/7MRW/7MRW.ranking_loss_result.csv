@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7MRW m* = 0.609
+7MRW m^ = 0.011
+7MRW ranking loss = 0.598
+
+7MRW,string_interact_uniref_sto_2,0.22516555,0.609
+7MRW,custom_template_with_alphafold_models_4,0.29607937,0.011

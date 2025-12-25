@@ -1,0 +1,156 @@
+{
+  "run_name": "polish_lr_low_seed888_2025-12-25_13-44-41",
+  "created": "2025-12-25T13:44:42.370644",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed555.yaml",
+  "overrides": {
+    "paths.graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM/graph_data",
+    "trainer.num_epochs": 360,
+    "early_stopping.patience": 50,
+    "scheduler.patience": 25,
+    "scheduler.factor": 0.3,
+    "optimizer.learning_rate": "2e-3",
+    "dataloader.batch_size": 12,
+    "trainer.accumulate_grad_batches": 48,
+    "dataloader.seed": 888
+  },
+  "notes": "Auto-generated polish manifest from best run: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/sched_boost_lr035_lean_seed222_2025-12-25_08-07-46_phase2_seed555",
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_lr_low_seed888_2025-12-25_13-44-41/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_lr_low_seed888_2025-12-25_13-44-41",
+    "--git-commit",
+    "9b1bb2b320",
+    "--git-dirty"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  },
+  "training_parameters": {
+    "trainer": {
+      "num_epochs": 360,
+      "accumulate_grad_batches": 48,
+      "precision": 32,
+      "accelerator": "cpu",
+      "devices": 1
+    },
+    "dataloader": {
+      "batch_size": 12,
+      "num_workers": 2,
+      "seed": 888
+    },
+    "fast_dev_run": false
+  },
+  "selection_primary_metric": "tuning_rank_spearman",
+  "selection": {
+    "primary_metric": "tuning_rank_spearman",
+    "primary_mode": "max",
+    "use_val_spearman": true,
+    "spearman_weight": 1.0,
+    "spearman_min_delta": 0.0,
+    "secondary_metric": "val_spearman_corr",
+    "tuning_enabled": true,
+    "tuning_eval_every": 1
+  },
+  "runtime": {
+    "training_seconds": 2320,
+    "epochs_completed": 63,
+    "epochs_total": 360,
+    "epoch_seconds": [
+      28,
+      35,
+      35,
+      36,
+      36,
+      37,
+      37,
+      36,
+      36,
+      36,
+      36,
+      36,
+      37,
+      35,
+      36,
+      36,
+      36,
+      37,
+      37,
+      37,
+      36,
+      37,
+      37,
+      37,
+      36,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37,
+      36,
+      37,
+      36,
+      36,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37,
+      36,
+      37,
+      37,
+      38,
+      37,
+      39,
+      37,
+      37,
+      37,
+      37,
+      38,
+      38,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37,
+      37
+    ],
+    "epoch_seconds_stats": {
+      "mean": 36.586485138936304,
+      "median": 36.77270499999577,
+      "min": 27.69588037500216,
+      "max": 38.85051629200461
+    }
+  },
+  "checkpoints": {
+    "primary_metric": "tuning_rank_spearman",
+    "primary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_lr_low_seed888_2025-12-25_13-44-41/model_checkpoints/checkpoint.tuning_rank_spearman-0.18997_val-0.08030_epoch012.chkpt",
+    "alternates": {
+      "val_loss": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_lr_low_seed888_2025-12-25_13-44-41/model_checkpoints/val_loss_checkpoints/alt_val.val-0.08198_epoch010.ckpt"
+    }
+  },
+  "mlflow": {
+    "run_id": "fad9afc8128247dc9c7d2bab599da1d6",
+    "experiment": "dynamic_topoqa",
+    "experiment_id": "246251525625132477",
+    "run_name": "polish_lr_low_seed888_2025-12-25_13-44-41",
+    "tracking_uri": "./ml_runs2"
+  },
+  "completed": "2025-12-25T14:23:45.334020",
+  "artifacts": {
+    "logs_dir": "logs",
+    "metrics_dir": "metrics"
+  }
+}

@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7MRW m* = 0.609
+7MRW m^ = 0.006
+7MRW ranking loss = 0.603
+
+7MRW,string_interact_uniref_sto_2,0.03671883,0.609
+7MRW,ori_temp_pipeline_with_alphafold_models_1,0.15656336,0.006

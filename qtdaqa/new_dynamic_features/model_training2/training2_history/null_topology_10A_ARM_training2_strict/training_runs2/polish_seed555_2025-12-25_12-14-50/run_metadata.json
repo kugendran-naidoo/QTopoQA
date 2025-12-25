@@ -1,0 +1,150 @@
+{
+  "run_name": "polish_seed555_2025-12-25_12-14-50",
+  "created": "2025-12-25T12:14:50.932301",
+  "source_config": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed555.yaml",
+  "overrides": {
+    "paths.graph": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM/graph_data",
+    "trainer.num_epochs": 320,
+    "early_stopping.patience": 40,
+    "scheduler.patience": 20,
+    "scheduler.factor": 0.3,
+    "optimizer.learning_rate": "3e-3",
+    "dataloader.seed": 555
+  },
+  "notes": "Auto-generated polish manifest from best run: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/sched_boost_lr035_lean_seed222_2025-12-25_08-07-46_phase2_seed555",
+  "trial_label": null,
+  "command": [
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/model_train_topoqa_cpu.py",
+    "--config",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2025-12-25_12-14-50/config/config.yaml",
+    "--run-dir",
+    "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2025-12-25_12-14-50",
+    "--git-commit",
+    "9b1bb2b320",
+    "--git-dirty"
+  ],
+  "environment": {
+    "CUBLAS_WORKSPACE_CONFIG": ":16:8",
+    "PL_SEED_WORKERS": "1",
+    "PYTHONHASHSEED": "222",
+    "TORCH_USE_DETERMINISTIC_ALGORITHMS": "1"
+  },
+  "training_parameters": {
+    "trainer": {
+      "num_epochs": 320,
+      "accumulate_grad_batches": 8,
+      "precision": 32,
+      "accelerator": "cpu",
+      "devices": 1
+    },
+    "dataloader": {
+      "batch_size": 48,
+      "num_workers": 2,
+      "seed": 555
+    },
+    "fast_dev_run": false
+  },
+  "selection_primary_metric": "tuning_rank_spearman",
+  "selection": {
+    "primary_metric": "tuning_rank_spearman",
+    "primary_mode": "max",
+    "use_val_spearman": true,
+    "spearman_weight": 1.0,
+    "spearman_min_delta": 0.0,
+    "secondary_metric": "val_spearman_corr",
+    "tuning_enabled": true,
+    "tuning_eval_every": 1
+  },
+  "runtime": {
+    "training_seconds": 1466,
+    "epochs_completed": 59,
+    "epochs_total": 320,
+    "epoch_seconds": [
+      17,
+      25,
+      26,
+      26,
+      26,
+      26,
+      25,
+      26,
+      26,
+      26,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      24,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      24,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      25,
+      24,
+      24,
+      24,
+      24,
+      25,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      24,
+      25,
+      24,
+      24,
+      25,
+      24,
+      24
+    ],
+    "epoch_seconds_stats": {
+      "mean": 24.579180093915365,
+      "median": 24.605369040997175,
+      "min": 17.343132542002422,
+      "max": 26.123924458996044
+    }
+  },
+  "checkpoints": {
+    "primary_metric": "tuning_rank_spearman",
+    "primary_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2025-12-25_12-14-50/model_checkpoints/checkpoint.tuning_rank_spearman-0.40965_val-0.10147_epoch018.chkpt",
+    "alternates": {
+      "val_loss": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2025-12-25_12-14-50/model_checkpoints/val_loss_checkpoints/alt_val.val-0.08467_epoch015.ckpt"
+    }
+  },
+  "mlflow": {
+    "run_id": "90250eb5b360432d9a3ad76c9a4aae8c",
+    "experiment": "dynamic_topoqa",
+    "experiment_id": "246251525625132477",
+    "run_name": "polish_seed555_2025-12-25_12-14-50",
+    "tracking_uri": "./ml_runs2"
+  },
+  "completed": "2025-12-25T12:39:37.784525",
+  "artifacts": {
+    "logs_dir": "logs",
+    "metrics_dir": "metrics"
+  }
+}
