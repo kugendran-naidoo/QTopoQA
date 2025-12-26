@@ -153,6 +153,7 @@ class TrainingConfig:
     tuning_max_samples: Optional[int] = None
     tuning_fraction: Optional[float] = None
     tuning_eval_every: int = 1
+    tuning_min_groups_ge2: int = 200
     rank_loss_weight: float = 0.0
     rank_loss_margin: float = 0.0
     rank_loss_mode: str = "hinge"
@@ -160,6 +161,10 @@ class TrainingConfig:
     variance_reduction_enabled: bool = False
     variance_reduction_method: str = "topk_avg"
     variance_reduction_top_k: int = 3
+    variance_reduction_ema_decay: float = 0.999
+    variance_reduction_swa_start: float = 0.75
+    variance_reduction_save_every_epochs: int = 0
+    variance_reduction_resume: bool = True
     coverage_minimum: float = 0.0
     coverage_fail_on_missing: bool = True
     graph_load_profiling: bool = False
@@ -184,6 +189,23 @@ def _normalise_ratio(value: float | int | str, default: float = 0.0) -> float:
     if numeric > 1.0:
         numeric = numeric / 100.0
     return min(max(numeric, 0.0), 1.0)
+
+
+def _coerce_float(value: object, default: float) -> float:
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _resolve_swa_start_epoch(value: float, total_epochs: int) -> int:
+    if total_epochs <= 0:
+        return 0
+    if value < 1.0:
+        return max(0, min(total_epochs - 1, int(round(total_epochs * value))))
+    return max(0, min(total_epochs - 1, int(round(value))))
 
 
 PRIMARY_METRIC_CHOICES = {
@@ -334,6 +356,12 @@ def load_config(path: Path) -> TrainingConfig:
             tuning_eval_every = max(1, int(tuning_eval_every))
         except (TypeError, ValueError):
             tuning_eval_every = 1
+        tuning_min_groups_raw = tuning_cfg.get("min_groups_ge2", tuning_cfg.get("min_groups", 200))
+        try:
+            tuning_min_groups_ge2 = int(tuning_min_groups_raw) if tuning_min_groups_raw is not None else 0
+        except (TypeError, ValueError):
+            tuning_min_groups_ge2 = 0
+        tuning_min_groups_ge2 = max(0, tuning_min_groups_ge2)
 
         ranking_cfg = _get("ranking_loss", {})
         if not isinstance(ranking_cfg, dict):
@@ -351,6 +379,16 @@ def load_config(path: Path) -> TrainingConfig:
             variance_reduction_top_k = int(variance_cfg.get("top_k", 3))
         except (TypeError, ValueError):
             variance_reduction_top_k = 3
+        variance_reduction_ema_decay = _coerce_float(variance_cfg.get("ema_decay"), 0.999)
+        if not 0.0 < variance_reduction_ema_decay <= 1.0:
+            variance_reduction_ema_decay = 0.999
+        variance_reduction_swa_start = _coerce_float(variance_cfg.get("swa_start"), 0.75)
+        if variance_reduction_swa_start < 0.0:
+            variance_reduction_swa_start = 0.75
+        variance_reduction_save_every_epochs = int(variance_cfg.get("save_every_epochs", 0) or 0)
+        if variance_reduction_save_every_epochs < 0:
+            variance_reduction_save_every_epochs = 0
+        variance_reduction_resume = bool(variance_cfg.get("resume", True))
 
         cfg = TrainingConfig(
             graph_dir=graph_dir,
@@ -394,6 +432,7 @@ def load_config(path: Path) -> TrainingConfig:
             tuning_max_samples=tuning_max_samples,
             tuning_fraction=tuning_fraction,
             tuning_eval_every=tuning_eval_every,
+            tuning_min_groups_ge2=tuning_min_groups_ge2,
             rank_loss_weight=rank_loss_weight,
             rank_loss_margin=rank_loss_margin,
             rank_loss_mode=rank_loss_mode,
@@ -401,6 +440,10 @@ def load_config(path: Path) -> TrainingConfig:
             variance_reduction_enabled=variance_reduction_enabled,
             variance_reduction_method=variance_reduction_method,
             variance_reduction_top_k=variance_reduction_top_k,
+            variance_reduction_ema_decay=variance_reduction_ema_decay,
+            variance_reduction_swa_start=variance_reduction_swa_start,
+            variance_reduction_save_every_epochs=variance_reduction_save_every_epochs,
+            variance_reduction_resume=variance_reduction_resume,
         )
         return cfg
 
@@ -536,6 +579,12 @@ def load_config(path: Path) -> TrainingConfig:
         tuning_eval_every = max(1, int(tuning_eval_every))
     except (TypeError, ValueError):
         tuning_eval_every = 1
+    tuning_min_groups_raw = tuning_cfg.get("min_groups_ge2", tuning_cfg.get("min_groups", 200))
+    try:
+        tuning_min_groups_ge2 = int(tuning_min_groups_raw) if tuning_min_groups_raw is not None else 0
+    except (TypeError, ValueError):
+        tuning_min_groups_ge2 = 0
+    tuning_min_groups_ge2 = max(0, tuning_min_groups_ge2)
 
     ranking_cfg = _section("ranking_loss")
     rank_loss_weight = float(ranking_cfg.get("weight", 0.0) or 0.0)
@@ -549,6 +598,16 @@ def load_config(path: Path) -> TrainingConfig:
         variance_reduction_top_k = int(variance_cfg.get("top_k", 3))
     except (TypeError, ValueError):
         variance_reduction_top_k = 3
+    variance_reduction_ema_decay = _coerce_float(variance_cfg.get("ema_decay"), 0.999)
+    if not 0.0 < variance_reduction_ema_decay <= 1.0:
+        variance_reduction_ema_decay = 0.999
+    variance_reduction_swa_start = _coerce_float(variance_cfg.get("swa_start"), 0.75)
+    if variance_reduction_swa_start < 0.0:
+        variance_reduction_swa_start = 0.75
+    variance_reduction_save_every_epochs = int(variance_cfg.get("save_every_epochs", 0) or 0)
+    if variance_reduction_save_every_epochs < 0:
+        variance_reduction_save_every_epochs = 0
+    variance_reduction_resume = bool(variance_cfg.get("resume", True))
 
     cfg = TrainingConfig(
         graph_dir=graph_dir,
@@ -585,6 +644,7 @@ def load_config(path: Path) -> TrainingConfig:
         tuning_max_samples=tuning_max_samples,
         tuning_fraction=tuning_fraction,
         tuning_eval_every=tuning_eval_every,
+        tuning_min_groups_ge2=tuning_min_groups_ge2,
         rank_loss_weight=rank_loss_weight,
         rank_loss_margin=rank_loss_margin,
         rank_loss_mode=rank_loss_mode,
@@ -592,6 +652,10 @@ def load_config(path: Path) -> TrainingConfig:
         variance_reduction_enabled=variance_reduction_enabled,
         variance_reduction_method=variance_reduction_method,
         variance_reduction_top_k=variance_reduction_top_k,
+        variance_reduction_ema_decay=variance_reduction_ema_decay,
+        variance_reduction_swa_start=variance_reduction_swa_start,
+        variance_reduction_save_every_epochs=variance_reduction_save_every_epochs,
+        variance_reduction_resume=variance_reduction_resume,
         coverage_minimum=coverage_minimum,
         coverage_fail_on_missing=coverage_fail_on_missing,
         graph_load_profiling=graph_load_profiling,
@@ -1574,6 +1638,135 @@ class TuningMetricsCallback(Callback):
             pl_module.train()
 
 
+class WeightAveragingCallback(Callback):
+    def __init__(
+        self,
+        logger: logging.Logger,
+        method: str,
+        output_path: Path,
+        ema_decay: float = 0.999,
+        swa_start_epoch: int = 0,
+        save_every_epochs: int = 0,
+        resume: bool = True,
+    ) -> None:
+        super().__init__()
+        self.logger = logger
+        self.method = method
+        self.output_path = output_path
+        self.ema_decay = ema_decay
+        self.swa_start_epoch = max(0, int(swa_start_epoch))
+        self.save_every_epochs = max(0, int(save_every_epochs))
+        self.resume = resume
+        self._avg_state: Optional[Dict[str, torch.Tensor]] = None
+        self._avg_count = 0
+        self.averaged_path: Optional[Path] = None
+
+    def _snapshot_state(self, state_dict: Dict[str, object]) -> Dict[str, torch.Tensor]:
+        snapshot: Dict[str, torch.Tensor] = {}
+        for key, value in state_dict.items():
+            if torch.is_tensor(value):
+                snapshot[key] = value.detach().cpu().clone()
+        return snapshot
+
+    def _update_average(self, state_dict: Dict[str, object]) -> None:
+        current = self._snapshot_state(state_dict)
+        if not current:
+            return
+        if self._avg_state is None:
+            self._avg_state = current
+            self._avg_count = 1
+            return
+        self._avg_count += 1
+        if self.method == "ema":
+            decay = self.ema_decay
+            for key, tensor in current.items():
+                if key in self._avg_state:
+                    self._avg_state[key].mul_(decay).add_(tensor, alpha=1.0 - decay)
+        else:  # swa
+            count = float(self._avg_count)
+            for key, tensor in current.items():
+                if key in self._avg_state:
+                    self._avg_state[key].add_(tensor - self._avg_state[key], alpha=1.0 / count)
+
+    def _load_average_checkpoint(self) -> None:
+        if not self.output_path.exists():
+            return
+        try:
+            ckpt = torch.load(self.output_path, map_location="cpu")
+        except Exception as exc:
+            self.logger.warning("Failed to load averaged checkpoint %s: %s", self.output_path, exc)
+            return
+        state = ckpt.get("state_dict") if isinstance(ckpt, dict) else None
+        if not isinstance(state, dict):
+            self.logger.warning("Averaged checkpoint %s missing state_dict; skipping resume.", self.output_path)
+            return
+        self._avg_state = self._snapshot_state(state)
+        self._avg_count = 1
+        meta = ckpt.get("averaging_state") if isinstance(ckpt, dict) else None
+        if isinstance(meta, dict):
+            count = meta.get("avg_count")
+            method = meta.get("method")
+            if isinstance(method, str) and method != self.method:
+                self.logger.warning(
+                    "Averaged checkpoint method %s does not match current method %s; skipping resume.",
+                    method,
+                    self.method,
+                )
+                self._avg_state = None
+                self._avg_count = 0
+                return
+            if isinstance(count, (int, float)) and count > 0:
+                self._avg_count = int(count)
+        self.logger.info("Resumed %s averaging state from %s (avg_count=%d).", self.method, self.output_path, self._avg_count)
+
+    def _save_average_checkpoint(self, trainer, pl_module) -> None:
+        if self._avg_state is None:
+            self.logger.warning("Weight averaging requested but no averaged state was collected.")
+            return
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        original_state = self._snapshot_state(pl_module.state_dict())
+        device = next(pl_module.parameters()).device
+        averaged_state = {key: value.to(device) for key, value in self._avg_state.items()}
+
+        try:
+            pl_module.load_state_dict(averaged_state, strict=False)
+            trainer.save_checkpoint(str(self.output_path))
+            try:
+                ckpt = torch.load(self.output_path, map_location="cpu")
+                if isinstance(ckpt, dict):
+                    ckpt["averaging_state"] = {
+                        "method": self.method,
+                        "avg_count": self._avg_count,
+                        "ema_decay": self.ema_decay,
+                    }
+                    torch.save(ckpt, self.output_path)
+            except Exception as exc:
+                self.logger.warning("Failed to embed averaging metadata into %s: %s", self.output_path, exc)
+            self.averaged_path = self.output_path
+            self.logger.info("Saved %s averaged checkpoint to %s", self.method, self.output_path)
+        finally:
+            if original_state:
+                restored_state = {key: value.to(device) for key, value in original_state.items()}
+                pl_module.load_state_dict(restored_state, strict=False)
+
+    def on_fit_start(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if self.resume:
+            self._load_average_checkpoint()
+
+    def on_train_epoch_end(self, trainer, pl_module) -> None:  # type: ignore[override]
+        if trainer.sanity_checking:
+            return
+        if self.method == "swa" and trainer.current_epoch < self.swa_start_epoch:
+            return
+        self._update_average(pl_module.state_dict())
+        if self.save_every_epochs and (trainer.current_epoch + 1) % self.save_every_epochs == 0:
+            self._save_average_checkpoint(trainer, pl_module)
+
+    def on_fit_end(self, trainer, pl_module) -> None:  # type: ignore[override]
+        self._save_average_checkpoint(trainer, pl_module)
+
+
 class EpochSummaryLogger(Callback):
     def __init__(self, logger: logging.Logger) -> None:
         super().__init__()
@@ -2261,18 +2454,21 @@ def main() -> int:
             tuning_groups_ge2 = int(coverage["tuning"].get("groups_ge2", 0))
         except (TypeError, ValueError):
             tuning_groups_ge2 = 0
-    if primary_metric.startswith("tuning_") and tuning_groups_ge2 == 0:
+    tuning_min_groups_ge2 = max(0, int(cfg.tuning_min_groups_ge2))
+    if primary_metric.startswith("tuning_") and tuning_groups_ge2 < tuning_min_groups_ge2:
         logger.warning(
-            "selection.primary_metric=%s requested but tuning groups>=2 is 0; falling back to val_rank_spearman.",
+            "selection.primary_metric=%s requested but tuning groups>=2 is %d (<%d); falling back to val_loss.",
+            primary_metric,
+            tuning_groups_ge2,
+            tuning_min_groups_ge2,
+        )
+        primary_metric = "val_loss"
+    if primary_metric.startswith("tuning_") and (tuning_loader is None or compute_grouped_ranking_metrics is None):
+        logger.warning(
+            "selection.primary_metric=%s requested but tuning metrics are unavailable; falling back to val_loss.",
             primary_metric,
         )
-        primary_metric = "val_rank_spearman"
-    if primary_metric.startswith("tuning_") and tuning_loader is None:
-        logger.warning(
-            "selection.primary_metric=%s requested but no tuning dataset is configured; falling back to val_rank_spearman.",
-            primary_metric,
-        )
-        primary_metric = "val_rank_spearman"
+        primary_metric = "val_loss"
     if primary_metric not in PRIMARY_METRIC_CHOICES:
         primary_metric = "val_loss"
 
@@ -2341,6 +2537,24 @@ def main() -> int:
             tuning_loader,
             eval_every=cfg.tuning_eval_every,
         )
+    weight_avg_callback = None
+    if cfg.variance_reduction_enabled and cfg.variance_reduction_method in {"ema", "swa"}:
+        swa_start_epoch = _resolve_swa_start_epoch(cfg.variance_reduction_swa_start, cfg.num_epochs)
+        output_path = (cfg.save_dir / "model_checkpoints" / f"averaged_{cfg.variance_reduction_method}.ckpt")
+        weight_avg_callback = WeightAveragingCallback(
+            logger,
+            cfg.variance_reduction_method,
+            output_path,
+            ema_decay=cfg.variance_reduction_ema_decay,
+            swa_start_epoch=swa_start_epoch,
+            save_every_epochs=cfg.variance_reduction_save_every_epochs,
+            resume=cfg.variance_reduction_resume,
+        )
+        logger.info(
+            "Weight averaging enabled (%s) -> %s",
+            cfg.variance_reduction_method,
+            output_path,
+        )
 
     progress_bar_cb = None
     enable_progress_bar = cfg.progress_bar_refresh_rate > 0
@@ -2350,6 +2564,8 @@ def main() -> int:
     callback_list: List[Callback] = [selection_callback, checkpoint_cb, early_stop_cb, *lr_callbacks]
     if tuning_callback is not None:
         callback_list.append(tuning_callback)
+    if weight_avg_callback is not None:
+        callback_list.append(weight_avg_callback)
     if alternate_checkpoint_cb is not None:
         callback_list.append(alternate_checkpoint_cb)
     if progress_bar_cb is not None:
@@ -2492,6 +2708,8 @@ def main() -> int:
 
     ranked_checkpoints: List[Path] = []
     val_metrics: List[Dict[str, object]] = []
+    ema_metrics: Optional[Dict[str, object]] = None
+    ema_checkpoint_path: Optional[Path] = None
 
     epoch_durations = timing_callback.epoch_durations[:]
     runtime_summary: Dict[str, Any] = {
@@ -2522,9 +2740,65 @@ def main() -> int:
             ckpt_path=best_ckpt_path,
         )
         logger.info("Validation metrics: %s", val_metrics)
+        if weight_avg_callback is not None:
+            ema_checkpoint_path = weight_avg_callback.averaged_path or weight_avg_callback.output_path
+            if ema_checkpoint_path and ema_checkpoint_path.exists():
+                logger.info(
+                    "Running %s validation using averaged checkpoint %s",
+                    cfg.variance_reduction_method,
+                    ema_checkpoint_path,
+                )
+                try:
+                    ema_val_metrics = trainer.validate(
+                        model,
+                        dataloaders=val_loader,
+                        ckpt_path=str(ema_checkpoint_path),
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        "Failed to compute %s validation metrics: %s",
+                        cfg.variance_reduction_method,
+                        exc,
+                    )
+                else:
+                    logger.info(
+                        "%s validation metrics: %s",
+                        cfg.variance_reduction_method,
+                        ema_val_metrics,
+                    )
+                    if ema_val_metrics:
+                        ema_metrics = ema_val_metrics[0]
+            else:
+                logger.warning(
+                    "Averaged checkpoint not found; skipping %s validation metrics.",
+                    cfg.variance_reduction_method,
+                )
 
     best_ckpt_path = checkpoint_cb.best_model_path or best_ckpt_path
     best_path_obj = resolve_checkpoint_path(best_ckpt_path)
+    if ema_metrics is not None and ema_checkpoint_path is not None:
+        def _update_ema_metadata(metadata: Dict[str, object]) -> None:
+            ema_block = metadata.setdefault("ema_metrics", {})
+            if isinstance(ema_block, dict):
+                ema_block["checkpoint"] = str(ema_checkpoint_path)
+                ema_block["method"] = cfg.variance_reduction_method
+                for key in (
+                    "val_loss",
+                    "val_pearson_corr",
+                    "val_spearman_corr",
+                    "val_rank_spearman",
+                    "val_rank_regret",
+                    "tuning_rank_spearman",
+                    "tuning_rank_regret",
+                ):
+                    value = _safe_scalar(ema_metrics.get(key))
+                    if value is not None:
+                        ema_block[key] = value
+
+        try:
+            update_run_metadata(cfg.save_dir, _update_ema_metadata)
+        except Exception as exc:  # pragma: no cover - best effort
+            logger.warning("Unable to record EMA validation metrics: %s", exc)
 
     if checkpoint_dir.exists():
         ranked_checkpoints = _rank_checkpoints(
@@ -2560,6 +2834,7 @@ def main() -> int:
 
     alternate_checkpoint_path: Optional[Path] = None
     variance_checkpoint_path: Optional[Path] = None
+    weight_avg_path: Optional[Path] = None
     if cfg.variance_reduction_enabled and cfg.variance_reduction_method == "topk_avg":
         top_k = max(1, int(cfg.variance_reduction_top_k))
         if ranked_checkpoints:
@@ -2570,6 +2845,8 @@ def main() -> int:
             )
             if variance_checkpoint_path:
                 _create_named_symlink(checkpoint_dir / "averaged_topk.ckpt", variance_checkpoint_path, logger)
+    if weight_avg_callback is not None and weight_avg_callback.averaged_path is not None:
+        weight_avg_path = weight_avg_callback.averaged_path
     if alternate_checkpoint_cb is not None:
         best_alt_path = alternate_checkpoint_cb.best_model_path
         if best_alt_path:
@@ -2592,6 +2869,8 @@ def main() -> int:
         alternates_meta[alternate_metric_name] = alternate_checkpoint_path
     if variance_checkpoint_path is not None:
         alternates_meta["avg_topk"] = variance_checkpoint_path
+    if weight_avg_path is not None:
+        alternates_meta[f"avg_{cfg.variance_reduction_method}"] = weight_avg_path
     try:
         record_checkpoint_paths(
             cfg.save_dir,

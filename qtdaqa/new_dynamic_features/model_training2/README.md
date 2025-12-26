@@ -88,6 +88,8 @@ touching the final eval sets.
 - `labels` – CSV with the same columns as train/val (MODEL,dockq,capri).
 - `eval_every` – compute tuning ranking metrics every N epochs.
 - `max_samples` / `fraction` – cap the tuning slice size for faster metrics.
+- `min_groups_ge2` – minimum number of multi-decoy target groups required
+  before tuning metrics are allowed to drive selection (guardrail fallback).
 
 ### `ranking_loss`
 Optional pairwise ranking loss added to MSE during training.
@@ -99,8 +101,18 @@ Optional pairwise ranking loss added to MSE during training.
 ### `variance_reduction`
 Optional variance-reduced checkpointing after training.
 - `enabled` – turn on top‑K averaging.
-- `method` – `topk_avg` (currently supported).
+- `method` – `topk_avg`, `ema`, or `swa`.
 - `top_k` – number of checkpoints to average.
+- `ema_decay` – EMA decay factor (only for `method: ema`).
+- `swa_start` – SWA start epoch or fraction of total epochs (only for `method: swa`).
+- `save_every_epochs` – periodically persist EMA/SWA checkpoint to disk (0 = only at end).
+- `resume` – resume EMA/SWA tracking from an existing averaged checkpoint if present.
+- When EMA/SWA is enabled, a post-fit validation pass is run using the averaged checkpoint and
+  the resulting metrics are stored in `run_metadata.json` under `ema_metrics` for eval-blind selection.
+- To backfill `ema_metrics` for older runs, use:
+  `python -m qtdaqa.new_dynamic_features.model_training2.tools.ema_backfill_eval --training-root training_runs2`
+- Option B selection supports `--shortlist-metric` (default `best_val_loss`). Use `ema_val_loss` to build the shortlist
+  based on EMA validation loss before applying the tuning metric.
 
 ### `dataloader`
 - `num_workers` – default `0` for macOS (spawning workers can hurt stability).
@@ -134,6 +146,14 @@ Optional logging; disable if you don’t need remote tracking.
 
 1. **Sweep (`train_cli batch …`)** – executes the manifest jobs under
    `manifests/`. Each job gets its own `training_runs2/<run_id>` folder.
+
+### Option B checkpoint selection helper
+To select a checkpoint without using eval sets, use:
+```
+python tools/option_b_select.py --top-k 3 --tuning-metric best_val_tuning_rank_spearman
+```
+This picks top‑K by `val_loss` then chooses the best run by the tuning metric,
+emitting the checkpoint path for that run.
 2. **Selection** – `run_full_pipeline.sh` inspects `run_metadata.json`/metrics
    and ranks runs using `selection.primary_metric`. The metric choice is recorded
    in each run’s metadata so inference knows whether val loss or the selection

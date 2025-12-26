@@ -16,9 +16,12 @@ fi
 
 cd "${SCRIPT_DIR}"
 export PYTHONPATH="${REPO_ROOT}:${PYTHONPATH:-}"
+: "${KMP_USE_SHM:=0}"
+: "${OMP_NUM_THREADS:=1}"
+export KMP_USE_SHM OMP_NUM_THREADS
 
 python -m qtdaqa.new_dynamic_features.model_training2.train_cli run \
-  --config configs/sched_boost_seed222.yaml \
+  --config configs/sched_boost_lean_seed222.yaml \
   --run-name smoke_test \
   --fast-dev-run \
   --override "paths.graph=${GRAPH_DIR}" \

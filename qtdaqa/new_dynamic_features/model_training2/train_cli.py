@@ -67,6 +67,9 @@ MAXIMIZE_METRICS = {
     "val_spearman_corr",
     "val_rank_spearman",
     "tuning_rank_spearman",
+    "ema_val_spearman_corr",
+    "ema_val_rank_spearman",
+    "ema_tuning_rank_spearman",
 }
 
 
@@ -1184,9 +1187,22 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         return "; ".join(parts) + " — ensure inference uses a builder with these modules/variants."
 
     training_parameters = run_metadata.get("training_parameters") if isinstance(run_metadata, dict) else None
+    ema_metrics = run_metadata.get("ema_metrics") if isinstance(run_metadata, dict) else None
+
+    def _coerce_metric(value: object) -> float | None:
+        if value is None:
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
 
     recent_metrics: List[Dict[str, Any]] = []
     latest_metric: Optional[Dict[str, Any]] = None
+    best_val_tuning_rank_spearman = None
+    best_val_tuning_rank_regret = None
+    best_tuning_rank_spearman = None
+    best_tuning_rank_regret = None
     if val_history:
         ordered_history = sorted(
             enumerate(val_history),
@@ -1195,6 +1211,19 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
                 item[0],
             ),
         )
+        candidates = [entry for entry in val_history if entry.get("val_loss") is not None]
+        if candidates:
+            best_val_entry = min(candidates, key=lambda entry: entry.get("val_loss"))
+            best_val_tuning_rank_spearman = best_val_entry.get("tuning_rank_spearman")
+            best_val_tuning_rank_regret = best_val_entry.get("tuning_rank_regret")
+        tuning_candidates = [entry for entry in val_history if entry.get("tuning_rank_spearman") is not None]
+        if tuning_candidates:
+            best_tuning_entry = max(tuning_candidates, key=lambda entry: entry.get("tuning_rank_spearman"))
+            best_tuning_rank_spearman = best_tuning_entry.get("tuning_rank_spearman")
+        regret_candidates = [entry for entry in val_history if entry.get("tuning_rank_regret") is not None]
+        if regret_candidates:
+            best_regret_entry = min(regret_candidates, key=lambda entry: entry.get("tuning_rank_regret"))
+            best_tuning_rank_regret = best_regret_entry.get("tuning_rank_regret")
 
         def _pruned(entry: Dict[str, Any]) -> Dict[str, Any]:
             payload = {
@@ -1238,8 +1267,26 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "best_primary_metric_name": primary_metric_name,
         "best_primary_metric_value": primary_best.get(primary_metric_name) if primary_best else None,
         "best_primary_metric_epoch": primary_best.get("epoch") if primary_best else None,
+        "best_val_tuning_rank_spearman": best_val_tuning_rank_spearman,
+        "best_val_tuning_rank_regret": best_val_tuning_rank_regret,
+        "best_tuning_rank_spearman": best_tuning_rank_spearman,
+        "best_tuning_rank_regret": best_tuning_rank_regret,
         "builder_advisory": _make_builder_advisory(),
     }
+    if isinstance(ema_metrics, dict):
+        summary["ema_metrics"] = ema_metrics
+        for key in (
+            "val_loss",
+            "val_pearson_corr",
+            "val_spearman_corr",
+            "val_rank_spearman",
+            "val_rank_regret",
+            "tuning_rank_spearman",
+            "tuning_rank_regret",
+        ):
+            value = _coerce_metric(ema_metrics.get(key))
+            if value is not None:
+                summary[f"ema_{key}"] = value
     if alternate_checkpoint_meta:
         summary["alternate_checkpoints"] = alternate_checkpoint_meta
     if selection_alt_checkpoint:
