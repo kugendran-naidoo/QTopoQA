@@ -279,3 +279,74 @@ Metric val_loss improved by 0.009 >= min_delta = 0.0. New best score: 0.127
 2025-12-31 21:26:47 INFO Epoch 011 | 50% complete (batch 91/181)
 2025-12-31 21:26:47 INFO Epoch 011 | 75% complete (batch 136/181)
 2025-12-31 21:26:56 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.273470
+2025-12-31 21:27:09 INFO Tuning ranking metrics: regret=0.174895 spearman=-0.223161 (groups=207, skipped=1078)
+2025-12-31 21:27:09 INFO Tuning DockQ metrics: mae=0.351852 hit_rate_023=0.678261 (groups=207, skipped=1078)
+2025-12-31 21:27:09 INFO Epoch 011 | train_mse=0.130095 | val_loss=0.139579 | best_val_loss=0.126515
+2025-12-31 21:27:17 INFO Epoch 012 | 25% complete (batch 46/181)
+2025-12-31 21:27:18 INFO Epoch 012 | 50% complete (batch 91/181)
+2025-12-31 21:27:19 INFO Epoch 012 | 75% complete (batch 136/181)
+2025-12-31 21:27:28 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.166269
+2025-12-31 21:27:40 INFO Tuning ranking metrics: regret=0.148925 spearman=-0.143145 (groups=207, skipped=1078)
+2025-12-31 21:27:40 INFO Tuning DockQ metrics: mae=0.318676 hit_rate_023=0.677295 (groups=207, skipped=1078)
+2025-12-31 21:27:40 INFO Epoch 012 | train_mse=0.136574 | val_loss=0.133012 | best_val_loss=0.126515
+2025-12-31 21:27:49 INFO Epoch 013 | 25% complete (batch 46/181)
+2025-12-31 21:27:50 INFO Epoch 013 | 50% complete (batch 91/181)
+2025-12-31 21:27:51 INFO Epoch 013 | 75% complete (batch 136/181)
+2025-12-31 21:28:00 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.368485
+2025-12-31 21:28:12 INFO Tuning ranking metrics: regret=0.136329 spearman=-0.143614 (groups=207, skipped=1078)
+2025-12-31 21:28:12 INFO Tuning DockQ metrics: mae=0.272781 hit_rate_023=0.676329 (groups=207, skipped=1078)
+2025-12-31 21:28:12 INFO Epoch 013 | train_mse=0.119926 | val_loss=0.127663 | best_val_loss=0.126515
+2025-12-31 21:28:21 INFO Epoch 014 | 25% complete (batch 46/181)
+2025-12-31 21:28:22 INFO Epoch 014 | 50% complete (batch 91/181)
+2025-12-31 21:28:23 INFO Epoch 014 | 75% complete (batch 136/181)
+2025-12-31 21:28:31 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.439173
+2025-12-31 21:28:44 INFO Tuning ranking metrics: regret=0.136563 spearman=-0.072554 (groups=207, skipped=1078)
+2025-12-31 21:28:44 INFO Tuning DockQ metrics: mae=0.307707 hit_rate_023=0.674879 (groups=207, skipped=1078)
+2025-12-31 21:28:44 INFO Epoch 014 | train_mse=0.116793 | val_loss=0.109574 | best_val_loss=0.126515
+2025-12-31 21:28:44 INFO Saved ema averaged checkpoint to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/sched_boost_lean_seed222_2025-12-31_21-20-31/model_checkpoints/averaged_ema.ckpt
+Metric val_loss improved by 0.017 >= min_delta = 0.0. New best score: 0.110
+2025-12-31 21:28:53 INFO Epoch 015 | 25% complete (batch 46/181)
+2025-12-31 21:28:53 INFO Epoch 015 | 50% complete (batch 91/181)
+2025-12-31 21:28:55 INFO Epoch 015 | 75% complete (batch 136/181)
+2025-12-31 21:29:03 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.493973
+2025-12-31 21:29:16 INFO Tuning ranking metrics: regret=0.146876 spearman=-0.146470 (groups=207, skipped=1078)
+2025-12-31 21:29:16 INFO Tuning DockQ metrics: mae=0.283658 hit_rate_023=0.675845 (groups=207, skipped=1078)
+2025-12-31 21:29:16 INFO Epoch 015 | train_mse=0.123432 | val_loss=0.106334 | best_val_loss=0.109574
+Metric val_loss improved by 0.003 >= min_delta = 0.0. New best score: 0.106
+2025-12-31 21:29:25 INFO Epoch 016 | 25% complete (batch 46/181)
+2025-12-31 21:29:26 INFO Epoch 016 | 50% complete (batch 91/181)
+2025-12-31 21:29:26 INFO Epoch 016 | 75% complete (batch 136/181)
+2025-12-31 21:29:35 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.496606
+2025-12-31 21:29:48 INFO Tuning ranking metrics: regret=0.117518 spearman=0.036617 (groups=207, skipped=1078)
+2025-12-31 21:29:48 INFO Tuning DockQ metrics: mae=0.220906 hit_rate_023=0.674396 (groups=207, skipped=1078)
+2025-12-31 21:29:48 INFO Epoch 016 | train_mse=0.119205 | val_loss=0.073787 | best_val_loss=0.106334
+Metric val_loss improved by 0.033 >= min_delta = 0.0. New best score: 0.074
+2025-12-31 21:29:56 INFO Epoch 017 | 25% complete (batch 46/181)
+2025-12-31 21:29:57 INFO Epoch 017 | 50% complete (batch 91/181)
+2025-12-31 21:29:58 INFO Epoch 017 | 75% complete (batch 136/181)
+2025-12-31 21:30:06 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.610721
+2025-12-31 21:30:19 INFO Tuning ranking metrics: regret=0.123766 spearman=-0.004961 (groups=207, skipped=1078)
+2025-12-31 21:30:19 INFO Tuning DockQ metrics: mae=0.247321 hit_rate_023=0.674396 (groups=207, skipped=1078)
+2025-12-31 21:30:19 INFO Epoch 017 | train_mse=0.112657 | val_loss=0.092386 | best_val_loss=0.073787
+2025-12-31 21:30:28 INFO Epoch 018 | 25% complete (batch 46/181)
+2025-12-31 21:30:29 INFO Epoch 018 | 50% complete (batch 91/181)
+2025-12-31 21:30:30 INFO Epoch 018 | 75% complete (batch 136/181)
+2025-12-31 21:30:39 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.595816
+2025-12-31 21:30:51 INFO Tuning ranking metrics: regret=0.121611 spearman=-0.086970 (groups=207, skipped=1078)
+2025-12-31 21:30:51 INFO Tuning DockQ metrics: mae=0.279496 hit_rate_023=0.675362 (groups=207, skipped=1078)
+2025-12-31 21:30:51 INFO Epoch 018 | train_mse=0.100275 | val_loss=0.119532 | best_val_loss=0.073787
+2025-12-31 21:30:59 INFO Epoch 019 | 25% complete (batch 46/181)
+2025-12-31 21:31:00 INFO Epoch 019 | 50% complete (batch 91/181)
+2025-12-31 21:31:01 INFO Epoch 019 | 75% complete (batch 136/181)
+2025-12-31 21:31:10 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.546479
+2025-12-31 21:31:22 INFO Tuning ranking metrics: regret=0.128270 spearman=-0.020340 (groups=207, skipped=1078)
+2025-12-31 21:31:22 INFO Tuning DockQ metrics: mae=0.256301 hit_rate_023=0.677778 (groups=207, skipped=1078)
+2025-12-31 21:31:22 INFO Epoch 019 | train_mse=0.093417 | val_loss=0.119723 | best_val_loss=0.073787
+2025-12-31 21:31:22 INFO Saved ema averaged checkpoint to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/sched_boost_lean_seed222_2025-12-31_21-20-31/model_checkpoints/averaged_ema.ckpt
+2025-12-31 21:31:31 INFO Epoch 020 | 25% complete (batch 46/181)
+2025-12-31 21:31:32 INFO Epoch 020 | 50% complete (batch 91/181)
+2025-12-31 21:31:32 INFO Epoch 020 | 75% complete (batch 136/181)
+2025-12-31 21:31:41 INFO Selection metric (val_loss - 1.000*max(0,val_spearman_corr-0.000)) = -0.545118
+2025-12-31 21:31:54 INFO Tuning ranking metrics: regret=0.122001 spearman=0.000557 (groups=207, skipped=1078)
+2025-12-31 21:31:54 INFO Tuning DockQ metrics: mae=0.238828 hit_rate_023=0.675845 (groups=207, skipped=1078)
+2025-12-31 21:31:54 INFO Epoch 020 | train_mse=0.090404 | val_loss=0.082016 | best_val_loss=0.073787
