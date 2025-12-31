@@ -4,11 +4,13 @@ set -euo pipefail
 trap 'echo "Interrupted; aborting." >&2; exit 1' INT TERM
 
 DATASETS=("BM55-AF2" "HAF2" "ABAG-AF3")
-TOP_K="${TOP_K:-3}"
+TOP_K="${TOP_K:-10}"
 # Options: best_val_loss, ema_val_loss
 SHORTLIST_METRIC="${SHORTLIST_METRIC:-ema_val_loss}"
-TUNING_METRIC="${TUNING_METRIC:-ema_tuning_rank_spearman}"
-WORK_DIR="${WORK_DIR:-optionB_ema}"
+# TUNING_METRIC="${TUNING_METRIC:-ema_tuning_rank_spearman}"
+TUNING_METRIC="${TUNING_METRIC:-ema_tuning_dockq_mae}"
+# TUNING_METRIC="${TUNING_METRIC:-ema_tuning_hit_rate_023}"
+WORK_DIR="${WORK_DIR:-null_topology_10A_ARM_optionB_dockq_mae}"
 REUSE_ONLY="${REUSE_ONLY:-true}"
 export QTOPO_REUSE_ONLY="${REUSE_ONLY}"
 ZERO_EDGE_OK="${ZERO_EDGE_OK:-1}"

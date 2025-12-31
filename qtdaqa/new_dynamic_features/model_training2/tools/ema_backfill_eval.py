@@ -140,6 +140,8 @@ def _record_ema_metrics(
             "val_rank_regret",
             "tuning_rank_spearman",
             "tuning_rank_regret",
+            "tuning_dockq_mae",
+            "tuning_hit_rate_023",
         ):
             value = _safe_scalar(metrics.get(key))
             if value is not None:

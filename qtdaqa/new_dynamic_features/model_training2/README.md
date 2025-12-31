@@ -74,6 +74,8 @@ Key sections you’ll encounter:
     on the validation split (requires target IDs in model names).
   - `tuning_rank_spearman` / `tuning_rank_regret` – ranking metrics computed on
     an explicit tuning slice (set `tuning.labels`).
+  - `tuning_dockq_mae` / `tuning_hit_rate_023` – DockQ proxy metrics computed on
+    the tuning slice; intended for Option‑B selection rather than primary training.
 - `use_val_spearman` / `spearman_*` – control the secondary metric fed to the
   checkpoint callback.
 
@@ -90,6 +92,10 @@ touching the final eval sets.
 - `max_samples` / `fraction` – cap the tuning slice size for faster metrics.
 - `min_groups_ge2` – minimum number of multi-decoy target groups required
   before tuning metrics are allowed to drive selection (guardrail fallback).
+Tuning metrics written each epoch (when enabled):
+- `tuning_rank_spearman`, `tuning_rank_regret`
+- `tuning_dockq_mae` (mean absolute error on DockQ)
+- `tuning_hit_rate_023` (avg top‑10 hit‑rate for DockQ ≥ 0.23)
 
 ### `ranking_loss`
 Optional pairwise ranking loss added to MSE during training.
@@ -154,6 +160,37 @@ python tools/option_b_select.py --top-k 3 --tuning-metric best_val_tuning_rank_s
 ```
 This picks top‑K by `val_loss` then chooses the best run by the tuning metric,
 emitting the checkpoint path for that run.
+You can also use DockQ proxies, for example:
+```
+python tools/option_b_select.py --top-k 3 --tuning-metric best_val_tuning_dockq_mae
+python tools/option_b_select.py --top-k 3 --tuning-metric best_val_tuning_hit_rate_023
+```
+If EMA metrics are available, use `ema_tuning_dockq_mae` or `ema_tuning_hit_rate_023`.
+
+### Recommended backfill order + comparisons (EMA metrics)
+If you need to compare older EMA metrics against the new DockQ‑proxy EMA metrics:
+1) Run the **legacy backfill** (no `--force`) and record your baseline inference results.
+2) Run the **refresh backfill** (with `--force`) to overwrite `ema_metrics` and add:
+   - `ema_tuning_dockq_mae`
+   - `ema_tuning_hit_rate_023`
+3) Re‑run Option‑B inference using the new metrics and compare summary CSVs:
+   - `optionB_ema_sm_ema_val_loss_tm_ema_tuning_rank_spearman` (baseline)
+   - `optionB_ema_sm_ema_val_loss_tm_ema_tuning_dockq_mae`
+   - `optionB_ema_sm_ema_val_loss_tm_ema_tuning_hit_rate_023`
+
+For **new runs**, no backfill is needed: the EMA post‑fit hook records
+`ema_tuning_dockq_mae` and `ema_tuning_hit_rate_023` automatically.
+Quick one‑liner to confirm after training completes:
+```
+python - <<'PY'
+import json
+from pathlib import Path
+run = Path("training_runs2/<RUN_NAME>/run_metadata.json")
+ema = json.loads(run.read_text()).get("ema_metrics", {})
+print("ema_tuning_dockq_mae:", ema.get("tuning_dockq_mae"))
+print("ema_tuning_hit_rate_023:", ema.get("tuning_hit_rate_023"))
+PY
+```
 2. **Selection** – `run_full_pipeline.sh` inspects `run_metadata.json`/metrics
    and ranks runs using `selection.primary_metric`. The metric choice is recorded
    in each run’s metadata so inference knows whether val loss or the selection

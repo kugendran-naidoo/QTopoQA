@@ -77,10 +77,16 @@ def main() -> int:
         choices=(
             "best_val_tuning_rank_spearman",
             "best_val_tuning_rank_regret",
+            "best_val_tuning_dockq_mae",
+            "best_val_tuning_hit_rate_023",
             "best_tuning_rank_spearman",
             "best_tuning_rank_regret",
+            "best_tuning_dockq_mae",
+            "best_tuning_hit_rate_023",
             "ema_tuning_rank_spearman",
             "ema_tuning_rank_regret",
+            "ema_tuning_dockq_mae",
+            "ema_tuning_hit_rate_023",
         ),
     )
     parser.add_argument("--emit-checkpoint-only", action="store_true")

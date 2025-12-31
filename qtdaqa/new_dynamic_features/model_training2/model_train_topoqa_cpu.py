@@ -98,9 +98,10 @@ except ImportError:  # pragma: no cover
         log_builder_provenance,
     )
 try:
-    from common.ranking_metrics import compute_grouped_ranking_metrics  # type: ignore  # noqa: E402
+    from common.ranking_metrics import compute_grouped_ranking_metrics, default_group_key  # type: ignore  # noqa: E402
 except Exception:  # pragma: no cover - optional helper
     compute_grouped_ranking_metrics = None
+    default_group_key = None
 from common.resume_guard import validate_resume_checkpoint  # type: ignore  # noqa: E402
 
 @dataclasses.dataclass
@@ -215,12 +216,15 @@ PRIMARY_METRIC_CHOICES = {
     "val_rank_regret",
     "tuning_rank_spearman",
     "tuning_rank_regret",
+    "tuning_dockq_mae",
+    "tuning_hit_rate_023",
 }
 
 MAXIMIZE_METRICS = {
     "val_spearman_corr",
     "val_rank_spearman",
     "tuning_rank_spearman",
+    "tuning_hit_rate_023",
 }
 
 
@@ -1525,6 +1529,8 @@ class SelectionMetricLogger(Callback):
 
 
 class TuningMetricsCallback(Callback):
+    _HIT_RATE_THRESHOLD = 0.23
+
     def __init__(
         self,
         logger: logging.Logger,
@@ -1535,6 +1541,11 @@ class TuningMetricsCallback(Callback):
         self.logger = logger
         self.dataloader = dataloader
         self.eval_every = max(1, int(eval_every))
+
+    def _group_key(self, name: str) -> str:
+        if default_group_key is not None:
+            return default_group_key(name)
+        return str(name).split("_", 1)[0]
 
     def _extract_names(self, batch) -> List[str]:
         expected = getattr(batch, "num_graphs", None)
@@ -1576,10 +1587,43 @@ class TuningMetricsCallback(Callback):
                 pass
         return []
 
+    def _compute_hit_rate(
+        self,
+        names: Sequence[str],
+        preds: Sequence[float],
+        trues: Sequence[float],
+        *,
+        threshold: float,
+        top_k: int = 10,
+    ) -> Tuple[Optional[float], int, int]:
+        grouped: Dict[str, List[Tuple[float, float]]] = {}
+        for name, pred, tgt in zip(names, preds, trues):
+            key = self._group_key(str(name))
+            if not key:
+                continue
+            grouped.setdefault(key, []).append((float(pred), float(tgt)))
+
+        rates: List[float] = []
+        skipped = 0
+        for items in grouped.values():
+            if len(items) < 2:
+                skipped += 1
+                continue
+            items = sorted(items, key=lambda item: item[0], reverse=True)
+            top_items = items[:top_k]
+            if not top_items:
+                skipped += 1
+                continue
+            hits = sum(1 for _, tgt in top_items if tgt >= threshold)
+            rates.append(hits / float(len(top_items)))
+        if not rates:
+            return None, 0, skipped
+        return float(sum(rates) / len(rates)), len(rates), skipped
+
     def on_validation_epoch_end(self, trainer, pl_module) -> None:  # type: ignore[override]
         if trainer.sanity_checking:
             return
-        if self.dataloader is None or compute_grouped_ranking_metrics is None:
+        if self.dataloader is None:
             return
         if (trainer.current_epoch + 1) % self.eval_every != 0:
             return
@@ -1623,16 +1667,38 @@ class TuningMetricsCallback(Callback):
         trues = trues[:aligned]
         names = names[:aligned]
 
-        summary = compute_grouped_ranking_metrics(names, preds, trues)
-        pl_module.log("tuning_rank_regret", summary.mean_regret, on_epoch=True, prog_bar=False, logger=True)
-        pl_module.log("tuning_rank_spearman", summary.mean_spearman, on_epoch=True, prog_bar=False, logger=True)
-        self.logger.info(
-            "Tuning ranking metrics: regret=%.6f spearman=%.6f (groups=%d, skipped=%d)",
-            summary.mean_regret,
-            summary.mean_spearman,
-            summary.group_count,
-            summary.skipped_groups,
+        if compute_grouped_ranking_metrics is not None:
+            summary = compute_grouped_ranking_metrics(names, preds, trues)
+            pl_module.log("tuning_rank_regret", summary.mean_regret, on_epoch=True, prog_bar=False, logger=True)
+            pl_module.log("tuning_rank_spearman", summary.mean_spearman, on_epoch=True, prog_bar=False, logger=True)
+            self.logger.info(
+                "Tuning ranking metrics: regret=%.6f spearman=%.6f (groups=%d, skipped=%d)",
+                summary.mean_regret,
+                summary.mean_spearman,
+                summary.group_count,
+                summary.skipped_groups,
+            )
+
+        mae = float(sum(abs(p - t) for p, t in zip(preds, trues)) / len(preds))
+        hit_rate, hit_groups, hit_skipped = self._compute_hit_rate(
+            names,
+            preds,
+            trues,
+            threshold=self._HIT_RATE_THRESHOLD,
+            top_k=10,
         )
+        pl_module.log("tuning_dockq_mae", mae, on_epoch=True, prog_bar=False, logger=True)
+        if hit_rate is not None:
+            pl_module.log("tuning_hit_rate_023", hit_rate, on_epoch=True, prog_bar=False, logger=True)
+            self.logger.info(
+                "Tuning DockQ metrics: mae=%.6f hit_rate_023=%.6f (groups=%d, skipped=%d)",
+                mae,
+                hit_rate,
+                hit_groups,
+                hit_skipped,
+            )
+        else:
+            self.logger.info("Tuning DockQ metrics: mae=%.6f hit_rate_023=NA (skipped=%d)", mae, hit_skipped)
 
         if was_training:
             pl_module.train()
@@ -2742,6 +2808,11 @@ def main() -> int:
         logger.info("Validation metrics: %s", val_metrics)
         if weight_avg_callback is not None:
             ema_checkpoint_path = weight_avg_callback.averaged_path or weight_avg_callback.output_path
+            if ema_checkpoint_path and not ema_checkpoint_path.exists():
+                if ema_checkpoint_path.suffix == ".ckpt":
+                    alt_path = ema_checkpoint_path.with_suffix(".chkpt")
+                    if alt_path.exists():
+                        ema_checkpoint_path = alt_path
             if ema_checkpoint_path and ema_checkpoint_path.exists():
                 logger.info(
                     "Running %s validation using averaged checkpoint %s",
@@ -2790,6 +2861,8 @@ def main() -> int:
                     "val_rank_regret",
                     "tuning_rank_spearman",
                     "tuning_rank_regret",
+                    "tuning_dockq_mae",
+                    "tuning_hit_rate_023",
                 ):
                     value = _safe_scalar(ema_metrics.get(key))
                     if value is not None:
@@ -2906,6 +2979,8 @@ def main() -> int:
                 "val_rank_regret",
                 "tuning_rank_spearman",
                 "tuning_rank_regret",
+                "tuning_dockq_mae",
+                "tuning_hit_rate_023",
             ):
                 metric_value = _safe_scalar(trainer.callback_metrics.get(metric_name))
                 if metric_value is not None:

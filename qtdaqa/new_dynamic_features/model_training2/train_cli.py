@@ -59,6 +59,8 @@ PRIMARY_METRICS = (
     "val_rank_regret",
     "tuning_rank_spearman",
     "tuning_rank_regret",
+    "tuning_dockq_mae",
+    "tuning_hit_rate_023",
 )
 DEFAULT_PRIMARY_METRIC = "val_loss"
 RankedRun = Tuple[str, float, Dict[str, Any]]
@@ -70,6 +72,10 @@ MAXIMIZE_METRICS = {
     "ema_val_spearman_corr",
     "ema_val_rank_spearman",
     "ema_tuning_rank_spearman",
+    "tuning_hit_rate_023",
+    "ema_tuning_hit_rate_023",
+    "best_val_tuning_hit_rate_023",
+    "best_tuning_hit_rate_023",
 }
 
 
@@ -831,6 +837,8 @@ def _collect_val_history(
                 rank_regret = None
                 tuning_rank_spearman = None
                 tuning_rank_regret = None
+                tuning_dockq_mae = None
+                tuning_hit_rate_023 = None
                 rank_spearman_raw = row.get("val_rank_spearman")
                 if rank_spearman_raw not in (None, ""):
                     try:
@@ -855,6 +863,18 @@ def _collect_val_history(
                         tuning_rank_regret = float(tuning_rank_regret_raw)
                     except ValueError:
                         tuning_rank_regret = None
+                tuning_dockq_mae_raw = row.get("tuning_dockq_mae")
+                if tuning_dockq_mae_raw not in (None, ""):
+                    try:
+                        tuning_dockq_mae = float(tuning_dockq_mae_raw)
+                    except ValueError:
+                        tuning_dockq_mae = None
+                tuning_hit_rate_raw = row.get("tuning_hit_rate_023")
+                if tuning_hit_rate_raw not in (None, ""):
+                    try:
+                        tuning_hit_rate_023 = float(tuning_hit_rate_raw)
+                    except ValueError:
+                        tuning_hit_rate_023 = None
                 selection_metric = None
                 if selection_enabled:
                     if val_spearman is None:
@@ -871,6 +891,8 @@ def _collect_val_history(
                         "val_rank_regret": rank_regret,
                         "tuning_rank_spearman": tuning_rank_spearman,
                         "tuning_rank_regret": tuning_rank_regret,
+                        "tuning_dockq_mae": tuning_dockq_mae,
+                        "tuning_hit_rate_023": tuning_hit_rate_023,
                         "selection_metric": selection_metric,
                         "source": str(metrics_file),
                     }
@@ -1203,6 +1225,10 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
     best_val_tuning_rank_regret = None
     best_tuning_rank_spearman = None
     best_tuning_rank_regret = None
+    best_val_tuning_dockq_mae = None
+    best_val_tuning_hit_rate_023 = None
+    best_tuning_dockq_mae = None
+    best_tuning_hit_rate_023 = None
     if val_history:
         ordered_history = sorted(
             enumerate(val_history),
@@ -1216,6 +1242,8 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
             best_val_entry = min(candidates, key=lambda entry: entry.get("val_loss"))
             best_val_tuning_rank_spearman = best_val_entry.get("tuning_rank_spearman")
             best_val_tuning_rank_regret = best_val_entry.get("tuning_rank_regret")
+            best_val_tuning_dockq_mae = best_val_entry.get("tuning_dockq_mae")
+            best_val_tuning_hit_rate_023 = best_val_entry.get("tuning_hit_rate_023")
         tuning_candidates = [entry for entry in val_history if entry.get("tuning_rank_spearman") is not None]
         if tuning_candidates:
             best_tuning_entry = max(tuning_candidates, key=lambda entry: entry.get("tuning_rank_spearman"))
@@ -1224,6 +1252,14 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         if regret_candidates:
             best_regret_entry = min(regret_candidates, key=lambda entry: entry.get("tuning_rank_regret"))
             best_tuning_rank_regret = best_regret_entry.get("tuning_rank_regret")
+        mae_candidates = [entry for entry in val_history if entry.get("tuning_dockq_mae") is not None]
+        if mae_candidates:
+            best_mae_entry = min(mae_candidates, key=lambda entry: entry.get("tuning_dockq_mae"))
+            best_tuning_dockq_mae = best_mae_entry.get("tuning_dockq_mae")
+        hit_candidates = [entry for entry in val_history if entry.get("tuning_hit_rate_023") is not None]
+        if hit_candidates:
+            best_hit_entry = max(hit_candidates, key=lambda entry: entry.get("tuning_hit_rate_023"))
+            best_tuning_hit_rate_023 = best_hit_entry.get("tuning_hit_rate_023")
 
         def _pruned(entry: Dict[str, Any]) -> Dict[str, Any]:
             payload = {
@@ -1234,6 +1270,8 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
                 "val_rank_regret": entry.get("val_rank_regret"),
                 "tuning_rank_spearman": entry.get("tuning_rank_spearman"),
                 "tuning_rank_regret": entry.get("tuning_rank_regret"),
+                "tuning_dockq_mae": entry.get("tuning_dockq_mae"),
+                "tuning_hit_rate_023": entry.get("tuning_hit_rate_023"),
                 "selection_metric": entry.get("selection_metric"),
             }
             if entry.get("source"):
@@ -1269,8 +1307,12 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
         "best_primary_metric_epoch": primary_best.get("epoch") if primary_best else None,
         "best_val_tuning_rank_spearman": best_val_tuning_rank_spearman,
         "best_val_tuning_rank_regret": best_val_tuning_rank_regret,
+        "best_val_tuning_dockq_mae": best_val_tuning_dockq_mae,
+        "best_val_tuning_hit_rate_023": best_val_tuning_hit_rate_023,
         "best_tuning_rank_spearman": best_tuning_rank_spearman,
         "best_tuning_rank_regret": best_tuning_rank_regret,
+        "best_tuning_dockq_mae": best_tuning_dockq_mae,
+        "best_tuning_hit_rate_023": best_tuning_hit_rate_023,
         "builder_advisory": _make_builder_advisory(),
     }
     if isinstance(ema_metrics, dict):
@@ -1283,6 +1325,8 @@ def _summarise_run(run_dir: Path) -> Dict[str, Any]:
             "val_rank_regret",
             "tuning_rank_spearman",
             "tuning_rank_regret",
+            "tuning_dockq_mae",
+            "tuning_hit_rate_023",
         ):
             value = _coerce_metric(ema_metrics.get(key))
             if value is not None:

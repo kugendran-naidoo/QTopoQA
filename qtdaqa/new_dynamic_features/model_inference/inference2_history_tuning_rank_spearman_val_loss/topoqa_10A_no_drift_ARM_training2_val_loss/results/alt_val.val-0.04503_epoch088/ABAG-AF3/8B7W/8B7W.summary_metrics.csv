@@ -1,4 +1,0 @@
-Note last 4 columns ranking_loss, top10_A, top10_B, top10_C
-
-TARGET,m_star_best_true,top_pred_true,top_pred_pred,ranking_loss,top10_A,top10_B,top10_C
-8B7W,0.242000,0.055000,0.722059,0.187000,1,0,0

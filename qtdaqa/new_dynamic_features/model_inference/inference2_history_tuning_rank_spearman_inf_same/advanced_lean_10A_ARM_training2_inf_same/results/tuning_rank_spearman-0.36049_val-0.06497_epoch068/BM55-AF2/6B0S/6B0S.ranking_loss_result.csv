@@ -1,7 +1,0 @@
-ranking loss = m* - m^
-6B0S m* = 0.652
-6B0S m^ = 0.589
-6B0S ranking loss = 0.063
-
-6B0S,ranked_4,0.04963887,0.652
-6B0S,model_3_multimer_20220423_342393,0.1003965,0.589

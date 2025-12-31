@@ -8,7 +8,7 @@ TOP_K="${TOP_K:-3}"
 # Options: best_val_loss, ema_val_loss
 SHORTLIST_METRIC="${SHORTLIST_METRIC:-ema_val_loss}"
 TUNING_METRIC="${TUNING_METRIC:-best_val_tuning_rank_spearman}"
-WORK_DIR="${WORK_DIR:-optionB_spearman}"
+WORK_DIR="${WORK_DIR:-optionB_spearman_sm_ema_val_loss_tm_ema_val_loss}"
 REUSE_ONLY="${REUSE_ONLY:-true}"
 export QTOPO_REUSE_ONLY="${REUSE_ONLY}"
 ZERO_EDGE_OK="${ZERO_EDGE_OK:-1}"
@@ -123,9 +123,14 @@ for DATASET in "${DATASETS[@]}"; do
 done
 echo "Schema preflight complete."
 
-for DATASET in "${DATASETS[@]}"; do
+PIDS_STAGE1=()
+STATUS_STAGE1=()
+
+for idx_ds in "${!DATASETS[@]}"; do
+  DATASET="${DATASETS[$idx_ds]}"
   LOG_FILE="${DATASET}_${CKPT_ID}_${WORK_DIR}_$(date +%Y%m%d_%H%M%S).log"
   echo "Running ${DATASET} -> ${LOG_FILE}"
+  set -o pipefail
   env QTOPO_REUSE_ONLY="${REUSE_ONLY}" \
   time "${SCRIPT_DIR}/run_model_inference.sh" \
     --dataset-name "${DATASET}" \
@@ -135,13 +140,41 @@ for DATASET in "${DATASETS[@]}"; do
     --results-dir "${RESULTS_ROOT}" \
     --reuse-existing-graphs \
     --log-level INFO \
-    2>&1 | tee "${LOG_FILE}"
+    2>&1 | tee "${LOG_FILE}" &
+  PIDS_STAGE1[idx_ds]=$!
+  STATUS_STAGE1[idx_ds]="pending"
+  set +o pipefail
+done
+
+echo "Waiting for dataset runs to complete ..."
+for idx_ds in "${!DATASETS[@]}"; do
+  DATASET="${DATASETS[$idx_ds]}"
+  PID=${PIDS_STAGE1[idx_ds]}
+  if wait "${PID}"; then
+    STATUS_STAGE1[idx_ds]="success"
+  else
+    STATUS_STAGE1[idx_ds]="failed"
+    echo "Run failed for ${DATASET} (PID ${PID})." >&2
+  fi
+done
+
+echo "Running zero-edge checks on built graphs..."
+for idx_ds in "${!DATASETS[@]}"; do
+  DATASET="${DATASETS[$idx_ds]}"
+  [[ ${STATUS_STAGE1[idx_ds]} != "success" ]] && continue
+  if ! check_zero_edges "${DATASET}"; then
+    echo "Zero-edge check failed for ${DATASET}; aborting." >&2
+    exit 1
+  fi
+done
+echo "Zero-edge checks complete."
+
+echo "Inference complete - Running final results ..."
+for idx_ds in "${!DATASETS[@]}"; do
+  DATASET="${DATASETS[$idx_ds]}"
+  [[ ${STATUS_STAGE1[idx_ds]} != "success" ]] && continue
   RESULTS_DIR="${RESULTS_ROOT}/${DATASET}"
   if [[ -d "${RESULTS_DIR}" ]]; then
-    if ! check_zero_edges "${DATASET}"; then
-      echo "Zero-edge check failed for ${DATASET}; aborting." >&2
-      exit 1
-    fi
     "${SCRIPT_DIR}/run_results_summary.sh" --results-dir "${RESULTS_DIR}"
   else
     echo "Warning: results dir not found for ${DATASET}: ${RESULTS_DIR}" >&2
