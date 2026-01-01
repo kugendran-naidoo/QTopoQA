@@ -1,7 +1,0 @@
-paths.graph: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/null_topology_10A_ARM/graph_data
-trainer.num_epochs: 320
-early_stopping.patience: 40
-scheduler.patience: 20
-scheduler.factor: 0.3
-optimizer.learning_rate: 3e-3
-dataloader.seed: 555

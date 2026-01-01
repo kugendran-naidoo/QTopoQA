@@ -1,8 +1,0 @@
-shared:
-  notes: "Single-run polish job (update config + seed before launching)."
-  log_lr: false
-  fast_dev_run: false
-jobs:
-  - name: polish_template
-    config: configs/polish_template.yaml   # point at your customised polish config
-continue_on_error: false

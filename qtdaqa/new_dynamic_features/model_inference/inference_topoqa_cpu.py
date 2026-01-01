@@ -28,10 +28,16 @@ from .builder_runner import (
     _preflight_registry_support,
     validate_graph_metadata,
 )
-from qtdaqa.new_dynamic_features.model_training import train_cli
+try:
+    from qtdaqa.new_dynamic_features.model_training2 import train_cli
+except ImportError as exc:  # pragma: no cover - required dependency
+    raise ImportError(
+        "model_training2 is required for inference. Ensure "
+        "qtdaqa/new_dynamic_features/model_training2 is present and importable."
+    ) from exc
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtdaqa.new_dynamic_features.model_training.model.gat_5_edge1 import (
+    from qtdaqa.new_dynamic_features.model_training2.model.gat_5_edge1 import (
         GNN_edge1_edgepooling,
     )
 
@@ -172,7 +178,7 @@ def _guard_schema_overrides(cfg: InferenceConfig, checkpoint_meta: Dict[str, obj
 
 
 def _default_training_root() -> Path:
-    return SCRIPT_DIR.parent / "model_training" / "training_runs"
+    return SCRIPT_DIR.parent / "model_training2" / "training_runs2"
 
 
 def _auto_select_checkpoint(training_root: Path) -> Path:
@@ -731,7 +737,7 @@ def gather_graphs(graph_dir: Path) -> List[Tuple[str, Path]]:
 
 
 def load_model(cfg: InferenceConfig, edge_schema: Dict[str, object], node_schema: Dict[str, object]):
-    from qtdaqa.new_dynamic_features.model_training.model.gat_5_edge1 import (  # noqa: WPS433
+    from qtdaqa.new_dynamic_features.model_training2.model.gat_5_edge1 import (  # noqa: WPS433
         GNN_edge1_edgepooling,
     )
 

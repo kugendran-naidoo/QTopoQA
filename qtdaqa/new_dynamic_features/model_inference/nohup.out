@@ -1,0 +1,942 @@
+Option B EMA checkpoint: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt
+Running schema preflight (no graph build; checks compatibility only)...
+Preflight (schema/build) for BM55-AF2 with ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888
+Preflight (schema/build) for HAF2 with ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888
+Preflight (schema/build) for ABAG-AF3 with ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888
+Schema preflight complete.
+Running BM55-AF2 -> BM55-AF2_ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888_topoqa_10A_ARM_optionB_dockq_mae_20260101_130159.log
+Running HAF2 -> HAF2_ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888_topoqa_10A_ARM_optionB_dockq_mae_20260101_130159.log
+Running ABAG-AF3 -> ABAG-AF3_ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888_topoqa_10A_ARM_optionB_dockq_mae_20260101_130159.log
+Waiting for dataset runs to complete ...
+2026-01-01 13:02:01,863 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed101/model_checkpoints/checkpoint.val-0.04014_epoch312.chkpt (score=0.04013850539922714, run=polish_seed555_2026-01-01_04-03-52_phase2_seed101) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2
+2026-01-01 13:02:01,866 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 11,
+    "module": "edge/legacy_band/v11",
+    "variant": "legacy_v11",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "jobs": 16,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "alias": "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA",
+    "jobs": 16,
+    "summary": "11-D legacy edge features (distance + atom distance histogram)."
+  },
+  "topology_schema": {
+    "module": "topology/persistence_basic/v1",
+    "module_params": {
+      "dedup_sort": false,
+      "element_filters": [
+        [
+          "C"
+        ],
+        [
+          "N"
+        ],
+        [
+          "O"
+        ],
+        [
+          "C",
+          "N"
+        ],
+        [
+          "C",
+          "O"
+        ],
+        [
+          "N",
+          "O"
+        ],
+        [
+          "C",
+          "N",
+          "O"
+        ]
+      ],
+      "filtration_cutoff": 8.0,
+      "jobs": 16,
+      "min_persistence": 0.01,
+      "neighbor_distance": 8.0
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "dim": 140
+  },
+  "node_schema": {
+    "columns": [
+      "rasa",
+      "phi",
+      "psi",
+      "SS8_0",
+      "SS8_1",
+      "SS8_2",
+      "SS8_3",
+      "SS8_4",
+      "SS8_5",
+      "SS8_6",
+      "SS8_7",
+      "AA_0",
+      "AA_1",
+      "AA_2",
+      "AA_3",
+      "AA_4",
+      "AA_5",
+      "AA_6",
+      "AA_7",
+      "AA_8",
+      "AA_9",
+      "AA_10",
+      "AA_11",
+      "AA_12",
+      "AA_13",
+      "AA_14",
+      "AA_15",
+      "AA_16",
+      "AA_17",
+      "AA_18",
+      "AA_19",
+      "AA_20",
+      "f0_C_death_sum",
+      "f0_C_death_min",
+      "f0_C_death_max",
+      "f0_C_death_mean",
+      "f0_C_death_std",
+      "f0_N_death_sum",
+      "f0_N_death_min",
+      "f0_N_death_max",
+      "f0_N_death_mean",
+      "f0_N_death_std",
+      "f0_O_death_sum",
+      "f0_O_death_min",
+      "f0_O_death_max",
+      "f0_O_death_mean",
+      "f0_O_death_std",
+      "f0_CN_death_sum",
+      "f0_CN_death_min",
+      "f0_CN_death_max",
+      "f0_CN_death_mean",
+      "f0_CN_death_std",
+      "f0_CO_death_sum",
+      "f0_CO_death_min",
+      "f0_CO_death_max",
+      "f0_CO_death_mean",
+      "f0_CO_death_std",
+      "f0_NO_death_sum",
+      "f0_NO_death_min",
+      "f0_NO_death_max",
+      "f0_NO_death_mean",
+      "f0_NO_death_std",
+      "f0_CNO_death_sum",
+      "f0_CNO_death_min",
+      "f0_CNO_death_max",
+      "f0_CNO_death_mean",
+      "f0_CNO_death_std",
+      "f1_C_len_sum",
+      "f1_C_len_min",
+      "f1_C_len_max",
+      "f1_C_len_mean",
+      "f1_C_len_std",
+      "f1_C_birth_sum",
+      "f1_C_birth_min",
+      "f1_C_birth_max",
+      "f1_C_birth_mean",
+      "f1_C_birth_std",
+      "f1_C_death_sum",
+      "f1_C_death_min",
+      "f1_C_death_max",
+      "f1_C_death_mean",
+      "f1_C_death_std",
+      "f1_N_len_sum",
+      "f1_N_len_min",
+      "f1_N_len_max",
+      "f1_N_len_mean",
+      "f1_N_len_std",
+      "f1_N_birth_sum",
+      "f1_N_birth_min",
+      "f1_N_birth_max",
+      "f1_N_birth_mean",
+      "f1_N_birth_std",
+      "f1_N_death_sum",
+      "f1_N_death_min",
+      "f1_N_death_max",
+      "f1_N_death_mean",
+      "f1_N_death_std",
+      "f1_O_len_sum",
+      "f1_O_len_min",
+      "f1_O_len_max",
+      "f1_O_len_mean",
+      "f1_O_len_std",
+      "f1_O_birth_sum",
+      "f1_O_birth_min",
+      "f1_O_birth_max",
+      "f1_O_birth_mean",
+      "f1_O_birth_std",
+      "f1_O_death_sum",
+      "f1_O_death_min",
+      "f1_O_death_max",
+      "f1_O_death_mean",
+      "f1_O_death_std",
+      "f1_CN_len_sum",
+      "f1_CN_len_min",
+      "f1_CN_len_max",
+      "f1_CN_len_mean",
+      "f1_CN_len_std",
+      "f1_CN_birth_sum",
+      "f1_CN_birth_min",
+      "f1_CN_birth_max",
+      "f1_CN_birth_mean",
+      "f1_CN_birth_std",
+      "f1_CN_death_sum",
+      "f1_CN_death_min",
+      "f1_CN_death_max",
+      "f1_CN_death_mean",
+      "f1_CN_death_std",
+      "f1_CO_len_sum",
+      "f1_CO_len_min",
+      "f1_CO_len_max",
+      "f1_CO_len_mean",
+      "f1_CO_len_std",
+      "f1_CO_birth_sum",
+      "f1_CO_birth_min",
+      "f1_CO_birth_max",
+      "f1_CO_birth_mean",
+      "f1_CO_birth_std",
+      "f1_CO_death_sum",
+      "f1_CO_death_min",
+      "f1_CO_death_max",
+      "f1_CO_death_mean",
+      "f1_CO_death_std",
+      "f1_NO_len_sum",
+      "f1_NO_len_min",
+      "f1_NO_len_max",
+      "f1_NO_len_mean",
+      "f1_NO_len_std",
+      "f1_NO_birth_sum",
+      "f1_NO_birth_min",
+      "f1_NO_birth_max",
+      "f1_NO_birth_mean",
+      "f1_NO_birth_std",
+      "f1_NO_death_sum",
+      "f1_NO_death_min",
+      "f1_NO_death_max",
+      "f1_NO_death_mean",
+      "f1_NO_death_std",
+      "f1_CNO_len_sum",
+      "f1_CNO_len_min",
+      "f1_CNO_len_max",
+      "f1_CNO_len_mean",
+      "f1_CNO_len_std",
+      "f1_CNO_birth_sum",
+      "f1_CNO_birth_min",
+      "f1_CNO_birth_max",
+      "f1_CNO_birth_mean",
+      "f1_CNO_birth_std",
+      "f1_CNO_death_sum",
+      "f1_CNO_death_min",
+      "f1_CNO_death_max",
+      "f1_CNO_death_mean",
+      "f1_CNO_death_std"
+    ],
+    "dim": 172,
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "module": "node/dssp_topo_merge/v1",
+    "module_params": {
+      "drop_na": true,
+      "jobs": 16
+    }
+  }
+}
+2026-01-01 13:02:01,866 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888/ABAG-AF3",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888/ABAG-AF3/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 24,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": false,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "force_node_dim": null,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2",
+  "config_name": "config.yaml.ABAG-AF3",
+  "dataset_name": "ABAG-AF3",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888",
+  "check_schema": false
+}
+2026-01-01 13:02:01,867 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/feature_metadata.json
+2026-01-01 13:02:01,867 INFO 
+2026-01-01 13:02:01,867 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt
+2026-01-01 13:02:01,867 INFO Inference config: config.yaml.ABAG-AF3
+2026-01-01 13:02:01,867 INFO 
+2026-01-01 13:02:01,873 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2026-01-01 13:02:01,873 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/builder_logs --jobs 24 --no-sort-artifacts --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/builder_features/features.from_metadata.yaml
+2026-01-01 13:02:01,920 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed101/model_checkpoints/checkpoint.val-0.04014_epoch312.chkpt (score=0.04013850539922714, run=polish_seed555_2026-01-01_04-03-52_phase2_seed101) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2
+2026-01-01 13:02:01,921 INFO Auto-selected checkpoint /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed101/model_checkpoints/checkpoint.val-0.04014_epoch312.chkpt (score=0.04013850539922714, run=polish_seed555_2026-01-01_04-03-52_phase2_seed101) from training root /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2
+2026-01-01 13:02:01,924 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 11,
+    "module": "edge/legacy_band/v11",
+    "variant": "legacy_v11",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "jobs": 16,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "alias": "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA",
+    "jobs": 16,
+    "summary": "11-D legacy edge features (distance + atom distance histogram)."
+  },
+  "topology_schema": {
+    "module": "topology/persistence_basic/v1",
+    "module_params": {
+      "dedup_sort": false,
+      "element_filters": [
+        [
+          "C"
+        ],
+        [
+          "N"
+        ],
+        [
+          "O"
+        ],
+        [
+          "C",
+          "N"
+        ],
+        [
+          "C",
+          "O"
+        ],
+        [
+          "N",
+          "O"
+        ],
+        [
+          "C",
+          "N",
+          "O"
+        ]
+      ],
+      "filtration_cutoff": 8.0,
+      "jobs": 16,
+      "min_persistence": 0.01,
+      "neighbor_distance": 8.0
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "dim": 140
+  },
+  "node_schema": {
+    "columns": [
+      "rasa",
+      "phi",
+      "psi",
+      "SS8_0",
+      "SS8_1",
+      "SS8_2",
+      "SS8_3",
+      "SS8_4",
+      "SS8_5",
+      "SS8_6",
+      "SS8_7",
+      "AA_0",
+      "AA_1",
+      "AA_2",
+      "AA_3",
+      "AA_4",
+      "AA_5",
+      "AA_6",
+      "AA_7",
+      "AA_8",
+      "AA_9",
+      "AA_10",
+      "AA_11",
+      "AA_12",
+      "AA_13",
+      "AA_14",
+      "AA_15",
+      "AA_16",
+      "AA_17",
+      "AA_18",
+      "AA_19",
+      "AA_20",
+      "f0_C_death_sum",
+      "f0_C_death_min",
+      "f0_C_death_max",
+      "f0_C_death_mean",
+      "f0_C_death_std",
+      "f0_N_death_sum",
+      "f0_N_death_min",
+      "f0_N_death_max",
+      "f0_N_death_mean",
+      "f0_N_death_std",
+      "f0_O_death_sum",
+      "f0_O_death_min",
+      "f0_O_death_max",
+      "f0_O_death_mean",
+      "f0_O_death_std",
+      "f0_CN_death_sum",
+      "f0_CN_death_min",
+      "f0_CN_death_max",
+      "f0_CN_death_mean",
+      "f0_CN_death_std",
+      "f0_CO_death_sum",
+      "f0_CO_death_min",
+      "f0_CO_death_max",
+      "f0_CO_death_mean",
+      "f0_CO_death_std",
+      "f0_NO_death_sum",
+      "f0_NO_death_min",
+      "f0_NO_death_max",
+      "f0_NO_death_mean",
+      "f0_NO_death_std",
+      "f0_CNO_death_sum",
+      "f0_CNO_death_min",
+      "f0_CNO_death_max",
+      "f0_CNO_death_mean",
+      "f0_CNO_death_std",
+      "f1_C_len_sum",
+      "f1_C_len_min",
+      "f1_C_len_max",
+      "f1_C_len_mean",
+      "f1_C_len_std",
+      "f1_C_birth_sum",
+      "f1_C_birth_min",
+      "f1_C_birth_max",
+      "f1_C_birth_mean",
+      "f1_C_birth_std",
+      "f1_C_death_sum",
+      "f1_C_death_min",
+      "f1_C_death_max",
+      "f1_C_death_mean",
+      "f1_C_death_std",
+      "f1_N_len_sum",
+      "f1_N_len_min",
+      "f1_N_len_max",
+      "f1_N_len_mean",
+      "f1_N_len_std",
+      "f1_N_birth_sum",
+      "f1_N_birth_min",
+      "f1_N_birth_max",
+      "f1_N_birth_mean",
+      "f1_N_birth_std",
+      "f1_N_death_sum",
+      "f1_N_death_min",
+      "f1_N_death_max",
+      "f1_N_death_mean",
+      "f1_N_death_std",
+      "f1_O_len_sum",
+      "f1_O_len_min",
+      "f1_O_len_max",
+      "f1_O_len_mean",
+      "f1_O_len_std",
+      "f1_O_birth_sum",
+      "f1_O_birth_min",
+      "f1_O_birth_max",
+      "f1_O_birth_mean",
+      "f1_O_birth_std",
+      "f1_O_death_sum",
+      "f1_O_death_min",
+      "f1_O_death_max",
+      "f1_O_death_mean",
+      "f1_O_death_std",
+      "f1_CN_len_sum",
+      "f1_CN_len_min",
+      "f1_CN_len_max",
+      "f1_CN_len_mean",
+      "f1_CN_len_std",
+      "f1_CN_birth_sum",
+      "f1_CN_birth_min",
+      "f1_CN_birth_max",
+      "f1_CN_birth_mean",
+      "f1_CN_birth_std",
+      "f1_CN_death_sum",
+      "f1_CN_death_min",
+      "f1_CN_death_max",
+      "f1_CN_death_mean",
+      "f1_CN_death_std",
+      "f1_CO_len_sum",
+      "f1_CO_len_min",
+      "f1_CO_len_max",
+      "f1_CO_len_mean",
+      "f1_CO_len_std",
+      "f1_CO_birth_sum",
+      "f1_CO_birth_min",
+      "f1_CO_birth_max",
+      "f1_CO_birth_mean",
+      "f1_CO_birth_std",
+      "f1_CO_death_sum",
+      "f1_CO_death_min",
+      "f1_CO_death_max",
+      "f1_CO_death_mean",
+      "f1_CO_death_std",
+      "f1_NO_len_sum",
+      "f1_NO_len_min",
+      "f1_NO_len_max",
+      "f1_NO_len_mean",
+      "f1_NO_len_std",
+      "f1_NO_birth_sum",
+      "f1_NO_birth_min",
+      "f1_NO_birth_max",
+      "f1_NO_birth_mean",
+      "f1_NO_birth_std",
+      "f1_NO_death_sum",
+      "f1_NO_death_min",
+      "f1_NO_death_max",
+      "f1_NO_death_mean",
+      "f1_NO_death_std",
+      "f1_CNO_len_sum",
+      "f1_CNO_len_min",
+      "f1_CNO_len_max",
+      "f1_CNO_len_mean",
+      "f1_CNO_len_std",
+      "f1_CNO_birth_sum",
+      "f1_CNO_birth_min",
+      "f1_CNO_birth_max",
+      "f1_CNO_birth_mean",
+      "f1_CNO_birth_std",
+      "f1_CNO_death_sum",
+      "f1_CNO_death_min",
+      "f1_CNO_death_max",
+      "f1_CNO_death_mean",
+      "f1_CNO_death_std"
+    ],
+    "dim": 172,
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "module": "node/dssp_topo_merge/v1",
+    "module_params": {
+      "drop_na": true,
+      "jobs": 16
+    }
+  }
+}
+2026-01-01 13:02:01,924 INFO Resolved feature schema: {
+  "edge_schema": {
+    "dim": 11,
+    "module": "edge/legacy_band/v11",
+    "variant": "legacy_v11",
+    "module_params": {
+      "distance_max": 10.0,
+      "distance_min": 0.0,
+      "jobs": 16,
+      "scale_features": true
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "alias": "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA",
+    "jobs": 16,
+    "summary": "11-D legacy edge features (distance + atom distance histogram)."
+  },
+  "topology_schema": {
+    "module": "topology/persistence_basic/v1",
+    "module_params": {
+      "dedup_sort": false,
+      "element_filters": [
+        [
+          "C"
+        ],
+        [
+          "N"
+        ],
+        [
+          "O"
+        ],
+        [
+          "C",
+          "N"
+        ],
+        [
+          "C",
+          "O"
+        ],
+        [
+          "N",
+          "O"
+        ],
+        [
+          "C",
+          "N",
+          "O"
+        ]
+      ],
+      "filtration_cutoff": 8.0,
+      "jobs": 16,
+      "min_persistence": 0.01,
+      "neighbor_distance": 8.0
+    },
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "dim": 140
+  },
+  "node_schema": {
+    "columns": [
+      "rasa",
+      "phi",
+      "psi",
+      "SS8_0",
+      "SS8_1",
+      "SS8_2",
+      "SS8_3",
+      "SS8_4",
+      "SS8_5",
+      "SS8_6",
+      "SS8_7",
+      "AA_0",
+      "AA_1",
+      "AA_2",
+      "AA_3",
+      "AA_4",
+      "AA_5",
+      "AA_6",
+      "AA_7",
+      "AA_8",
+      "AA_9",
+      "AA_10",
+      "AA_11",
+      "AA_12",
+      "AA_13",
+      "AA_14",
+      "AA_15",
+      "AA_16",
+      "AA_17",
+      "AA_18",
+      "AA_19",
+      "AA_20",
+      "f0_C_death_sum",
+      "f0_C_death_min",
+      "f0_C_death_max",
+      "f0_C_death_mean",
+      "f0_C_death_std",
+      "f0_N_death_sum",
+      "f0_N_death_min",
+      "f0_N_death_max",
+      "f0_N_death_mean",
+      "f0_N_death_std",
+      "f0_O_death_sum",
+      "f0_O_death_min",
+      "f0_O_death_max",
+      "f0_O_death_mean",
+      "f0_O_death_std",
+      "f0_CN_death_sum",
+      "f0_CN_death_min",
+      "f0_CN_death_max",
+      "f0_CN_death_mean",
+      "f0_CN_death_std",
+      "f0_CO_death_sum",
+      "f0_CO_death_min",
+      "f0_CO_death_max",
+      "f0_CO_death_mean",
+      "f0_CO_death_std",
+      "f0_NO_death_sum",
+      "f0_NO_death_min",
+      "f0_NO_death_max",
+      "f0_NO_death_mean",
+      "f0_NO_death_std",
+      "f0_CNO_death_sum",
+      "f0_CNO_death_min",
+      "f0_CNO_death_max",
+      "f0_CNO_death_mean",
+      "f0_CNO_death_std",
+      "f1_C_len_sum",
+      "f1_C_len_min",
+      "f1_C_len_max",
+      "f1_C_len_mean",
+      "f1_C_len_std",
+      "f1_C_birth_sum",
+      "f1_C_birth_min",
+      "f1_C_birth_max",
+      "f1_C_birth_mean",
+      "f1_C_birth_std",
+      "f1_C_death_sum",
+      "f1_C_death_min",
+      "f1_C_death_max",
+      "f1_C_death_mean",
+      "f1_C_death_std",
+      "f1_N_len_sum",
+      "f1_N_len_min",
+      "f1_N_len_max",
+      "f1_N_len_mean",
+      "f1_N_len_std",
+      "f1_N_birth_sum",
+      "f1_N_birth_min",
+      "f1_N_birth_max",
+      "f1_N_birth_mean",
+      "f1_N_birth_std",
+      "f1_N_death_sum",
+      "f1_N_death_min",
+      "f1_N_death_max",
+      "f1_N_death_mean",
+      "f1_N_death_std",
+      "f1_O_len_sum",
+      "f1_O_len_min",
+      "f1_O_len_max",
+      "f1_O_len_mean",
+      "f1_O_len_std",
+      "f1_O_birth_sum",
+      "f1_O_birth_min",
+      "f1_O_birth_max",
+      "f1_O_birth_mean",
+      "f1_O_birth_std",
+      "f1_O_death_sum",
+      "f1_O_death_min",
+      "f1_O_death_max",
+      "f1_O_death_mean",
+      "f1_O_death_std",
+      "f1_CN_len_sum",
+      "f1_CN_len_min",
+      "f1_CN_len_max",
+      "f1_CN_len_mean",
+      "f1_CN_len_std",
+      "f1_CN_birth_sum",
+      "f1_CN_birth_min",
+      "f1_CN_birth_max",
+      "f1_CN_birth_mean",
+      "f1_CN_birth_std",
+      "f1_CN_death_sum",
+      "f1_CN_death_min",
+      "f1_CN_death_max",
+      "f1_CN_death_mean",
+      "f1_CN_death_std",
+      "f1_CO_len_sum",
+      "f1_CO_len_min",
+      "f1_CO_len_max",
+      "f1_CO_len_mean",
+      "f1_CO_len_std",
+      "f1_CO_birth_sum",
+      "f1_CO_birth_min",
+      "f1_CO_birth_max",
+      "f1_CO_birth_mean",
+      "f1_CO_birth_std",
+      "f1_CO_death_sum",
+      "f1_CO_death_min",
+      "f1_CO_death_max",
+      "f1_CO_death_mean",
+      "f1_CO_death_std",
+      "f1_NO_len_sum",
+      "f1_NO_len_min",
+      "f1_NO_len_max",
+      "f1_NO_len_mean",
+      "f1_NO_len_std",
+      "f1_NO_birth_sum",
+      "f1_NO_birth_min",
+      "f1_NO_birth_max",
+      "f1_NO_birth_mean",
+      "f1_NO_birth_std",
+      "f1_NO_death_sum",
+      "f1_NO_death_min",
+      "f1_NO_death_max",
+      "f1_NO_death_mean",
+      "f1_NO_death_std",
+      "f1_CNO_len_sum",
+      "f1_CNO_len_min",
+      "f1_CNO_len_max",
+      "f1_CNO_len_mean",
+      "f1_CNO_len_std",
+      "f1_CNO_birth_sum",
+      "f1_CNO_birth_min",
+      "f1_CNO_birth_max",
+      "f1_CNO_birth_mean",
+      "f1_CNO_birth_std",
+      "f1_CNO_death_sum",
+      "f1_CNO_death_min",
+      "f1_CNO_death_max",
+      "f1_CNO_death_mean",
+      "f1_CNO_death_std"
+    ],
+    "dim": 172,
+    "source": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/topoqa_10A_ARM/graph_data/graph_metadata.json",
+    "module": "node/dssp_topo_merge/v1",
+    "module_params": {
+      "drop_na": true,
+      "jobs": 16
+    }
+  }
+}
+2026-01-01 13:02:01,924 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/BM55-AF2_decoys",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888/BM55-AF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888/BM55-AF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 8,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": false,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "force_node_dim": null,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2",
+  "config_name": "config.yaml.BM55-AF2",
+  "dataset_name": "BM55-AF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888",
+  "check_schema": false
+}
+2026-01-01 13:02:01,924 INFO Config: {
+  "data_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/HAF2_decoys",
+  "work_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2",
+  "checkpoint_path": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt",
+  "results_dir": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888/HAF2",
+  "output_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888/HAF2/inference_results.csv",
+  "label_file": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/label_info.csv",
+  "batch_size": 32,
+  "num_workers": 0,
+  "builder": {
+    "jobs": 12,
+    "topology_dedup_sort": null,
+    "dump_edges": null,
+    "sort_artifacts": false,
+    "feature_config": null,
+    "features": {},
+    "builder_name": null
+  },
+  "reuse_existing_graphs": true,
+  "use_checkpoint_schema": true,
+  "force_node_dim": null,
+  "interface_schema": {},
+  "topology_schema": {},
+  "node_schema": {},
+  "edge_schema": {},
+  "training_root": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2",
+  "config_name": "config.yaml.HAF2",
+  "dataset_name": "HAF2",
+  "work_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work",
+  "results_dir_base": "/Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/results/ema_polish_seed555_2026-01-01_04-03-52_phase2_seed888",
+  "check_schema": false
+}
+2026-01-01 13:02:01,924 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/feature_metadata.json
+2026-01-01 13:02:01,925 INFO 
+2026-01-01 13:02:01,925 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt
+2026-01-01 13:02:01,925 INFO Feature metadata written to /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/feature_metadata.json
+2026-01-01 13:02:01,925 INFO Inference config: config.yaml.BM55-AF2
+2026-01-01 13:02:01,925 INFO 
+2026-01-01 13:02:01,925 INFO 
+2026-01-01 13:02:01,925 INFO Checkpoint file: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/averaged_ema.chkpt
+2026-01-01 13:02:01,925 INFO Inference config: config.yaml.HAF2
+2026-01-01 13:02:01,925 INFO 
+2026-01-01 13:02:01,930 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2026-01-01 13:02:01,931 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/BM55-AF2_decoys --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/builder_logs --jobs 8 --no-sort-artifacts --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/builder_features/features.from_metadata.yaml
+2026-01-01 13:02:01,931 INFO Building graphs using qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 (selection source: checkpoint).
+2026-01-01 13:02:01,931 INFO Running graph builder (qtdaqa.new_dynamic_features.graph_builder2.graph_builder2): /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/venv_qtopo/bin/python3 -m qtdaqa.new_dynamic_features.graph_builder2.graph_builder2 --dataset-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/HAF2_decoys --work-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/builder_work --graph-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/graph_data --log-dir /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/builder_logs --jobs 12 --no-sort-artifacts --feature-config /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/builder_features/features.from_metadata.yaml
+2026-01-01 13:02:02 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2026-01-01 13:02:02 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/builder_features/features.from_metadata.yaml
+2026-01-01 13:02:02 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2026-01-01 13:02:02 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/builder_features/features.from_metadata.yaml
+2026-01-01 13:02:02 INFO PDB warnings suppressed (use --pdb-warnings to enable).
+2026-01-01 13:02:02 INFO Loading feature configuration from /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/builder_features/features.from_metadata.yaml
+2026-01-01 13:02:03 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/builder_logs/graph_builder.2026-01-01_13-02-02
+2026-01-01 13:02:03 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/ABAG-AF3/ABAG-AF3_decoys
+2026-01-01 13:02:03 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/builder_work
+2026-01-01 13:02:03 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/ABAG-AF3/graph_data
+2026-01-01 13:02:03 INFO Jobs: 24 (from CLI)
+2026-01-01 13:02:03 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Topology module : topology/persistence_basic/v1 [alias: Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Node module     : node/dssp_topo_merge/v1 [alias: 140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Edge module     : edge/legacy_band/v11 [alias: 10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2026-01-01 13:02:03 INFO Topology rounding: disabled (set options.topology_round_decimals to enable)
+2026-01-01 13:02:03 INFO Identified 875 PDB files for processing.
+2026-01-01 13:02:03 INFO Beginning interface stage (jobs=16)
+2026-01-01 13:02:03 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/builder_logs/graph_builder.2026-01-01_13-02-02
+2026-01-01 13:02:03 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/BM55-AF2/BM55-AF2_decoys
+2026-01-01 13:02:03 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/builder_work
+2026-01-01 13:02:03 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/BM55-AF2/graph_data
+2026-01-01 13:02:03 INFO Jobs: 8 (from CLI)
+2026-01-01 13:02:03 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Topology module : topology/persistence_basic/v1 [alias: Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Node module     : node/dssp_topo_merge/v1 [alias: 140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Edge module     : edge/legacy_band/v11 [alias: 10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2026-01-01 13:02:03 INFO Topology rounding: disabled (set options.topology_round_decimals to enable)
+2026-01-01 13:02:03 INFO Identified 449 PDB files for processing.
+2026-01-01 13:02:03 INFO Beginning interface stage (jobs=16)
+2026-01-01 13:02:03 INFO Prepared log directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/builder_logs/graph_builder.2026-01-01_13-02-02
+2026-01-01 13:02:03 INFO Dataset directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/datasets/evaluation/HAF2/HAF2_decoys
+2026-01-01 13:02:03 INFO Work directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/builder_work
+2026-01-01 13:02:03 INFO Graph directory: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_inference/output/topoqa_10A_ARM_optionB_dockq_mae/work/HAF2/graph_data
+2026-01-01 13:02:03 INFO Jobs: 12 (from CLI)
+2026-01-01 13:02:03 INFO Interface module: interface/polar_cutoff/v1 [alias: residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Topology module : topology/persistence_basic/v1 [alias: Betti 0 and Betti 1 topology summaries on interface coords = 140D PH | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Node module     : node/dssp_topo_merge/v1 [alias: 140D PH (topology summaries on interface coords) + 32D DSSP = Node 172D | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Edge module     : edge/legacy_band/v11 [alias: 10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA] (jobs=16)
+2026-01-01 13:02:03 INFO Artifact CSV sorting: disabled via --no-sort-artifacts (interface ordering always deterministic)
+2026-01-01 13:02:03 INFO Topology rounding: disabled (set options.topology_round_decimals to enable)
+2026-01-01 13:02:03 INFO Identified 1270 PDB files for processing.
+2026-01-01 13:02:03 INFO Beginning interface stage (jobs=16)
+2026-01-01 13:02:15 INFO [Interface - BM55-AF2_decoys] 4.9% complete (22/449)
+2026-01-01 13:02:21 INFO [Interface - BM55-AF2_decoys] 9.8% complete (44/449)
+2026-01-01 13:02:31 INFO [Interface - BM55-AF2_decoys] 14.7% complete (66/449)
+2026-01-01 13:02:37 INFO [Interface - BM55-AF2_decoys] 19.6% complete (88/449)
+2026-01-01 13:02:41 INFO [Interface - BM55-AF2_decoys] 24.5% complete (110/449)
+2026-01-01 13:02:47 INFO [Interface - BM55-AF2_decoys] 29.4% complete (132/449)
+2026-01-01 13:02:48 INFO [Interface - ABAG-AF3_decoys] 4.9% complete (43/875)
+2026-01-01 13:02:49 INFO [Interface - BM55-AF2_decoys] 34.3% complete (154/449)
+2026-01-01 13:02:50 INFO [Interface - BM55-AF2_decoys] 39.2% complete (176/449)
+2026-01-01 13:02:52 INFO [Interface - BM55-AF2_decoys] 44.1% complete (198/449)
+2026-01-01 13:02:54 INFO [Interface - BM55-AF2_decoys] 49.0% complete (220/449)
+2026-01-01 13:02:57 INFO [Interface - HAF2_decoys] 5.0% complete (63/1270)
+2026-01-01 13:02:58 INFO [Interface - BM55-AF2_decoys] 53.9% complete (242/449)
+2026-01-01 13:03:01 INFO [Interface - BM55-AF2_decoys] 58.8% complete (264/449)
+2026-01-01 13:03:04 INFO [Interface - BM55-AF2_decoys] 63.7% complete (286/449)
+2026-01-01 13:03:11 INFO [Interface - BM55-AF2_decoys] 68.6% complete (308/449)
+2026-01-01 13:03:17 INFO [Interface - BM55-AF2_decoys] 73.5% complete (330/449)
+2026-01-01 13:03:23 INFO [Interface - BM55-AF2_decoys] 78.4% complete (352/449)
+2026-01-01 13:03:26 INFO [Interface - BM55-AF2_decoys] 83.3% complete (374/449)
+2026-01-01 13:03:30 INFO [Interface - BM55-AF2_decoys] 88.2% complete (396/449)
+2026-01-01 13:03:33 INFO [Interface - BM55-AF2_decoys] 93.1% complete (418/449)
+2026-01-01 13:03:36 INFO [Interface - BM55-AF2_decoys] 98.0% complete (440/449)
+2026-01-01 13:03:36 INFO [Interface - BM55-AF2_decoys] 100.0% complete (449/449)
+2026-01-01 13:03:37 INFO Interface stage complete: 449 success, 0 failures
+2026-01-01 13:03:37 INFO Interface feature extraction elapsed time: 93.70 s
+2026-01-01 13:03:37 INFO Beginning topology stage (jobs=16)
+2026-01-01 13:03:48 INFO [Interface - ABAG-AF3_decoys] 9.8% complete (86/875)
+2026-01-01 13:03:55 INFO [Interface - HAF2_decoys] 9.9% complete (126/1270)
+2026-01-01 13:04:03 INFO [Interface - ABAG-AF3_decoys] 14.7% complete (129/875)
+2026-01-01 13:04:15 INFO [Interface - ABAG-AF3_decoys] 19.7% complete (172/875)
+2026-01-01 13:04:22 INFO [Interface - ABAG-AF3_decoys] 24.6% complete (215/875)
+2026-01-01 13:04:22 INFO [Topology - BM55-AF2_decoys] 4.9% complete (22/449)
+2026-01-01 13:04:25 INFO [Interface - HAF2_decoys] 14.9% complete (189/1270)
+2026-01-01 13:04:30 INFO [Interface - ABAG-AF3_decoys] 29.5% complete (258/875)
+2026-01-01 13:04:31 INFO [Interface - HAF2_decoys] 19.8% complete (252/1270)
+2026-01-01 13:04:39 INFO [Interface - ABAG-AF3_decoys] 34.4% complete (301/875)
+2026-01-01 13:04:51 INFO [Topology - BM55-AF2_decoys] 9.8% complete (44/449)
+2026-01-01 13:04:55 INFO [Interface - HAF2_decoys] 24.8% complete (315/1270)
+2026-01-01 13:05:00 INFO [Interface - ABAG-AF3_decoys] 39.3% complete (344/875)
+2026-01-01 13:05:16 INFO [Interface - HAF2_decoys] 29.8% complete (378/1270)
+2026-01-01 13:05:30 INFO [Interface - HAF2_decoys] 34.7% complete (441/1270)
+2026-01-01 13:05:41 INFO [Interface - HAF2_decoys] 39.7% complete (504/1270)
+2026-01-01 13:05:47 INFO [Interface - HAF2_decoys] 44.6% complete (567/1270)
+2026-01-01 13:05:50 INFO [Interface - ABAG-AF3_decoys] 44.2% complete (387/875)
+2026-01-01 13:06:02 INFO [Topology - BM55-AF2_decoys] 14.7% complete (66/449)
+2026-01-01 13:06:30 INFO [Interface - ABAG-AF3_decoys] 49.1% complete (430/875)
+2026-01-01 13:06:41 INFO [Interface - ABAG-AF3_decoys] 54.1% complete (473/875)

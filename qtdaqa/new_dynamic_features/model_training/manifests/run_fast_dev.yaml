@@ -1,8 +1,0 @@
-shared:
-  notes: "Fast-dev smoke sweep for validation."
-  fast_dev_run: true
-  log_lr: false
-jobs:
-  - name: sched_boost_seed222_fastdev
-    config: configs/sched_boost_seed222.yaml
-continue_on_error: false

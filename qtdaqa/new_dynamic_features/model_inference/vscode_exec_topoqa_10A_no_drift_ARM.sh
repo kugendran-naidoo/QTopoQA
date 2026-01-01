@@ -78,7 +78,7 @@ while IFS= read -r line; do
   CHECKPOINT_ROWS+=("$line")
 done < <("${PYTHON_BIN}" - <<'PY'
 from pathlib import Path
-from qtdaqa.new_dynamic_features.model_training import train_cli
+from qtdaqa.new_dynamic_features.model_training2 import train_cli
 
 runs = train_cli.rank_runs(train_cli.RUN_ROOT)
 import os
