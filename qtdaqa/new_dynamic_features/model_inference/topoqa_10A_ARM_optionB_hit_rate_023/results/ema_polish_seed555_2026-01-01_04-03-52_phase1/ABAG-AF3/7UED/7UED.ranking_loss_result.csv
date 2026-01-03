@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7UED m* = 0.785
+7UED m^ = 0.776
+7UED ranking loss = 0.009
+
+7UED,fold_7ued_2_model_1,0.16185874,0.785
+7UED,fold_7ued_3_model_1,0.73458666,0.776

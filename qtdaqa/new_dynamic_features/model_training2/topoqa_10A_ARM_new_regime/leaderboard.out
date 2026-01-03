@@ -1,0 +1,64 @@
+1. polish_seed555_2026-01-01_04-03-52_phase2_seed101
+   primary_metric: val_loss = 0.04013850539922714
+   secondary_metric: val_spearman_corr = 0.7758281230926514
+   val_loss: 0.04013850539922714
+   selection_metric: 0.04013850539922714
+   checkpoint: training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed101/model_checkpoints/checkpoint.val-0.04014_epoch312.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+2. polish_seed555_2026-01-01_04-03-52_phase2_seed888
+   primary_metric: val_loss = 0.04038206860423088
+   secondary_metric: val_spearman_corr = 0.7711667418479919
+   val_loss: 0.04038206860423088
+   selection_metric: 0.04038206860423088
+   checkpoint: training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed888/model_checkpoints/checkpoint.val-0.04038_epoch307.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+3. polish_seed555_2026-01-01_04-03-52_phase1
+   primary_metric: val_loss = 0.04042995721101761
+   secondary_metric: val_spearman_corr = 0.7704960703849792
+   val_loss: 0.04042995721101761
+   selection_metric: 0.04042995721101761
+   checkpoint: training_runs2/polish_seed555_2026-01-01_04-03-52_phase1/model_checkpoints/checkpoint.val-0.04043_epoch306.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+4. polish_seed555_2026-01-01_04-03-52_phase2_seed555
+   primary_metric: val_loss = 0.04076186940073967
+   secondary_metric: val_spearman_corr = 0.7703284025192261
+   val_loss: 0.04076186940073967
+   selection_metric: 0.04076186940073967
+   checkpoint: training_runs2/polish_seed555_2026-01-01_04-03-52_phase2_seed555/model_checkpoints/checkpoint.val-0.04076_epoch312.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+5. polish_seed555_2026-01-01_04-03-52
+   primary_metric: val_loss = 0.04112694784998894
+   secondary_metric: val_spearman_corr = 0.7711499929428101
+   val_loss: 0.04112694784998894
+   selection_metric: 0.04112694784998894
+   checkpoint: training_runs2/polish_seed555_2026-01-01_04-03-52/model_checkpoints/checkpoint.val-0.04113_epoch276.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+6. polish_seed101_2026-01-01_00-19-09
+   primary_metric: val_loss = 0.04261574149131775
+   secondary_metric: val_spearman_corr = 0.7659856081008911
+   val_loss: 0.04261574149131775
+   selection_metric: 0.04261574149131775
+   checkpoint: training_runs2/polish_seed101_2026-01-01_00-19-09/model_checkpoints/checkpoint.val-0.04262_epoch162.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+7. polish_lr_low_seed888_2026-01-01_10-25-33
+   primary_metric: val_loss = 0.04333721846342087
+   secondary_metric: val_spearman_corr = 0.769476592540741
+   val_loss: 0.04333721846342087
+   selection_metric: 0.04333721846342087
+   checkpoint: training_runs2/polish_lr_low_seed888_2026-01-01_10-25-33/model_checkpoints/checkpoint.val-0.04334_epoch067.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+
+8. polish_lr_low_seed555_2026-01-01_06-50-25
+   primary_metric: val_loss = 0.044133350253105164
+   secondary_metric: val_spearman_corr = 0.7729063630104065
+   val_loss: 0.044133350253105164
+   selection_metric: 0.044133350253105164
+   checkpoint: training_runs2/polish_lr_low_seed555_2026-01-01_06-50-25/model_checkpoints/checkpoint.val-0.04413_epoch074.chkpt
+   builder_advisory: edge module: edge/legacy_band/v11; variant: legacy_v11; builder: graph_builder2 — ensure inference uses a builder with these modules/variants.
+

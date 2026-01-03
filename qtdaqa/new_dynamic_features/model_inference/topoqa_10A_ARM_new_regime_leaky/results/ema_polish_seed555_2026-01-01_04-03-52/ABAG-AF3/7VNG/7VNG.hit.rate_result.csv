@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+7VNG hit rate =  10/5/0
+
+7VNG,fold_7vng_3_model_4,0.43671364,0.747
+7VNG,fold_7vng_2_model_1,0.43635532,0.759
+7VNG,fold_7vng_2_model_2,0.43620279,0.765
+7VNG,fold_7vng_4_model_4,0.43615049,0.363
+7VNG,fold_7vng_5_model_2,0.43604356,0.428
+7VNG,fold_7vng_2_model_4,0.4357532,0.573
+7VNG,fold_7vng_4_model_3,0.43550962,0.475
+7VNG,fold_7vng_1_model_4,0.43541321,0.767
+7VNG,fold_7vng_5_model_3,0.43533877,0.343
+7VNG,fold_7vng_4_model_2,0.43518388,0.425

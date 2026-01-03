@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7T25 m* = 0.866
+7T25 m^ = 0.855
+7T25 ranking loss = 0.011
+
+7T25,fold_7t25_1_model_4,0.64011854,0.866
+7T25,fold_7t25_5_model_3,0.70950407,0.855

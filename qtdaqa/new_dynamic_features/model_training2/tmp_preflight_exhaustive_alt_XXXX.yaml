@@ -1,0 +1,16 @@
+shared:
+  fast_dev_run: true
+  limit_train_batches: 1
+  limit_val_batches: 1
+jobs:
+  - name: preflight_exhaustive_alt_sched_boost_lean_seed222
+    config: configs_exhaustive_alt/sched_boost_lean_seed222.yaml
+  - name: preflight_exhaustive_alt_sched_boost_lr035_lean_seed222
+    config: configs_exhaustive_alt/sched_boost_lr035_lean_seed222.yaml
+  - name: preflight_exhaustive_alt_sched_boost_lr002_lean_seed222
+    config: configs_exhaustive_alt/sched_boost_lr002_lean_seed222.yaml
+  - name: preflight_exhaustive_alt_sched_boost_batch_alt_lean_seed222
+    config: configs_exhaustive_alt/sched_boost_batch_alt_lean_seed222.yaml
+  - name: preflight_exhaustive_alt_large_batch_sched_boost_lean_seed222
+    config: configs_exhaustive_alt/large_batch_sched_boost_lean_seed222.yaml
+continue_on_error: false

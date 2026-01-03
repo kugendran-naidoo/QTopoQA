@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7X7O m* = 0.798
+7X7O m^ = 0.779
+7X7O ranking loss = 0.019
+
+7X7O,fold_7x7o_3_model_2,0.36655065,0.798
+7X7O,fold_7x7o_3_model_1,0.53008461,0.779

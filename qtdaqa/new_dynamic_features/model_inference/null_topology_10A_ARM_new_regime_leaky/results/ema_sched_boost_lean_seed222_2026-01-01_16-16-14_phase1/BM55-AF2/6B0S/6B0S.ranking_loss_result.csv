@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+6B0S m* = 0.652
+6B0S m^ = 0.567
+6B0S ranking loss = 0.085
+
+6B0S,ranked_4,0.59888101,0.652
+6B0S,ranked_0,0.60110474,0.567

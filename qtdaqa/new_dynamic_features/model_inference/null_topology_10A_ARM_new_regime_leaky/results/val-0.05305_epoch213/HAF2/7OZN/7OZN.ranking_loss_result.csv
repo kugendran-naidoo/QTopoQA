@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7OZN m* = 0.501
+7OZN m^ = 0.302
+7OZN ranking loss = 0.199
+
+7OZN,sequence_based_template_with_alphafold_0,0.64678866,0.501
+7OZN,ori_template_pipeline_0,0.76874113,0.302

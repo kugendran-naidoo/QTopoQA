@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+8B7W m* = 0.242
+8B7W m^ = 0.055
+8B7W ranking loss = 0.187
+
+8B7W,fold_8b7w_3_model_4,0.32959127,0.242
+8B7W,fold_8b7w_4_model_0,0.33089149,0.055

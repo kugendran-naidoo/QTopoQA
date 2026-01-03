@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+7KBR hit rate =  10/10/10
+
+7KBR,uniprot_distance_uniref_a3m_0,0.36106291,0.949
+7KBR,species_interact_uniref_a3m_3,0.36085466,0.946
+7KBR,string_interact_uniref_a3m_3,0.36057431,0.948
+7KBR,string_interact_uniref_a3m_1,0.36057264,0.946
+7KBR,species_interact_uniref_a3m_0,0.36056978,0.951
+7KBR,species_interact_uniref_a3m_2,0.36039367,0.949
+7KBR,pdb_interact_uniref_a3m_1,0.36039287,0.948
+7KBR,custom_template_file_4,0.36009783,0.972
+7KBR,custom_template_file_0,0.36009145,0.974
+7KBR,uniclust_oxmatch_a3m_2,0.36005512,0.949

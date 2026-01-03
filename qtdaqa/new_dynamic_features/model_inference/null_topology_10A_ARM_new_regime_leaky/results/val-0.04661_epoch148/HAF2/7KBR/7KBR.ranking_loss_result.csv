@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7KBR m* = 0.974
+7KBR m^ = 0.879
+7KBR ranking loss = 0.095
+
+7KBR,custom_template_file_0,0.82514727,0.974
+7KBR,ori_template_pipeline_0,0.84818423,0.879

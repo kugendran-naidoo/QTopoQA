@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+7TFO hit rate =  10/0/0
+
+7TFO,fold_7tfo_3_model_0,0.26099828,0.446
+7TFO,fold_7tfo_1_model_2,0.20763215,0.448
+7TFO,fold_7tfo_3_model_3,0.19828288,0.456
+7TFO,fold_7tfo_2_model_2,0.1939106,0.462
+7TFO,fold_7tfo_3_model_4,0.1901764,0.456
+7TFO,fold_7tfo_4_model_4,0.18518297,0.452
+7TFO,fold_7tfo_3_model_1,0.17003164,0.448
+7TFO,fold_7tfo_2_model_0,0.16997832,0.446
+7TFO,fold_7tfo_5_model_0,0.15746932,0.459
+7TFO,fold_7tfo_1_model_1,0.12811162,0.456

@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7SBG m* = 0.684
+7SBG m^ = 0.642
+7SBG ranking loss = 0.042
+
+7SBG,fold_7sbg_4_model_3,0.70029533,0.684
+7SBG,fold_7sbg_5_model_2,0.70363116,0.642

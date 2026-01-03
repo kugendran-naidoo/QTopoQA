@@ -6,7 +6,7 @@ set -euo pipefail
 trap 'echo "Interrupted; aborting." >&2; exit 1' INT TERM
 
 DATASETS=("BM55-AF2" "HAF2" "ABAG-AF3")
-TOP_K=3                     # number of top checkpoints to use
+TOP_K=10                     # number of top checkpoints to use
 export TOP_K
 # when true, also run each selected top-K run’s averaged_ema.* checkpoint if present
 INCLUDE_EMA=true
@@ -20,7 +20,7 @@ RANK_MODE="primary"
 #   val_spearman_corr (recommended; uses best val Spearman from selection history)
 SECONDARY_METRIC="val_spearman_corr"
 export RANK_MODE SECONDARY_METRIC
-WORK_DIR="topoqa_10A_ARM_new_regime_leaky"
+WORK_DIR="advanced_lean_10A_ARM_new_regime_leaky"
 APPEND_TIMESTAMP=false
 REUSE_ONLY=true
 export QTOPO_REUSE_ONLY="${REUSE_ONLY}"
