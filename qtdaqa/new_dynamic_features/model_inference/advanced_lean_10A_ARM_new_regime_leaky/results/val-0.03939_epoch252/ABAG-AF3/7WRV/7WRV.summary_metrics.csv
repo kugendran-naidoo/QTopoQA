@@ -1,0 +1,4 @@
+Note last 4 columns ranking_loss, top10_A, top10_B, top10_C
+
+TARGET,m_star_best_true,top_pred_true,top_pred_pred,ranking_loss,top10_A,top10_B,top10_C
+7WRV,0.484390,0.284593,0.208258,0.199797,10,0,0

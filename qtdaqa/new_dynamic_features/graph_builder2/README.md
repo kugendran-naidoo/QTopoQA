@@ -137,6 +137,30 @@ topology:           # optional, but common
 #     lap_moment_orders: [1, 2, 3, 4]
 #     lap_heat_times: [0.1, 1.0, 5.0]
 
+### Bipartite interface graph (TopoQA definition)
+This is the graph a Laplacian-only or Laplacian-augmented topology module operates on:
+
+```
+1) Identify interface residues:
+   For each residue i in chain A:
+     if any atom of i is within cutoff (e.g., 10 A) of any atom in chain B,
+     then i is in U (interface residues of chain A).
+   Repeat for chain B -> V.
+
+2) Build bipartite graph G = (U ∪ V, E):
+   Nodes: U (chain A interface residues) + V (chain B interface residues)
+   Edges: (u, v) in E iff u in U, v in V, and dist(Ca_u, Ca_v) < cutoff
+   No A-A or B-B edges.
+
+3) Generalize to k-partite (k > 2):
+   Partition nodes by chain/label (P1..Pk).
+   Add edges only between different partitions (Pi <-> Pj, i != j).
+
+4) Compute Laplacian features on G:
+   Build adjacency (weighted or unweighted), form Laplacian L,
+   extract eigenvalue stats/moments/heat traces as configured.
+```
+
 # Null topology (ablation control; keeps 140D shape but no signal)
 # topology:
 #   module: topology/persistence_null/v1

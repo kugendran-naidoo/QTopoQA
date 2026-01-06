@@ -1,0 +1,4 @@
+Note last 4 columns ranking_loss, top10_A, top10_B, top10_C
+
+TARGET,m_star_best_true,top_pred_true,top_pred_pred,ranking_loss,top10_A,top10_B,top10_C
+7SJO,0.620497,0.579122,0.404397,0.041374,10,10,0

@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7SJN m* = 0.900
+7SJN m^ = 0.888
+7SJN ranking loss = 0.012
+
+7SJN,fold_7sjn_1_model_2,0.11854482,0.9
+7SJN,fold_7sjn_1_model_0,0.13894138,0.888

@@ -60,6 +60,30 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Topology: `topology/persistence_basic/v1` – per-residue persistent homology; params: `neighbor_distance`, `filtration_cutoff`, `min_persistence`, `dedup_sort`, `element_filters`, `jobs`. Can sort output; default element_filters tuples mirror the baseline (C/N/O combos).  
 - Cost drivers: PH cost increases with larger `neighbor_distance`/`filtration_cutoff` and additional `element_filters`. `dedup_sort` improves determinism with minor overhead.  
 - Topology: `topology/persistence_laplacian_hybrid/v1` – PH 140D + Laplacian spectral block (default 32D). Params extend persistence_basic with Lap options (`lap_graph_mode`, `lap_distance_cutoff`/`lap_k_neighbors`/`lap_max_neighbors`, `lap_edge_weight` gaussian/inverse/binary with sigma, `lap_eigs_count`, `lap_heat_times`, `lap_moment_orders`, `lap_normalize`). Cost drivers: PH element_filters + Lap eigs_count/weights/normalize and neighborhood size (cutoff/kNN/max_neighbors).  
+
+### Bipartite interface graph (TopoQA definition)
+Laplacian-only and Laplacian-augmented topology modules operate on the interface graph defined by chain labels:
+
+```
+1) Identify interface residues:
+   For each residue i in chain A:
+     if any atom of i is within cutoff (e.g., 10 A) of any atom in chain B,
+     then i is in U (interface residues of chain A).
+   Repeat for chain B -> V.
+
+2) Build bipartite graph G = (U ∪ V, E):
+   Nodes: U (chain A interface residues) + V (chain B interface residues)
+   Edges: (u, v) in E iff u in U, v in V, and dist(Ca_u, Ca_v) < cutoff
+   No A-A or B-B edges.
+
+3) Generalize to k-partite (k > 2):
+   Partition nodes by chain/label (P1..Pk).
+   Add edges only between different partitions (Pi <-> Pj, i != j).
+
+4) Compute Laplacian features on G:
+   Build adjacency (weighted or unweighted), form Laplacian L,
+   extract eigenvalue stats/moments/heat traces as configured.
+```
 - Topology: `topology/lightweight_MoL/v1` – PH 140D + 8D unweighted Lap moments (mu1-4, kappa2-4). Params: PH params plus `lap_k_neighbors`, `lap_max_neighbors`, `lap_size_threshold`, `lap_estimator` (exact/slq), `lap_slq_probes`, `lap_slq_steps` (compat), `lap_profile`. Cost drivers: PH filters/distances; Lap moment estimation depends on neighborhood size and estimator/SLQ probes. Default topo dim 148.  
 - Topology: `topology/persistence_k_partite_advanced/v1` – k-partite PH with typed-contact block and richer presets: minimal (140D); lean (base+cross/per-primary); heavy (bias+polar H-bond+typed); heavy_stratified (adds secondary strat, chemotype default); rich (heavy_stratified + weighted filtration ON by default; power/landmark opt-in). Defaults: polar/typed ON in heavy/heavy_stratified/rich; weighted ON only in rich; power/landmark OFF unless enabled.
 - Node: `node/dssp_topo_merge/v1` – merges DSSP with topology; params: `drop_na`, `jobs`. Depends on external `mkdssp`; node IDs are canonicalized/sorted; `drop_na` may remove rows. Default node_dim ≈ 32 DSSP + topology_dim (e.g., 172 with 140D PH); jobs precedence CLI --jobs > config default_jobs > module default.  

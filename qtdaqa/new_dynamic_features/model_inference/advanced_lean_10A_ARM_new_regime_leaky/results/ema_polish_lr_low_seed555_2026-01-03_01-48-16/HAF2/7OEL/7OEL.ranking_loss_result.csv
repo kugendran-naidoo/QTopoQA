@@ -1,0 +1,7 @@
+ranking loss = m* - m^
+7OEL m* = 0.759
+7OEL m^ = 0.724
+7OEL ranking loss = 0.035
+
+7OEL,uniclust_oxmatch_a3m_2,0.37642983,0.759
+7OEL,uniprot_distance_uniref_sto_3,0.38345918,0.724
