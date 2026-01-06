@@ -1,0 +1,54 @@
+# Feature-config for topology/persistence_k_partite_advanced_laplacian_only/v2 (fixed-width schema) — heavy preset.
+defaults:
+  jobs: 16
+
+options:
+  topology_round_decimals: -1
+
+interface:
+  module: interface/polar_cutoff/v1
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1
+    jobs: 16
+
+topology:
+  module: topology/persistence_k_partite_advanced_laplacian_only/v2
+  alias: "Advanced k-partite Laplacian-only (v2) heavy"
+  params:
+    preset: heavy
+    neighbor_distance: 8.0
+    lap_graph_mode: cross_chain
+    lap_graph_mode_primary: all
+    lap_distance_cutoff: 8.0
+    lap_k_neighbors: null
+    lap_max_neighbors: 128
+    lap_edge_weight: gaussian
+    lap_sigma: 4.0
+    lap_eigs_count: 16
+    lap_moment_orders: [1, 2, 3, 4]
+    lap_heat_times: [0.1, 1.0, 5.0]
+    lap_include_entropy: true
+    lap_normalize: sym
+    k_max: 2
+    secondary_partition: none
+    secondary_k_max: 4
+    max_atoms: 25000
+    max_block_seconds: 60.0
+    dssp_timeout_seconds: 10.0
+    dssp_slow_threshold: 2.0
+    write_slot_maps: false
+
+node:
+  module: node/dssp_topo_merge_passthrough/v1
+  params:
+    drop_na: true
+    jobs: 16
+
+edge:
+  module: edge/legacy_band/v11
+  params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_features: true
+    jobs: 16

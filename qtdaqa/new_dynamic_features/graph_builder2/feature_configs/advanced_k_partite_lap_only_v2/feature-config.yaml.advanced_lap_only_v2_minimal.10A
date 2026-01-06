@@ -1,0 +1,75 @@
+# Auto-generated feature-config template
+# Pick one module per required stage. Edit parameter values as needed.
+# Run `./run_graph_builder2.sh --list-modules` for detailed descriptions.
+defaults:
+  jobs: 16  # Optional global worker override; remove if unused.
+
+options:
+  topology_round_decimals: -1  # Round topology numeric columns to N decimals (0-15); -1 or omit to disable (recommended 12 when enabling).
+
+# REQUIRED stage: interface
+interface:
+  module: interface/polar_cutoff/v1  # alias: TopoQA default 10A cut-off
+  alias: "residue ID + 3D coordinates (x,y,z) default cutoff 10A | TopoQA"
+  summary: "Polar interface detection using distance cutoff."
+  description: "Identifies interface residues across chains using the polar interface routine (new_calculate_interface.process_pdb_file) with configurable distance cutoff and coordinate rounding."
+  params:
+    cutoff: 10.0
+    coordinate_decimals: -1  # skip rounding to keep raw coords
+    jobs: 16
+
+# OPTIONAL stage: topology
+topology:
+  module: topology/persistence_k_partite_advanced_laplacian_only/v2
+  alias: "Laplacian-only k-partite 41D (Minimal)"
+  summary: "Laplacian-only k-partite topology with fixed-width slots."
+  description: "Computes Laplacian spectral features on the bipartite interface graph, expanded into fixed-width k-partite slots (base, per-primary, per-pair, and optional stratified). Slots are padded deterministically and include missingness channels for robust downstream training."
+  # dim: 164
+  params:
+    preset: minimal  # minimal: base slot only (no per-primary or pair slots)
+    neighbor_distance: 8.0
+    lap_graph_mode: cross_chain  # cross_chain (default) for base/pair blocks; all includes intra-chain edges
+    lap_graph_mode_primary: all  # ignored for minimal (no per-primary slots)
+    lap_distance_cutoff: 8.0
+    lap_k_neighbors: null  # optional deterministic k-NN cap; otherwise cutoff-based
+    lap_max_neighbors: 128  # cap neighborhood size (includes target residue)
+    lap_edge_weight: gaussian  # gaussian (default, sigma ~ neighbor_distance/2), inverse, or binary
+    lap_sigma: 4.0
+    lap_eigs_count: 16
+    lap_moment_orders: [1, 2, 3, 4]
+    lap_heat_times: [0.1, 1.0, 5.0]
+    lap_include_entropy: true
+    lap_normalize: sym
+    k_max: 2  # ignored for minimal (base slot only)
+    secondary_partition: none  # ignored for minimal
+    secondary_k_max: 4  # ignored for minimal
+    max_atoms: 25000  # ignored for minimal
+    max_block_seconds: 60.0  # ignored for minimal
+    dssp_timeout_seconds: 10.0
+    dssp_slow_threshold: 2.0
+    write_slot_maps: false  # If true, write work/topology_slot_maps/<pdb_id>.slot_map.json for debugging
+    max_topology_dim_allowed: null  # Optional safety: warn/fail if expected worst-case topo_dim exceeds this limit
+    fail_fast_topology_dim: false  # If true, raise error when expected worst-case topo_dim exceeds limit; otherwise warn only
+    jobs: 16
+
+# REQUIRED stage: node
+node:
+  module: node/dssp_topo_merge_passthrough/v1  # alias: Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims
+  alias: "Passthrough (all dims from topology module) + 32D DSSP = Node Dynamic Dims"
+  summary: "DSSP/basic features merged with all topology columns (passthrough)."
+  description: "Runs DSSP/basic feature extraction and merges with the provided topology CSV using all non-ID topology columns (no hardcoded list). Topology columns are MinMax scaled per file; output columns ordered as ID, DSSP/basic 32D, then topology columns in file order. Suitable for hybrid topology (PH+Lap) or any dynamic topo layout."
+  params:
+    drop_na: true  # matches fea_df_clean = fea_df.dropna() in both inference_model.py and k_mac_inference_pca_tsne4.py
+    jobs: 16
+
+# REQUIRED stage: edge
+edge:
+  module: edge/legacy_band/v11
+  alias: "10D atomic distances between two residues + 1D distance between C (alpha) = Edge 11D | TopoQA"
+  summary: "11D legacy edge features (distance + atom distance histogram)."
+  description: "Reproduces the original 11-dimensional edge attributes consisting of residue pair distance and a 10-bin histogram of inter-atomic distances, scaled to [0, 1]."
+  params:
+    distance_min: 0.0
+    distance_max: 10.0
+    scale_features: true
+    jobs: 16

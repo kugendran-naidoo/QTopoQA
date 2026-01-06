@@ -161,6 +161,17 @@ This is the graph a Laplacian-only or Laplacian-augmented topology module operat
    extract eigenvalue stats/moments/heat traces as configured.
 ```
 
+### Laplacian-only k-partite module notes (Q&A)
+- Bipartiteness: the module does not add intra-chain edges; it operates on the bipartite/k-partite interface graph (inter-chain edges only). Exploration is constrained to inter-partition contacts unless a future graph_mode explicitly allows intra-partition edges.
+- Defaults: normalized Laplacian, gaussian edge weights, eigs_count=16, moments 1-4, heat traces at [0.1, 1.0, 5.0], and max_neighbors guardrails provide stable, multi-scale connectivity summaries that are robust across interface sizes and help downstream GNNs.
+- Betti numbers: no normalized or PH Betti numbers are computed; Laplacian-only uses spectral summaries, not PH.
+- Laplacian moments: yes, moments (raw and centered) are core features; they summarize spectral shape but do not capture persistence over filtrations.
+- Zero eigenvalues: zeros are treated as connectivity signals (component counts); non-zero eigenvalues drive spectral stats/entropy/heat traces.
+- Spectral gap: the plan includes lambda_2 (algebraic connectivity) or an explicit gap; it is a compact indicator of inter-chain connectivity strength.
+- Hodge theory: MoL corresponds to the 0-form (graph) Laplacian slice of Hodge theory; it does not capture higher-order Hodge Laplacians.
+- Knots: knot information is not captured by Laplacian moments (nor by standard PH without special constructions).
+- TopoQA: the original TopoQA pipeline uses PH on atom point clouds; it does not use persistent spectral graphs with PH.
+
 # Null topology (ablation control; keeps 140D shape but no signal)
 # topology:
 #   module: topology/persistence_null/v1
@@ -411,3 +422,14 @@ modules or defaults change.
   - heavy_stratified: heavy + secondary strat (chemotype default); polar/typed on.
   - rich: heavy_stratified + weighted filtration ON by default; power/landmark stay opt-in to avoid unexpected cost/approximation.
 - Defaults: polar/typed ON in heavy/heavy_stratified/rich; weighted ON only in rich; power/landmark OFF unless explicitly enabled. Generated configs include inline comments reflecting these choices.
+
+## Laplacian-only k-partite module (v2)
+- Module: `topology/persistence_k_partite_advanced_laplacian_only/v2`
+- Summary: Laplacian-only topology on the bipartite interface graph with fixed-width k-partite slots and missingness channels.
+- Dims (per slot): 32 Laplacian features by default (`lap_eigs_count=16`, moments 1–4, heat traces 0.1/1/5, entropy), plus 9 missingness channels.
+- Presets:
+  - minimal: base slot only.
+  - lean: base + per-primary + per-pair slots.
+  - heavy: same slots as lean (no extra blocks yet).
+  - heavy_stratified: lean slots + secondary stratification (chemotype default; DSSP optional).
+- Key params: `lap_graph_mode` (base/pair), `lap_graph_mode_primary`, `lap_distance_cutoff`, `lap_edge_weight`, `lap_sigma`, `lap_eigs_count`, `lap_moment_orders`, `lap_heat_times`, `lap_normalize`, `k_max`, `secondary_partition`, `secondary_k_max`, `max_atoms`, `max_block_seconds`.

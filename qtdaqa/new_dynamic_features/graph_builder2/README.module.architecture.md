@@ -60,6 +60,7 @@ Each module implements `validate_params` to coerce types/check ranges. `describe
 - Topology: `topology/persistence_basic/v1` – per-residue persistent homology; params: `neighbor_distance`, `filtration_cutoff`, `min_persistence`, `dedup_sort`, `element_filters`, `jobs`. Can sort output; default element_filters tuples mirror the baseline (C/N/O combos).  
 - Cost drivers: PH cost increases with larger `neighbor_distance`/`filtration_cutoff` and additional `element_filters`. `dedup_sort` improves determinism with minor overhead.  
 - Topology: `topology/persistence_laplacian_hybrid/v1` – PH 140D + Laplacian spectral block (default 32D). Params extend persistence_basic with Lap options (`lap_graph_mode`, `lap_distance_cutoff`/`lap_k_neighbors`/`lap_max_neighbors`, `lap_edge_weight` gaussian/inverse/binary with sigma, `lap_eigs_count`, `lap_heat_times`, `lap_moment_orders`, `lap_normalize`). Cost drivers: PH element_filters + Lap eigs_count/weights/normalize and neighborhood size (cutoff/kNN/max_neighbors).  
+- Topology: `topology/persistence_k_partite_advanced_laplacian_only/v2` – Laplacian-only topology on the bipartite/k-partite interface graph with fixed-width slots + missingness channels. Params: `lap_graph_mode`, `lap_graph_mode_primary`, `lap_distance_cutoff`, `lap_edge_weight`, `lap_sigma`, `lap_eigs_count`, `lap_moment_orders`, `lap_heat_times`, `lap_normalize`, `k_max`, `secondary_partition`, `secondary_k_max`, `max_atoms`, `max_block_seconds`. Default Lap block dim 32; per-slot missingness dim 9.  
 
 ### Bipartite interface graph (TopoQA definition)
 Laplacian-only and Laplacian-augmented topology modules operate on the interface graph defined by chain labels:
@@ -84,6 +85,17 @@ Laplacian-only and Laplacian-augmented topology modules operate on the interface
    Build adjacency (weighted or unweighted), form Laplacian L,
    extract eigenvalue stats/moments/heat traces as configured.
 ```
+
+### Laplacian-only k-partite module notes (Q&A)
+- Bipartiteness: operates on the bipartite/k-partite interface graph (inter-partition edges only); does not add intra-partition edges unless an explicit graph_mode permits it.
+- Defaults: normalized Laplacian + gaussian weights + eigs_count=16 + moments 1-4 + heat traces (0.1/1/5) + max_neighbors guardrails yield stable multi-scale connectivity summaries for GNNs.
+- Betti numbers: no PH Betti numbers are computed; this is a spectral-only module.
+- Laplacian moments: core features include raw/centered moments; they summarize spectral shape but do not model persistence over filtrations.
+- Zero eigenvalues: interpreted as component counts; non-zero eigenvalues drive entropy/heat/moment stats.
+- Spectral gap: lambda_2 or a gap term is included as a connectivity-strength signal.
+- Hodge theory: MoL corresponds to the 0-form graph Laplacian slice; higher-order Hodge Laplacians are not included.
+- Knots: knot invariants are not captured by Laplacian moments (nor by standard PH without special constructions).
+- TopoQA: original TopoQA uses PH on atom point clouds; no persistent spectral graphs with PH are used there.
 - Topology: `topology/lightweight_MoL/v1` – PH 140D + 8D unweighted Lap moments (mu1-4, kappa2-4). Params: PH params plus `lap_k_neighbors`, `lap_max_neighbors`, `lap_size_threshold`, `lap_estimator` (exact/slq), `lap_slq_probes`, `lap_slq_steps` (compat), `lap_profile`. Cost drivers: PH filters/distances; Lap moment estimation depends on neighborhood size and estimator/SLQ probes. Default topo dim 148.  
 - Topology: `topology/persistence_k_partite_advanced/v1` – k-partite PH with typed-contact block and richer presets: minimal (140D); lean (base+cross/per-primary); heavy (bias+polar H-bond+typed); heavy_stratified (adds secondary strat, chemotype default); rich (heavy_stratified + weighted filtration ON by default; power/landmark opt-in). Defaults: polar/typed ON in heavy/heavy_stratified/rich; weighted ON only in rich; power/landmark OFF unless enabled.
 - Node: `node/dssp_topo_merge/v1` – merges DSSP with topology; params: `drop_na`, `jobs`. Depends on external `mkdssp`; node IDs are canonicalized/sorted; `drop_na` may remove rows. Default node_dim ≈ 32 DSSP + topology_dim (e.g., 172 with 140D PH); jobs precedence CLI --jobs > config default_jobs > module default.  
