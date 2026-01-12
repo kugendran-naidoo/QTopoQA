@@ -1,6 +1,7 @@
 from .persistence_basic_v1 import PersistenceTopologyModule
 from .persistence_laplacian_hybrid_v1 import PersistenceLaplacianHybridModule
 from .persistence_null_v1 import PersistenceNullTopologyModule
+from .persistence_permutation_null_v2 import PersistencePermutationNullTopologyModule
 from .persistence_k_partite_advanced_v1 import PersistenceKPartiteAdvancedModule
 from .persistence_k_partite_advanced_v2 import PersistenceKPartiteAdvancedV2Module
 from .persistence_k_partite_advanced_laplacian_only_v2 import (

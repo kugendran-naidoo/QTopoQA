@@ -189,6 +189,30 @@ This is the graph a Laplacian-only or Laplacian-augmented topology module operat
 #     constant_value: 0.0
 #     jobs: 16
 
+# Permutation-null topology (recommended ablation; preserves distributions)
+# topology:
+#   module: topology/persistence_permutation_null/v2
+#   alias: "Permutation null topology (per-row, per-protein) = 140D ablation"
+#   summary: "Topology ablation: permuted PH features with preserved distributions."
+#   params:
+#     neighbor_distance: 8.0
+#     filtration_cutoff: 8.0
+#     min_persistence: 0.01
+#     dedup_sort: false
+#     element_filters:
+#       - [C]
+#       - [N]
+#       - [O]
+#       - [C, N]
+#       - [C, O]
+#       - [N, O]
+#       - [C, N, O]
+#     shuffle_scope: per_protein
+#     shuffle_mode: per_row
+#     seed: 1337
+#     allow_seed_override: false
+#     jobs: 16
+
 node:
   module: node/dssp_topo_merge/v1  # alias: TopoQA default
   alias: "TopoQA default"

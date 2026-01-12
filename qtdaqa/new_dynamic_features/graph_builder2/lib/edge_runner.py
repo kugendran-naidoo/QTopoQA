@@ -119,6 +119,35 @@ def _write_topology_columns_file(topology_dir: Path, graph_dir: Path) -> None:
         LOG.warning("Unable to write topology_columns.json: %s", exc)
 
 
+def _resolve_edge_columns(edge_module: EdgeFeatureModule, edge_dim: int) -> List[str]:
+    if edge_dim <= 0:
+        return []
+    module_id = edge_module.metadata().module_id if edge_module is not None else ""
+    if module_id == "edge/legacy_band/v11":
+        columns = ["distance_ca"] + [f"hist_bin_{idx}" for idx in range(10)]
+        if len(columns) == edge_dim:
+            return columns
+    return [f"edge_{idx}" for idx in range(edge_dim)]
+
+
+def _write_edge_columns_file(edge_columns: List[str], graph_dir: Path) -> Optional[Path]:
+    if not edge_columns:
+        return None
+    target = graph_dir / "edge_columns.json"
+    target.write_text(json.dumps(edge_columns, indent=2), encoding="utf-8")
+    LOG.info("Edge columns written to %s", target)
+    return target
+
+
+def _write_node_columns_file(node_columns: List[str], graph_dir: Path) -> Optional[Path]:
+    if not node_columns:
+        return None
+    target = graph_dir / "node_columns.json"
+    target.write_text(json.dumps(node_columns, indent=2), encoding="utf-8")
+    LOG.info("Node columns written to %s", target)
+    return target
+
+
 def _sort_edge_dump(dump_path: Path) -> None:
     if not dump_path.exists():
         return
@@ -387,7 +416,18 @@ def run_edge_stage(
         metadata_records["edge_module"] = edge_module.metadata().module_id
     if edge_dim is not None:
         metadata_records["edge_feature_dim"] = edge_dim
-        metadata_records["_edge_schema"] = {"dim": edge_dim, "module": metadata_records.get("edge_module")}
+        edge_columns = _resolve_edge_columns(edge_module, edge_dim)
+        metadata_records["_edge_schema"] = {
+            "dim": edge_dim,
+            "module": metadata_records.get("edge_module"),
+            "columns": edge_columns,
+        }
+        _write_edge_columns_file(edge_columns, output_dir)
+    node_schema = metadata_records.get("_node_schema")
+    if isinstance(node_schema, dict):
+        node_columns = node_schema.get("columns")
+        if isinstance(node_columns, list):
+            _write_node_columns_file(node_columns, output_dir)
     if module_registry:
         metadata_records["_module_registry"] = module_registry
     metadata_path.write_text(json.dumps(metadata_records, indent=2, sort_keys=True), encoding="utf-8")

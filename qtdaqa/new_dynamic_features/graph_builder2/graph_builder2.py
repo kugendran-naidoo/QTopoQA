@@ -44,6 +44,13 @@ except ImportError:  # pragma: no cover - fallback for direct execution
     from lib.pdb_utils import configure_pdb_parser  # type: ignore
     from builder_info import build_builder_info
 
+try:  # Optional dependency for post-graph validation/manifest writing.
+    from qtdaqa.new_dynamic_features.model_training2.tools.new_validate_graphs import (
+        validate as validate_graphs,
+    )
+except Exception:  # pragma: no cover - allow running without model_training2 tools
+    validate_graphs = None
+
 if TYPE_CHECKING:  # pragma: no cover
     from .modules.base import (
         EdgeFeatureModule,
@@ -141,6 +148,7 @@ def _write_text_summary(
     topology_result: Dict[str, object],
     node_result: Dict[str, object],
     edge_result: Dict[str, object],
+    summary: Optional[Dict[str, object]] = None,
 ) -> None:
     lines: List[str] = []
     lines.append("=== Graph Builder Summary ===")
@@ -229,7 +237,70 @@ def _write_text_summary(
         for model_key, error, log_path in edge_result["failures"]:
             lines.append(f"    - {model_key}: {error} (log: {log_path})")
 
+    if summary:
+        dims = summary.get("feature_dims") if isinstance(summary, dict) else None
+        if isinstance(dims, dict):
+            _stage_header("Feature Dimensions")
+            for key in ("topology_feature_dim", "node_feature_dim", "edge_feature_dim"):
+                if key in dims:
+                    lines.append(f"  {key}: {dims.get(key)}")
+        meta_map = summary.get("metadata_map") if isinstance(summary, dict) else None
+        if isinstance(meta_map, dict):
+            _stage_header("Metadata Map")
+            for name, info in meta_map.items():
+                description = ""
+                path_value = ""
+                if isinstance(info, dict):
+                    description = info.get("description", "")
+                    path_value = info.get("path", "")
+                lines.append(f"  {name}: {description}")
+                if path_value:
+                    lines.append(f"    path: {path_value}")
+
     summary_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _run_graph_validation(
+    graph_dir: Path,
+    *,
+    manifest_path: Optional[Path] = None,
+    workers: int = 0,
+    progress_interval: float = 15.0,
+    ignore_metadata: bool = False,
+) -> Dict[str, object]:
+    if validate_graphs is None:
+        raise RuntimeError("new_validate_graphs is unavailable; cannot run graph validation.")
+    manifest = manifest_path or (graph_dir / "graph_manifest.json")
+    exit_code = validate_graphs(
+        graph_dir,
+        manifest,
+        True,
+        None,
+        ignore_metadata,
+        workers=workers,
+        progress_interval=progress_interval,
+    )
+    return {"manifest": str(manifest), "exit_code": exit_code}
+
+
+def _maybe_run_graph_validation(
+    *,
+    enabled: bool,
+    graph_dir: Path,
+    workers: int,
+    progress_interval: float,
+    ignore_metadata: bool = False,
+) -> Dict[str, object]:
+    if not enabled:
+        return {"enabled": False, "exit_code": None}
+    payload = _run_graph_validation(
+        graph_dir,
+        workers=workers,
+        progress_interval=progress_interval,
+        ignore_metadata=ignore_metadata,
+    )
+    payload["enabled"] = True
+    return payload
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -304,6 +375,25 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Emit Bio.PDB structure parsing warnings instead of suppressing them.",
     )
+    parser.add_argument(
+        "--no-validate-graphs",
+        dest="validate_graphs",
+        action="store_false",
+        help="Disable post-run graph validation/manifest writing (enabled by default).",
+    )
+    parser.add_argument(
+        "--validate-graphs-workers",
+        type=int,
+        default=0,
+        help="Worker processes for graph validation (0 uses all available CPUs).",
+    )
+    parser.add_argument(
+        "--validate-graphs-progress-interval",
+        type=float,
+        default=15.0,
+        help="Seconds between validation progress logs (0 disables periodic logs).",
+    )
+    parser.set_defaults(validate_graphs=True)
     return parser
 
 
@@ -1143,6 +1233,68 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     summary["edge"]["graph_stage_elapsed"] = graph_stage_elapsed
 
+    validation_failed = False
+    try:
+        validation_summary = _maybe_run_graph_validation(
+            enabled=bool(getattr(args, "validate_graphs", True)),
+            graph_dir=graph_dir,
+            workers=int(getattr(args, "validate_graphs_workers", 0)),
+            progress_interval=float(getattr(args, "validate_graphs_progress_interval", 15.0)),
+        )
+        summary["validation"] = validation_summary
+        if validation_summary.get("enabled") and validation_summary.get("exit_code") not in (0, None):
+            validation_failed = True
+            LOG.error("Graph validation failed (exit_code=%s).", validation_summary.get("exit_code"))
+    except Exception as exc:  # pragma: no cover - safety for validation failures
+        validation_failed = True
+        summary["validation"] = {"enabled": True, "error": str(exc)}
+        LOG.error("Graph validation error: %s", exc)
+
+    feature_dims: Dict[str, object] = {}
+    metadata_map: Dict[str, Dict[str, str]] = {}
+    graph_metadata_path = graph_dir / "graph_metadata.json"
+    if graph_metadata_path.exists():
+        try:
+            graph_metadata = json.loads(graph_metadata_path.read_text(encoding="utf-8"))
+            for key in ("topology_feature_dim", "node_feature_dim", "edge_feature_dim"):
+                if graph_metadata.get(key) is not None:
+                    feature_dims[key] = graph_metadata.get(key)
+        except Exception as exc:
+            LOG.warning("Unable to read graph_metadata.json for feature dims: %s", exc)
+    if "edge_feature_dim" not in feature_dims and edge_result.get("edge_feature_dim") is not None:
+        feature_dims["edge_feature_dim"] = edge_result.get("edge_feature_dim")
+    summary["feature_dims"] = feature_dims
+
+    metadata_map["graph_metadata.json"] = {
+        "description": "Top-level metadata (dims, module registry, schema hints).",
+        "path": str(graph_metadata_path),
+    }
+    metadata_map["topology_columns.json"] = {
+        "description": "Topology column names (ID + feature columns).",
+        "path": str(graph_dir / "topology_columns.json"),
+    }
+    metadata_map["node_columns.json"] = {
+        "description": "Node feature column names (if emitted).",
+        "path": str(graph_dir / "node_columns.json"),
+    }
+    metadata_map["edge_columns.json"] = {
+        "description": "Edge feature column names (if emitted).",
+        "path": str(graph_dir / "edge_columns.json"),
+    }
+    metadata_map["graph_manifest.json"] = {
+        "description": "Validation manifest from new_validate_graphs (if enabled).",
+        "path": str(graph_dir / "graph_manifest.json"),
+    }
+    metadata_map["graph_builder_summary.json"] = {
+        "description": "Run summary metrics (machine-readable).",
+        "path": str(graph_dir / "graph_builder_summary.json"),
+    }
+    metadata_map["graph_builder_summary.log"] = {
+        "description": "Run summary log (human-readable).",
+        "path": str(graph_dir / "graph_builder_summary.log"),
+    }
+    summary["metadata_map"] = metadata_map
+
     summary_log = run_info.run_dir / "graph_builder_summary.json"
     summary_log.write_text(json.dumps(summary, indent=2, sort_keys=True, default=_json_default), encoding="utf-8")
     LOG.info("Summary written to %s", _relative_path(summary_log, run_info.root_dir))
@@ -1166,6 +1318,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         topology_result,
         node_result,
         edge_result,
+        summary,
     )
     LOG.info("Summary log written to %s", _relative_path(text_summary_path, run_info.root_dir))
 
@@ -1183,6 +1336,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if edge_result["success"] == 0:
         LOG.error("No graphs produced. See logs for details.")
+        return 1
+    if validation_failed:
+        LOG.error("Graph validation failed. See logs for details.")
         return 1
 
     LOG.info("Dynamic graph builder completed successfully.")
