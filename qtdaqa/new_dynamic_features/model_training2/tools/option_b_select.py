@@ -7,6 +7,7 @@ Select a checkpoint using Option B:
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -98,13 +99,34 @@ def main() -> int:
         raise SystemExit(f"No runs found under {training_root}")
 
     ranked: List[Tuple[float, Path, Dict[str, object]]] = []
+    missing_shortlist: List[str] = []
+    missing_tuning: List[str] = []
     for run_dir, summary in runs:
         shortlist_value = _extract_metric(summary, args.shortlist_metric)
         if shortlist_value is None:
+            missing_shortlist.append(run_dir.name)
             continue
+        tuning_value = _extract_metric(summary, args.tuning_metric)
+        if tuning_value is None:
+            missing_tuning.append(run_dir.name)
         ranked.append((shortlist_value, run_dir, summary))
     if not ranked:
         raise SystemExit(f"No runs with {args.shortlist_metric} found.")
+
+    if missing_shortlist:
+        print(
+            f"[option_b_select][warning] runs missing {args.shortlist_metric}: {len(missing_shortlist)}",
+            file=sys.stderr,
+        )
+        for run_name in missing_shortlist:
+            print(f"[option_b_select][warning] missing {args.shortlist_metric}: {run_name}", file=sys.stderr)
+    if missing_tuning:
+        print(
+            f"[option_b_select][warning] runs missing {args.tuning_metric}: {len(missing_tuning)}",
+            file=sys.stderr,
+        )
+        for run_name in missing_tuning:
+            print(f"[option_b_select][warning] missing {args.tuning_metric}: {run_name}", file=sys.stderr)
 
     ranked.sort(key=lambda item: item[0], reverse=(_metric_direction(args.shortlist_metric) == "max"))
     top_k = max(1, int(args.top_k))

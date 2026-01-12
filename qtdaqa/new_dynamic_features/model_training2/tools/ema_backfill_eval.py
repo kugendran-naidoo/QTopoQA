@@ -146,6 +146,7 @@ def _record_ema_metrics(
             value = _safe_scalar(metrics.get(key))
             if value is not None:
                 ema_block[key] = value
+                metadata[f"ema_{key}"] = value
 
     update_run_metadata(run_dir, _mutate)
 

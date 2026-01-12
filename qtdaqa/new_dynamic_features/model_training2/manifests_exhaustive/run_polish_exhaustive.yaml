@@ -1,0 +1,103 @@
+shared:
+  notes: "Auto-generated exhaustive polish manifest from best run: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/training_runs2/exhaustive_sched_boost_lr001_lean_seed222_2026-01-10_14-29-01_phase2_seed888 (prefix=exhaustive_)"
+  log_lr: false
+  fast_dev_run: false
+
+jobs:
+  - name: polish_seed101
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 60
+      scheduler.patience: 15
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 1e-3
+      dataloader.seed: 101
+
+  - name: extra_polish_seed101
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 420
+      early_stopping.patience: 80
+      scheduler.patience: 20
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 5e-4
+      dataloader.seed: 101
+  - name: polish_seed222
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 60
+      scheduler.patience: 15
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 1e-3
+      dataloader.seed: 222
+
+  - name: extra_polish_seed222
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 420
+      early_stopping.patience: 80
+      scheduler.patience: 20
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 5e-4
+      dataloader.seed: 222
+  - name: polish_seed555
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 60
+      scheduler.patience: 15
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 1e-3
+      dataloader.seed: 555
+
+  - name: extra_polish_seed555
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 420
+      early_stopping.patience: 80
+      scheduler.patience: 20
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 5e-4
+      dataloader.seed: 555
+  - name: polish_seed777
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 60
+      scheduler.patience: 15
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 1e-3
+      dataloader.seed: 777
+
+  - name: extra_polish_seed777
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 420
+      early_stopping.patience: 80
+      scheduler.patience: 20
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 5e-4
+      dataloader.seed: 777
+  - name: polish_seed888
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 360
+      early_stopping.patience: 60
+      scheduler.patience: 15
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 1e-3
+      dataloader.seed: 888
+
+  - name: extra_polish_seed888
+    config: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/model_training2/configs/sched_boost_finetune_seed888.yaml
+    overrides:
+      trainer.num_epochs: 420
+      early_stopping.patience: 80
+      scheduler.patience: 20
+      scheduler.factor: 0.2
+      optimizer.learning_rate: 5e-4
+      dataloader.seed: 888
+
+continue_on_error: false

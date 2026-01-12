@@ -1,4 +1,4 @@
-export GRAPH_DIR=advanced_lean_10A
+export GRAPH_DIR=lap_lean_10A_ARM
 
 echo "Generating graph-dir manifest for ${GRAPH_DIR} ..."
 

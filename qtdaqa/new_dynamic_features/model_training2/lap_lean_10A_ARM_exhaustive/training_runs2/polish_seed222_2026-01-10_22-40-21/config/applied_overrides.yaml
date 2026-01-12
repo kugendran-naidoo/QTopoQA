@@ -1,0 +1,7 @@
+paths.graph: /Volumes/PData/Data/Dev/Github/Repos/phd3/qtopo/QTopoQA/qtdaqa/new_dynamic_features/graph_builder2/output/lap_lean_10A_ARM/graph_data
+trainer.num_epochs: 360
+early_stopping.patience: 60
+scheduler.patience: 15
+scheduler.factor: 0.2
+optimizer.learning_rate: 1e-3
+dataloader.seed: 222

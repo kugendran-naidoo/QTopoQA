@@ -91,6 +91,13 @@ except ImportError:  # pragma: no cover
     GraphTensorCache = None  # type: ignore
 from common.metadata_artifacts import write_feature_metadata_artifacts  # type: ignore  # noqa: E402
 try:
+    from common.feature_mask import load_feature_mask, summarise_feature_mask  # type: ignore  # noqa: E402
+except Exception:  # pragma: no cover - fallback for ad-hoc runs
+    from qtdaqa.new_dynamic_features.model_training2.common.feature_mask import (  # type: ignore  # noqa: E402
+        load_feature_mask,
+        summarise_feature_mask,
+    )
+try:
     from builder_metadata import load_builder_info_from_metadata, log_builder_provenance  # type: ignore  # noqa: E402
 except ImportError:  # pragma: no cover
     from qtdaqa.new_dynamic_features.model_training2.builder_metadata import (  # type: ignore  # noqa: E402
@@ -173,6 +180,11 @@ class TrainingConfig:
     enable_graph_cache: bool = True
     graph_cache_size: int = 256
     canonicalize_on_load: bool = False
+    feature_mask_path: Optional[Path] = None
+    feature_mask_apply_to: str = "node"
+    feature_mask_strict: bool = True
+    feature_lottery_save_init_state: bool = False
+    feature_lottery_init_state_path: Optional[Path] = None
     mlflow: MlflowConfig = dataclasses.field(default_factory=MlflowConfig)
     edge_schema: dict = dataclasses.field(default_factory=dict)
     topology_schema: dict = dataclasses.field(default_factory=dict)
@@ -335,6 +347,30 @@ def load_config(path: Path) -> TrainingConfig:
         graph_load_top_k = max(1, graph_load_top_k)
         graph_load_profiling = bool(profiling_cfg.get("graph_load", False))
         canonicalize_on_load = bool(_get("canonicalize_on_load", False))
+        feature_mask_cfg = _get("feature_mask", {})
+        if not isinstance(feature_mask_cfg, dict):
+            feature_mask_cfg = {}
+        feature_mask_path_raw = feature_mask_cfg.get("path")
+        feature_mask_path = (
+            _resolve_path(feature_mask_path_raw, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+            if feature_mask_path_raw
+            else None
+        )
+        feature_mask_apply_to = str(feature_mask_cfg.get("apply_to", "node")).strip().lower()
+        if feature_mask_apply_to not in {"node", "edge"}:
+            raise ValueError(f"feature_mask.apply_to must be 'node' or 'edge' (got {feature_mask_apply_to})")
+        feature_mask_strict_raw = feature_mask_cfg.get("strict")
+        feature_mask_strict = True if feature_mask_strict_raw is None else bool(feature_mask_strict_raw)
+        feature_lottery_cfg = _get("feature_lottery", {})
+        if not isinstance(feature_lottery_cfg, dict):
+            feature_lottery_cfg = {}
+        feature_lottery_save_init_state = bool(feature_lottery_cfg.get("save_init_state", False))
+        init_state_raw = feature_lottery_cfg.get("init_state_path")
+        feature_lottery_init_state_path = (
+            _resolve_path(init_state_raw, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+            if init_state_raw
+            else None
+        )
         tuning_cfg = _get("tuning", {})
         if not isinstance(tuning_cfg, dict):
             tuning_cfg = {}
@@ -429,6 +465,11 @@ def load_config(path: Path) -> TrainingConfig:
             coverage_fail_on_missing=coverage_fail_on_missing,
             graph_load_profiling=graph_load_profiling,
             graph_load_top_k=graph_load_top_k,
+            feature_mask_path=feature_mask_path,
+            feature_mask_apply_to=feature_mask_apply_to,
+            feature_mask_strict=feature_mask_strict,
+            feature_lottery_save_init_state=feature_lottery_save_init_state,
+            feature_lottery_init_state_path=feature_lottery_init_state_path,
             mlflow=MlflowConfig(),
             edge_schema=dict(_get("edge_schema", {})),
             topology_schema=dict(_get("topology_schema", {})),
@@ -493,6 +534,26 @@ def load_config(path: Path) -> TrainingConfig:
     num_workers = int(dataloader_cfg.get("num_workers", 0))
     seed = int(dataloader_cfg.get("seed", 222))
     canonicalize_on_load = bool(dataloader_cfg.get("canonicalize_on_load", False))
+    feature_mask_cfg = _section("feature_mask")
+    feature_mask_path_raw = feature_mask_cfg.get("path")
+    feature_mask_path = (
+        _resolve_path(feature_mask_path_raw, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+        if feature_mask_path_raw
+        else None
+    )
+    feature_mask_apply_to = str(feature_mask_cfg.get("apply_to", "node")).strip().lower()
+    if feature_mask_apply_to not in {"node", "edge"}:
+        raise ValueError(f"feature_mask.apply_to must be 'node' or 'edge' (got {feature_mask_apply_to})")
+    feature_mask_strict_raw = feature_mask_cfg.get("strict")
+    feature_mask_strict = True if feature_mask_strict_raw is None else bool(feature_mask_strict_raw)
+    feature_lottery_cfg = _section("feature_lottery")
+    feature_lottery_save_init_state = bool(feature_lottery_cfg.get("save_init_state", False))
+    init_state_raw = feature_lottery_cfg.get("init_state_path")
+    feature_lottery_init_state_path = (
+        _resolve_path(init_state_raw, base_dir, fallbacks=(SCRIPT_DIR,), allow_missing=True)
+        if init_state_raw
+        else None
+    )
 
     trainer_cfg = _section("trainer")
     accelerator = str(trainer_cfg.get("accelerator", "cpu"))
@@ -666,6 +727,11 @@ def load_config(path: Path) -> TrainingConfig:
         graph_load_top_k=graph_load_top_k,
         enable_graph_cache=enable_graph_cache,
         graph_cache_size=graph_cache_size,
+        feature_mask_path=feature_mask_path,
+        feature_mask_apply_to=feature_mask_apply_to,
+        feature_mask_strict=feature_mask_strict,
+        feature_lottery_save_init_state=feature_lottery_save_init_state,
+        feature_lottery_init_state_path=feature_lottery_init_state_path,
         mlflow=mlflow_config,
         edge_schema=dict(data.get("edge_schema", {})),
         topology_schema=dict(data.get("topology_schema", {})),
@@ -805,11 +871,17 @@ class GraphRegressionDataset(Dataset):
         profiler: Optional[GraphLoadProfiler] = None,
         cache: Optional[GraphTensorCache] = None,
         canonicalize_on_load: bool = False,
+        feature_mask: Optional[torch.Tensor] = None,
+        feature_mask_apply_to: str = "node",
+        feature_mask_strict: bool = True,
     ):
         self.samples = list(samples)
         self.profiler = profiler
         self.cache = cache
         self.canonicalize_on_load = canonicalize_on_load
+        self.feature_mask = feature_mask
+        self.feature_mask_apply_to = feature_mask_apply_to
+        self.feature_mask_strict = feature_mask_strict
 
     def __len__(self) -> int:
         return len(self.samples)
@@ -830,6 +902,39 @@ class GraphRegressionDataset(Dataset):
 
         if self.canonicalize_on_load:
             data = canonicalize_graph(data)
+
+        if self.feature_mask is not None:
+            data = data.clone()
+            mask = self.feature_mask
+            target = self.feature_mask_apply_to
+            if target == "edge":
+                attr = getattr(data, "edge_attr", None)
+                if torch.is_tensor(attr):
+                    if attr.dim() == 1:
+                        attr = attr.view(-1, 1)
+                    if attr.size(-1) != mask.numel():
+                        if self.feature_mask_strict:
+                            raise ValueError(
+                                f"Edge feature mask length {mask.numel()} does not match edge_attr dim {attr.size(-1)}"
+                            )
+                    else:
+                        data.edge_attr = attr * mask.to(attr.device).view(1, -1)
+                elif self.feature_mask_strict:
+                    raise ValueError("Feature mask apply_to=edge but edge_attr is missing.")
+            else:
+                x = getattr(data, "x", None)
+                if torch.is_tensor(x):
+                    if x.dim() == 1:
+                        x = x.view(-1, 1)
+                    if x.size(-1) != mask.numel():
+                        if self.feature_mask_strict:
+                            raise ValueError(
+                                f"Node feature mask length {mask.numel()} does not match node dim {x.size(-1)}"
+                            )
+                    else:
+                        data.x = x * mask.to(x.device).view(1, -1)
+                elif self.feature_mask_strict:
+                    raise ValueError("Feature mask apply_to=node but node features are missing.")
 
         if self.profiler and self.profiler.enabled and start is not None:
             duration = time.perf_counter() - start
@@ -1979,6 +2084,30 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
     )
     _merge_defaults_into_edge_schema(feature_metadata)
 
+    feature_mask = None
+    if cfg.feature_mask_path:
+        mask_array = load_feature_mask(cfg.feature_mask_path)
+        feature_mask = torch.tensor(mask_array, dtype=torch.float32)
+        node_dim_val = feature_metadata.node_schema.get("dim")
+        if node_dim_val is not None:
+            expected = int(node_dim_val)
+            if feature_mask.numel() != expected:
+                message = (
+                    f"Feature mask length {feature_mask.numel()} does not match node_dim {expected} "
+                    f"(mask={cfg.feature_mask_path})"
+                )
+                if cfg.feature_mask_strict:
+                    raise ValueError(message)
+                logger.warning(message)
+        summary = summarise_feature_mask(mask_array)
+        logger.info(
+            "Feature mask loaded (%s): kept=%d/%d (%.1f%%)",
+            cfg.feature_mask_path,
+            summary["kept"],
+            summary["length"],
+            summary["kept_fraction"] * 100.0,
+        )
+
     def _load_feature_config_payload() -> Tuple[Optional[Dict[str, object]], Optional[Dict[str, object]]]:
         fc_snapshot = None
         fc_payload = None
@@ -2148,12 +2277,18 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
         profiler=load_profiler if load_profiler.enabled else None,
         cache=cache_instance,
         canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
+        feature_mask=feature_mask,
+        feature_mask_apply_to=cfg.feature_mask_apply_to,
+        feature_mask_strict=cfg.feature_mask_strict,
     )
     val_dataset = GraphRegressionDataset(
         val_samples,
         profiler=load_profiler if load_profiler.enabled else None,
         cache=cache_instance,
         canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
+        feature_mask=feature_mask,
+        feature_mask_apply_to=cfg.feature_mask_apply_to,
+        feature_mask_strict=cfg.feature_mask_strict,
     )
     tuning_dataset = (
         GraphRegressionDataset(
@@ -2161,6 +2296,9 @@ def build_dataloaders(cfg: TrainingConfig, logger: logging.Logger):
             profiler=load_profiler if load_profiler.enabled else None,
             cache=cache_instance,
             canonicalize_on_load=cfg.canonicalize_on_load or bool(os.environ.get("CANONICALIZE_GRAPHS_ON_LOAD")),
+            feature_mask=feature_mask,
+            feature_mask_apply_to=cfg.feature_mask_apply_to,
+            feature_mask_strict=cfg.feature_mask_strict,
         )
         if tuning_samples
         else None
@@ -2308,6 +2446,20 @@ def main() -> int:
         tuning_enabled=bool(cfg.tuning_label_file),
         tuning_eval_every=cfg.tuning_eval_every,
     )
+    if cfg.feature_mask_path or cfg.feature_lottery_save_init_state or cfg.feature_lottery_init_state_path:
+        def _record_feature_controls(metadata: Dict[str, object]) -> None:
+            if cfg.feature_mask_path:
+                metadata["feature_mask"] = {
+                    "path": str(cfg.feature_mask_path),
+                    "apply_to": cfg.feature_mask_apply_to,
+                    "strict": bool(cfg.feature_mask_strict),
+                }
+            if cfg.feature_lottery_save_init_state or cfg.feature_lottery_init_state_path:
+                metadata["feature_lottery"] = {
+                    "save_init_state": bool(cfg.feature_lottery_save_init_state),
+                    "init_state_path": str(cfg.feature_lottery_init_state_path) if cfg.feature_lottery_init_state_path else None,
+                }
+        update_run_metadata(cfg.save_dir, _record_feature_controls)
 
     if args.trial_label:
         logger.info("trial = %s", args.trial_label)
@@ -2500,6 +2652,27 @@ def main() -> int:
 
     checkpoint_dir = cfg.save_dir / "model_checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
+
+    if cfg.feature_lottery_init_state_path:
+        init_path = cfg.feature_lottery_init_state_path
+        if not init_path.exists():
+            raise FileNotFoundError(f"feature_lottery.init_state_path not found: {init_path}")
+        payload = torch.load(init_path, map_location="cpu")
+        state_dict = payload.get("state_dict") if isinstance(payload, dict) else None
+        if isinstance(state_dict, dict):
+            payload = state_dict
+        missing, unexpected = model.load_state_dict(payload, strict=False)
+        if missing:
+            logger.warning("Init state missing %d keys (first: %s)", len(missing), missing[:3])
+        if unexpected:
+            logger.warning("Init state had %d unexpected keys (first: %s)", len(unexpected), unexpected[:3])
+        logger.info("Loaded feature_lottery.init_state_path: %s", init_path)
+
+    if cfg.feature_lottery_save_init_state:
+        init_state_path = checkpoint_dir / "init_state.pt"
+        if not init_state_path.exists():
+            torch.save(model.state_dict(), init_state_path)
+            logger.info("Saved init state for feature lottery: %s", init_state_path)
     resume_ckpt_path = validate_resume_checkpoint(
         cfg.save_dir,
         checkpoint_dir,
@@ -2867,6 +3040,7 @@ def main() -> int:
                     value = _safe_scalar(ema_metrics.get(key))
                     if value is not None:
                         ema_block[key] = value
+                        metadata[f"ema_{key}"] = value
 
         try:
             update_run_metadata(cfg.save_dir, _update_ema_metadata)

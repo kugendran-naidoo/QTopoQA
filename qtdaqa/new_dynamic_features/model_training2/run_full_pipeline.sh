@@ -430,4 +430,18 @@ PY
 done
 
 ISO_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date '+%Y-%m-%dT%H:%M:%SZ')"
+EMA_BACKFILL="${EMA_BACKFILL:-1}"
+EMA_BACKFILL_FORCE="${EMA_BACKFILL_FORCE:-0}"
+if [[ "${EMA_BACKFILL}" != "0" ]]; then
+  echo "[run_full_pipeline] Backfilling EMA metrics (if missing)..."
+  EMA_CMD=(python -m qtdaqa.new_dynamic_features.model_training2.tools.ema_backfill_eval --training-root "${RUN_ROOT}")
+  if [[ "${EMA_BACKFILL_FORCE}" != "0" ]]; then
+    EMA_CMD+=(--force)
+  fi
+  if ! "${EMA_CMD[@]}"; then
+    echo "[run_full_pipeline][warning] EMA backfill failed; continuing." >&2
+  fi
+else
+  echo "[run_full_pipeline] EMA backfill skipped (EMA_BACKFILL=0)."
+fi
 echo "[run_full_pipeline] Pipeline complete at ${ISO_TS}"

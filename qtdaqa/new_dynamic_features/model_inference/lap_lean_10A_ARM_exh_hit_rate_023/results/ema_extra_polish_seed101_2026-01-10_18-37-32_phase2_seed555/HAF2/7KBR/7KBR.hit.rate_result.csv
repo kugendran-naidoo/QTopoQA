@@ -1,0 +1,18 @@
+Acceptable-or-better (a): count DockQ ≥ 0.23
+Medium-or-better (b): count DockQ ≥ 0.49
+High (c): count DockQ ≥ 0.80
+
+hit rate = a/b/c 
+
+7KBR hit rate =  10/10/10
+
+7KBR,ori_temp_pipeline_with_alphafold_models_0,0.77996206,0.918
+7KBR,structure_temp_dimer_a_0,0.77993315,0.918
+7KBR,sequence_based_template_with_alphafold_0,0.779881,0.918
+7KBR,custom_template_with_alphafold_models_0,0.77974695,0.918
+7KBR,ori_temp_pipeline_with_alphafold_models_3,0.77958721,0.866
+7KBR,custom_template_with_alphafold_models_3,0.77957636,0.867
+7KBR,sequence_based_template_with_alphafold_3,0.77957064,0.866
+7KBR,structure_temp_dimer_a_3,0.77910441,0.866
+7KBR,no_templates_1,0.77759039,0.854
+7KBR,no_templates_0,0.77735394,0.84
